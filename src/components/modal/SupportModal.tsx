@@ -1,0 +1,64 @@
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import { MessageCircleMore } from 'lucide-react'
+
+export default function SupportModal() {
+  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUM
+  const whatsappMessage = 'Hello, I need support with Ride Rent.'
+
+  const whatsappLink = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(
+    whatsappMessage
+  )}`
+
+  return (
+    <Dialog>
+      <DialogTrigger>
+        <div className="px-3 py-1 text-white transition-colors bg-black shadow-lg hover:text-yellow rounded-2xl flex-center gap-x-2">
+          Need help? <MessageCircleMore size={20} />
+        </div>
+      </DialogTrigger>
+      <DialogContent className=" w-fit max-sm:w-[95%] mx-auto !rounded-3xl">
+        <DialogHeader>
+          <DialogTitle className="text-xl font-bold text-center">
+            Need Help ?
+          </DialogTitle>
+          <DialogDescription aria-label="Delete selected item" />
+          <div className="max-w-md p-2 text-center bg-white rounded-lg ">
+            <p className="mb-2 text-gray-700 ">
+              Feel free to contact us! We are always happy to help you.
+            </p>
+            <ul className="mb-6 text-left text-gray-600 list-disc list-inside">
+              <li>Need help with vehicle registration?</li>
+              <li>Having trouble managing your listings?</li>
+              <li>Company details need updating?</li>
+              <li>Issues with uploading vehicle photos?</li>
+              <li>Want to know more about your subscription plan?</li>
+              <li>Have questions about your account settings?</li>
+            </ul>
+            <p className="mb-6 text-sm text-gray-600">
+              Click the button below to chat with us via WhatsApp
+            </p>
+            <a
+              href={whatsappLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-5 py-3 font-semibold text-white transition-transform bg-green-500 shadow-lg rounded-2xl hover:bg-green-600 hover:scale-105"
+            >
+              <MessageCircleMore size={20} className="mr-2" />
+              WhatsApp us
+            </a>
+            <p className="mt-4 text-xs text-gray-500">
+              Support available Monday to Friday, 9am - 9pm.
+            </p>
+          </div>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
+  )
+}

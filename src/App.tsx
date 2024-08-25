@@ -1,0 +1,142 @@
+import { lazy, Suspense } from 'react'
+import { createBrowserRouter, Outlet, RouterProvider } from 'react-router-dom'
+import {
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from '@tanstack/react-query'
+import axios from 'axios'
+import Layout from './layout/Layout'
+import ErrorPage from './pages/ErrorPage'
+import { AgentProvider } from './context/AgentContext'
+import { toast } from './components/ui/use-toast'
+import ProtectedRoute from './layout/ProtectedRoutes'
+import LazyLoader from './components/loading-skelton/LazyLoader'
+
+// dynamic import
+const RegistrationPage = lazy(() => import('./pages/register/RegistrationPage'))
+const CompanyRegistration = lazy(
+  () => import('./pages/register/CompanyRegistration')
+)
+const RegistrationComplete = lazy(
+  () => import('./pages/register/RegistrationComplete')
+)
+const OTPPage = lazy(() => import('./pages/register/OTPPage'))
+const LoginPage = lazy(() => import('./pages/login/LoginPage'))
+const ResetPassword = lazy(() => import('./pages/general/ResetPassword'))
+const ResetPasswordOtpPage = lazy(
+  () => import('./pages/general/ResetPasswordOtpPage')
+)
+const ConfirmNewPassword = lazy(
+  () => import('./pages/general/ConfirmNewPassword')
+)
+
+// vehicle  pages
+const VehiclesFormAddPage = lazy(
+  () => import('./pages/vehicles/VehiclesFormAddPage')
+)
+
+const VehiclesFormUpdatePage = lazy(
+  () => import('./pages/vehicles/VehiclesFormUpdatePage')
+)
+
+// general pages
+const Dashboard = lazy(() => import('./pages/dashboard/Dashboard'))
+const ListingsPage = lazy(() => import('./pages/listings/ListingsPage'))
+const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
+const HelpPage = lazy(() => import('./pages/general/HelpPage'))
+
+axios.defaults.baseURL = import.meta.env.VITE_API_URL
+
+const router = createBrowserRouter([
+  {
+    element: (
+      <Suspense fallback={<LazyLoader />}>
+        <Outlet />
+      </Suspense>
+    ),
+    errorElement: <ErrorPage />,
+    children: [
+      {
+        path: '/register',
+        element: <RegistrationPage />,
+      },
+      {
+        path: '/verify-otp',
+        element: <OTPPage />,
+      },
+      {
+        path: '/register/company-details',
+        element: <CompanyRegistration />,
+      },
+      {
+        path: '/register/complete',
+        element: <RegistrationComplete />,
+      },
+
+      {
+        path: '/login',
+        element: <LoginPage />,
+      },
+      {
+        path: '/reset-password',
+        element: <ResetPassword />,
+      },
+      {
+        path: '/reset-password/verify-otp',
+        element: <ResetPasswordOtpPage />,
+      },
+      {
+        path: '/confirm-new-password',
+        element: <ConfirmNewPassword />,
+      },
+      {
+        path: '/help',
+        element: <HelpPage />,
+      },
+      {
+        element: <Layout />,
+        children: [
+          {
+            element: <ProtectedRoute />,
+            children: [
+              { path: '/', element: <Dashboard /> },
+              { path: '/listings', element: <ListingsPage /> },
+              { path: '/profile', element: <ProfilePage /> },
+              {
+                path: '/listings/add',
+                element: <VehiclesFormAddPage />,
+              },
+              {
+                path: '/listings/view/:vehicleId',
+                element: <VehiclesFormUpdatePage />,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+])
+
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error) => {
+      toast({
+        variant: 'destructive',
+        title: 'Something went wrong',
+        description: `${error.message}`,
+      })
+    },
+  }),
+})
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AgentProvider>
+        <RouterProvider router={router} />
+      </AgentProvider>
+    </QueryClientProvider>
+  )
+}
