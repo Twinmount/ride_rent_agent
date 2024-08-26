@@ -489,6 +489,7 @@ export type SingleVehicleType = {
   specs: Record<string, SpecificationType>
   updatedAt: string
   createdAt: string
+  thumbnail: string
 }
 
 // get all vehicles api response

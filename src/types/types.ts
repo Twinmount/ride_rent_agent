@@ -58,3 +58,13 @@ export type SpecificationFormData = {
 }
 
 export type TabsTypes = 'primary' | 'specifications' | 'features'
+
+export interface ApiError {
+  response?: {
+    data?: {
+      error?: {
+        message?: string
+      }
+    }
+  }
+}

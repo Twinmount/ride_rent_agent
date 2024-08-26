@@ -6,15 +6,9 @@ import { load, StorageKeys } from '@/utils/storage'
 import { jwtDecode } from 'jwt-decode'
 import { DecodedRefreshToken } from '@/layout/ProtectedRoutes'
 import { fetchAllVehicles } from '@/api/vehicle'
-import { getApprovalStatusDescription } from '@/helpers'
-import ApprovalStatusDropdown from '@/components/ApprovalStatusDropdown'
-
-type ApprovalStatusType = 'APPROVED' | 'UNDER_REVIEW' | 'REJECTED' | 'PENDING'
 
 export default function ListingsPage() {
   const [page, setPage] = useState(1)
-  const [approvalStatus, setApprovalStatus] =
-    useState<ApprovalStatusType>('APPROVED')
 
   let limit: 10 | 15 | 20 | 30 | 50 = 10
   let sortOrder: 'ASC' | 'DESC' = 'ASC'
@@ -27,16 +21,15 @@ export default function ListingsPage() {
   const { userId } = decodedRefreshToken
 
   const { data, isLoading } = useQuery({
-    queryKey: ['vehicles', page, limit, sortOrder, approvalStatus],
+    queryKey: ['vehicles', page, limit, sortOrder],
     queryFn: () =>
       fetchAllVehicles({
         page,
         limit,
         sortOrder,
         userId,
-        isModified: false,
-        approvalStatus,
       }),
+    refetchOnWindowFocus: 'always',
   })
 
   return (
@@ -44,18 +37,15 @@ export default function ListingsPage() {
       <div className="flex mb-5 max-md:flex-col flex-between">
         <div className="flex flex-col items-start justify-center">
           <h2 className="text-3xl font-bold ">Your Listed Vehicles</h2>
-          <div className="px-1 mb-4 text-sm text-gray-500 text-start md:pr-10">
-            {getApprovalStatusDescription(approvalStatus)}
-          </div>
         </div>
 
         {/* Approval Status Dropdown */}
-        <div className="flex justify-center mb-4 mr-5 max-md:justify-end max-md:ml-auto">
+        {/* <div className="flex justify-center mb-4 mr-5 max-md:justify-end max-md:ml-auto">
           <ApprovalStatusDropdown
             approvalStatus={approvalStatus}
             onStatusChange={setApprovalStatus}
           />
-        </div>
+        </div> */}
       </div>
 
       {/* Descriptive Message */}

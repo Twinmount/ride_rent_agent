@@ -13,24 +13,6 @@ export default function ApprovalStatusPage({
   return (
     <div className="flex justify-center min-h-screen bg-gray-100">
       <div className="max-w-md p-6 text-center bg-white rounded-lg shadow-lg mt-44 h-fit">
-        {status === 'PENDING' && (
-          <>
-            <h1 className="mb-4 text-2xl font-semibold text-yellow-600">
-              Registration Completed!
-            </h1>
-            <p className="text-lg text-gray-700">
-              Your company registration is completed and is currently waiting
-              for approval from the admin. You will be notified via{' '}
-              <span className="font-semibold text-green-500">WhatsApp</span>{' '}
-              once the approval process is complete.
-            </p>
-            <div className="mt-6">
-              <span className="inline-block px-4 py-2 text-white bg-yellow-500 rounded-full">
-                Pending Approval
-              </span>
-            </div>
-          </>
-        )}
         {status === 'REJECTED' && (
           <>
             <h1 className="mb-4 text-2xl font-semibold text-red-600">

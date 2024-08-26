@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { CompanyFormDefaultValues } from '@/constants'
 import { CompanyFormSchema } from '@/lib/validator'
-import { CompanyFormType } from '@/types/types'
+import { ApiError, CompanyFormType } from '@/types/types'
 import { ShieldCheck } from 'lucide-react'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -116,7 +116,16 @@ export default function CompanyRegistrationForm({
       setIsEmailSent(true)
       setIsTimerActive(true)
 
-      sendOtpMutation.mutateAsync({ email }).catch(() => {
+      sendOtpMutation.mutateAsync({ email }).catch((error) => {
+        const apiError = error as ApiError
+
+        if (apiError.response?.data?.error?.message) {
+          toast({
+            variant: 'destructive',
+            title: 'Email failed',
+            description: apiError.response?.data?.error?.message,
+          })
+        }
         setIsEmailSent(false)
         setIsTimerActive(false)
         setTimer(60)

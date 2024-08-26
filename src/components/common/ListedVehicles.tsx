@@ -60,14 +60,12 @@ export default function ListedVehicles({
         description: `${vehicle.vehicleModel} is ${
           !isEnabled ? 'enabled' : 'disabled'
         }`,
-        className: `text-white font-semibold text-lg ${
-          !isEnabled ? 'bg-yellow' : 'bg-red-500'
-        }`,
+        className: `text-white font-semibold text-lg bg-yellow
+       `,
       })
       // Invalidate the query to refresh the vehicles list
       queryClient.invalidateQueries({
         queryKey: ['vehicles'],
-        exact: true,
       })
     } catch (error) {
       toast({
@@ -92,7 +90,7 @@ export default function ListedVehicles({
           {vehicles.map((vehicle) => (
             <div
               key={vehicle.vehicleId}
-              className="overflow-hidden transition-all border rounded-lg shadow-lg group"
+              className="h-full overflow-hidden transition-all border rounded-lg shadow-lg max-h-72 group"
             >
               <div className="w-full h-[70%] min-h-[170px] max-h-[70%] overflow-hidden relative">
                 <Link
@@ -100,10 +98,7 @@ export default function ListedVehicles({
                   className="w-full cursor-pointer"
                 >
                   <img
-                    src={
-                      'https://storage.googleapis.com/ride-rent/' +
-                      vehicle.vehiclePhotos
-                    }
+                    src={vehicle.thumbnail}
                     alt={vehicle.vehicleModel}
                     className="object-cover w-full h-full transition-all scale-100 group-hover:scale-110"
                   />
@@ -139,7 +134,7 @@ export default function ListedVehicles({
                     disabled={
                       vehicle.approvalStatus !== 'APPROVED' ||
                       isUpdating ||
-                      vehicle.disabledBy === 'admin'
+                      (vehicle.disabledBy === 'admin' && vehicle.isDisabled)
                     }
                   />
                 </div>

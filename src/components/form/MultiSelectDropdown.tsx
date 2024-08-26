@@ -25,16 +25,17 @@ const MultiSelectDropdown = ({
   uniqueValue,
 }: MultiSelectDropdownProps) => {
   useEffect(() => {
-    // On component mount, initialize the values only once
-    if (value.length === 0) {
-      const preSelectedValues = options
-        .filter((option) => option.selected)
-        .map((option) => option.name)
+    const timer = setTimeout(() => {
+      if (value.length === 0) {
+        const preSelectedValues = options
+          .filter((option) => option.selected)
+          .map((option) => option.name)
 
-      onChangeHandler(preSelectedValues)
-    }
-  }, []) // Empty dependency array to run only on mount
-
+        onChangeHandler(preSelectedValues)
+      }
+    }, 1000)
+    return () => clearTimeout(timer)
+  }, [])
   const handleCheckboxChange = (checkedValue: string, isChecked: boolean) => {
     const newValue = isChecked
       ? [...value, checkedValue]

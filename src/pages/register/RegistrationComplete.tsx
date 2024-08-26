@@ -133,9 +133,10 @@ export default function RegistrationComplete() {
 
       {/* Information about registration and approval */}
       <div className="mt-8 text-center">
-        <p className="text-lg text-gray-700">
+        <p className="text-lg text-gray-700 md:px-10">
           Your company registration is completed and is currently waiting for
-          approval from the admin. You will be notified via{' '}
+          approval from the admin.
+          <br /> You will be notified via{' '}
           <span className="font-semibold text-green-500">WhatsApp</span> once
           the approval process is complete.
         </p>
