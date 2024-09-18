@@ -104,6 +104,7 @@ const OTPPage = () => {
         save(StorageKeys.REFRESH_TOKEN, data.result.refreshToken)
         toast({
           title: 'Your account is created successfully!. Now you can login',
+          className: 'bg-yellow text-white',
         })
         navigate('/login', { replace: true })
       }

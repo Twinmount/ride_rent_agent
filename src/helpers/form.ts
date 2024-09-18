@@ -212,6 +212,9 @@ export function mapGetPrimaryFormToPrimaryFormType(
     commercialLicenses: data.commercialLicenses,
     commercialLicenseExpireDate: new Date(data.commercialLicenseExpireDate), // Convert string to Date
     isLease: data.isLease,
+    isCryptoAccepted: data.isCryptoAccepted,
+    isSpotDeliverySupported: data.isSpotDeliverySupported,
+    description: data.description,
     specification: data.specification as 'UAE_SPEC' | 'USA_SPEC' | 'OTHERS',
     rentalDetails: data.rentalDetails,
     phoneNumber: formattedPhoneNumber, // Set the combined phone number
@@ -283,4 +286,13 @@ export const validateTabAccess = ({
   }
 
   return { canAccess: true, message: '' } // Default case
+}
+
+// Type guard to check if a value has the 'selected' property for specification form
+export function hasSelected(
+  value:
+    | { name: string; label: string; _id?: string }
+    | { name: string; label: string; selected: boolean }
+): value is { name: string; label: string; selected: boolean } {
+  return (value as { selected: boolean }).selected !== undefined
 }

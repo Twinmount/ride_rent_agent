@@ -1,8 +1,16 @@
-export default function Spinner() {
+type SpinnerProps = {
+  color?: string // Optional color prop for text color
+  additionalClass?: string // Optional additional class prop
+}
+
+export default function Spinner({
+  color = 'text-white', // Default color is 'text-white'
+  additionalClass = '', // Default additional class is empty
+}: SpinnerProps) {
   return (
     <div>
       <svg
-        className="w-5 h-5 ml-2 text-white m animate-spin"
+        className={`w-5 h-5 ml-2 animate-spin ${color} ${additionalClass}`} // Apply props dynamically
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

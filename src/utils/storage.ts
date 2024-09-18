@@ -12,9 +12,9 @@ export enum StorageKeys {
   REFRESH_TOKEN = 'refreshToken',
 
   /**
-   * Key for storing user profile data.
+   * Key for storing user id.
    */
-  USER_DATA = 'userData',
+  USER_ID = 'userId',
 
   /**
    * Key for storing user authentication status.
@@ -30,6 +30,11 @@ export enum StorageKeys {
    * so that it can be used in the phase 2 and phase 3
    */
   CATEGORY_ID = 'categoryId',
+  /**
+   * Key for storing vehicle type id after the submission of primary phase form
+   * so that it can be used in the phase 2 and phase 3
+   */
+  VEHICLE_TYPE_ID = 'vehicleTypeId',
 }
 
 export function load<T>(key: string): T | undefined {
@@ -38,7 +43,6 @@ export function load<T>(key: string): T | undefined {
     if (!storedValue) throw new Error('Value not found in storage')
     return JSON.parse(storedValue) as T
   } catch (error) {
-    console.error(`Error loading from storage using key "${key}":`, error)
     return undefined
   }
 }

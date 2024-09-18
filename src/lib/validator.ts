@@ -83,7 +83,8 @@ export const PrimaryFormSchema = z.object({
   vehicleModel: z.string().min(1, 'Model is required'),
   vehicleRegistrationNumber: z
     .string()
-    .min(1, 'Vehicle registration number is required'),
+    .min(1, 'Vehicle registration number is required')
+    .max(15, 'Vehicle registration number cannot exceed 15 characters'),
   vehicleRegisteredYear: z.string().min(1, 'Registered Year is required'),
   vehiclePhotos: z
     .array(
@@ -114,6 +115,8 @@ export const PrimaryFormSchema = z.object({
     ),
   commercialLicenseExpireDate: z.date(),
   isLease: z.boolean().default(false),
+  isCryptoAccepted: z.boolean().default(false),
+  isSpotDeliverySupported: z.boolean().default(false),
   specification: z
     .enum(['USA_SPEC', 'UAE_SPEC', 'OTHERS'], {
       required_error: 'Specification is required',

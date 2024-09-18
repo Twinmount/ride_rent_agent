@@ -39,17 +39,13 @@ export default function Layout() {
           <LazyLoader />
         ) : !data?.result ? (
           <ProtectedPage />
-        ) : data.result.approvalStatus === 'PENDING' ? (
-          <RegistrationComplete />
         ) : data.result.approvalStatus === 'REJECTED' ? (
           <ApprovalStatusPage
             status="REJECTED"
             rejectionReason={data?.result.rejectionReason}
           />
-        ) : data.result.approvalStatus === 'APPROVED' ? (
-          <Outlet />
         ) : (
-          <ProtectedPage />
+          <Outlet />
         )}
       </MainWrapper>
     </>

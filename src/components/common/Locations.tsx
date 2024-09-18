@@ -4,11 +4,13 @@ import { fetchAllStates } from '@/api/states'
 import { fetchAllCities } from '@/api/cities'
 import { CityType, StateType } from '@/types/API-types'
 import LocationsTabSkelton from '../loading-skelton/LocationsTabSkelton'
+import CitiesSkelton from '../loading-skelton/CitiesSkelton'
 
 const Locations = () => {
-  // State management for selected country and cities
+  // State management for selected state and cities
   const [selectedState, setSelectedState] = useState<StateType | null>(null)
   const [cities, setCities] = useState<CityType[]>([])
+  const [showAllCities, setShowAllCities] = useState<boolean>(false)
 
   // Fetch all states
   const { data: statesData, isLoading: isStatesLoading } = useQuery({
@@ -40,7 +42,16 @@ const Locations = () => {
   // Handle state change
   const handleStateChange = (state: StateType) => {
     setSelectedState(state) // Update the selected state
+    setShowAllCities(false) // Reset to show less cities when state changes
   }
+
+  // Toggle show all or less cities
+  const toggleShowAllCities = () => {
+    setShowAllCities((prev) => !prev)
+  }
+
+  // Determine which cities to display
+  const citiesToDisplay = showAllCities ? cities : cities.slice(0, 50)
 
   return (
     <div className="bg-white wrapper">
@@ -51,16 +62,16 @@ const Locations = () => {
       {/* State selection buttons */}
       <div className="flex flex-wrap justify-center gap-2 mb-4 gap-x-4">
         {isStatesLoading ? (
-          <LocationsTabSkelton count={4} />
+          <CitiesSkelton count={4} />
         ) : (
           statesData?.result.map((state) => (
             <button
               key={state.stateId}
               onClick={() => handleStateChange(state)}
-              className={` ${
+              className={`${
                 selectedState?.stateId === state.stateId &&
                 '!bg-black text-white'
-              } bg-white border-none py-1 px-2 rounded-lg cursor-pointer transition-all font-bold hover:bg-black hover:text-white`}
+              } bg-slate-200 border-none py-1 px-2 rounded-lg cursor-pointer transition-all font-bold hover:bg-black hover:text-white`}
             >
               {state.stateName}
             </button>
@@ -69,15 +80,29 @@ const Locations = () => {
       </div>
       {/* City list */}
       {selectedState?.stateId && (
-        <div className="flex flex-wrap justify-center w-full max-w-full gap-2 mx-auto cursor-pointer gap-x-4 md:max-w-[90%] lg:max-w-[80%]">
-          {isCitiesLoading ? (
-            <LocationsTabSkelton count={8} />
-          ) : (
-            cities.map((city) => (
-              <div className="font-semibold text-[0.9rem] " key={city.cityId}>
-                {city.cityName}
-              </div>
-            ))
+        <div className="flex flex-col items-center">
+          <div className="flex flex-wrap justify-center w-full max-w-full gap-2 mx-auto gap-x-4 ">
+            {isCitiesLoading ? (
+              <CitiesSkelton count={8} />
+            ) : (
+              citiesToDisplay.map((city) => (
+                <div
+                  className="font-semibold bg-slate-100 rounded-xl px-2 text-[0.9rem] cursor-pointer"
+                  key={city.cityId}
+                >
+                  {city.cityName}
+                </div>
+              ))
+            )}
+          </div>
+          {/* Show more/less button */}
+          {cities.length > 50 && (
+            <button
+              onClick={toggleShowAllCities}
+              className="relative px-2 py-1 mt-3 text-white bg-black bottom-1 flex-center rounded-xl"
+            >
+              {showAllCities ? 'Show Less' : 'Show All'}
+            </button>
           )}
         </div>
       )}

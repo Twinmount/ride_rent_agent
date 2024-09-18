@@ -17,24 +17,27 @@ import { load, StorageKeys } from '@/utils/storage'
 export function useVehicleIdentifiers(type: 'Add' | 'Update'): {
   vehicleId: string
   vehicleCategoryId?: string
+  vehicleTypeId?: string
 } {
-  const { vehicleId } = useParams<{ vehicleId: string }>()
-
   if (type === 'Update') {
+    const { vehicleId } = useParams<{ vehicleId: string }>()
+
     const vehicleCategoryId = load<string>(StorageKeys.CATEGORY_ID)
+    const vehicleTypeId = load<string>(StorageKeys.VEHICLE_TYPE_ID)
 
     if (!vehicleId) {
       throw new Error('Vehicle ID is required while updating the form')
     }
 
     if (vehicleCategoryId) {
-      return { vehicleId, vehicleCategoryId }
+      return { vehicleId, vehicleCategoryId, vehicleTypeId }
     }
 
     return { vehicleId }
   } else {
     const vehicleId = load<string>(StorageKeys.VEHICLE_ID)
     const vehicleCategoryId = load<string>(StorageKeys.CATEGORY_ID)
+    const vehicleTypeId = load<string>(StorageKeys.VEHICLE_TYPE_ID)
 
     if (!vehicleId || !vehicleCategoryId) {
       throw new Error(
@@ -42,6 +45,6 @@ export function useVehicleIdentifiers(type: 'Add' | 'Update'): {
       )
     }
 
-    return { vehicleId, vehicleCategoryId }
+    return { vehicleId, vehicleCategoryId, vehicleTypeId }
   }
 }

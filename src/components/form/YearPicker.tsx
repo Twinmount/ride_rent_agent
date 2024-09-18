@@ -31,6 +31,7 @@ export default function YearPicker({
 }: YearPickerProps) {
   const [selectedValue, setSelectedValue] = useState(value || '')
   const [searchTerm, setSearchTerm] = useState('')
+  const [open, setOpen] = useState(false)
 
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: currentYear - 1899 }, (_, i) =>
@@ -45,7 +46,7 @@ export default function YearPicker({
   }
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -58,7 +59,7 @@ export default function YearPicker({
           <ChevronDown className="w-6 h-6 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="md:!w-96 p-0">
+      <PopoverContent className="relative p-0 w-72 right-10">
         <Command>
           <CommandInput
             placeholder={`Search ${placeholder}...`}
@@ -73,7 +74,10 @@ export default function YearPicker({
                   <CommandItem
                     key={year}
                     value={year}
-                    onSelect={() => handleSelect(year)}
+                    onSelect={() => {
+                      handleSelect(year)
+                      setOpen(false)
+                    }}
                   >
                     <Check
                       className={cn(

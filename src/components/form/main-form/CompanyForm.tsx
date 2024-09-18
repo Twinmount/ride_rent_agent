@@ -162,6 +162,12 @@ export default function CompanyRegistrationForm({
         description:
           'Please verify the OTP sent to your email before submitting the form.',
       })
+
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth', // This will create a smooth scrolling effect
+      })
+
       return
     }
 
@@ -287,7 +293,9 @@ export default function CompanyRegistrationForm({
                   </div>
 
                   <FormDescription className="mt-1 ml-1">
-                    Enter your email to receive OTP
+                    Enter the email for your company. An{' '}
+                    <span className="font-semibold text-yellow">OTP</span> will
+                    send to it.
                   </FormDescription>
                 </div>
               </div>
@@ -356,11 +364,9 @@ export default function CompanyRegistrationForm({
               <SingleFileUpload
                 name={field.name}
                 label="Company Logo"
-                description="Upload a image with a maximum file size of 300KB. The image should have dimensions not exceeding 500x500 pixels"
+                description="Company logo can have a maximum size of 5MB."
                 existingFile={formData?.companyLogo}
-                maxSizeMB={0.3}
-                maxWidth={500}
-                maxHeight={500}
+                maxSizeMB={5}
               />
             )}
           />
@@ -373,11 +379,9 @@ export default function CompanyRegistrationForm({
               <SingleFileUpload
                 name={field.name}
                 label="Commercial License"
-                description="Upload a image with a maximum file size of 300KB. The image should have dimensions not exceeding 500x500 pixels"
+                description="Commercial License image can have a maximum size of 5MB."
                 existingFile={formData?.commercialLicense}
-                maxSizeMB={1}
-                maxWidth={1000}
-                maxHeight={1000}
+                maxSizeMB={5}
               />
             )}
           />

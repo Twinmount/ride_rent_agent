@@ -35,7 +35,7 @@ const BrandsDropdown = ({
 }: BrandsDropdownProps) => {
   const [selectedValue, setSelectedValue] = React.useState<string>(value || '')
   const [searchTerm, setSearchTerm] = React.useState('')
-
+  const [open, setOpen] = React.useState(false)
   // Fetch brand by ID if value is provided
   const { data: specificBrandData, isLoading: isSpecificBrandLoading } =
     useQuery({
@@ -44,10 +44,10 @@ const BrandsDropdown = ({
       enabled: !!value, // Only run this query if value is provided
     })
 
-  // Fetch brands by search term and category
+  // Fetch brands by search term and category id
   const {
     data: brandData,
-    isLoading: isBrandsLoading,
+    isFetching: isBrandsLoading,
     refetch,
   } = useQuery({
     queryKey: ['brands', vehicleCategoryId, searchTerm],
@@ -59,7 +59,7 @@ const BrandsDropdown = ({
         vehicleCategoryId: vehicleCategoryId as string,
         search: searchTerm,
       }),
-    enabled: !!vehicleCategoryId && searchTerm.length >= 3,
+    enabled: !!vehicleCategoryId,
     staleTime: 0,
   })
 
@@ -70,12 +70,31 @@ const BrandsDropdown = ({
     }
   }, [specificBrandData])
 
-  const handleSearch = async (query: string) => {
-    setSearchTerm(query)
-    if (query.length >= 3) {
-      await refetch() // wait for refetch to complete
+  React.useEffect(() => {
+    if (value) {
+      setSelectedValue(value)
+    }
+  }, [value])
+
+  const debounce = <T extends any[]>(
+    callback: (...args: T) => void,
+    delay: number
+  ) => {
+    let timeoutId: NodeJS.Timeout
+    return (...args: T) => {
+      clearTimeout(timeoutId)
+      timeoutId = setTimeout(() => callback(...args), delay)
     }
   }
+
+  // Debounced handle search
+  const debouncedHandleSearch = React.useCallback(
+    debounce((query: string) => {
+      setSearchTerm(query)
+      refetch() // Trigger the refetch
+    }, 500), // 300ms delay
+    [refetch]
+  )
 
   const handleSelect = (currentValue: string) => {
     setSelectedValue(currentValue)
@@ -83,27 +102,37 @@ const BrandsDropdown = ({
   }
 
   const selectedBrandName = React.useMemo(() => {
-    if (isSpecificBrandLoading) return 'Loading...'
+    // Prioritize loading states first
+    if (isSpecificBrandLoading || isBrandsLoading) return 'Loading...'
+
+    // Try to find the brand in the `brandData` list
     if (selectedValue && brandData?.result.list) {
       const brand = brandData.result.list.find(
         (brand) => brand.id === selectedValue
       )
-      return brand?.brandName || `Choose ${placeholder}`
+      if (brand) {
+        return brand.brandName
+      }
     }
+
+    // If `brandData` doesn't have the brand, fallback to `specificBrandData`
     if (specificBrandData?.result) {
       return specificBrandData.result.brandName
     }
+
+    // Default text if nothing is found or loaded yet
     return `Choose ${placeholder}`
   }, [
     selectedValue,
     brandData,
     specificBrandData,
     isSpecificBrandLoading,
+    isBrandsLoading,
     placeholder,
   ])
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -123,17 +152,17 @@ const BrandsDropdown = ({
         <Command shouldFilter={false}>
           <CommandInput
             placeholder={`Search ${placeholder}...`}
-            onValueChange={handleSearch}
+            onValueChange={debouncedHandleSearch}
           />
           <CommandList>
-            {searchTerm.length < 3 ? (
-              <CommandEmpty>
-                Please enter at least 3 letters to search brands.
-              </CommandEmpty>
+            {!searchTerm ? (
+              <CommandEmpty>Please search the brand.</CommandEmpty>
             ) : isBrandsLoading ? (
               <CommandEmpty>Searching for {searchTerm}...</CommandEmpty>
             ) : brandData?.result.list.length === 0 ? (
-              <CommandEmpty>No {placeholder} found.</CommandEmpty>
+              <CommandEmpty>
+                No {placeholder} found for &apos;{searchTerm}&apos;.
+              </CommandEmpty>
             ) : (
               <CommandGroup>
                 {brandData &&
@@ -141,7 +170,10 @@ const BrandsDropdown = ({
                     <CommandItem
                       key={brand.id}
                       value={brand.id}
-                      onSelect={() => handleSelect(brand.id)}
+                      onSelect={() => {
+                        handleSelect(brand.id)
+                        setOpen(false)
+                      }}
                     >
                       <Check
                         className={cn(

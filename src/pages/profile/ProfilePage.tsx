@@ -160,7 +160,7 @@ export default function ProfilePage() {
           </dt>
           <dd className="flex flex-col ml-4 gap-x-3">
             <span className="text-base ">
-              {userData?.countryCode} {userData?.phoneNumber}
+              +{userData?.countryCode} {userData?.phoneNumber}
             </span>
           </dd>
         </div>

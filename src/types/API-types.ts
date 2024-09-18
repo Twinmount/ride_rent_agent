@@ -298,7 +298,7 @@ export interface AddPrimaryFormResponse {
   statusCode: number
 }
 
-// Specification form data
+// Primary form data
 export type GetPrimaryForm = {
   vehicleId: string
   vehicleRegistrationNumber: string
@@ -331,10 +331,14 @@ export type GetPrimaryForm = {
   vehicleRegisteredYear: string
   commercialLicenseExpireDate: string
   isLease: boolean
+  isCryptoAccepted: boolean
+  isSpotDeliverySupported: boolean
+  description: string
   vehiclePhotos: string[]
   commercialLicenses: string[]
 }
-// Specification form get all response
+
+// Primary form get all response
 export interface GetPrimaryFormResponse {
   result: GetPrimaryForm
   status: string
@@ -427,7 +431,6 @@ export interface FeaturesFormResponse {
   status: string
   statusCode: number
 }
-
 // fetch all vehicles response
 // Features Type
 export type FeatureType = {

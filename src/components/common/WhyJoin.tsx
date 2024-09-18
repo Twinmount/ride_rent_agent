@@ -21,13 +21,13 @@ export default function WhyJoin({ data }: WhyJoinProps) {
       >
         Why join <span className="font-bold">Ride.Rent</span> Today?
       </MotionH2>
-      <div className="flex flex-col items-center w-full mx-auto my-4 gap-y-3 md:w-4/5 lg:w-[65%]">
+      <div className="flex flex-col items-center w-full mx-auto my-4 gap-y-4 md:w-4/5 lg:w-[65%]">
         {data.map((feature) => (
           <MotionDiv
-            className="border-gray-500/20 shadow-lg p-2 rounded-[1rem] bg-white md:py-2 md:px-4"
+            className="border-gray-500/20 shadow-lg p-2 rounded-[1rem] bg-white md:py-2 md:px-4  border-t border-t-gray-200"
             key={feature.key}
           >
-            <h4 className="mb-2 text-center">{feature.title}</h4>
+            <h4 className="mb-2 font-semibold text-center">{feature.title}</h4>
             <p className="text-center text-[0.9rem] text-gray-700 w-full mx-auto md:w-11/12">
               {feature.description}
             </p>

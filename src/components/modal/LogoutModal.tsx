@@ -19,6 +19,7 @@ export default function LogoutModal() {
   const handleLogout = () => {
     remove(StorageKeys.ACCESS_TOKEN)
     remove(StorageKeys.REFRESH_TOKEN)
+    remove(StorageKeys.USER_ID)
     navigate('/login')
   }
 

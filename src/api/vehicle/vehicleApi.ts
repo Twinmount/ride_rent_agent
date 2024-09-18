@@ -29,6 +29,8 @@ type PrimaryFormType = {
   commercialLicenses: (File | string)[] // Array of files or URLs
   commercialLicenseExpireDate: Date
   isLease: boolean
+  isCryptoAccepted: boolean
+  isSpotDeliverySupported: boolean
   specification: 'UAE_SPEC' | 'USA_SPEC' | 'OTHERS'
   rentalDetails: {
     day: RentalDetailType
@@ -40,7 +42,6 @@ type PrimaryFormType = {
   cityIds: string[]
 }
 
-// register an agent
 export const addPrimaryDetailsForm = async (
   values: PrimaryFormType,
   countryCode: string,
@@ -69,6 +70,11 @@ export const addPrimaryDetailsForm = async (
       values.commercialLicenseExpireDate.toISOString()
     )
     formData.append('isLease', values.isLease.toString())
+    formData.append('isCryptoAccepted', values.isCryptoAccepted.toString())
+    formData.append(
+      'isSpotDeliverySupported',
+      values.isSpotDeliverySupported.toString()
+    )
     formData.append('specification', values.specification)
     formData.append('phoneNumber', phoneNumber)
     formData.append('stateId', values.stateId)
@@ -91,10 +97,6 @@ export const addPrimaryDetailsForm = async (
         formData.append(`commercialLicenses`, license)
       }
     })
-
-    // const formDataArray = Array.from(formData.entries())
-
-    // console.log('form data from api function', formDataArray)
 
     // Send the FormData object using the API post method
     const data = await API.post<AddPrimaryFormResponse>({
@@ -119,7 +121,6 @@ export const addPrimaryDetailsForm = async (
   }
 }
 
-// Update an agent's primary details
 export const updatePrimaryDetailsForm = async (
   vehicleId: string,
   values: PrimaryFormType,
@@ -148,6 +149,11 @@ export const updatePrimaryDetailsForm = async (
       values.commercialLicenseExpireDate.toISOString()
     )
     formData.append('isLease', values.isLease.toString())
+    formData.append('isCryptoAccepted', values.isCryptoAccepted.toString())
+    formData.append(
+      'isSpotDeliverySupported',
+      values.isSpotDeliverySupported.toString()
+    )
     formData.append('specification', values.specification)
     formData.append('phoneNumber', phoneNumber)
     formData.append('stateId', values.stateId)
@@ -193,12 +199,12 @@ export const updatePrimaryDetailsForm = async (
     throw error
   }
 }
-
 type GetSpecificationFormDataParams = {
   page?: number
   limit?: number
   sortOrder?: string
   vehicleCategoryId: string
+  vehicleTypeId: string
 }
 
 // fetch specification form data
@@ -229,9 +235,14 @@ export const getSpecificationFormFieldData = async ({
   limit = 50,
   sortOrder = 'ASC',
   vehicleCategoryId,
+  vehicleTypeId,
 }: GetSpecificationFormDataParams): Promise<GetSpecificationFormFieldsResponse> => {
+  console.log(
+    'get specification form field api called, here is the vehicleCategoryId',
+    vehicleCategoryId
+  )
   try {
-    const url = `${Slug.GET_SPEC_FORM_FIELD_LIST}?vehicleCategoryId=${vehicleCategoryId}&page=${page}&limit=${limit}&sortOrder=${sortOrder}`
+    const url = `${Slug.GET_SPEC_FORM_FIELD_LIST}?vehicleCategoryId=${vehicleCategoryId}&vehicleTypeId=${vehicleTypeId}&page=${page}&limit=${limit}&sortOrder=${sortOrder}`
 
     const data = await API.get<GetSpecificationFormFieldsResponse>({
       slug: url,

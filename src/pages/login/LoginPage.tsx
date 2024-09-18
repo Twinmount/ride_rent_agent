@@ -68,6 +68,7 @@ const LoginPage = () => {
         remove(StorageKeys.REFRESH_TOKEN)
         save(StorageKeys.ACCESS_TOKEN, data.result.token)
         save(StorageKeys.REFRESH_TOKEN, data.result.refreshToken)
+        save(StorageKeys.USER_ID, data.result.userId)
 
         navigate('/')
       }

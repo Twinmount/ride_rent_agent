@@ -15,48 +15,41 @@ import {
   addFeatures,
   getFeaturesFormData,
   getFeaturesFormFieldsData,
-  getLevelsFilled,
   updateFeatures,
 } from '@/api/vehicle'
 import FormSkelton from '@/components/loading-skelton/FormSkelton'
 import Spinner from '@/components/general/Spinner'
 import { Accordion } from '@/components/ui/accordion'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from '@/components/ui/use-toast'
-import { load, StorageKeys } from '@/utils/storage'
-import { jwtDecode } from 'jwt-decode'
 import { formatFeatures } from '@/helpers/form'
 
 type FeaturesFormType = Record<string, string[] | null>
 
 type FeaturesFormProps = {
   type: 'Add' | 'Update'
+  refetchLevels?: () => void
+  isAddOrIncomplete?: boolean
 }
 
-export default function FeaturesForm({ type }: FeaturesFormProps) {
+export default function FeaturesForm({
+  type,
+  refetchLevels,
+  isAddOrIncomplete,
+}: FeaturesFormProps) {
   const { vehicleId, vehicleCategoryId } = useVehicleIdentifiers(type)
   const navigate = useNavigate()
+  const { userId } = useParams<{ userId: string }>()
 
   const queryClient = useQueryClient()
 
-  // Fetch levelsFilled only if the type is "Update"
-  const { data: levelsData } = useQuery({
-    queryKey: ['getLevelsFilled', vehicleId],
-    queryFn: () => getLevelsFilled(vehicleId as string),
-    enabled: type === 'Update' && !!vehicleId,
-  })
-
-  const levelsFilled = levelsData
-    ? parseInt(levelsData.result.levelsFilled, 10)
-    : 1
-
-  const isAddOrIncomplete =
-    type === 'Add' || (type === 'Update' && levelsFilled < 3)
+  console.log('vehicleID: ', vehicleId)
+  console.log('vehicleCategoryId: ', vehicleCategoryId)
+  console.log('userId: ', userId)
 
   const { data, isLoading } = useQuery({
     queryKey: [
       isAddOrIncomplete ? 'features-form-data' : 'features-update-form-data',
-      vehicleCategoryId,
       vehicleId,
     ],
     queryFn: async () => {
@@ -72,35 +65,74 @@ export default function FeaturesForm({ type }: FeaturesFormProps) {
         return await getFeaturesFormData(vehicleId)
       }
     },
-    enabled: !!vehicleId && (!!vehicleCategoryId || levelsFilled < 3),
+    enabled: !!vehicleId,
   })
+
+  console.log('FeaturesFormData ', data)
 
   const form = useForm<FeaturesFormType>({
     defaultValues: {},
   })
 
+  // Custom validation logic: Ensures at least one checkbox is selected for each feature
+  const validateFeatures = (values: FeaturesFormType) => {
+    let isValid = true
+    const updatedErrors: Record<string, string> = {}
+
+    data?.result.forEach((feature) => {
+      if (!values[feature.name] || values[feature.name]?.length === 0) {
+        updatedErrors[
+          feature.name
+        ] = `Please select at least one option for ${feature.name}`
+        isValid = false
+      }
+    })
+
+    if (!isValid) {
+      Object.keys(updatedErrors).forEach((key) => {
+        form.setError(key, {
+          type: 'manual',
+          message: updatedErrors[key],
+        })
+      })
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      toast({
+        title: 'Validation Error',
+        description: 'Please fill in all required fields.',
+        variant: 'destructive',
+        className: 'bg-red-500 text-white',
+      })
+    } else {
+      form.clearErrors() // Clear all errors if valid
+    }
+
+    return isValid
+  }
+
   async function onSubmit(values: FeaturesFormType) {
     console.log('Form Submitted:', values)
 
-    // Extract user ID from the token
-    const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN)
-    const { userId } = jwtDecode<{ userId: string }>(refreshToken as string)
+    // Validate before submitting
+    const isValid = validateFeatures(values)
+    if (!isValid) return // Exit if not valid
 
     // Prepare the features object for the request body
     const features = formatFeatures(values, data?.result || [])
 
+    console.log('formated features:', features)
+
     const requestBody = {
       features,
-      userId,
+      userId: userId as string,
       vehicleId: vehicleId as string,
       vehicleCategoryId: vehicleCategoryId as string,
     }
 
     try {
       let response
-      if (type === 'Add') {
+      if (isAddOrIncomplete) {
         response = await addFeatures(requestBody)
-      } else if (type === 'Update') {
+      } else {
         response = await updateFeatures({ features, vehicleId })
       }
       console.log(response)
@@ -110,10 +142,9 @@ export default function FeaturesForm({ type }: FeaturesFormProps) {
           className: 'bg-yellow text-white',
         })
         queryClient.invalidateQueries({
-          queryKey: ['primary-details-form'],
-          exact: true,
+          queryKey: ['features-update-form-data', vehicleId],
         })
-        console.log('levels Filled: ', levelsFilled)
+        refetchLevels?.()
         navigate('/listings')
       }
     } catch (error) {
@@ -158,11 +189,13 @@ export default function FeaturesForm({ type }: FeaturesFormProps) {
                               onChangeHandler={field.onChange}
                               value={field.value || []}
                               placeholder={feature.name}
-                              options={feature.values.map((value) => ({
-                                label: value.label,
-                                name: value.name,
-                                selected: value.selected as boolean, // Pass `selected` prop here
-                              }))}
+                              options={feature.values
+                                .filter((value) => value !== null)
+                                .map((value) => ({
+                                  label: value!.label,
+                                  name: value!.name,
+                                  selected: value!.selected as boolean,
+                                }))}
                             />
                           </FormControl>
                           <FormMessage className="ml-2" />
@@ -184,7 +217,7 @@ export default function FeaturesForm({ type }: FeaturesFormProps) {
           disabled={form.formState.isSubmitting}
           className="w-full md:w-10/12 lg:w-8/12 mx-auto flex-center col-span-2 mt-3 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow"
         >
-          {type === 'Add' ? 'Add Features' : 'Update Features'}
+          {isAddOrIncomplete ? 'Add Features' : 'Update Features'}
           {form.formState.isSubmitting && <Spinner />}
         </Button>
       </form>

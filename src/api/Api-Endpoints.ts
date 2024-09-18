@@ -1,6 +1,6 @@
 export enum Slug {
   // Authentication Endpoints
-  LOGIN = '/auth/login',
+  LOGIN = '/auth/agent/login',
   REGISTER = '/auth/send-otp',
   VERIFY_OTP = '/auth/verify-otp',
   REFRESH = '/auth/refresh',

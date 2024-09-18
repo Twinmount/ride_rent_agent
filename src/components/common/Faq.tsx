@@ -15,7 +15,7 @@ type FAQProps = {
 
 export default function FAQ({ data }: FAQProps) {
   return (
-    <MotionSection className="pt-8 pb-12 bg-gray-100 wrapper">
+    <MotionSection className="pt-8 pb-12 bg-gray-100 wrapper rounded-2xl">
       <div className="relative mb-12">
         <h1 className="text-center mb-[1.7rem] font-bold">
           Frequently Asked Questions

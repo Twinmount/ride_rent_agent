@@ -83,6 +83,8 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
   commercialLicenses: [],
   commercialLicenseExpireDate: new Date(),
   isLease: false,
+  isCryptoAccepted: false,
+  isSpotDeliverySupported: false,
   specification: 'UAE_SPEC',
   rentalDetails: {
     day: { enabled: false, rentInAED: '', mileageLimit: '' },

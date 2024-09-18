@@ -34,14 +34,13 @@ import CitiesDropdown from '../CitiesDropdown'
 import CategoryDropdown from '../CategoryDropdown'
 import VehicleTypesDropdown from '../VehicleTypesDropdown'
 import StatesDropdown from '../StatesDropdown'
-import { jwtDecode } from 'jwt-decode'
-import { DecodedRefreshToken } from '@/layout/ProtectedRoutes'
-import { load, save, StorageKeys } from '@/utils/storage'
+import { save, StorageKeys } from '@/utils/storage'
 import { toast } from '@/components/ui/use-toast'
 import { addPrimaryDetailsForm, updatePrimaryDetailsForm } from '@/api/vehicle'
 import Spinner from '@/components/general/Spinner'
 import { useParams } from 'react-router-dom'
 import { useLoadingMessages } from '@/hooks/useLoadingMessage'
+import { ApiError } from '@/types/types'
 
 type PrimaryFormProps = {
   type: 'Add' | 'Update'
@@ -58,8 +57,9 @@ export default function PrimaryDetailsForm({
 }: PrimaryFormProps) {
   const [countryCode, setCountryCode] = useState<string>('')
 
-  const { vehicleId } = useParams<{
+  const { vehicleId, userId } = useParams<{
     vehicleId: string
+    userId: string
   }>()
 
   // Call the useLoadingMessages hook to manage loading messages
@@ -76,16 +76,17 @@ export default function PrimaryDetailsForm({
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof PrimaryFormSchema>) {
+    console.log('level one submit handler values : ', values)
+
     const rentalError = validateRentalDetails(values.rentalDetails)
     if (rentalError) {
       form.setError('rentalDetails', {
         type: 'manual',
         message: rentalError,
       })
+      form.setFocus('rentalDetails')
       return
     }
-    const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN)
-    const { userId } = jwtDecode<DecodedRefreshToken>(refreshToken as string)
 
     // Append other form data
     try {
@@ -94,7 +95,7 @@ export default function PrimaryDetailsForm({
         data = await addPrimaryDetailsForm(
           values as PrimaryFormType,
           countryCode,
-          userId
+          userId as string
         )
       } else if (type === 'Update') {
         data = await updatePrimaryDetailsForm(
@@ -113,16 +114,32 @@ export default function PrimaryDetailsForm({
         if (type === 'Add') {
           save(StorageKeys.VEHICLE_ID, data.result.vehicleId)
           save(StorageKeys.CATEGORY_ID, data.result.vehicleCategory.categoryId)
+          save(StorageKeys.VEHICLE_TYPE_ID, data.result.vehicleType.typeId)
+
           if (onNextTab) onNextTab()
         }
       }
     } catch (error) {
+      const apiError = error as ApiError
+
+      if (
+        apiError.response?.data?.error?.message ===
+        'We already have a vehicle registered with this registration number'
+      ) {
+        form.setError('vehicleRegistrationNumber', {
+          type: 'manual',
+          message:
+            'This registration number is already registered. Please use a different one.',
+        })
+        form.setFocus('vehicleRegistrationNumber')
+      } else {
+        toast({
+          variant: 'destructive',
+          title: `${type} Vehicle failed`,
+          description: 'Something went wrong',
+        })
+      }
       console.log(error)
-      toast({
-        variant: 'destructive',
-        title: `${type} Company failed`,
-        description: 'Something went wrong',
-      })
     }
   }
 
@@ -155,7 +172,7 @@ export default function PrimaryDetailsForm({
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    select the vehicle category
+                    select vehicle category
                   </FormDescription>
                 </div>
                 <FormMessage />
@@ -183,7 +200,7 @@ export default function PrimaryDetailsForm({
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    select the vehicle type
+                    select vehicle type
                   </FormDescription>
                   <FormMessage />
                 </div>
@@ -224,7 +241,7 @@ export default function PrimaryDetailsForm({
             render={({ field }) => (
               <FormItem className="flex w-full mb-2 max-sm:flex-col ">
                 <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
-                  Model <span className="mr-5 max-sm:hidden">:</span>
+                  Model Name <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
@@ -257,19 +274,20 @@ export default function PrimaryDetailsForm({
                 <div className="flex-col items-start w-full">
                   <FormControl>
                     <Input
-                      placeholder="eg: '1234-1234"
+                      placeholder="eg: ABC12345"
                       {...field}
                       className={`input-field`}
                       type="text"
-                      inputMode="numeric"
                       onKeyDown={(e) => {
+                        // Allow only alphanumeric characters and control keys like Backspace, Delete, and Arrow keys
                         if (
-                          !/^\d*$/.test(e.key) &&
+                          !/[a-zA-Z0-9]/.test(e.key) &&
                           ![
                             'Backspace',
                             'Delete',
                             'ArrowLeft',
                             'ArrowRight',
+                            'Tab', // To allow tabbing between fields
                           ].includes(e.key)
                         ) {
                           e.preventDefault()
@@ -278,7 +296,10 @@ export default function PrimaryDetailsForm({
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    Enter the vehicle registration number
+                    Enter your vehicle registration number (e.g., ABC12345). The
+                    number should be a combination of letters and numbers,
+                    without any spaces or special characters, up to 15
+                    characters.
                   </FormDescription>
                   <FormMessage className="ml-2" />
                 </div>
@@ -296,8 +317,8 @@ export default function PrimaryDetailsForm({
                 label="Vehicle Photos"
                 multiple={true}
                 existingFiles={initialValues.vehiclePhotos}
-                description="Add Vehicle Photos. Up to 8 photos can be added. Each photos can be upto 1MB"
-                maxSizeMB={1}
+                description="Add Vehicle Photos. Up to 8 photos can be added."
+                maxSizeMB={30}
               />
             )}
           />
@@ -371,40 +392,6 @@ export default function PrimaryDetailsForm({
             )}
           />
 
-          {/* Lease */}
-          <FormField
-            control={form.control}
-            name="isLease"
-            render={({ field }) => (
-              <FormItem className="flex w-full mb-2 max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
-                  Lease <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <div className="flex items-center mt-3 space-x-2">
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
-                        id="isLease"
-                      />
-                      <label
-                        htmlFor="isLease"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Available for lease?
-                      </label>
-                    </div>
-                  </FormControl>
-                  <FormDescription className="mt-1 ml-2">
-                    Select if this vehicle is available for lease.
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
           {/* Specification */}
           <FormField
             control={form.control}
@@ -451,7 +438,7 @@ export default function PrimaryDetailsForm({
             render={({ field }) => (
               <FormItem className="flex w-full mb-2 max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
-                  Mobile <span className="mr-5 max-sm:hidden">:</span>
+                  Whatsapp/Mobile <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
@@ -476,7 +463,8 @@ export default function PrimaryDetailsForm({
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    Enter the mobile number that will receive the direct booking
+                    Enter the <span className="text-green-400">whatsapp</span>{' '}
+                    mobile number. This number will receive the direct booking
                     details.
                   </FormDescription>
                   <FormMessage className="ml-2" />
@@ -559,6 +547,112 @@ export default function PrimaryDetailsForm({
                   </FormControl>
                   <FormDescription className="ml-2">
                     Select all the cities of operation/serving areas.
+                  </FormDescription>
+                  <FormMessage className="ml-2" />
+                </div>
+              </FormItem>
+            )}
+          />
+
+          {/* Lease */}
+          <FormField
+            control={form.control}
+            name="isLease"
+            render={({ field }) => (
+              <FormItem className="flex w-full mb-2 max-sm:flex-col">
+                <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
+                  Lease? <span className="mr-5 max-sm:hidden">:</span>
+                </FormLabel>
+                <div className="flex-col items-start w-full">
+                  <FormControl>
+                    <div className="flex items-center mt-3 space-x-2">
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
+                        id="isLease"
+                      />
+                      <label
+                        htmlFor="isLease"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Available for lease?
+                      </label>
+                    </div>
+                  </FormControl>
+                  <FormDescription className="mt-1 ml-2">
+                    Select if this vehicle is available for lease.
+                  </FormDescription>
+                  <FormMessage className="ml-2" />
+                </div>
+              </FormItem>
+            )}
+          />
+          {/* crypto details */}
+          <FormField
+            control={form.control}
+            name="isCryptoAccepted"
+            render={({ field }) => (
+              <FormItem className="flex w-full mb-2 max-sm:flex-col">
+                <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
+                  Crypto? <span className="mr-5 max-sm:hidden">:</span>
+                </FormLabel>
+                <div className="flex-col items-start w-full">
+                  <FormControl>
+                    <div className="flex items-center mt-3 space-x-2">
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
+                        id="isCryptoAccepted"
+                      />
+                      <label
+                        htmlFor="isCryptoAccepted"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Accept cryptocurrency payments?
+                      </label>
+                    </div>
+                  </FormControl>
+                  <FormDescription className="mt-1 ml-2">
+                    Select this option if your company accepts payments via
+                    cryptocurrency.
+                  </FormDescription>
+                  <FormMessage className="ml-2" />
+                </div>
+              </FormItem>
+            )}
+          />
+
+          {/* spot delivery */}
+          <FormField
+            control={form.control}
+            name="isSpotDeliverySupported"
+            render={({ field }) => (
+              <FormItem className="flex w-full mb-2 max-sm:flex-col">
+                <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
+                  Spot delivery? <span className="mr-5 max-sm:hidden">:</span>
+                </FormLabel>
+                <div className="flex-col items-start w-full">
+                  <FormControl>
+                    <div className="flex items-center mt-3 space-x-2">
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
+                        id="isSpotDeliverySupported"
+                      />
+                      <label
+                        htmlFor="isSpotDeliverySupported"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Offer spot delivery service?
+                      </label>
+                    </div>
+                  </FormControl>
+                  <FormDescription className="mt-1 ml-2">
+                    Select this option if your company offers on-the-spot
+                    delivery services.
                   </FormDescription>
                   <FormMessage className="ml-2" />
                 </div>

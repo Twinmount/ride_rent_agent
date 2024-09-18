@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Plus, Share2 } from 'lucide-react'
+import { Share2 } from 'lucide-react'
 import { Switch } from '../ui/switch'
 import { useToast } from '../ui/use-toast'
 import { Link } from 'react-router-dom'
@@ -9,15 +9,20 @@ import ListingsGridSkelton from '../loading-skelton/ListingsGridSkelton'
 import { toggleVehicleVisibility } from '@/api/vehicle'
 import VehicleStatusOverlay from '../VehicleStatusOverlay'
 import { useQueryClient } from '@tanstack/react-query'
+import AddVehiclePlaceholder from '../AddVehiclePlaceholder'
 
 interface ListedVehiclesProps {
   vehicles: SingleVehicleType[]
   isLoading: boolean
+  userId: string
+  companyId: string
 }
 
 export default function ListedVehicles({
   vehicles,
   isLoading,
+  userId,
+  companyId,
 }: ListedVehiclesProps) {
   const { toast } = useToast()
   const queryClient = useQueryClient()
@@ -79,6 +84,7 @@ export default function ListedVehicles({
       setSelectedVehicle(null)
     }
   }
+
   return (
     <div className="">
       {isLoading ? (
@@ -87,6 +93,7 @@ export default function ListedVehicles({
         </div>
       ) : vehicles.length > 0 ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {/* Render the existing vehicle cards */}
           {vehicles.map((vehicle) => (
             <div
               key={vehicle.vehicleId}
@@ -110,7 +117,9 @@ export default function ListedVehicles({
                 </Link>
               </div>
               <div className="px-2 pb-2">
-                <Link to={`/listings/view/${vehicle.vehicleId}`}>
+                <Link
+                  to={`/listings/view/${vehicle.vehicleId}/${companyId}/${userId}`}
+                >
                   <h3 className="mt-2 text-lg font-bold line-clamp-1">
                     {vehicle.vehicleModel}
                   </h3>
@@ -141,20 +150,16 @@ export default function ListedVehicles({
               </div>
             </div>
           ))}
+
+          {/* AddVehiclePlaceholder should always be rendered as the last item */}
+          <AddVehiclePlaceholder userId={userId} />
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center w-full gap-2 mt-48 h-36">
-          <h3 className="text-lg font-bold text-yellow">No Vehicles found!</h3>
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+          <AddVehiclePlaceholder userId={userId} />
         </div>
       )}
-      <button className="fixed z-30 overflow-hidden cursor-pointer w-fit h-fit rounded-xl right-3 md:right-10 bottom-10 shadow-xl hover:scale-[1.02] transition-all">
-        <Link
-          className="px-3 py-2 text-white flex-center gap-x-1 bg-yellow"
-          to={`/listings/add`}
-        >
-          New Vehicle <Plus />
-        </Link>
-      </button>
+
       {selectedVehicle && (
         <ConfirmationDialog
           vehicle={selectedVehicle}

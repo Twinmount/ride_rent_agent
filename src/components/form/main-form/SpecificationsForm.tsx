@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import {
   Form,
   FormControl,
@@ -13,7 +13,6 @@ import SpecificationDropdown from '../SpecificationDropdown'
 import { useVehicleIdentifiers } from '@/hooks/useVehicleIdentifiers'
 import {
   addSpecifications,
-  getLevelsFilled,
   getSpecificationFormData,
   getSpecificationFormFieldData,
   updateSpecifications,
@@ -21,39 +20,32 @@ import {
 import FormSkelton from '@/components/loading-skelton/FormSkelton'
 import Spinner from '@/components/general/Spinner'
 import { toast } from '@/components/ui/use-toast'
-import { load, StorageKeys } from '@/utils/storage'
-import { jwtDecode } from 'jwt-decode'
-import { formatSpecifications } from '@/helpers/form'
+import { formatSpecifications, hasSelected } from '@/helpers/form'
 import { SpecificationFormData } from '@/types/API-types'
+import { useParams } from 'react-router-dom'
+import { useEffect } from 'react'
 
 type SpecificationFormType = Record<string, string | null>
 
 type SpecificationFormProps = {
   type: 'Add' | 'Update'
   onNextTab?: () => void
+  refetchLevels?: () => void
+  isAddOrIncomplete?: boolean
 }
 
 export default function SpecificationsForm({
   type,
   onNextTab,
+  refetchLevels,
+  isAddOrIncomplete,
 }: SpecificationFormProps) {
-  const { vehicleId, vehicleCategoryId } = useVehicleIdentifiers(type)
+  const { vehicleId, vehicleCategoryId, vehicleTypeId } =
+    useVehicleIdentifiers(type)
 
-  const queryClient = useQueryClient()
+  const { userId } = useParams<{ userId: string }>()
 
-  // Fetch levelsFilled only if the type is "Update"
-  const { data: levelsData } = useQuery({
-    queryKey: ['getLevelsFilled', vehicleId],
-    queryFn: () => getLevelsFilled(vehicleId as string),
-    enabled: type === 'Update' && !!vehicleId,
-  })
-
-  const levelsFilled = levelsData
-    ? parseInt(levelsData.result.levelsFilled, 10)
-    : 1
-
-  const isAddOrIncomplete =
-    type === 'Add' || (type === 'Update' && (levelsFilled ?? 1) < 3)
+  console.log('is add or incomplete', isAddOrIncomplete)
 
   // useQuery for fetching form data, now relying on levelsFilled
   const { data, isLoading } = useQuery({
@@ -61,13 +53,13 @@ export default function SpecificationsForm({
       isAddOrIncomplete
         ? 'specification-form-data'
         : 'specification-update-form-data',
-      vehicleCategoryId,
       vehicleId,
     ],
     queryFn: async () => {
       if (isAddOrIncomplete) {
         const data = await getSpecificationFormFieldData({
           vehicleCategoryId: vehicleCategoryId as string,
+          vehicleTypeId: vehicleTypeId as string,
         })
         return {
           ...data,
@@ -77,19 +69,86 @@ export default function SpecificationsForm({
         return await getSpecificationFormData(vehicleId)
       }
     },
-    enabled: !!vehicleId && (!!vehicleCategoryId || levelsFilled < 3),
+    enabled: !!vehicleId,
   })
 
-  console.log('specificationFormData ', data)
-
-  const initialValues = {}
+  const fields = data?.result || []
 
   const form = useForm<SpecificationFormType>({
-    defaultValues: initialValues,
+    defaultValues: {},
   })
 
+  useEffect(() => {
+    if (data) {
+      const formDefaultValues: Record<string, string> = {}
+
+      data.result.forEach((spec) => {
+        const selectedValue = spec.values
+          .filter((value) => value !== null) // Filter out null values
+          .find((value) => hasSelected(value) && value.selected)
+
+        if (selectedValue) {
+          formDefaultValues[spec.name] = selectedValue.name
+        }
+      })
+
+      form.reset(formDefaultValues)
+    }
+  }, [data])
+
+  // Custom validation logic: Ensures at least one option is selected for each specification
+  const validateSpecifications = (values: SpecificationFormType) => {
+    let isValid = true
+    const updatedErrors: Record<string, string> = {}
+
+    data?.result.forEach((spec) => {
+      const validValues = spec.values.filter((value) => value !== null) // Filter out null values
+
+      if (
+        !values[spec.name] ||
+        values[spec.name]?.length === 0 ||
+        !validValues.length
+      ) {
+        updatedErrors[
+          spec.name
+        ] = `Please select at least one option for ${spec.name}`
+        isValid = false
+      }
+    })
+
+    if (!isValid) {
+      Object.keys(updatedErrors).forEach((key) => {
+        form.setError(key, {
+          type: 'manual',
+          message: updatedErrors[key],
+        })
+      })
+
+      // Scroll to the top of the page
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+
+      // Show a toast message indicating the validation error
+      toast({
+        title: 'Validation Error',
+        description: 'Please fill in all required fields.',
+        variant: 'destructive',
+        className: 'bg-red-500 text-white',
+      })
+    } else {
+      form.clearErrors() // Clear all errors if valid
+    }
+
+    return isValid
+  }
+
   async function onSubmit(values: SpecificationFormType) {
-    console.log('Form Submitted:', values)
+    if (!validateSpecifications(values)) {
+      return
+    }
+
+    const allValues = form.getValues()
+
+    console.log('All form values for submission:', allValues)
 
     // Transform data.result to match SpecificationFormData[]
     const transformedData = (data?.result || []).map((spec) => ({
@@ -105,19 +164,16 @@ export default function SpecificationsForm({
 
     console.log('Final specs object:', specs)
 
-    const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN)
-    const { userId } = jwtDecode<{ userId: string }>(refreshToken as string)
-
     const requestBody = {
       specs,
-      userId,
+      userId: userId as string,
       vehicleId,
       vehicleCategoryId: vehicleCategoryId as string,
     }
 
     try {
       let response
-      if (type === 'Add') {
+      if (isAddOrIncomplete) {
         response = await addSpecifications(requestBody)
         console.log('response ', response)
       } else if (type === 'Update') {
@@ -133,10 +189,7 @@ export default function SpecificationsForm({
           className: 'bg-yellow text-white',
         })
 
-        queryClient.invalidateQueries({
-          queryKey: ['primary-details-form'],
-          exact: true,
-        })
+        refetchLevels?.()
         if (isAddOrIncomplete && onNextTab) {
           onNextTab()
         }
@@ -150,8 +203,6 @@ export default function SpecificationsForm({
       })
     }
   }
-
-  const fields = data?.result || []
 
   return isLoading ? (
     <FormSkelton />
@@ -170,15 +221,18 @@ export default function SpecificationsForm({
                 name={spec.name}
                 render={({ field }) => {
                   // selecting the default value for Update case.
-                  const selectedOption = spec.values.find(
-                    (
-                      option
-                    ): option is {
-                      name: string
-                      label: string
-                      selected: boolean
-                    } => 'selected' in option && option.selected
-                  )
+                  const selectedOption = spec.values
+                    .filter((option) => option !== null)
+                    .find(
+                      (
+                        option
+                      ): option is {
+                        name: string
+                        label: string
+                        selected: boolean
+                      } => option && 'selected' in option && option.selected
+                    )
+
                   return (
                     <FormItem className="flex w-full mb-2 max-sm:flex-col">
                       <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
@@ -190,10 +244,12 @@ export default function SpecificationsForm({
                           <SpecificationDropdown
                             onChangeHandler={field.onChange}
                             value={field.value || selectedOption?.name || ''}
-                            options={spec.values.map((value) => ({
-                              label: value.label,
-                              value: value.name,
-                            }))}
+                            options={spec.values
+                              .filter((value) => value !== null)
+                              .map((value) => ({
+                                label: value!.label, // Non-null assertion
+                                value: value!.name,
+                              }))}
                           />
                         </FormControl>
                         <FormMessage className="ml-2" />
@@ -214,7 +270,7 @@ export default function SpecificationsForm({
           disabled={form.formState.isSubmitting}
           className="w-full md:w-10/12 lg:w-8/12 mx-auto flex-center col-span-2 mt-3 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow"
         >
-          {type === 'Add' ? 'Add Specifications' : 'Update Specifications'}
+          {isAddOrIncomplete ? 'Add Specifications' : 'Update Specifications'}
           {form.formState.isSubmitting && <Spinner />}
         </Button>
       </form>

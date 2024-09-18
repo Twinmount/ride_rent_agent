@@ -104,11 +104,9 @@ const RegistrationForm = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex-1 bg-white shadow-lg p-4 pb-6 rounded-[1rem] w-full"
+        className="flex-1 bg-white shadow-lg p-4 pb-6 rounded-[1rem] border w-full"
       >
-        <h3 className="mb-4 text-xl text-center">
-          Join <span className="font-bold ">Ride.Rent</span>
-        </h3>
+        <h3 className="mb-4 text-2xl font-bold text-center">Register Now</h3>
         <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto ">
           {/* mobile / whatsapp*/}
           <FormField

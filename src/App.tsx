@@ -12,6 +12,7 @@ import { AgentProvider } from './context/AgentContext'
 import { toast } from './components/ui/use-toast'
 import ProtectedRoute from './layout/ProtectedRoutes'
 import LazyLoader from './components/loading-skelton/LazyLoader'
+import { HelmetProvider } from 'react-helmet-async'
 
 // dynamic import
 const RegistrationPage = lazy(() => import('./pages/register/RegistrationPage'))
@@ -52,7 +53,9 @@ const router = createBrowserRouter([
   {
     element: (
       <Suspense fallback={<LazyLoader />}>
-        <Outlet />
+        <HelmetProvider>
+          <Outlet />
+        </HelmetProvider>
       </Suspense>
     ),
     errorElement: <ErrorPage />,
@@ -104,11 +107,11 @@ const router = createBrowserRouter([
               { path: '/listings', element: <ListingsPage /> },
               { path: '/profile', element: <ProfilePage /> },
               {
-                path: '/listings/add',
+                path: '/listings/add/:userId',
                 element: <VehiclesFormAddPage />,
               },
               {
-                path: '/listings/view/:vehicleId',
+                path: '/listings/view/:vehicleId/:companyId/:userId',
                 element: <VehiclesFormUpdatePage />,
               },
             ],
