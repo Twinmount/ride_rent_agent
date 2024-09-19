@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
@@ -143,6 +143,14 @@ export default function PrimaryDetailsForm({
     }
   }
 
+  useEffect(() => {
+    console.log('form errors :', form.formState.errors)
+    // Check for validation errors and scroll to the top if errors are present
+    if (Object.keys(form.formState.errors).length > 0) {
+      window.scrollTo({ top: 170, behavior: 'smooth' }) // Scroll to the top of the page
+    }
+  }, [form.formState.errors])
+
   return (
     <Form {...form}>
       <form
@@ -174,8 +182,8 @@ export default function PrimaryDetailsForm({
                   <FormDescription className="ml-2">
                     select vehicle category
                   </FormDescription>
+                  <FormMessage />
                 </div>
-                <FormMessage />
               </FormItem>
             )}
           />

@@ -10,7 +10,6 @@ import { jwtDecode } from 'jwt-decode'
 import LazyLoader from '@/components/loading-skelton/LazyLoader'
 import ProtectedPage from '@/pages/general/ProtectedPage'
 import ApprovalStatusPage from '@/pages/general/ApprovalStatusPage'
-import RegistrationComplete from '@/pages/register/RegistrationComplete'
 import ScrollToTop from '@/helpers/ScrollToTop'
 
 export default function Layout() {

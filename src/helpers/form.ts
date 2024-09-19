@@ -214,7 +214,6 @@ export function mapGetPrimaryFormToPrimaryFormType(
     isLease: data.isLease,
     isCryptoAccepted: data.isCryptoAccepted,
     isSpotDeliverySupported: data.isSpotDeliverySupported,
-    description: data.description,
     specification: data.specification as 'UAE_SPEC' | 'USA_SPEC' | 'OTHERS',
     rentalDetails: data.rentalDetails,
     phoneNumber: formattedPhoneNumber, // Set the combined phone number
