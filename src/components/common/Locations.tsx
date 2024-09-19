@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query'
 import { fetchAllStates } from '@/api/states'
 import { fetchAllCities } from '@/api/cities'
 import { CityType, StateType } from '@/types/API-types'
-import LocationsTabSkelton from '../loading-skelton/LocationsTabSkelton'
 import CitiesSkelton from '../loading-skelton/CitiesSkelton'
 
 const Locations = () => {

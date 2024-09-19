@@ -38,7 +38,6 @@ const CategoryDropdown = ({
     if (data) {
       setCategories(data.result.list)
     }
-    console.log('category data : ', data)
   }, [data])
 
   return (

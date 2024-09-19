@@ -156,12 +156,15 @@ export function formatFeatures(
  *
  * @param {Record<string, string | null>} values - The values from the form submission.
  * @param {SpecificationFormData[]} specData - The specification data returned from the API.
- * @returns {Record<string, { name: string; value: string; selected: boolean }>} - The formatted specifications object for the POST request.
+ * @returns {Record<string, { name: string; value: string; selected: boolean; hoverInfo: string }>} - The formatted specifications object for the POST request.
  */
 export function formatSpecifications(
   values: Record<string, string | null>,
   specData: SpecificationFormData[]
-): Record<string, { name: string; value: string; selected: boolean }> {
+): Record<
+  string,
+  { name: string; value: string; selected: boolean; hoverInfo: string }
+> {
   return Object.keys(values).reduce((acc, key) => {
     const selectedLabel = values[key] as string
     const specItem = specData.find((spec) => spec.name === key)
@@ -176,11 +179,12 @@ export function formatSpecifications(
           name: selectedValueObj.name,
           value: selectedValueObj.label,
           selected: true,
+          hoverInfo: specItem.hoverInfo, // Adding hoverInfo to the object
         }
       }
     }
     return acc
-  }, {} as Record<string, { name: string; value: string; selected: boolean }>)
+  }, {} as Record<string, { name: string; value: string; selected: boolean; hoverInfo: string }>) // Updated return type to include hoverInfo
 }
 
 /**

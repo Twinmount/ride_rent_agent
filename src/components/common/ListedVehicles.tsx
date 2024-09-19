@@ -31,12 +31,14 @@ export default function ListedVehicles({
   const [isUpdating, setIsUpdating] = useState<boolean>(false) // To handle the update process
 
   const handleShare = (vehicle: SingleVehicleType) => {
+    const vehiclePublicUrl = `https://ride.rent/${vehicle.state.stateValue}/${vehicle.vehicleCategory.value}/${vehicle.vehicleId}`
+
     if (navigator.share) {
       navigator
         .share({
           title: vehicle.vehicleModel,
           text: `Check out this vehicle: ${vehicle.vehicleModel}`,
-          url: window.location.href,
+          url: vehiclePublicUrl,
         })
         .catch((error) => console.error('Error sharing', error))
     } else {
@@ -101,7 +103,7 @@ export default function ListedVehicles({
             >
               <div className="w-full h-[70%] min-h-[170px] max-h-[70%] overflow-hidden relative">
                 <Link
-                  to={`/listings/view/${vehicle.vehicleId}`}
+                  to={`/listings/view/${vehicle.vehicleId}/${companyId}/${userId}`}
                   className="w-full cursor-pointer"
                 >
                   <img

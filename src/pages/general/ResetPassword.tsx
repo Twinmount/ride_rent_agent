@@ -57,14 +57,12 @@ const LoginPage = () => {
         body: requestBody,
       })
 
-      console.log('reset password data; ', data)
-
       if (data) {
         sessionStorage.setItem('otpId', data?.result.otpId)
         navigate('/reset-password/verify-otp')
       }
     } catch (error: any) {
-      console.log('error : ', error)
+      console.error('error : ', error)
       if (error.response && error.response.status === 400) {
         toast({
           variant: 'destructive',

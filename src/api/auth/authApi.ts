@@ -22,7 +22,6 @@ export const register = async (
   values: registerArgsType,
   countryCode: string
 ): Promise<RegisterResponse> => {
-  console.log('register or send otp values: ', values)
   try {
     // extracting phone number and country code
     const phoneNumber = values.phoneNumber.replace(`+${countryCode}`, '').trim()
@@ -32,8 +31,6 @@ export const register = async (
       phoneNumber,
       password: values.password,
     }
-
-    console.log('requestBody: ', requestBody)
 
     // Send the FormData object using the API post method
     const data = await API.post<RegisterResponse>({
@@ -57,7 +54,6 @@ export const resendOTP = async (
   values: resendOtpArgsType
 ): Promise<RegisterResponse> => {
   try {
-    console.log('resendOTP values ', values)
     // Send the FormData object using the API post method
     const data = await API.post<RegisterResponse>({
       slug: Slug.REGISTER,

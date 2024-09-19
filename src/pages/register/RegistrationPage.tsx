@@ -11,7 +11,7 @@ import { Helmet } from 'react-helmet-async'
 export default function RegistrationPage() {
   return (
     <>
-      <section className="py-10 bg-white wrapper">
+      <section className="pb-10 bg-white ">
         <Helmet>
           <title>
             Register Your Vehicle for Free on Ride.Rent- Advertise Cars, Boats,
@@ -28,24 +28,25 @@ export default function RegistrationPage() {
             and book the perfect vehicle for their needs"
           />
         </Helmet>
-        {/* top heading */}
-        <MotionDiv className="mt-4 mb-16 text-center">
-          <h1 className="text-[1.9rem] font-semibold">
-            A SINGLE PLATFORM TO RENT YOUR VEHICLES
-          </h1>
-          <h2 className="text-gray-700 text-[1.1rem]">
-            Register and showcase your fleet to the world, get faster bookings
-          </h2>
-        </MotionDiv>
 
         {/* form section */}
-        <MotionDiv className="flex flex-col-reverse items-center justify-center gap-4 mx-auto mb-12 md:w-4/5 lg:w-[80%] xl:w-[60%] lg:flex-row">
-          {/* sign up features */}
-          <SignUpFeatures />
+        <div
+          className="h-auto min-h-screen flex-center max-lg:py-10"
+          style={{
+            backgroundImage: `url('/assets/img/bg/register-banner.webp')`,
+            backgroundSize: 'cover', // This ensures the image covers the div
+            backgroundPosition: 'center', // This centers the background image
+            backgroundRepeat: 'no-repeat', // Prevent the image from repeating
+          }}
+        >
+          <MotionDiv className="flex flex-col items-center justify-center gap-4 mx-auto mb-12 lg:flex-row W-[95%] lg:w-[85%]">
+            {/* sign up features */}
+            <SignUpFeatures />
 
-          {/* form */}
-          <RegistrationForm />
-        </MotionDiv>
+            {/* form */}
+            <RegistrationForm />
+          </MotionDiv>
+        </div>
 
         {/* Why Join Us */}
         <WhyJoin data={features} />

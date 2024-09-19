@@ -152,8 +152,6 @@ export default function CompanyRegistrationForm({
   }
 
   async function onSubmit(values: z.infer<typeof CompanyFormSchema>) {
-    console.log('company form values', values)
-
     // Check if OTP is verified before submitting the form
     if (!isOtpVerified) {
       toast({
@@ -187,7 +185,7 @@ export default function CompanyRegistrationForm({
         navigate('/')
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
       toast({
         variant: 'destructive',
         title: `${type} Company failed`,

@@ -51,8 +51,6 @@ const ConfirmNewPassword = () => {
         body: requestBody,
       })
 
-      console.log('confirm password data; ', data)
-
       if (data) {
         toast({
           title: 'Password changed successfully',
@@ -63,7 +61,7 @@ const ConfirmNewPassword = () => {
         navigate('/')
       }
     } catch (error: any) {
-      console.log('error : ', error)
+      console.error('error : ', error)
       if (error.response && error.response.status === 400) {
         toast({
           variant: 'destructive',

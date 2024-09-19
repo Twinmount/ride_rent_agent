@@ -76,8 +76,6 @@ export default function PrimaryDetailsForm({
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof PrimaryFormSchema>) {
-    console.log('level one submit handler values : ', values)
-
     const rentalError = validateRentalDetails(values.rentalDetails)
     if (rentalError) {
       form.setError('rentalDetails', {
@@ -139,15 +137,19 @@ export default function PrimaryDetailsForm({
           description: 'Something went wrong',
         })
       }
-      console.log(error)
+      console.error(error)
     }
   }
 
   useEffect(() => {
-    console.log('form errors :', form.formState.errors)
     // Check for validation errors and scroll to the top if errors are present
     if (Object.keys(form.formState.errors).length > 0) {
-      window.scrollTo({ top: 170, behavior: 'smooth' }) // Scroll to the top of the page
+      toast({
+        variant: 'destructive',
+        title: `Validation Error`,
+        description: 'Please make sure values are provided',
+      })
+      window.scrollTo({ top: 65, behavior: 'smooth' }) // Scroll to the top of the page
     }
   }, [form.formState.errors])
 

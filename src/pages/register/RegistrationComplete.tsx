@@ -4,8 +4,6 @@ import { getUser } from '@/api/user'
 import { load, StorageKeys } from '@/utils/storage'
 import { jwtDecode } from 'jwt-decode'
 import { DecodedRefreshToken } from '@/layout/ProtectedRoutes'
-import Lottie from 'react-lottie'
-import animationData from '@/data/confetti.json'
 import { CheckCheck, Files } from 'lucide-react'
 import { useState } from 'react'
 import LazyLoader from '@/components/loading-skelton/LazyLoader'
@@ -61,26 +59,9 @@ export default function RegistrationComplete() {
     )
   }
 
-  const defaultOptions = {
-    loop: false,
-    autoplay: true,
-    animationData: animationData,
-    rendererSettings: {
-      preserveAspectRatio: 'xMidYMid slice',
-    },
-  }
-
   return (
     <section className="flex flex-col items-center justify-center h-screen p-4 bg-gray-100">
       <div className="relative">
-        <div className="absolute -bottom-5 -left-36">
-          <Lottie
-            speed={0.2}
-            options={defaultOptions}
-            height={160}
-            width={600}
-          />
-        </div>
         <h1 className="mb-8 text-3xl font-bold">Registration Complete</h1>
       </div>
 

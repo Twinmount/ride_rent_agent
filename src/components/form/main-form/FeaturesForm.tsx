@@ -43,10 +43,6 @@ export default function FeaturesForm({
 
   const queryClient = useQueryClient()
 
-  console.log('vehicleID: ', vehicleId)
-  console.log('vehicleCategoryId: ', vehicleCategoryId)
-  console.log('userId: ', userId)
-
   const { data, isLoading } = useQuery({
     queryKey: [
       isAddOrIncomplete ? 'features-form-data' : 'features-update-form-data',
@@ -67,8 +63,6 @@ export default function FeaturesForm({
     },
     enabled: !!vehicleId,
   })
-
-  console.log('FeaturesFormData ', data)
 
   const form = useForm<FeaturesFormType>({
     defaultValues: {},
@@ -110,16 +104,12 @@ export default function FeaturesForm({
   }
 
   async function onSubmit(values: FeaturesFormType) {
-    console.log('Form Submitted:', values)
-
     // Validate before submitting
     const isValid = validateFeatures(values)
     if (!isValid) return // Exit if not valid
 
     // Prepare the features object for the request body
     const features = formatFeatures(values, data?.result || [])
-
-    console.log('formated features:', features)
 
     const requestBody = {
       features,
@@ -135,7 +125,6 @@ export default function FeaturesForm({
       } else {
         response = await updateFeatures({ features, vehicleId })
       }
-      console.log(response)
       if (response) {
         toast({
           title: `Features ${type.toLowerCase()}ed successfully`,

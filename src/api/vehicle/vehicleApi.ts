@@ -237,10 +237,6 @@ export const getSpecificationFormFieldData = async ({
   vehicleCategoryId,
   vehicleTypeId,
 }: GetSpecificationFormDataParams): Promise<GetSpecificationFormFieldsResponse> => {
-  console.log(
-    'get specification form field api called, here is the vehicleCategoryId',
-    vehicleCategoryId
-  )
   try {
     const url = `${Slug.GET_SPEC_FORM_FIELD_LIST}?vehicleCategoryId=${vehicleCategoryId}&vehicleTypeId=${vehicleTypeId}&page=${page}&limit=${limit}&sortOrder=${sortOrder}`
 
@@ -286,6 +282,7 @@ type SpecificationItem = {
   name: string
   value: string
   selected: boolean
+  hoverInfo: string
 }
 
 // add specification form argument type
@@ -315,7 +312,10 @@ export const addSpecifications = async (
 
 // Update specification form argument type
 type UpdateSpecificationsRequestBody = {
-  specs: Record<string, { name: string; value: string; selected: boolean }>
+  specs: Record<
+    string,
+    { name: string; value: string; selected: boolean; hoverInfo: string }
+  >
   vehicleId: string
 }
 

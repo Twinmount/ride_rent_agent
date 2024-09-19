@@ -45,8 +45,6 @@ export default function SpecificationsForm({
 
   const { userId } = useParams<{ userId: string }>()
 
-  console.log('is add or incomplete', isAddOrIncomplete)
-
   // useQuery for fetching form data, now relying on levelsFilled
   const { data, isLoading } = useQuery({
     queryKey: [
@@ -146,10 +144,6 @@ export default function SpecificationsForm({
       return
     }
 
-    const allValues = form.getValues()
-
-    console.log('All form values for submission:', allValues)
-
     // Transform data.result to match SpecificationFormData[]
     const transformedData = (data?.result || []).map((spec) => ({
       ...spec,
@@ -162,8 +156,6 @@ export default function SpecificationsForm({
     // Format the data as per the backend requirement
     const specs = formatSpecifications(values, transformedData)
 
-    console.log('Final specs object:', specs)
-
     const requestBody = {
       specs,
       userId: userId as string,
@@ -175,7 +167,6 @@ export default function SpecificationsForm({
       let response
       if (isAddOrIncomplete) {
         response = await addSpecifications(requestBody)
-        console.log('response ', response)
       } else if (type === 'Update') {
         response = await updateSpecifications({
           specs,

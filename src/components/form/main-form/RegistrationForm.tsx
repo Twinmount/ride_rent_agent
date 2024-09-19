@@ -48,15 +48,6 @@ const RegistrationForm = () => {
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof RegistrationFormSchema>) {
-    console.log(values)
-
-    // if (!isPhoneValid(values.phoneNumber)) {
-    //   form.setError('phoneNumber', {
-    //     type: 'manual',
-    //     message: 'Provide valid phone number',
-    //   })
-    //   return
-    // }
     try {
       const phoneNumber = values.phoneNumber
         .replace(`+${countryCode}`, '')
@@ -104,9 +95,10 @@ const RegistrationForm = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex-1 bg-white shadow-lg p-4 pb-6 rounded-[1rem] border w-full"
+        className="flex-1 bg-white shadow-lg p-4 pb-6 rounded-[1rem] border w-full min-w-[350px] max-w-[400px]"
       >
-        <h3 className="mb-4 text-2xl font-bold text-center">Register Now</h3>
+        <h3 className="text-2xl font-bold text-center ">Register Now</h3>
+        <h4 className="mb-4 text-base text-center">No Credit Card Required</h4>
         <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto ">
           {/* mobile / whatsapp*/}
           <FormField

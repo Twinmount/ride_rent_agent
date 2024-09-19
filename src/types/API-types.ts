@@ -358,7 +358,8 @@ export interface GetLevelsFilledResponse {
 export type SpecificationFormData = {
   id: string
   name: string
-  values: { label: string; name: string; _id: string }[]
+  hoverInfo: string
+  values: { label: string; name: string; _id: string; hoverInfo: string }[]
   vehicleCategoryId: string
 }
 
@@ -379,6 +380,7 @@ export interface GetSpecificationFormFieldsResponse {
 export type SpecificationField = {
   id: string
   name: string
+  hoverInfo: string
   values: {
     name: string
     label: string
@@ -391,7 +393,7 @@ export type SpecificationField = {
 // Type for the API response (for "Update")
 export interface GetSpecificationFormDataResponse {
   status: string
-  result: SpecificationField[] // Array of SpecificationField
+  result: SpecificationField[]
   statusCode: number
 }
 
