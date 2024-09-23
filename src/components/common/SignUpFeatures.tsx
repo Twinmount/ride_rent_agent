@@ -11,7 +11,7 @@ const SignUpFeatures = () => {
       </h2>
       <ul className="flex flex-col gap-1 text-lg font-semibold text-white w-fit max-lg:mx-auto">
         <li className="flex items-center gap-x-1">
-          <Check className="mb-auto text-yellow" /> No Middlemen of Commission
+          <Check className="mb-auto text-yellow" /> No Middlemen or Commission
         </li>
         <li className="flex items-center gap-x-1">
           <Check className="mb-auto text-yellow" />

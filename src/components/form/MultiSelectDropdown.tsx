@@ -1,11 +1,13 @@
+import { useEffect, useState } from 'react'
+import { Label } from '@/components/ui/label'
 import {
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent,
-} from '@/components/ui/accordion'
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+} from '@/components/ui/dropdown-menu'
+import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import { FormControl, FormLabel, FormItem } from '@/components/ui/form'
-import { useEffect } from 'react'
+import { ChevronDown } from 'lucide-react'
 
 type MultiSelectDropdownProps = {
   value?: string[]
@@ -13,7 +15,6 @@ type MultiSelectDropdownProps = {
   placeholder?: string
   options: { name: string; label: string; selected: boolean }[]
   isDisabled?: boolean
-  uniqueValue: string
 }
 
 const MultiSelectDropdown = ({
@@ -21,65 +22,75 @@ const MultiSelectDropdown = ({
   onChangeHandler,
   options,
   isDisabled = false,
-  uniqueValue,
 }: MultiSelectDropdownProps) => {
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(value) // Selected options state
+
+  // Pre-select values on mount (for Update case)
   useEffect(() => {
-    // Pre-select the values on mount (for Update case)
     const timer = setTimeout(() => {
-      if (value.length === 0) {
+      if (selectedOptions.length === 0) {
         const preSelectedValues = options
           .filter((option) => option.selected)
           .map((option) => option.name)
-
-        onChangeHandler(preSelectedValues)
+        setSelectedOptions(preSelectedValues)
+        onChangeHandler(preSelectedValues) // Sync initial state with form handler
       }
-    }, 1000)
-
-    // Cleanup function to clear the timeout if the component unmounts
+    }, 500)
     return () => clearTimeout(timer)
-  }, []) // Empty dependency array to run only on mount
+  }, [onChangeHandler, options, selectedOptions])
 
-  const handleCheckboxChange = (checkedValue: string, isChecked: boolean) => {
-    // Modify the selected values based on checkbox interaction
-    const newValue = isChecked
-      ? [...value, checkedValue]
-      : value.filter((val) => val !== checkedValue)
-
-    onChangeHandler(newValue) // Call the handler to update form value
+  const handleOptionSelect = (optionName: string) => {
+    let updatedOptions
+    if (selectedOptions.includes(optionName)) {
+      updatedOptions = selectedOptions.filter((o) => o !== optionName)
+    } else {
+      updatedOptions = [...selectedOptions, optionName]
+    }
+    setSelectedOptions(updatedOptions)
+    onChangeHandler(updatedOptions) // Update form value
   }
+
   return (
-    <AccordionItem value={uniqueValue} className="pb-2 mb-2 border-none">
-      <AccordionTrigger
-        disabled={isDisabled}
-        className="px-2 overflow-hidden bg-white border rounded-lg hover:no-underline"
-      >
-        <div className="text-gray-500">
-          {value.length > 0
-            ? `${value.length} features selected`
-            : 'Choose features'}
-        </div>
-      </AccordionTrigger>
-      <AccordionContent className="overflow-y-auto max-h-96 bg-slate-50">
-        {options.length > 0 &&
-          options.map((option) => (
-            <FormItem
-              key={option.name}
-              className="flex items-center gap-2 mb-1"
-            >
-              <FormControl>
+    <div className="relative pb-2 border-none top-1">
+      {/* Trigger Button */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            className={`w-full justify-between px-2 overflow-hidden bg-white border rounded-lg hover:no-underline cursor-pointer ${
+              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            <span>
+              {selectedOptions.length > 0
+                ? `${selectedOptions.length} selected`
+                : 'Choose features'}
+            </span>
+            <ChevronDown />
+          </Button>
+        </DropdownMenuTrigger>
+
+        {/* Dropdown Menu Content */}
+        <DropdownMenuContent className="max-sm:w-full w-[400px] p-4 overflow-auto bg-slate-50 shadow-lg max-h-96">
+          {/* Multi-select options */}
+          <div className="flex flex-col w-full gap-2">
+            {options.map((option) => (
+              <div key={option.name} className="flex items-center gap-2 mb-1">
                 <Checkbox
-                  checked={value.includes(option.name)} // Set checkbox state based on selected values
-                  onCheckedChange={(checked) =>
-                    handleCheckboxChange(option.name, checked as boolean)
-                  }
-                  className="bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none mt-2"
+                  id={option.name}
+                  checked={selectedOptions.includes(option.name)}
+                  onCheckedChange={() => handleOptionSelect(option.name)}
+                  className="bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none "
                 />
-              </FormControl>
-              <FormLabel className="">{option.label}</FormLabel>
-            </FormItem>
-          ))}
-      </AccordionContent>
-    </AccordionItem>
+                <Label htmlFor={option.name} className="font-normal">
+                  {option.label}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }
 

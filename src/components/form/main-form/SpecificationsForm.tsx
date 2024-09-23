@@ -45,6 +45,10 @@ export default function SpecificationsForm({
 
   const { userId } = useParams<{ userId: string }>()
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
+
   // useQuery for fetching form data, now relying on levelsFilled
   const { data, isLoading } = useQuery({
     queryKey: [

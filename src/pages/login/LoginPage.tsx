@@ -108,16 +108,17 @@ const LoginPage = () => {
           backgroundRepeat: 'no-repeat', // Prevent the image from repeating
         }}
       >
-        <h1 className="mb-3 text-5xl font-extrabold text-white max-lg:text-4xl max-lg:text-center">
+        <div className="absolute inset-0 bg-black opacity-50"></div>
+        <h1 className="z-10 mb-3 text-5xl font-extrabold text-white max-lg:text-4xl max-lg:text-center">
           SHOWCASE YOUR FLEET TO THE WORLD
         </h1>
-        <h2 className="mb-4 text-3xl font-semibold text-white max-lg:text-xl max-lg:text-center">
+        <h2 className="z-10 mb-4 text-3xl font-semibold text-white max-lg:text-xl max-lg:text-center">
           Log in and manage your fleet, categories, and bookings
         </h2>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className=" bg-white shadow-lg p-4 pb-6 rounded-[1rem] w-full max-md:w-[95%] h-fit max-h-fit max-w-[500px] mx-auto"
+            className="z-10  bg-white shadow-lg p-4 pb-6 rounded-[1rem] w-full max-md:w-[95%] h-fit max-h-fit max-w-[500px] mx-auto"
           >
             <h3 className="mb-4 text-3xl font-bold text-center text-yellow">
               Login Now

@@ -16,7 +16,7 @@ import ImagePreviewModal from '../modal/ImagePreviewModal'
 type SingleFileUploadProps = {
   name: string
   label: string
-  description: string
+  description: React.ReactNode
   maxSizeMB?: number
   existingFile?: string | null
   isDisabled?: boolean

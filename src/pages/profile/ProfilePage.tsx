@@ -9,6 +9,7 @@ import { DecodedRefreshToken } from '@/layout/ProtectedRoutes'
 import { jwtDecode } from 'jwt-decode'
 import { getUser } from '@/api/user'
 import LazyLoader from '@/components/loading-skelton/LazyLoader'
+import SupportModal from '@/components/modal/SupportModal'
 
 export default function ProfilePage() {
   const [isCopied, setIsCopied] = useState(false)
@@ -189,15 +190,9 @@ export default function ProfilePage() {
         </div>
 
         <div className="mt-3 flex-between">
-          {/* delete account */}
-          {/* <Link to={'/'} className="text-red-500 w-fit">
-            Delete account?
-          </Link> */}
-
-          {/* edit profile */}
-          <Link to={'/help'} className="text-blue-500 w-fit">
-            Edit profile?
-          </Link>
+          <div className="mr-6 flex-center gap-x-4">
+            <SupportModal classes="text-blue-500 w-fit flex-center gap-x-2" />
+          </div>
         </div>
       </dl>
     </section>

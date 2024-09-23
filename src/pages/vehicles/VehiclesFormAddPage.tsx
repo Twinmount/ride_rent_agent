@@ -61,7 +61,7 @@ export default function VehiclesFormAddPage() {
           <CircleArrowLeft />
         </button>
         <h1 className="text-center h3-bold max-sm:text-xl sm:text-left">
-          Manually Add New Vehicle
+          Add New Vehicle
         </h1>
       </div>
 

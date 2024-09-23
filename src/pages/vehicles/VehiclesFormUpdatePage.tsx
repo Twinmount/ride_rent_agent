@@ -88,9 +88,7 @@ export default function VehiclesFormUpdatePage() {
         >
           <CircleArrowLeft />
         </button>
-        <h1 className="text-center h3-bold sm:text-left">
-          Vehicle Details Form
-        </h1>
+        <h1 className="text-center h3-bold sm:text-left">Vehicle Details</h1>
       </div>
 
       <div>

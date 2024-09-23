@@ -19,10 +19,10 @@ import {
 } from '@/api/vehicle'
 import FormSkelton from '@/components/loading-skelton/FormSkelton'
 import Spinner from '@/components/general/Spinner'
-import { Accordion } from '@/components/ui/accordion'
 import { useNavigate, useParams } from 'react-router-dom'
 import { toast } from '@/components/ui/use-toast'
 import { formatFeatures } from '@/helpers/form'
+import { useEffect } from 'react'
 
 type FeaturesFormType = Record<string, string[] | null>
 
@@ -42,6 +42,10 @@ export default function FeaturesForm({
   const { userId } = useParams<{ userId: string }>()
 
   const queryClient = useQueryClient()
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
 
   const { data, isLoading } = useQuery({
     queryKey: [
@@ -154,50 +158,47 @@ export default function FeaturesForm({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col w-full gap-5 mx-auto bg-white rounded-3xl p-2 md:p-4 py-8 !pb-8"
+        className="flex flex-col w-full gap-5 p-2 py-8 pb-64 mx-auto bg-white rounded-3xl "
       >
         <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto">
-          <Accordion type="single" collapsible>
-            {fields.length > 0 ? (
-              fields.map((feature, index) => (
-                <FormField
-                  key={feature.id}
-                  control={form.control}
-                  name={feature.name}
-                  render={({ field }) => {
-                    return (
-                      <FormItem className="flex w-full mb-2 max-sm:flex-col">
-                        <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
-                          {feature.name}
-                          <span className="mr-5 max-sm:hidden">:</span>
-                        </FormLabel>
-                        <div className="flex-col items-start w-full">
-                          <FormControl>
-                            <MultiSelectDropdown
-                              uniqueValue={index.toString()}
-                              onChangeHandler={field.onChange}
-                              value={field.value || []}
-                              placeholder={feature.name}
-                              options={feature.values
-                                .filter((value) => value !== null)
-                                .map((value) => ({
-                                  label: value!.label,
-                                  name: value!.name,
-                                  selected: value!.selected as boolean,
-                                }))}
-                            />
-                          </FormControl>
-                          <FormMessage className="ml-2" />
-                        </div>
-                      </FormItem>
-                    )
-                  }}
-                />
-              ))
-            ) : (
-              <p>No features found for this category.</p>
-            )}
-          </Accordion>
+          {fields.length > 0 ? (
+            fields.map((feature) => (
+              <FormField
+                key={feature.id}
+                control={form.control}
+                name={feature.name}
+                render={({ field }) => {
+                  return (
+                    <FormItem className="flex w-full mb-2 overflow-hidden max-sm:flex-col">
+                      <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
+                        {feature.name}
+                        <span className="mr-5 max-sm:hidden">:</span>
+                      </FormLabel>
+                      <div className="flex-col items-start w-full">
+                        <FormControl>
+                          <MultiSelectDropdown
+                            onChangeHandler={field.onChange}
+                            value={field.value || []}
+                            placeholder={feature.name}
+                            options={feature.values
+                              .filter((value) => value !== null) // Filter out null values
+                              .map((value) => ({
+                                label: value!.label,
+                                name: value!.name,
+                                selected: value!.selected as boolean,
+                              }))}
+                          />
+                        </FormControl>
+                        <FormMessage className="ml-2" />
+                      </div>
+                    </FormItem>
+                  )
+                }}
+              />
+            ))
+          ) : (
+            <p>No features found for this category.</p>
+          )}
         </div>
 
         <Button

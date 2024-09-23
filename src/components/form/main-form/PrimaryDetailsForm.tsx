@@ -473,7 +473,10 @@ export default function PrimaryDetailsForm({
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    Enter the <span className="text-green-400">whatsapp</span>{' '}
+                    Enter the{' '}
+                    <span className="font-semibold text-green-400">
+                      Whatsapp
+                    </span>{' '}
                     mobile number. This number will receive the direct booking
                     details.
                   </FormDescription>

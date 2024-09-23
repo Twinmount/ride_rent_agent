@@ -8,7 +8,11 @@ import {
 } from '@/components/ui/dialog'
 import { MessageCircleMore } from 'lucide-react'
 
-export default function SupportModal() {
+export default function SupportModal({
+  classes = 'px-3 py-1 text-white transition-colors bg-black shadow-lg hover:text-yellow rounded-2xl flex-center gap-x-2',
+}: {
+  classes?: string
+}) {
   const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUM
   const whatsappMessage = 'Hello, I need support with Ride Rent.'
 
@@ -19,7 +23,7 @@ export default function SupportModal() {
   return (
     <Dialog>
       <DialogTrigger>
-        <div className="px-3 py-1 text-white transition-colors bg-black shadow-lg hover:text-yellow rounded-2xl flex-center gap-x-2">
+        <div className={classes}>
           Need help? <MessageCircleMore size={20} />
         </div>
       </DialogTrigger>
@@ -30,7 +34,7 @@ export default function SupportModal() {
           </DialogTitle>
           <DialogDescription aria-label="Delete selected item" />
           <div className="max-w-md p-2 text-center bg-white rounded-lg ">
-            <p className="mb-2 text-gray-700 ">
+            <p className="mb-2 text-gray-700 font-bold">
               Feel free to contact us! We are always happy to help you.
             </p>
             <ul className="mb-6 text-left text-gray-600 list-disc list-inside">
@@ -40,6 +44,7 @@ export default function SupportModal() {
               <li>Issues with uploading vehicle photos?</li>
               <li>Want to know more about your subscription plan?</li>
               <li>Have questions about your account settings?</li>
+              <li>Delete your account?</li>
             </ul>
             <p className="mb-6 text-sm text-gray-600">
               Click the button below to chat with us via WhatsApp

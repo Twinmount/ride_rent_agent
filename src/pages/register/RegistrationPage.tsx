@@ -31,15 +31,15 @@ export default function RegistrationPage() {
 
         {/* form section */}
         <div
-          className="h-auto min-h-screen flex-center max-lg:py-10"
+          className="h-auto min-h-[88vh] flex-center max-lg:py-10"
           style={{
             backgroundImage: `url('/assets/img/bg/register-banner.webp')`,
-            backgroundSize: 'cover', // This ensures the image covers the div
-            backgroundPosition: 'center', // This centers the background image
-            backgroundRepeat: 'no-repeat', // Prevent the image from repeating
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
           }}
         >
-          <MotionDiv className="flex flex-col items-center justify-center gap-4 mx-auto mb-12 lg:flex-row W-[95%] lg:w-[85%]">
+          <MotionDiv className="flex z-10 flex-col items-center justify-center gap-4 mx-auto mb-12 lg:flex-row W-[95%] lg:w-[85%]">
             {/* sign up features */}
             <SignUpFeatures />
 
