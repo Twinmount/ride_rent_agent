@@ -45,7 +45,6 @@ const VehiclesFormUpdatePage = lazy(
 const Dashboard = lazy(() => import('./pages/dashboard/Dashboard'))
 const ListingsPage = lazy(() => import('./pages/listings/ListingsPage'))
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage'))
-const HelpPage = lazy(() => import('./pages/general/HelpPage'))
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL
 
@@ -94,14 +93,10 @@ const router = createBrowserRouter([
         element: <ConfirmNewPassword />,
       },
       {
-        path: '/help',
-        element: <HelpPage />,
-      },
-      {
-        element: <Layout />,
+        element: <ProtectedRoute />,
         children: [
           {
-            element: <ProtectedRoute />,
+            element: <Layout />,
             children: [
               { path: '/', element: <Dashboard /> },
               { path: '/listings', element: <ListingsPage /> },

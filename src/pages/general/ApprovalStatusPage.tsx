@@ -1,3 +1,4 @@
+import SupportModal from '@/components/modal/SupportModal'
 import { MessageCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 
@@ -33,13 +34,7 @@ export default function ApprovalStatusPage({
               </span>
             </div>
             <div className="flex justify-center mt-6">
-              <Link
-                to={'/help'}
-                className="flex items-center gap-2 px-4 py-2 text-white bg-green-500 rounded-full hover:bg-green-600"
-              >
-                <MessageCircle size={20} />
-                Contact Support
-              </Link>
+              <SupportModal />
             </div>
           </>
         )}

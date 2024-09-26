@@ -1,9 +1,10 @@
-import { useEffect } from 'react'
-import { Outlet, useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { jwtDecode } from 'jwt-decode'
 import { load, save, StorageKeys, remove } from '../utils/storage'
 import { API } from '@/api/ApiService'
 import { Slug } from '@/api/Api-Endpoints'
+import LazyLoader from '@/components/loading-skelton/LazyLoader'
 
 export interface DecodedAccessToken {
   email: string | null
@@ -36,7 +37,7 @@ interface RefreshResponse {
 const isTokenExpired = (exp: number, bufferInMinutes: number = 10): boolean => {
   const currentTime = Math.floor(Date.now() / 1000) // Current time in seconds
   const bufferTime = bufferInMinutes * 60 // Convert buffer time to seconds
-  return exp - bufferTime < currentTime // Returns true if the token is considered expired
+  return exp - bufferTime < currentTime // Returns true if the token is considered expired or within the buffer
 }
 
 /**
@@ -80,11 +81,13 @@ const refreshAccessToken = async (): Promise<boolean> => {
 
 /**
  * The ProtectedRoute component checks if the user is authorized to access the route.
- * If the access token is expired, it tries to refresh it using the refresh token.
+ * If the access token is expiring soon, it tries to refresh it using the refresh token.
  * If the refresh fails, the user is redirected to the login page.
  */
 const ProtectedRoute = () => {
-  const navigate = useNavigate() // React Router's hook for navigation
+  const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
+  const location = useLocation()
 
   useEffect(() => {
     const checkAuthorization = async () => {
@@ -102,6 +105,7 @@ const ProtectedRoute = () => {
         // Decode the access token to check its expiration time
         const decodedAccessToken = jwtDecode<DecodedAccessToken>(accessToken)
 
+        // Check if the access token is expired or about to expire (with a buffer of 0.1 minute)
         if (isTokenExpired(decodedAccessToken.exp)) {
           const refreshed = await refreshAccessToken() // Attempt to refresh the access token
 
@@ -116,11 +120,21 @@ const ProtectedRoute = () => {
         remove(StorageKeys.ACCESS_TOKEN)
         remove(StorageKeys.REFRESH_TOKEN)
         navigate('/login', { replace: true }) // Redirect to login page
+      } finally {
+        setLoading(false) // Set loading to false after the check is complete
       }
     }
 
-    checkAuthorization() // Run the authorization check when the component mounts
-  }, [navigate]) // Dependency array ensures this effect runs when the component mounts
+    // Run checkAuthorization on route changes
+    checkAuthorization()
+
+    const interval = setInterval(checkAuthorization, 300000)
+    return () => clearInterval(interval) // Cleanup interval on component unmount
+  }, [navigate, location]) // Dependency array ensures this effect runs on route changes and on initial mount
+
+  if (loading) {
+    return <LazyLoader /> // Show a loading screen while the token validation is in progress
+  }
 
   return <Outlet /> // Render the protected route's children if authorized
 }

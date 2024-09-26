@@ -6,7 +6,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog'
-import { MessageCircleMore } from 'lucide-react'
+import { Mail, MessageCircleMore, Phone } from 'lucide-react'
 
 export default function SupportModal({
   classes = 'px-3 py-1 text-white transition-colors bg-black shadow-lg hover:text-yellow rounded-2xl flex-center gap-x-2',
@@ -34,7 +34,7 @@ export default function SupportModal({
           </DialogTitle>
           <DialogDescription aria-label="Delete selected item" />
           <div className="max-w-md p-2 text-center bg-white rounded-lg ">
-            <p className="mb-2 text-gray-700 font-bold">
+            <p className="mb-2 font-bold text-gray-700">
               Feel free to contact us! We are always happy to help you.
             </p>
             <ul className="mb-6 text-left text-gray-600 list-disc list-inside">
@@ -58,6 +58,32 @@ export default function SupportModal({
               <MessageCircleMore size={20} className="mr-2" />
               WhatsApp us
             </a>
+
+            <div className="mt-3 text-lg font-bold text-center">OR</div>
+
+            {/* phone and mail */}
+            <div className="flex items-center justify-center mt-4 text-gray-700 max-sm:flex-col gap-x-6">
+              <div className="flex items-center p-1 bg-gray-100 rounded-lg">
+                <Phone className="w-5 h-5 text-blue-500" />
+                <a
+                  href="tel:+971502972335"
+                  className="ml-2 text-gray-600 hover:underline hover:text-gray-800"
+                >
+                  +971 - 502972335
+                </a>
+              </div>
+
+              <div className="flex items-center p-1 bg-gray-100 rounded-lg">
+                <Mail className="w-5 h-5 text-red-500" />
+                <a
+                  href="mailto:hello@ride.rent"
+                  className="ml-2 text-gray-600 hover:underline hover:text-gray-800"
+                >
+                  hello@ride.rent
+                </a>
+              </div>
+            </div>
+
             <p className="mt-4 text-xs text-gray-500">
               Support available Monday to Friday, 9am - 9pm.
             </p>
