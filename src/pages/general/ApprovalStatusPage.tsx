@@ -1,6 +1,4 @@
 import SupportModal from '@/components/modal/SupportModal'
-import { MessageCircle } from 'lucide-react'
-import { Link } from 'react-router-dom'
 
 type ApprovalStatusPageProps = {
   status: 'PENDING' | 'REJECTED'

@@ -9,6 +9,12 @@ export enum Slug {
   POST_RESET_PASSWORD = '/auth/reset-password',
   POST_VERIFY_RESET_PASSWORD = '/auth/verify-reset-password-otp',
 
+  // file upload endpoints
+  POST_SINGLE_FILE = '/file/upload/single',
+  GET_SINGLE_FILE = '/file',
+  DELETE_SINGLE_FILE = '/file',
+  POST_MULTIPLE_FILES = '/file/upload/multiple',
+
   // agent end points
   POST_COMPANY = '/company',
   PUT_COMPANY = '/company/seller',

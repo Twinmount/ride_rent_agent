@@ -8,86 +8,150 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Download, Eye, Upload, X } from 'lucide-react'
-import { validateFileSize } from '@/helpers/form'
+import { Upload, Eye, Download, Trash2, MoreVertical } from 'lucide-react'
 import { toast } from '@/components/ui/use-toast'
 import ImagePreviewModal from '../modal/ImagePreviewModal'
+import { uploadSingleFile } from '@/api/file-upload'
+import { GcsFilePaths } from '@/constants/enum'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
+import PreviewImageComponent from './PreviewImageComponent'
+
+import { downloadFileFromStream } from '@/helpers/form'
+import { Progress } from '../ui/progress'
 
 type SingleFileUploadProps = {
   name: string
   label: string
   description: React.ReactNode
-  maxSizeMB?: number
   existingFile?: string | null
   isDisabled?: boolean
+  maxSizeMB?: number
+  isDownloadable?: boolean
+  setIsFileUploading?: (isUploading: boolean) => void
+  bucketFilePath: GcsFilePaths
+  downloadFileName?: string
 }
 
-const SingleFileUpload: React.FC<SingleFileUploadProps> = ({
+const SingleFileUpload = ({
   name,
   label,
   description,
-  maxSizeMB = 5,
   existingFile = null,
   isDisabled = false,
-}) => {
+  maxSizeMB = 5,
+  isDownloadable = false,
+  setIsFileUploading,
+  bucketFilePath,
+  downloadFileName,
+}: SingleFileUploadProps) => {
   const { control, setValue, clearErrors } = useFormContext()
-  const [previewURL, setPreviewURL] = useState<string | null>(existingFile)
-  const [selectedImage, setSelectedImage] = useState<string | null>(null) // To track the image for modal preview
-  const [isDeleted, setIsDeleted] = useState(false) // Track if the file is deleted
+  const [isUploading, setIsUploading] = useState(false)
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [imagePath, setImagePath] = useState<string | null>(existingFile)
+  const [progress, setProgress] = useState<number>(0)
 
+  // Sync loading state with parent if necessary
   useEffect(() => {
-    // Set the preview to the existing URL only if no new file has been selected and the file has not been deleted
-    if (!previewURL && existingFile && !isDeleted) {
-      setPreviewURL(existingFile) // Set the existing file URL as preview
-      setValue(name, existingFile) // Store the existing URL as the form value (initial state)
+    if (setIsFileUploading) {
+      setIsFileUploading(isUploading)
     }
-  }, [existingFile, setValue, name, previewURL, isDeleted])
+  }, [isUploading, setIsFileUploading])
 
+  // Fetch image URL if `existingFile` is present (on Update)
+  useEffect(() => {
+    if (existingFile) {
+      setImagePath(existingFile)
+      setValue(name, existingFile)
+    }
+  }, [existingFile, setValue, name])
+
+  // Handle file upload and setting values
   const handleFileChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = event.target.files?.[0]
     if (file) {
-      if (!validateFileSize(file, maxSizeMB)) {
+      const fileSizeMB = file.size / (1024 * 1024)
+      if (fileSizeMB > maxSizeMB) {
         toast({
           variant: 'destructive',
-          title: 'Invalid file size',
-          description: `File ${file.name} exceeds the size limit of ${maxSizeMB}MB`,
+          title: `Image size exceeds ${maxSizeMB} MB`,
         })
         return
       }
 
-      // Set preview for the new file and store the file in form state
-      setPreviewURL(URL.createObjectURL(file)) // Set the new file preview
-      setValue(name, file) // Set the new file in the form state
-      clearErrors(name)
+      setIsUploading(true)
+      try {
+        const uploadResponse = await uploadSingleFile(
+          bucketFilePath,
+          file,
+          (progressEvent) => {
+            if (progressEvent.total) {
+              const progress =
+                (progressEvent.loaded / progressEvent.total) * 100
+              setProgress(progress)
+            }
+          }
+        )
+        const uploadedFilePath = uploadResponse.result.path
 
-      // Reset the input to allow re-uploading the same file after deletion
-      event.target.value = ''
-    }
-  }
+        setValue(name, uploadedFilePath)
+        setImagePath(uploadedFilePath) // Set the new image path
 
-  const handleDeleteImage = () => {
-    if (previewURL) {
-      // If the preview is a blob, revoke the object URL to free up memory
-      if (previewURL.startsWith('blob:')) {
-        URL.revokeObjectURL(previewURL)
+        clearErrors(name)
+      } catch (error) {
+        toast({
+          variant: 'destructive',
+          title: 'File upload failed',
+          description: 'Please try again.',
+        })
+      } finally {
+        setIsUploading(false)
+        setProgress(0)
       }
-      // Clear the preview and form state
-      setPreviewURL(null)
-      setValue(name, null)
-      setIsDeleted(true) // Set the deletion flag to prevent re-setting the file
     }
   }
 
-  const handleDownload = (
-    e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
-  ) => {
-    e.preventDefault() // Prevent default anchor behavior
-    const url = e.currentTarget.href // Get the URL from the anchor's href
-    window.open(url, '_blank') // Open the image in a new tab
+  // Handle image deletion
+  const handleDeleteImage = () => {
+    const fileInput = document.getElementById(
+      `file-upload-${name}`
+    ) as HTMLInputElement
+    if (fileInput) {
+      fileInput.value = '' // Clear the file input field
+    }
+
+    setImagePath(null) // Remove image path for PreviewImageComponent
+    setValue(name, null) // Remove the value from form
   }
 
+  // Handle image preview in modal
+  const handlePreviewImage = () => {
+    if (imagePath) {
+      setPreviewImage(imagePath)
+    }
+  }
+
+  // Handle image download using the helper function
+  const handleDownloadImage = async () => {
+    if (imagePath) {
+      try {
+        const fileName = downloadFileName || label
+        await downloadFileFromStream(imagePath, fileName)
+      } catch (error) {
+        toast({
+          variant: 'destructive',
+          title: 'Download failed',
+          description: 'Unable to download the image. Please try again.',
+        })
+      }
+    }
+  }
   return (
     <>
       <FormItem className="flex w-full mb-2 max-sm:flex-col">
@@ -103,79 +167,81 @@ const SingleFileUpload: React.FC<SingleFileUploadProps> = ({
                 <>
                   <Input
                     type="file"
-                    onChange={(e) => handleFileChange(e)} // Handle file change logic here
+                    onChange={handleFileChange}
                     className="hidden"
                     id={`file-upload-${name}`}
-                    disabled={isDisabled}
+                    disabled={isDisabled || isUploading}
                   />
                   <div className="flex items-center gap-4 mt-2">
-                    {previewURL ? (
+                    {imagePath ? (
                       <div className="relative w-24 group/box">
-                        <img
-                          src={previewURL} // Show the preview image, either from the URL or new file
-                          alt="Preview"
-                          className="object-cover w-full h-24 rounded-md"
-                        />
-                        <div className="absolute top-0 bottom-0 left-0 right-0 space-x-2 ">
+                        {/* Use PreviewImageComponent to handle image fetching */}
+                        <PreviewImageComponent imagePath={imagePath} />
+                        <div className="absolute top-0 bottom-0 left-0 right-0 space-x-2">
                           {!isDisabled && (
-                            <button
-                              type="button"
-                              className="absolute p-1 bg-white rounded-full shadow-md h-fit right-1 top-1"
-                              onClick={handleDeleteImage}
-                              disabled={isDisabled}
-                            >
-                              <X className="w-5 h-5 text-red-600" />
-                            </button>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger
+                                asChild
+                                className="border-none outline-none ring-0"
+                              >
+                                <button className="absolute p-1 bg-white border rounded-full shadow-md outline-none h-fit right-1 top-1 ring-0">
+                                  <MoreVertical className="w-5 h-5 text-gray-600" />
+                                </button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="w-28">
+                                {/* Delete */}
+                                <DropdownMenuItem
+                                  onClick={handleDeleteImage}
+                                  disabled={isDisabled || isUploading}
+                                >
+                                  <Trash2 className="w-5 h-5 mr-2 text-red-600" />
+                                  Delete
+                                </DropdownMenuItem>
+
+                                {/* Preview */}
+                                <DropdownMenuItem
+                                  onClick={handlePreviewImage}
+                                  disabled={isUploading}
+                                >
+                                  <Eye className="w-5 h-5 mr-2 text-blue-600" />
+                                  Preview
+                                </DropdownMenuItem>
+
+                                {/* Download */}
+                                {isDownloadable && (
+                                  <DropdownMenuItem
+                                    onClick={handleDownloadImage}
+                                    disabled={isUploading}
+                                  >
+                                    <Download className="w-5 h-5 mr-2 text-green-600" />
+                                    Download
+                                  </DropdownMenuItem>
+                                )}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
                           )}
-
-                          <div className="absolute left-0 right-0 flex items-center justify-around bottom-1 h-fit">
-                            {/* Preview Button */}
-                            {typeof previewURL === 'string' && (
-                              <button
-                                type="button"
-                                className="hidden p-1 bg-white rounded-full shadow-md h-fit group-hover/box:block"
-                                onClick={() => setSelectedImage(previewURL)}
-                              >
-                                <Eye className="w-5 h-5 text-green-500" />
-                              </button>
-                            )}
-
-                            {/* Download Button (only for string files) */}
-                            {typeof previewURL === 'string' && (
-                              <a
-                                href={previewURL} // Add the file URL here
-                                onClick={(e) => handleDownload(e)} // Open the image in a new tab
-                                className="hidden p-1 bg-white rounded-full shadow-md h-fit group-hover/box:block"
-                                target="_blank" // Optional: Ensure it's opened in a new tab by default
-                                rel="noopener noreferrer"
-                                aria-label="download file"
-                              >
-                                <Download className="w-5 h-5 text-blue-500" />
-                              </a>
-                            )}
-                          </div>
                         </div>
                       </div>
                     ) : (
                       <label
                         htmlFor={`file-upload-${name}`}
-                        className="w-full cursor-pointer"
+                        className="relative flex justify-center w-24 cursor-pointer"
                       >
-                        <div className="flex items-center justify-center w-full h-16 gap-2 border rounded-lg bg-gray-50">
-                          <span
-                            className={`text-lg ${
-                              isDisabled ? 'opacity-40' : 'text-yellow'
-                            }`}
-                          >
-                            Upload
-                          </span>
-                          <Upload
-                            size={24}
-                            className={`${
-                              isDisabled ? 'opacity-30' : 'text-yellow'
-                            }`}
-                          />
+                        <div className="flex flex-col items-center justify-center w-24 h-24 border rounded-lg cursor-pointer bg-gray-50">
+                          <Upload size={24} className="text-yellow" />
+                          <span className="text-sm text-yellow">Upload</span>
                         </div>
+
+                        {/* progress bar */}
+                        {isUploading && (
+                          <div className="absolute w-[99%] mx-auto mt-2 bottom-1">
+                            {/* progress bar */}
+
+                            <div className="w-full mt-2">
+                              <Progress value={progress} className="w-[95%] " />
+                            </div>
+                          </div>
+                        )}
                       </label>
                     )}
                   </div>
@@ -183,15 +249,16 @@ const SingleFileUpload: React.FC<SingleFileUploadProps> = ({
               )}
             />
           </FormControl>
-          <FormDescription>{description}</FormDescription>
+          <FormDescription className="mt-1">{description}</FormDescription>
           <FormMessage />
         </div>
       </FormItem>
 
-      {selectedImage && (
+      {/* Image Preview Modal */}
+      {previewImage && (
         <ImagePreviewModal
-          selectedImage={selectedImage}
-          setSelectedImage={setSelectedImage}
+          imagePath={previewImage}
+          setSelectedImage={setPreviewImage} // Close modal function
         />
       )}
     </>

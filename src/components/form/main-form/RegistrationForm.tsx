@@ -95,10 +95,10 @@ const RegistrationForm = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex-1 bg-white shadow-lg p-4 pb-6 rounded-[1rem] border w-full min-w-[350px] max-w-[400px]"
+        className="flex-1 bg-white shadow-lg p-4 lg:mt-6 pb-6 rounded-[1rem] border w-full min-w-[350px] max-w-[400px]"
       >
         <h3 className="text-2xl font-bold text-center ">Register Now</h3>
-        <h4 className="mb-4 text-base text-center">No Credit Card Required</h4>
+        <h4 className="text-base text-center ">No Credit Card Required</h4>
         <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto ">
           {/* mobile / whatsapp*/}
           <FormField
@@ -106,7 +106,7 @@ const RegistrationForm = () => {
             name="phoneNumber"
             render={({ field }) => (
               <FormItem className="flex flex-col w-full mb-2">
-                <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
+                <FormLabel className="flex justify-between mt-3 ml-2 text-base w-72 lg:text-lg">
                   Mobile
                 </FormLabel>
                 <div className="flex-col items-start w-full">
@@ -172,7 +172,7 @@ const RegistrationForm = () => {
 
           <div className="text-sm text-center">
             An OTP will be sent to your provided{' '}
-            <span className="font-bold text-green-500">WhatsApp</span> number
+            <span className="font-bold ">mobile</span> number
           </div>
 
           <Button

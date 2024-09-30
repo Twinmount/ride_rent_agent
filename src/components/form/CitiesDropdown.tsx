@@ -91,6 +91,8 @@ const CitiesDropdown = ({
         >
           {!stateId
             ? 'choose a state first'
+            : isLoading
+            ? 'fetching cities...'
             : selectedCities.length > 0
             ? `${selectedCities.length} cities selected`
             : `Choose ${placeholder}`}

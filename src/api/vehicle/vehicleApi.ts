@@ -23,10 +23,10 @@ type PrimaryFormType = {
   vehicleTypeId: string
   vehicleBrandId: string
   vehicleModel: string
-  vehiclePhotos: (File | string)[] // Array of files or URLs
+  vehiclePhotos: string[] // Array of files or URLs
   vehicleRegistrationNumber: string
   vehicleRegisteredYear: string
-  commercialLicenses: (File | string)[] // Array of files or URLs
+  commercialLicenses: string[] // Array of files or URLs
   commercialLicenseExpireDate: Date
   isLease: boolean
   isCryptoAccepted: boolean
@@ -51,62 +51,39 @@ export const addPrimaryDetailsForm = async (
     // Extracting phone number and country code
     const phoneNumber = values.phoneNumber.replace(`+${countryCode}`, '').trim()
 
-    const formData = new FormData()
+    // Prepare the request body as a regular object (no FormData)
+    const requestBody = {
+      userId,
+      countryCode,
+      vehicleCategoryId: values.vehicleCategoryId,
+      vehicleTypeId: values.vehicleTypeId,
+      vehicleBrandId: values.vehicleBrandId,
+      vehicleModel: values.vehicleModel,
+      vehicleRegistrationNumber: values.vehicleRegistrationNumber,
+      vehicleRegisteredYear: values.vehicleRegisteredYear,
+      commercialLicenseExpireDate:
+        values.commercialLicenseExpireDate.toISOString(),
+      isLease: values.isLease.toString(), // Convert boolean to string
+      isCryptoAccepted: values.isCryptoAccepted.toString(), // Convert boolean to string
+      isSpotDeliverySupported: values.isSpotDeliverySupported.toString(), // Convert boolean to string
+      specification: values.specification,
+      phoneNumber,
+      stateId: values.stateId,
+      cityIds: values.cityIds,
+      rentalDetails: JSON.stringify(values.rentalDetails),
+      vehiclePhotos: values.vehiclePhotos,
+      commercialLicenses: values.commercialLicenses,
+    }
 
-    // Append all the fields to the FormData object
-    formData.append('userId', userId)
-    formData.append('countryCode', countryCode)
-    formData.append('vehicleCategoryId', values.vehicleCategoryId)
-    formData.append('vehicleTypeId', values.vehicleTypeId)
-    formData.append('vehicleBrandId', values.vehicleBrandId)
-    formData.append('vehicleModel', values.vehicleModel)
-    formData.append(
-      'vehicleRegistrationNumber',
-      values.vehicleRegistrationNumber
-    )
-    formData.append('vehicleRegisteredYear', values.vehicleRegisteredYear)
-    formData.append(
-      'commercialLicenseExpireDate',
-      values.commercialLicenseExpireDate.toISOString()
-    )
-    formData.append('isLease', values.isLease.toString())
-    formData.append('isCryptoAccepted', values.isCryptoAccepted.toString())
-    formData.append(
-      'isSpotDeliverySupported',
-      values.isSpotDeliverySupported.toString()
-    )
-    formData.append('specification', values.specification)
-    formData.append('phoneNumber', phoneNumber)
-    formData.append('stateId', values.stateId)
-
-    formData.append('cityIds', values.cityIds.join(','))
-
-    // Append rentalDetails as a JSON string
-    formData.append('rentalDetails', JSON.stringify(values.rentalDetails))
-
-    // Append vehicle photos
-    values.vehiclePhotos.forEach((photo) => {
-      if (photo instanceof File) {
-        formData.append(`vehiclePhotos`, photo)
-      }
-    })
-
-    // Append commercial license
-    values.commercialLicenses.forEach((license) => {
-      if (license instanceof File) {
-        formData.append(`commercialLicenses`, license)
-      }
-    })
-
-    // Send the FormData object using the API post method
+    // Send the request as a JSON object
     const data = await API.post<AddPrimaryFormResponse>({
       slug: Slug.POST_PRIMARY_FORM,
-      body: formData,
+      body: requestBody,
       axiosConfig: {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
-        timeout: 120000,
+        timeout: 60000,
       },
     })
 
@@ -130,62 +107,39 @@ export const updatePrimaryDetailsForm = async (
     // Extracting phone number and country code
     const phoneNumber = values.phoneNumber.replace(`+${countryCode}`, '').trim()
 
-    const formData = new FormData()
+    // Prepare the request body as a regular object (no FormData)
+    const requestBody = {
+      vehicleId,
+      countryCode,
+      vehicleCategoryId: values.vehicleCategoryId,
+      vehicleTypeId: values.vehicleTypeId,
+      vehicleBrandId: values.vehicleBrandId,
+      vehicleModel: values.vehicleModel,
+      vehicleRegistrationNumber: values.vehicleRegistrationNumber,
+      vehicleRegisteredYear: values.vehicleRegisteredYear,
+      commercialLicenseExpireDate:
+        values.commercialLicenseExpireDate.toISOString(),
+      isLease: values.isLease.toString(), // Convert boolean to string
+      isCryptoAccepted: values.isCryptoAccepted.toString(), // Convert boolean to string
+      isSpotDeliverySupported: values.isSpotDeliverySupported.toString(), // Convert boolean to string
+      specification: values.specification,
+      phoneNumber,
+      stateId: values.stateId,
+      cityIds: values.cityIds,
+      rentalDetails: JSON.stringify(values.rentalDetails),
+      vehiclePhotos: values.vehiclePhotos,
+      commercialLicenses: values.commercialLicenses,
+    }
 
-    // Append necessary fields to the FormData object
-    formData.append('vehicleId', vehicleId)
-    formData.append('countryCode', countryCode)
-    formData.append('vehicleCategoryId', values.vehicleCategoryId)
-    formData.append('vehicleTypeId', values.vehicleTypeId)
-    formData.append('vehicleBrandId', values.vehicleBrandId)
-    formData.append('vehicleModel', values.vehicleModel)
-    formData.append(
-      'vehicleRegistrationNumber',
-      values.vehicleRegistrationNumber
-    )
-    formData.append('vehicleRegisteredYear', values.vehicleRegisteredYear)
-    formData.append(
-      'commercialLicenseExpireDate',
-      values.commercialLicenseExpireDate.toISOString()
-    )
-    formData.append('isLease', values.isLease.toString())
-    formData.append('isCryptoAccepted', values.isCryptoAccepted.toString())
-    formData.append(
-      'isSpotDeliverySupported',
-      values.isSpotDeliverySupported.toString()
-    )
-    formData.append('specification', values.specification)
-    formData.append('phoneNumber', phoneNumber)
-    formData.append('stateId', values.stateId)
-
-    formData.append('cityIds', values.cityIds.join(','))
-
-    // Append rentalDetails as a JSON string
-    formData.append('rentalDetails', JSON.stringify(values.rentalDetails))
-
-    // Append vehicle photos only if they are new files
-    values.vehiclePhotos.forEach((photo) => {
-      if (photo instanceof File) {
-        formData.append(`vehiclePhotos`, photo)
-      }
-    })
-
-    // Append commercial licenses only if they are new files
-    values.commercialLicenses.forEach((license) => {
-      if (license instanceof File) {
-        formData.append(`commercialLicenses`, license)
-      }
-    })
-
-    // Send the FormData object using the API post method
+    // Send the request as a JSON object
     const data = await API.put<AddPrimaryFormResponse>({
       slug: Slug.PUT_PRIMARY_FORM,
-      body: formData,
+      body: requestBody,
       axiosConfig: {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          'Content-Type': 'application/json',
         },
-        timeout: 120000,
+        timeout: 60000,
       },
     })
 
@@ -199,6 +153,7 @@ export const updatePrimaryDetailsForm = async (
     throw error
   }
 }
+
 type GetSpecificationFormDataParams = {
   page?: number
   limit?: number

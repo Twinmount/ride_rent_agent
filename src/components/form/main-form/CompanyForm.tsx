@@ -37,6 +37,7 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from '@/components/ui/input-otp'
+import { GcsFilePaths } from '@/constants/enum'
 
 type CompanyRegistrationFormProps = {
   type: 'Add' | 'Update'
@@ -54,6 +55,7 @@ export default function CompanyRegistrationForm({
   const [isOtpVerified, setIsOtpVerified] = useState(false)
   const [isTimerActive, setIsTimerActive] = useState(false)
   const [isEmailSent, setIsEmailSent] = useState(false)
+  const [isFileUploading, setIsFileUploading] = useState(false)
   const [timer, setTimer] = useState(60)
   const navigate = useNavigate()
 
@@ -166,6 +168,17 @@ export default function CompanyRegistrationForm({
         behavior: 'smooth', // This will create a smooth scrolling effect
       })
 
+      return
+    }
+
+    if (isFileUploading) {
+      toast({
+        title: 'File Upload in Progress',
+        description:
+          'Please wait until the file upload completes before submitting the form.',
+        duration: 3000,
+        className: 'bg-orange',
+      })
       return
     }
 
@@ -365,6 +378,14 @@ export default function CompanyRegistrationForm({
                 description="Company logo can have a maximum size of 5MB."
                 existingFile={formData?.companyLogo}
                 maxSizeMB={5}
+                setIsFileUploading={setIsFileUploading}
+                bucketFilePath={GcsFilePaths.LOGOS}
+                isDownloadable={true}
+                downloadFileName={
+                  formData?.companyName
+                    ? `[${formData.companyName}] - company-logo`
+                    : 'company-logo'
+                }
               />
             )}
           />
@@ -386,6 +407,14 @@ export default function CompanyRegistrationForm({
                 }
                 existingFile={formData?.commercialLicense}
                 maxSizeMB={5}
+                setIsFileUploading={setIsFileUploading}
+                bucketFilePath={GcsFilePaths.DOCUMENTS}
+                isDownloadable={true}
+                downloadFileName={
+                  formData?.companyName
+                    ? `[${formData.companyName}] - commercial-license`
+                    : 'commercial-license'
+                }
               />
             )}
           />

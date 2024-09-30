@@ -140,7 +140,7 @@ const LoginPage = () => {
 
             <div className="text-sm text-center">
               An OTP will be sent to your registered{' '}
-              <span className="font-bold text-green-500">WhatsApp</span> number
+              <span className="font-bold ">mobile</span> number
             </div>
 
             <Button

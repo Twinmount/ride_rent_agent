@@ -1,4 +1,4 @@
-import { CheckCheck, Files } from 'lucide-react'
+import { CheckCheck, Files, MoreVertical, Eye, Download } from 'lucide-react'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -10,9 +10,20 @@ import { jwtDecode } from 'jwt-decode'
 import { getUser } from '@/api/user'
 import LazyLoader from '@/components/loading-skelton/LazyLoader'
 import SupportModal from '@/components/modal/SupportModal'
+import PreviewImageComponent from '@/components/form/PreviewImageComponent'
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu'
+import { toast } from '@/components/ui/use-toast'
+import { downloadFileFromStream } from '@/helpers/form'
+import ImagePreviewModal from '@/components/modal/ImagePreviewModal'
 
 export default function ProfilePage() {
   const [isCopied, setIsCopied] = useState(false)
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(
@@ -63,6 +74,25 @@ export default function ProfilePage() {
     )
   }
 
+  // Handle image download using the helper function
+  const handleDownloadImage = async (filePath: string) => {
+    try {
+      await downloadFileFromStream(filePath, 'Registration Card')
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Download failed',
+        description: 'Unable to download the image. Please try again.',
+      })
+      console.error('Error downloading image:', error)
+    }
+  }
+
+  // Handle image preview
+  const handlePreviewImage = (filePath: string) => {
+    setPreviewImage(filePath)
+  }
+
   return (
     <section className="min-h-screen flex-center">
       <dl className="flex flex-col max-w-4xl p-3 text-lg bg-white shadow-md gap-y-3 md:text-xl lg:px-10 lg:py-10 rounded-xl">
@@ -88,12 +118,29 @@ export default function ProfilePage() {
             Company Logo <span className="mr-2">:</span>
           </dt>
           <dd className="flex items-center ml-4 gap-x-3">
-            <div className="w-12 h-12 overflow-hidden border-2 rounded-full border-yellow">
-              <img
-                src={profileData.companyLogo}
-                className="object-cover w-full h-full"
-                alt="company profile"
-              />
+            <div className="relative w-16 h-16 overflow-hidden border-2 rounded-2xl border-yellow">
+              <PreviewImageComponent imagePath={profileData.companyLogo} />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="absolute p-1 bg-white border-none rounded-full shadow-md outline-none h-fit right-1 top-1 ring-0">
+                    <MoreVertical className="w-5 h-5 text-gray-600" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-28">
+                  <DropdownMenuItem
+                    onClick={() => handlePreviewImage(profileData.companyLogo)}
+                  >
+                    <Eye className="w-5 h-5 mr-2 text-blue-600" />
+                    Preview
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => handleDownloadImage(profileData.companyLogo)}
+                  >
+                    <Download className="w-5 h-5 mr-2 text-green-600" />
+                    Download
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </dd>
         </div>
@@ -114,20 +161,36 @@ export default function ProfilePage() {
             Registration Card <span className="mr-2">:</span>
           </dt>
           <dd className="flex items-center ml-4 gap-x-3">
-            <div className="w-12 h-12 overflow-hidden border-2 rounded-full border-yellow">
-              <img
-                src={profileData.commercialLicense}
-                className="object-cover w-full h-full"
-                alt="company profile"
+            <div className="relative w-16 h-16 overflow-hidden border-2 rounded-2xl border-yellow">
+              <PreviewImageComponent
+                imagePath={profileData.commercialLicense}
               />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className="absolute p-1 bg-white border-none rounded-full shadow-md outline-none h-fit right-1 top-1 ring-0">
+                    <MoreVertical className="w-5 h-5 text-gray-600" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-28">
+                  <DropdownMenuItem
+                    onClick={() =>
+                      handlePreviewImage(profileData.commercialLicense)
+                    }
+                  >
+                    <Eye className="w-5 h-5 mr-2 text-blue-600" />
+                    Preview
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() =>
+                      handleDownloadImage(profileData.commercialLicense)
+                    }
+                  >
+                    <Download className="w-5 h-5 mr-2 text-green-600" />
+                    Download
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <Link
-              className="text-sm text-blue-500 hover:underline"
-              to={profileData.commercialLicense}
-              target="_blank"
-            >
-              Preview ?
-            </Link>
           </dd>
         </div>
 
@@ -148,9 +211,6 @@ export default function ProfilePage() {
           </dt>
           <dd className="flex flex-col ml-4 gap-x-3">
             <span className="text-base ">{userData?.emailId}</span>
-            {/* <Link to={'/'} className="text-base text-blue-600">
-              Change email?
-            </Link> */}
           </dd>
         </div>
 
@@ -195,6 +255,14 @@ export default function ProfilePage() {
           </div>
         </div>
       </dl>
+
+      {/* Image Preview Modal */}
+      {previewImage && (
+        <ImagePreviewModal
+          imagePath={previewImage}
+          setSelectedImage={setPreviewImage} // Close modal function
+        />
+      )}
     </section>
   )
 }

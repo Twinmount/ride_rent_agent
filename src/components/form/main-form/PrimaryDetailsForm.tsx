@@ -25,7 +25,7 @@ import { Label } from '@/components/ui/label'
 import { PhoneInput } from 'react-international-phone'
 import 'react-international-phone/style.css'
 import RentalDetailsFormField from '../RentalDetailsFormField'
-import FileUpload from '../FileUpload'
+import MultipleFileUpload from '../MultipleFileUpload'
 import { validateRentalDetails } from '@/helpers/form'
 import BrandsDropdown from '../BrandsDropdown'
 import DatePicker from 'react-datepicker'
@@ -39,8 +39,8 @@ import { toast } from '@/components/ui/use-toast'
 import { addPrimaryDetailsForm, updatePrimaryDetailsForm } from '@/api/vehicle'
 import Spinner from '@/components/general/Spinner'
 import { useParams } from 'react-router-dom'
-import { useLoadingMessages } from '@/hooks/useLoadingMessage'
 import { ApiError } from '@/types/types'
+import { GcsFilePaths } from '@/constants/enum'
 
 type PrimaryFormProps = {
   type: 'Add' | 'Update'
@@ -56,6 +56,7 @@ export default function PrimaryDetailsForm({
   initialCountryCode,
 }: PrimaryFormProps) {
   const [countryCode, setCountryCode] = useState<string>('')
+  const [isFileUploading, setIsFileUploading] = useState(false)
 
   const { vehicleId, userId } = useParams<{
     vehicleId: string
@@ -63,7 +64,6 @@ export default function PrimaryDetailsForm({
   }>()
 
   // Call the useLoadingMessages hook to manage loading messages
-  const message = useLoadingMessages()
 
   const initialValues =
     formData && type === 'Update' ? formData : PrimaryFormDefaultValues
@@ -83,6 +83,17 @@ export default function PrimaryDetailsForm({
         message: rentalError,
       })
       form.setFocus('rentalDetails')
+      return
+    }
+
+    if (isFileUploading) {
+      toast({
+        title: 'File Upload in Progress',
+        description:
+          'Please wait until the file upload completes before submitting the form.',
+        duration: 3000,
+        className: 'bg-orange',
+      })
       return
     }
 
@@ -322,13 +333,20 @@ export default function PrimaryDetailsForm({
             control={form.control}
             name="vehiclePhotos"
             render={() => (
-              <FileUpload
+              <MultipleFileUpload
                 name="vehiclePhotos"
                 label="Vehicle Photos"
-                multiple={true}
-                existingFiles={initialValues.vehiclePhotos}
+                existingFiles={initialValues.vehiclePhotos || []}
                 description="Add Vehicle Photos. Up to 8 photos can be added."
                 maxSizeMB={30}
+                setIsFileUploading={setIsFileUploading}
+                bucketFilePath={GcsFilePaths.IMAGE_VEHICLES}
+                isFileUploading={isFileUploading}
+                downloadFileName={
+                  formData?.vehicleModel
+                    ? ` ${formData.vehicleModel}`
+                    : 'vehicle-image'
+                }
               />
             )}
           />
@@ -338,12 +356,27 @@ export default function PrimaryDetailsForm({
             control={form.control}
             name="commercialLicenses"
             render={() => (
-              <FileUpload
+              <MultipleFileUpload
                 name="commercialLicenses"
                 label="Registration Card / Mulkia"
-                multiple={true}
-                existingFiles={initialValues.commercialLicenses}
-                description="Upload images of the Registration Card/Mulkia, both front and back."
+                existingFiles={initialValues.commercialLicenses || []}
+                description={
+                  <>
+                    Upload{' '}
+                    <span className="font-semibold text-yellow">front</span> &{' '}
+                    <span className="font-semibold text-yellow">back</span>{' '}
+                    images of the Registration Card / Mulkia
+                  </>
+                }
+                maxSizeMB={15}
+                setIsFileUploading={setIsFileUploading}
+                bucketFilePath={GcsFilePaths.COMMERCIAL_LICENSES}
+                isFileUploading={isFileUploading}
+                downloadFileName={
+                  formData?.vehicleModel
+                    ? `[commercial-license] - ${formData.vehicleModel}`
+                    : '[commercial-license]'
+                }
               />
             )}
           />
@@ -684,12 +717,6 @@ export default function PrimaryDetailsForm({
           {type === 'Add' ? 'Add Vehicle' : 'Update Vehicle'}
           {form.formState.isSubmitting && <Spinner />}
         </Button>
-
-        {form.formState.isSubmitting && (
-          <div className="-mt-5 italic text-center text-gray-600">
-            <p>{message}</p>
-          </div>
-        )}
       </form>
     </Form>
   )

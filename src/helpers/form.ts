@@ -299,3 +299,59 @@ export function hasSelected(
 ): value is { name: string; label: string; selected: boolean } {
   return (value as { selected: boolean }).selected !== undefined
 }
+
+// image download helper function
+export const downloadFileFromStream = async (
+  imagePath: string,
+  fileName: string
+) => {
+  try {
+    const apiBaseUrl = import.meta.env.VITE_API_URL
+    const url = `${apiBaseUrl}/file/stream?path=${imagePath}` // Stream endpoint for download
+
+    // Fetch the image stream from the backend API
+    const response = await fetch(url)
+    const reader = response.body?.getReader()
+
+    if (!reader) {
+      throw new Error('Failed to get reader from stream')
+    }
+
+    let chunks: Uint8Array[] = []
+    const stream = new ReadableStream({
+      async start(controller) {
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) {
+            controller.close()
+            break
+          }
+          controller.enqueue(value)
+          chunks.push(value)
+        }
+      },
+    })
+
+    // Create a blob from the stream
+    const blob = await new Response(stream).blob()
+
+    // Extract the file extension directly from the image path
+    const extension = imagePath.split('.').pop() // e.g., 'jpg', 'png'
+
+    // Create an object URL for the blob
+    const objectURL = URL.createObjectURL(blob)
+
+    // Trigger the download directly with the correct extension
+    const link = document.createElement('a')
+    link.href = objectURL
+    link.download = `${fileName}.${extension}` // Use the extension from the path
+    document.body.appendChild(link)
+    link.click()
+
+    // Clean up
+    document.body.removeChild(link)
+    URL.revokeObjectURL(objectURL)
+  } catch (error) {
+    throw new Error('Download failed')
+  }
+}
