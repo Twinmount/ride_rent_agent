@@ -2,7 +2,7 @@ import { Check } from 'lucide-react'
 
 const SignUpFeatures = () => {
   return (
-    <div className="w-[93%] lg:w-3/4 max-lg:mb-4">
+    <div className="w-[93%] lg:w-3/4 max-lg:mb-4 max-lg:mt-16">
       <h1 className="mb-3 text-5xl font-extrabold text-white max-lg:text-4xl max-lg:text-center">
         A FREE SHOWCASE FOR YOUR FLEET
       </h1>

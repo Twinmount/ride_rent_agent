@@ -31,7 +31,7 @@ export default function RegistrationPage() {
 
         {/* form section */}
         <div
-          className="h-auto min-h-[88vh] flex-center max-lg:py-10"
+          className="h-auto min-h-[92vh] flex-center max-lg:py-10 relative"
           style={{
             backgroundImage: `url('/assets/img/bg/register-banner.webp')`,
             backgroundSize: 'cover',
@@ -39,6 +39,13 @@ export default function RegistrationPage() {
             backgroundRepeat: 'no-repeat',
           }}
         >
+          <div className="absolute w-32 left-4 lg:left-20 top-6 md:w-40 lg:w-44">
+            <img
+              src="/assets/logo/header/riderent-register.webp"
+              alt="riderent logo"
+              className="object-contain w-full h-full"
+            />
+          </div>
           <MotionDiv className="flex z-10 flex-col items-center justify-center gap-4 mx-auto mb-12 lg:flex-row W-[95%] lg:w-[85%]">
             {/* sign up features */}
             <SignUpFeatures />
