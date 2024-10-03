@@ -362,10 +362,9 @@ export default function PrimaryDetailsForm({
                 existingFiles={initialValues.commercialLicenses || []}
                 description={
                   <>
-                    Upload{' '}
-                    <span className="font-semibold text-yellow">front</span> &{' '}
-                    <span className="font-semibold text-yellow">back</span>{' '}
-                    images of the Registration Card / Mulkia
+                    Upload <span className="font-bold text-yellow">front</span>{' '}
+                    & <span className="font-bold text-yellow">back</span> images
+                    of the Registration Card / Mulkia
                   </>
                 }
                 maxSizeMB={15}

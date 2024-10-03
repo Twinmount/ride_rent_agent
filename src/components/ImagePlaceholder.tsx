@@ -44,42 +44,6 @@ const ImagePlaceholder: React.FC<ImagePlaceholderProps> = ({
     }
   }
 
-  // For commercialLicenses, show 'front' and 'back' for the two placeholders
-  if (name === 'commercialLicenses') {
-    const labelText = 'upload'
-
-    return (
-      <label
-        key={`placeholder-${index}`}
-        htmlFor={`file-upload-${name}`}
-        className={`relative flex flex-col items-center justify-center w-16 h-16 border rounded-lg  bg-gray-5 ${
-          isUploading ? 'cursor-default' : 'cursor-pointer'
-        }`}
-      >
-        <input
-          type="file"
-          accept="image/*"
-          id={`file-upload-${name}`}
-          className="hidden"
-          multiple={true}
-          onChange={handleInputChange}
-          disabled={isUploading}
-        />
-        <Upload
-          size={24}
-          className={` ${isUploading ? 'text-gray-300' : 'text-yellow'}`}
-        />
-        <span
-          className={`text-sm  ${
-            isUploading ? 'text-gray-300' : 'text-yellow'
-          }`}
-        >
-          {labelText}
-        </span>
-      </label>
-    )
-  }
-
   // For vehiclePhotos, the first available placeholder after uploading should act as the file upload input
   if (index === uploadingCount) {
     return (

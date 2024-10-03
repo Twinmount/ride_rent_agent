@@ -41,7 +41,7 @@ export default function RegistrationPage() {
         >
           <div className="absolute w-32 left-4 lg:left-20 top-6 md:w-40 lg:w-44">
             <img
-              src="/assets/logo/header/riderent-register.webp"
+              src="/assets/logo/header/agent_white_logo.webp"
               alt="riderent logo"
               className="object-contain w-full h-full"
             />

@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="mb-6 ">
         <figure>
           <img
-            src={'/assets/logo/header/footer-icon.png'}
+            src={'/assets/logo/header/agent_white_logo.webp'}
             className="w-48"
             alt="Ride Rent Logo"
           />

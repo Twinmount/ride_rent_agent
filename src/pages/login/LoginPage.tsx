@@ -100,7 +100,7 @@ const LoginPage = () => {
   return (
     <>
       <section
-        className="flex flex-col h-screen bg-gray-100 flex-center"
+        className="relative flex flex-col h-screen bg-gray-100 flex-center"
         style={{
           backgroundImage: `url('/assets/img/bg/register-banner.webp')`,
           backgroundSize: 'cover', // This ensures the image covers the div
@@ -108,8 +108,15 @@ const LoginPage = () => {
           backgroundRepeat: 'no-repeat', // Prevent the image from repeating
         }}
       >
+        <div className="absolute z-10 w-32 left-4 lg:left-20 top-6 md:w-40 lg:w-44">
+          <img
+            src="/assets/logo/header/agent_white_logo.webp"
+            alt="riderent logo"
+            className="object-contain w-full h-full"
+          />
+        </div>
         <div className="absolute inset-0 bg-black opacity-50"></div>
-        <h1 className="z-10 mb-3 text-5xl font-extrabold text-white max-lg:text-4xl max-lg:text-center">
+        <h1 className="z-10 mt-16 mb-3 text-5xl font-extrabold text-white max-lg:text-4xl max-lg:text-center">
           SHOWCASE YOUR FLEET TO THE WORLD
         </h1>
         <h2 className="z-10 mb-4 text-3xl font-semibold text-white max-lg:text-xl max-lg:text-center">
