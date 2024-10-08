@@ -6,6 +6,7 @@ import {
   SpecificationFormData,
 } from '@/types/API-types'
 import { PrimaryFormType, TabsTypes } from '@/types/types'
+import { deleteFile } from '@/api/file-upload'
 
 type SpecificationOption = { label: string; value: string }
 
@@ -353,5 +354,21 @@ export const downloadFileFromStream = async (
     URL.revokeObjectURL(objectURL)
   } catch (error) {
     throw new Error('Download failed')
+  }
+}
+
+// Helper function to delete multiple files
+export const deleteMultipleFiles = async (
+  imagePaths: string[]
+): Promise<void> => {
+  if (imagePaths.length === 0) return
+
+  try {
+    for (const imagePath of imagePaths) {
+      await deleteFile(imagePath) // Call deleteFile API for each image path
+    }
+  } catch (error) {
+    console.error('Error deleting files:', error)
+    throw error // Optional: re-throw the error if you want to handle it in the form
   }
 }

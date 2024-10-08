@@ -38,6 +38,7 @@ import {
   InputOTPSlot,
 } from '@/components/ui/input-otp'
 import { GcsFilePaths } from '@/constants/enum'
+import { deleteMultipleFiles } from '@/helpers/form'
 
 type CompanyRegistrationFormProps = {
   type: 'Add' | 'Update'
@@ -56,6 +57,7 @@ export default function CompanyRegistrationForm({
   const [isTimerActive, setIsTimerActive] = useState(false)
   const [isEmailSent, setIsEmailSent] = useState(false)
   const [isFileUploading, setIsFileUploading] = useState(false)
+  const [deletedImages, setDeletedImages] = useState<string[]>([])
   const [timer, setTimer] = useState(60)
   const navigate = useNavigate()
 
@@ -188,6 +190,12 @@ export default function CompanyRegistrationForm({
         data = await addCompany(values, userId)
       } else if (type === 'Update') {
         data = await updateCompany(values, userId)
+      }
+
+      if (data) {
+        // actually delete the images from the db, if any
+        console.log('deleted images state : ', deletedImages)
+        await deleteMultipleFiles(deletedImages)
       }
 
       if (data) {
@@ -386,6 +394,7 @@ export default function CompanyRegistrationForm({
                     ? `[${formData.companyName}] - company-logo`
                     : 'company-logo'
                 }
+                setDeletedImages={setDeletedImages}
               />
             )}
           />
@@ -415,6 +424,7 @@ export default function CompanyRegistrationForm({
                     ? `[${formData.companyName}] - commercial-license`
                     : 'commercial-license'
                 }
+                setDeletedImages={setDeletedImages}
               />
             )}
           />

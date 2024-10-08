@@ -35,6 +35,7 @@ type SingleFileUploadProps = {
   setIsFileUploading?: (isUploading: boolean) => void
   bucketFilePath: GcsFilePaths
   downloadFileName?: string
+  setDeletedImages: (deletedPaths: (prev: string[]) => string[]) => void
 }
 
 const SingleFileUpload = ({
@@ -48,6 +49,7 @@ const SingleFileUpload = ({
   setIsFileUploading,
   bucketFilePath,
   downloadFileName,
+  setDeletedImages,
 }: SingleFileUploadProps) => {
   const { control, setValue, clearErrors } = useFormContext()
   const [isUploading, setIsUploading] = useState(false)
@@ -119,6 +121,11 @@ const SingleFileUpload = ({
 
   // Handle image deletion
   const handleDeleteImage = () => {
+    if (imagePath) {
+      // Add the image path to the deletedImages array using the setDeletedImages
+      setDeletedImages((prev) => [...prev, imagePath])
+    }
+
     const fileInput = document.getElementById(
       `file-upload-${name}`
     ) as HTMLInputElement

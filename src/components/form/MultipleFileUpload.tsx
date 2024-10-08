@@ -32,6 +32,7 @@ type MultipleFileUploadProps = {
   setIsFileUploading?: (isUploading: boolean) => void
   bucketFilePath: GcsFilePaths
   downloadFileName?: string
+  setDeletedFiles: (deletedPaths: (prev: string[]) => string[]) => void
 }
 
 const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
@@ -44,6 +45,7 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
   setIsFileUploading,
   bucketFilePath,
   downloadFileName,
+  setDeletedFiles,
 }) => {
   const { control, setValue, clearErrors } = useFormContext()
   const [files, setFiles] = useState<string[]>(existingFiles)
@@ -129,6 +131,7 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
 
   const handleDeleteFile = (filePath: string) => {
     setFiles((prevFiles) => prevFiles.filter((path) => path !== filePath))
+    setDeletedFiles((prev) => [...prev, filePath])
   }
 
   const handlePreviewImage = (filePath: string) => {
