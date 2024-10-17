@@ -1,7 +1,7 @@
-import { MdEmail } from 'react-icons/md'
+import { MdEmail } from "react-icons/md";
 
-import { FaPhoneVolume } from 'react-icons/fa6'
-import { socials } from '.'
+import { FaPhoneVolume } from "react-icons/fa6";
+import { socials } from ".";
 
 const Social = () => {
   return (
@@ -12,17 +12,17 @@ const Social = () => {
         <div className="gap-1 flex-center hover:text-yellow">
           <FaPhoneVolume className="text-yellow" />
           <a
-            href={`tel:${import.meta.env.VITE_FOOTER_PHONE_NUM}`}
+            href="tel:+971502972335"
             className="p-0 max-h-fit max-w-fit w-fit h-fit"
           >
-            {import.meta.env.VITE_FOOTER_PHONE_NUM}
+            +971 - 50-297-2335
           </a>
         </div>
         {/* mail */}
         <div className="gap-1 flex-center hover:text-yellow">
           <MdEmail className="text-yellow" />
-          <a href="mailto:Hello@ride.rent" className="t">
-            Hello@ride.rent
+          <a href="mailto:hello@ride.rent" className="">
+            hello@ride.rent
           </a>
         </div>
       </div>
@@ -32,22 +32,22 @@ const Social = () => {
         <div className="text-xl font-bold text-white">We are Social!</div>
         <div className="flex gap-x-2">
           {socials.map((social) => {
-            const Icon = social.icon
+            const Icon = social.icon;
             return (
               <a
                 key={social.id}
                 href={social.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 p-1 text-white transition-all rounded-full flex-center bg-yellow hover:scale-105"
+                className="p-1 w-8 h-8 text-white rounded-full transition-all transition-colors flex-center hover:text-yellow hover:scale-105"
               >
                 <Icon className="icon" />
               </a>
-            )
+            );
           })}
         </div>
       </div>
     </div>
-  )
-}
-export default Social
+  );
+};
+export default Social;
