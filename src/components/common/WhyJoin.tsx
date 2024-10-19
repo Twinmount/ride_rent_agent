@@ -1,21 +1,21 @@
-import MotionDiv from '@/components/framer-motion/MotionDiv'
-import { MotionH2 } from '../framer-motion/MotionElm'
+import MotionDiv from "@/components/framer-motion/MotionDiv";
+import { MotionH2 } from "../framer-motion/MotionElm";
 
 type WhyJoinProps = {
   data: {
-    key: number
-    title: string
-    description: string
-  }[]
-}
+    key: number;
+    title: string;
+    description: string;
+  }[];
+};
 
 export default function WhyJoin({ data }: WhyJoinProps) {
   return (
-    <div className="h-auto mx-auto my-8 wrapper">
+    <div className="mx-auto mt-2 mb-8 h-auto wrapper">
       <MotionH2
         initial={{ opacity: 0.1, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ type: 'tween', duration: 0.5 }}
+        transition={{ type: "tween", duration: 0.5 }}
         viewport={{ once: true }}
         className="text-center font-[400] text-[1.4rem]"
       >
@@ -35,5 +35,5 @@ export default function WhyJoin({ data }: WhyJoinProps) {
         ))}
       </div>
     </div>
-  )
+  );
 }

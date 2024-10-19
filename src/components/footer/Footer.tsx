@@ -1,13 +1,13 @@
-import Social from './Social'
+import Social from "./Social";
 
 export default function Footer() {
   return (
-    <footer className="flex flex-col items-center justify-center w-full py-6 text-center text-white bg-black">
+    <footer className="flex flex-col justify-center items-center py-6 w-full text-center text-white bg-black">
       {/* logo */}
-      <div className="mb-6 ">
+      <div className="mb-6">
         <figure>
           <img
-            src={'/assets/logo/header/agent_white_logo.webp'}
+            src={"/assets/logo/header/agent_white_logo.webp"}
             className="w-48"
             alt="Ride Rent Logo"
           />
@@ -20,5 +20,5 @@ export default function Footer() {
 
       <Social />
     </footer>
-  )
+  );
 }

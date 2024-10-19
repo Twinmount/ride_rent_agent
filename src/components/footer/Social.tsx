@@ -39,7 +39,7 @@ const Social = () => {
                 href={social.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="p-1 w-8 h-8 text-white rounded-full transition-all transition-colors flex-center hover:text-yellow hover:scale-105"
+                className="p-1 w-8 h-8 text-white rounded-full transition-colors flex-center hover:text-yellow hover:scale-105"
               >
                 <Icon className="icon" />
               </a>

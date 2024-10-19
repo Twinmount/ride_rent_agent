@@ -1,17 +1,17 @@
-import FAQ from '@/components/common/Faq'
-import WhyJoin from '@/components/common/WhyJoin'
-import WhyOpt from '@/components/common/WhyOpt'
-import SignUpFeatures from '@/components/common/SignUpFeatures'
-import { features, FAQ_Data } from '@/constants/data/data'
-import MotionDiv from '@/components/framer-motion/MotionDiv'
-import RegistrationForm from '@/components/form/main-form/RegistrationForm'
-import Footer from '@/components/footer/Footer'
-import { Helmet } from 'react-helmet-async'
+import FAQ from "@/components/common/Faq";
+import WhyJoin from "@/components/common/WhyJoin";
+import WhyOpt from "@/components/common/WhyOpt";
+import SignUpFeatures from "@/components/common/SignUpFeatures";
+import { features, FAQ_Data } from "@/constants/data/data";
+import MotionDiv from "@/components/framer-motion/MotionDiv";
+import RegistrationForm from "@/components/form/main-form/RegistrationForm";
+import Footer from "@/components/footer/Footer";
+import { Helmet } from "react-helmet-async";
 
 export default function RegistrationPage() {
   return (
     <>
-      <section className="pb-10 bg-white ">
+      <section className="pb-10 bg-white">
         <Helmet>
           <title>
             Register Your Vehicle for Free on Ride.Rent- Advertise Cars, Boats,
@@ -31,15 +31,15 @@ export default function RegistrationPage() {
 
         {/* form section */}
         <div
-          className="h-auto min-h-[92vh] flex-center max-lg:py-10 relative"
+          className="h-auto min-h-[88vh] flex-center max-lg:py-6 relative"
           style={{
             backgroundImage: `url('/assets/img/bg/register-banner.webp')`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundRepeat: "no-repeat",
           }}
         >
-          <div className="absolute w-32 left-4 lg:left-20 top-6 md:w-40 lg:w-44">
+          <div className="absolute left-4 top-6 w-32 lg:left-20 md:w-40 lg:w-44">
             <img
               src="/assets/logo/header/agent_white_logo.webp"
               alt="riderent logo"
@@ -66,5 +66,5 @@ export default function RegistrationPage() {
       </section>
       <Footer />
     </>
-  )
+  );
 }
