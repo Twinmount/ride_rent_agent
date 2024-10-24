@@ -5,20 +5,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Mail, MessageCircleMore, Phone } from 'lucide-react'
+} from "@/components/ui/dialog";
+import { Mail, MessageCircleMore, Phone } from "lucide-react";
 
 export default function SupportModal({
-  classes = 'px-3 py-1 text-white transition-colors bg-black shadow-lg hover:text-yellow rounded-2xl flex-center gap-x-2',
+  classes = "px-3 py-1 text-white transition-colors bg-black shadow-lg hover:text-yellow rounded-2xl flex-center gap-x-2",
 }: {
-  classes?: string
+  classes?: string;
 }) {
-  const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUM
-  const whatsappMessage = 'Hello, I need support with Ride Rent.'
-
-  const whatsappLink = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(
-    whatsappMessage
-  )}`
+  const whatsappLink = `https://api.whatsapp.com/send?phone=971502972335&text=Hello%2C%0AI need assistance managing my account.%0APlease connect me with an agent at your earliest convenience.%0A%0AThank you`;
 
   return (
     <Dialog>
@@ -33,11 +28,11 @@ export default function SupportModal({
             Need Help ?
           </DialogTitle>
           <DialogDescription aria-label="Delete selected item" />
-          <div className="max-w-md p-2 text-center bg-white rounded-lg ">
+          <div className="p-2 max-w-md text-center bg-white rounded-lg">
             <p className="mb-2 font-bold text-gray-700">
               Feel free to contact us! We are always happy to help you.
             </p>
-            <ul className="mb-6 text-left text-gray-600 list-disc list-inside">
+            <ul className="mb-6 list-disc list-inside text-left text-gray-600">
               <li>Need help with vehicle registration?</li>
               <li>Having trouble managing your listings?</li>
               <li>Company details need updating?</li>
@@ -53,7 +48,7 @@ export default function SupportModal({
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-5 py-3 font-semibold text-white transition-transform bg-green-500 shadow-lg rounded-2xl hover:bg-green-600 hover:scale-105"
+              className="inline-flex justify-center items-center px-5 py-3 font-semibold text-white bg-green-500 rounded-2xl shadow-lg transition-transform hover:bg-green-600 hover:scale-105"
             >
               <MessageCircleMore size={20} className="mr-2" />
               WhatsApp us
@@ -62,24 +57,24 @@ export default function SupportModal({
             <div className="mt-3 text-lg font-bold text-center">OR</div>
 
             {/* phone and mail */}
-            <div className="flex items-center justify-center mt-4 text-gray-700 max-sm:flex-col gap-x-6">
+            <div className="flex gap-x-6 justify-center items-center mt-4 text-gray-700 max-sm:flex-col">
               <div className="flex items-center p-1 bg-gray-100 rounded-lg">
                 <Phone className="w-5 h-5 text-blue-500" />
                 <a
                   href="tel:+971502972335"
                   className="ml-2 text-gray-600 hover:underline hover:text-gray-800"
                 >
-                  +971 - 502972335
+                  +971 50-297-2335
                 </a>
               </div>
 
               <div className="flex items-center p-1 bg-gray-100 rounded-lg">
                 <Mail className="w-5 h-5 text-red-500" />
                 <a
-                  href="mailto:hello@ride.rent"
+                  href="mailto:help@ride.rent"
                   className="ml-2 text-gray-600 hover:underline hover:text-gray-800"
                 >
-                  hello@ride.rent
+                  help@ride.rent
                 </a>
               </div>
             </div>
@@ -91,5 +86,5 @@ export default function SupportModal({
         </DialogHeader>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

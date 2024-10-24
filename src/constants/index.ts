@@ -1,97 +1,107 @@
-import { CompanyFormType, PrimaryFormType } from '@/types/types'
-import { LayoutDashboard, List, UserRoundPen } from 'lucide-react'
+import { CompanyFormType, PrimaryFormType } from "@/types/types";
+import {
+  Box,
+  LayoutDashboard,
+  List,
+  UserRoundPen,
+  UploadCloud,
+  ShieldAlert,
+  ClipboardList,
+  Lock,
+  CalendarCheck,
+} from "lucide-react";
 
 // sidebar content
 export const sidebarContent = [
-  { label: 'Dashboard', icon: LayoutDashboard, link: '/' },
-  { label: 'My Listings', icon: List, link: '/listings' },
+  { label: "Dashboard", icon: LayoutDashboard, link: "/" },
+  { label: "My Listings", icon: List, link: "/listings" },
   {
-    label: 'Profile',
+    label: "Profile",
     icon: UserRoundPen,
-    link: '/profile',
+    link: "/profile",
   },
-]
+  {
+    label: "SRM",
+    icon: Box,
+    link: "/srm",
+  },
+];
 
-// sample vehicle categories
-export const VehicleGeneralCategories = [
+// srm introduction features
+export const srmFeatures = [
   {
-    id: 1,
-    label: 'Car',
-    value: 'car',
+    label: "27x7 Customer Data Upload",
+    description:
+      "Agents can easily upload essential customer details like passport number, name, photo, and address, all stored securely within the system accessible 24/7.",
+    icon: UploadCloud,
   },
   {
-    id: 2,
-    label: 'Sports Car',
-    value: 'sports_car',
+    label: "Ai Powered Fraud Detection",
+    description:
+      "With customer details distributed across the platform, fraud detection is enhanced, allowing agents to identify and prevent fraudulent customers instantly and avoid fraudulent rentals.",
+    icon: ShieldAlert,
   },
   {
-    id: 3,
-    label: 'Cycle',
-    value: 'cycle',
+    label: "Seamless Record Management",
+    description:
+      "SCM offers a simple and intuitive interface for agents to manage customer records, making it easy to update, search, and access customer information.",
+    icon: ClipboardList,
   },
   {
-    id: 4,
-    label: 'Motorcycle',
-    value: 'motorcycle',
+    label: "Secured Data Storage",
+    description:
+      "Customer data is protected with advanced security measures, ensuring that sensitive information remains safe and compliant with data protection regulations.",
+    icon: Lock,
   },
   {
-    id: 5,
-    label: 'Sports Bike',
-    value: 'sports_bike',
+    label: "Effortless Customer Tracking",
+    description:
+      "Agents can track customer bookings, periods, history, and preferences, streamlining communication and improving customer service efficiency.",
+    icon: CalendarCheck,
   },
-  {
-    id: 6,
-    label: 'Leisure Boat',
-    value: 'leisure_boat',
-  },
-  {
-    id: 7,
-    label: 'Charter',
-    value: 'charter',
-  },
-]
+];
 
 // Company registration phase 2 form default values
 export const CompanyFormDefaultValues: CompanyFormType = {
-  companyName: '',
-  companyLogo: '',
-  commercialLicense: '',
+  companyName: "",
+  companyLogo: "",
+  commercialLicense: "",
   expireDate: new Date(),
-  regNumber: '',
-}
+  regNumber: "",
+};
 
 // otp page default value
 export const OtpPageDefaultValues = {
-  otp: '',
-}
+  otp: "",
+};
 
 // login page default value
 export const LoginPageDefaultValues = {
-  phoneNumber: '',
-  password: '',
-}
+  phoneNumber: "",
+  password: "",
+};
 
 // primary details form default values
 export const PrimaryFormDefaultValues: PrimaryFormType = {
-  vehicleCategoryId: '',
-  vehicleTypeId: '', //'luxury' for example
-  vehicleBrandId: '',
-  vehicleModel: '',
+  vehicleCategoryId: "",
+  vehicleTypeId: "", //'luxury' for example
+  vehicleBrandId: "",
+  vehicleModel: "",
   vehiclePhotos: [], //upto 8 photos of the vehicle
-  vehicleRegistrationNumber: '',
-  vehicleRegisteredYear: '',
+  vehicleRegistrationNumber: "",
+  vehicleRegisteredYear: "",
   commercialLicenses: [],
   commercialLicenseExpireDate: new Date(),
   isLease: false,
   isCryptoAccepted: false,
   isSpotDeliverySupported: false,
-  specification: 'UAE_SPEC',
+  specification: "UAE_SPEC",
   rentalDetails: {
-    day: { enabled: false, rentInAED: '', mileageLimit: '' },
-    week: { enabled: false, rentInAED: '', mileageLimit: '' },
-    month: { enabled: false, rentInAED: '', mileageLimit: '' },
+    day: { enabled: false, rentInAED: "", mileageLimit: "" },
+    week: { enabled: false, rentInAED: "", mileageLimit: "" },
+    month: { enabled: false, rentInAED: "", mileageLimit: "" },
   },
-  phoneNumber: '',
-  stateId: '',
+  phoneNumber: "",
+  stateId: "",
   cityIds: [],
-}
+};

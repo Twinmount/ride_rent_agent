@@ -1,15 +1,16 @@
-import { getUser } from '@/api/user'
-import CompanyForm from '@/components/form/main-form/CompanyForm'
-import FormSkelton from '@/components/loading-skelton/FormSkelton'
-import { useQuery } from '@tanstack/react-query'
+import { getUser } from "@/api/user";
+import FloatingWhatsAppButton from "@/components/FloatingWhatsappIcon";
+import CompanyForm from "@/components/form/main-form/CompanyForm";
+import FormSkelton from "@/components/loading-skelton/FormSkelton";
+import { useQuery } from "@tanstack/react-query";
 
 export default function CompanyRegistration() {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ['users'],
+    queryKey: ["users"],
     queryFn: getUser,
-  })
+  });
 
-  const { agentId } = data?.result || {}
+  const { agentId } = data?.result || {};
 
   return (
     <section className="py-5 pt-10">
@@ -20,12 +21,15 @@ export default function CompanyRegistration() {
       {isLoading ? (
         <FormSkelton />
       ) : !data || isError ? (
-        <div className="text-2xl font-semibold text-center text-red-500 mt-36">
+        <div className="mt-36 text-2xl font-semibold text-center text-red-500">
           failed to fetch your agent id
         </div>
       ) : (
         <CompanyForm type="Add" agentId={agentId as string} />
       )}
+
+      {/* whatsapp floating button */}
+      <FloatingWhatsAppButton />
     </section>
-  )
+  );
 }

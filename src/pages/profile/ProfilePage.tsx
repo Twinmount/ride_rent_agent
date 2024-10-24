@@ -1,110 +1,111 @@
-import { CheckCheck, Files, MoreVertical, Eye, Download } from 'lucide-react'
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
-import 'react-datepicker/dist/react-datepicker.css'
-import { useQuery } from '@tanstack/react-query'
-import { getCompany } from '@/api/company'
-import { load, StorageKeys } from '@/utils/storage'
-import { DecodedRefreshToken } from '@/layout/ProtectedRoutes'
-import { jwtDecode } from 'jwt-decode'
-import { getUser } from '@/api/user'
-import LazyLoader from '@/components/loading-skelton/LazyLoader'
-import SupportModal from '@/components/modal/SupportModal'
-import PreviewImageComponent from '@/components/form/PreviewImageComponent'
+import { CheckCheck, Files, MoreVertical, Eye, Download } from "lucide-react";
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import "react-datepicker/dist/react-datepicker.css";
+import { useQuery } from "@tanstack/react-query";
+import { getCompany } from "@/api/company";
+import { load, StorageKeys } from "@/utils/storage";
+import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
+import { jwtDecode } from "jwt-decode";
+import { getUser } from "@/api/user";
+import LazyLoader from "@/components/loading-skelton/LazyLoader";
+import SupportModal from "@/components/modal/SupportModal";
+import PreviewImageComponent from "@/components/form/PreviewImageComponent";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '@/components/ui/dropdown-menu'
-import { toast } from '@/components/ui/use-toast'
-import { downloadFileFromStream } from '@/helpers/form'
-import ImagePreviewModal from '@/components/modal/ImagePreviewModal'
+} from "@/components/ui/dropdown-menu";
+import { toast } from "@/components/ui/use-toast";
+import { downloadFileFromStream } from "@/helpers/form";
+import ImagePreviewModal from "@/components/modal/ImagePreviewModal";
+import NeedHelpToolTip from "@/components/common/NeedHelpToolTip";
 
 export default function ProfilePage() {
-  const [isCopied, setIsCopied] = useState(false)
-  const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [isCopied, setIsCopied] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(
       () => {
-        setIsCopied(true)
+        setIsCopied(true);
         setTimeout(() => {
-          setIsCopied(false)
-        }, 3000)
+          setIsCopied(false);
+        }, 3000);
       },
       (err) => {
-        console.error('Could not copy text: ', err)
+        console.error("Could not copy text: ", err);
       }
-    )
-  }
+    );
+  };
 
-  const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN)
+  const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
 
-  const { userId } = jwtDecode<DecodedRefreshToken>(refreshToken as string)
+  const { userId } = jwtDecode<DecodedRefreshToken>(refreshToken as string);
 
   // Query to get company data
   const { data: companyData, isLoading: isCompanyLoading } = useQuery({
-    queryKey: ['company'],
+    queryKey: ["company"],
     queryFn: () => getCompany(userId),
-  })
+  });
 
   // Query to get user data
   const { data: agentData, isLoading: isAgentLoading } = useQuery({
-    queryKey: ['users'],
+    queryKey: ["users"],
     queryFn: getUser,
-  })
+  });
 
   if (isCompanyLoading || isAgentLoading) {
     return (
       <section className="w-full min-h-screen bg-white flex-center">
         <LazyLoader />
       </section>
-    )
+    );
   }
 
-  const profileData = companyData?.result
-  const userData = agentData?.result
+  const profileData = companyData?.result;
+  const userData = agentData?.result;
 
   if (!profileData) {
     return (
       <section className="min-h-screen flex-center">
         <p>No company data found.</p>
       </section>
-    )
+    );
   }
 
   // Handle image download using the helper function
   const handleDownloadImage = async (filePath: string) => {
     try {
-      await downloadFileFromStream(filePath, 'Registration Card')
+      await downloadFileFromStream(filePath, "Registration Card");
     } catch (error) {
       toast({
-        variant: 'destructive',
-        title: 'Download failed',
-        description: 'Unable to download the image. Please try again.',
-      })
-      console.error('Error downloading image:', error)
+        variant: "destructive",
+        title: "Download failed",
+        description: "Unable to download the image. Please try again.",
+      });
+      console.error("Error downloading image:", error);
     }
-  }
+  };
 
   // Handle image preview
   const handlePreviewImage = (filePath: string) => {
-    setPreviewImage(filePath)
-  }
+    setPreviewImage(filePath);
+  };
 
   return (
     <section className="min-h-screen flex-center">
-      <dl className="flex flex-col max-w-4xl p-3 text-lg bg-white shadow-md gap-y-3 md:text-xl lg:px-10 lg:py-10 rounded-xl">
+      <dl className="flex flex-col gap-y-3 p-3 max-w-4xl text-lg bg-white rounded-xl shadow-md md:text-xl lg:px-10 lg:py-10">
         {/* agent id */}
         <div className="flex items-center">
-          <dt className="font-semibold w-44 flex-between">
+          <dt className="w-44 font-semibold flex-between">
             Agent ID <span className="mr-2">:</span>
           </dt>
-          <dd className="flex items-center ml-4 gap-x-3">
+          <dd className="flex gap-x-3 items-center ml-4">
             <span className="font-bold">{profileData.agentId}</span>
             <button
-              className="h-6 px-2 text-base border-none rounded-lg outline-none flex-center text-yellow"
+              className="px-2 h-6 text-base rounded-lg border-none outline-none flex-center text-yellow"
               onClick={() => copyToClipboard(userId)}
             >
               {isCopied ? <CheckCheck size={18} /> : <Files size={18} />}
@@ -114,15 +115,15 @@ export default function ProfilePage() {
 
         {/* company logo */}
         <div className="flex items-center">
-          <dt className="font-semibold w-44 flex-between">
+          <dt className="w-44 font-semibold flex-between">
             Company Logo <span className="mr-2">:</span>
           </dt>
-          <dd className="flex items-center ml-4 gap-x-3">
-            <div className="relative w-16 h-16 overflow-hidden border-2 rounded-2xl border-yellow">
+          <dd className="flex gap-x-3 items-center ml-4">
+            <div className="overflow-hidden relative w-16 h-16 rounded-2xl border-2 border-yellow">
               <PreviewImageComponent imagePath={profileData.companyLogo} />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="absolute p-1 bg-white border-none rounded-full shadow-md outline-none h-fit right-1 top-1 ring-0">
+                  <button className="absolute top-1 right-1 p-1 bg-white rounded-full border-none ring-0 shadow-md outline-none h-fit">
                     <MoreVertical className="w-5 h-5 text-gray-600" />
                   </button>
                 </DropdownMenuTrigger>
@@ -130,13 +131,13 @@ export default function ProfilePage() {
                   <DropdownMenuItem
                     onClick={() => handlePreviewImage(profileData.companyLogo)}
                   >
-                    <Eye className="w-5 h-5 mr-2 text-blue-600" />
+                    <Eye className="mr-2 w-5 h-5 text-blue-600" />
                     Preview
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onClick={() => handleDownloadImage(profileData.companyLogo)}
                   >
-                    <Download className="w-5 h-5 mr-2 text-green-600" />
+                    <Download className="mr-2 w-5 h-5 text-green-600" />
                     Download
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -146,28 +147,29 @@ export default function ProfilePage() {
         </div>
 
         {/* company name */}
-        <div className="flex items-center">
-          <dt className="font-semibold w-44 flex-between">
+        <div className="flex items-start">
+          <dt className="w-44 font-semibold flex-between">
             Company Name <span className="mr-2">:</span>
           </dt>
-          <dd className="flex items-center ml-4 gap-x-3">
+          <dd className="flex gap-x-3 items-center ml-4 max-md:flex-col">
             {profileData.companyName}
+            <NeedHelpToolTip content="Contact Support to Change Company Name" />
           </dd>
         </div>
 
         {/* Company Registration Card */}
-        <div className="flex items-center">
-          <dt className="font-semibold w-44 flex-between">
+        <div className="flex items-start">
+          <dt className="w-44 font-semibold flex-between">
             Registration Card <span className="mr-2">:</span>
           </dt>
-          <dd className="flex items-center ml-4 gap-x-3">
-            <div className="relative w-16 h-16 overflow-hidden border-2 rounded-2xl border-yellow">
+          <dd className="flex gap-x-3 items-center ml-4">
+            <div className="overflow-hidden relative w-16 h-16 rounded-2xl border-2 border-yellow">
               <PreviewImageComponent
                 imagePath={profileData.commercialLicense}
               />
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="absolute p-1 bg-white border-none rounded-full shadow-md outline-none h-fit right-1 top-1 ring-0">
+                  <button className="absolute top-1 right-1 p-1 bg-white rounded-full border-none ring-0 shadow-md outline-none h-fit">
                     <MoreVertical className="w-5 h-5 text-gray-600" />
                   </button>
                 </DropdownMenuTrigger>
@@ -177,7 +179,7 @@ export default function ProfilePage() {
                       handlePreviewImage(profileData.commercialLicense)
                     }
                   >
-                    <Eye className="w-5 h-5 mr-2 text-blue-600" />
+                    <Eye className="mr-2 w-5 h-5 text-blue-600" />
                     Preview
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -185,42 +187,44 @@ export default function ProfilePage() {
                       handleDownloadImage(profileData.commercialLicense)
                     }
                   >
-                    <Download className="w-5 h-5 mr-2 text-green-600" />
+                    <Download className="mr-2 w-5 h-5 text-green-600" />
                     Download
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
+            <NeedHelpToolTip content="Contact Support to Change Company Registration Card" />
           </dd>
         </div>
 
         {/* expiry date */}
         <div className="flex items-center">
-          <dt className="font-semibold w-44 flex-between">
+          <dt className="w-44 font-semibold flex-between">
             Expiry Date <span className="mr-2">:</span>
           </dt>
-          <dd className="flex items-center ml-4 text-base gap-x-3">
+          <dd className="flex gap-x-3 items-center ml-4 text-base">
             {new Date(profileData.expireDate).toLocaleDateString()}
           </dd>
         </div>
 
         {/* email */}
         <div className="flex items-start">
-          <dt className="font-semibold w-44 flex-between">
+          <dt className="w-44 font-semibold flex-between">
             Email<span className="mr-2">:</span>
           </dt>
-          <dd className="flex flex-col ml-4 gap-x-3">
-            <span className="text-base ">{userData?.emailId}</span>
+          <dd className="flex flex-col gap-x-3 ml-4">
+            <span className="text-base">{userData?.emailId}</span>
+            <NeedHelpToolTip content="Contact Support to Change Company Email" />
           </dd>
         </div>
 
         {/* phone number */}
         <div className="flex items-start">
-          <dt className="font-semibold w-44 flex-between">
+          <dt className="w-44 font-semibold flex-between">
             Phone Number<span className="mr-2">:</span>
           </dt>
-          <dd className="flex flex-col ml-4 gap-x-3">
-            <span className="text-base ">
+          <dd className="flex flex-col gap-x-3 ml-4">
+            <span className="text-base">
               +{userData?.countryCode} {userData?.phoneNumber}
             </span>
           </dd>
@@ -228,29 +232,29 @@ export default function ProfilePage() {
 
         {/* registration number */}
         <div className="flex items-center">
-          <dt className="font-semibold w-44 flex-between">
+          <dt className="w-44 font-semibold flex-between">
             Registration Number <span className="mr-2">:</span>
           </dt>
-          <dd className="flex items-center ml-4 gap-x-3">
+          <dd className="flex gap-x-3 items-center ml-4">
             {profileData.regNumber}
           </dd>
         </div>
 
         {/* password */}
         <div className="flex items-center">
-          <dt className="font-semibold w-44 flex-between">
+          <dt className="w-44 font-semibold flex-between">
             Password<span className="mr-2">:</span>
           </dt>
-          <dd className="flex items-center ml-4 gap-x-3">
-            <span className="font-bold">{'**********'}</span>
-            <Link to={'/reset-password'} className="text-base text-blue-600 ">
+          <dd className="flex gap-x-3 items-center ml-4">
+            <span className="font-bold">{"**********"}</span>
+            <Link to={"/reset-password"} className="text-base text-blue-600">
               Reset password?
             </Link>
           </dd>
         </div>
 
         <div className="mt-3 flex-between">
-          <div className="mr-6 flex-center gap-x-4">
+          <div className="gap-x-4 mr-6 flex-center">
             <SupportModal classes="text-blue-500 w-fit flex-center gap-x-2" />
           </div>
         </div>
@@ -264,5 +268,5 @@ export default function ProfilePage() {
         />
       )}
     </section>
-  )
+  );
 }

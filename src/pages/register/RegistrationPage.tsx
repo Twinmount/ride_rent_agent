@@ -7,6 +7,7 @@ import MotionDiv from "@/components/framer-motion/MotionDiv";
 import RegistrationForm from "@/components/form/main-form/RegistrationForm";
 import Footer from "@/components/footer/Footer";
 import { Helmet } from "react-helmet-async";
+import FloatingWhatsAppButton from "@/components/FloatingWhatsappIcon";
 
 export default function RegistrationPage() {
   return (
@@ -65,6 +66,9 @@ export default function RegistrationPage() {
         <WhyOpt />
       </section>
       <Footer />
+
+      {/* whatsapp floating button */}
+      <FloatingWhatsAppButton />
     </>
   );
 }
