@@ -166,7 +166,7 @@ const AgentDashboard: React.FC = () => {
         </div>
 
         {/* Conditional Overlay */}
-        {/* {vehiclesListLength === 0 && (
+        {vehiclesListLength === 0 && (
           <div className="flex absolute inset-0 justify-center pt-0 bg-gray-200 bg-opacity-30 backdrop-blur-md">
             <div className="flex flex-col text-center w-full max-sm:max-w-[90%] max-w-[500px]  mt-52 rounded-lg ">
               <h3 className="mb-4 text-2xl font-extrabold text-gray-800">
@@ -182,7 +182,7 @@ const AgentDashboard: React.FC = () => {
               </Link>
             </div>
           </div>
-        )} */}
+        )}
       </div>
     </section>
   );
