@@ -44,7 +44,7 @@ export const srmFeatures = [
   {
     label: "Seamless Record Management",
     description:
-      "SCM offers a simple and intuitive interface for agents to manage customer records, making it easy to update, search, and access customer information.",
+      "SRM offers a simple and intuitive interface for agents to manage customer records, making it easy to update, search, and access customer information.",
     icon: ClipboardList,
   },
   {
