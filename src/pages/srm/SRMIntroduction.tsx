@@ -17,7 +17,7 @@ const SRMIntroduction: React.FC = () => {
                 The Simple Rental Manager (SRM) by Ride.Rent
               </h2>
 
-              <p className="text-sm text-left text-gray-600">
+              <p className="text-sm text-left md:max-w-[70%] text-gray-600">
                 Securely upload & manage customer details, with built-in fraud
                 detector to identify & prevent fraudulent rentals.
               </p>

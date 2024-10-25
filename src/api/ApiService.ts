@@ -4,10 +4,10 @@ import axios, {
   AxiosRequestConfig,
   AxiosResponse,
   InternalAxiosRequestConfig,
-} from 'axios'
-import { ApiConfig, DEFAULT_API_CONFIG } from './Api-config'
-import { Slug } from './Api-Endpoints'
-import { StorageKeys, load, remove } from '@/utils/storage'
+} from "axios";
+import { ApiConfig, DEFAULT_API_CONFIG } from "./Api-config";
+import { Slug } from "./Api-Endpoints";
+import { StorageKeys, load, remove } from "@/utils/storage";
 
 /**
  * Represents the response structure of an API request.
@@ -16,7 +16,7 @@ import { StorageKeys, load, remove } from '@/utils/storage'
  */
 
 export interface ApiResponse<T> {
-  data: T
+  data: T;
 }
 
 /**
@@ -26,22 +26,22 @@ export interface APIParameters {
   /**
    * Additional Axios request configuration.
    */
-  axiosConfig?: AxiosRequestConfig
+  axiosConfig?: AxiosRequestConfig;
 
   /**
    * The request body data.
    */
-  body?: object
+  body?: object;
 
   /**
    * Query parameters to include in the request.
    */
-  queryParameters?: object
+  queryParameters?: object;
 
   /**
    * The API endpoint slug.
    */
-  slug: Slug | string
+  slug: Slug | string;
 }
 
 /**
@@ -49,16 +49,16 @@ export interface APIParameters {
  */
 export class ApiService {
   // The static instance of the class.
-  private static instance: ApiService | null = null
+  private static instance: ApiService | null = null;
   /**
    * The underlying axios instance which performs the requests.
    */
-  axios: AxiosInstance | undefined
+  axios: AxiosInstance | undefined;
 
   /**
    * Configurable options.
    */
-  config: ApiConfig
+  config: ApiConfig;
 
   /**
    * Private constructor to prevent instantiation from outside the class.
@@ -67,7 +67,7 @@ export class ApiService {
    * @param config The configuration to use.
    */
   private constructor(config: ApiConfig = DEFAULT_API_CONFIG) {
-    this.config = config
+    this.config = config;
   }
 
   /**
@@ -78,14 +78,14 @@ export class ApiService {
    */
   public static getInstance(config?: ApiConfig): ApiService {
     if (!ApiService.instance) {
-      ApiService.instance = new ApiService(config)
-      ApiService.instance.setup()
+      ApiService.instance = new ApiService(config);
+      ApiService.instance.setup();
     } else if (config) {
-      ApiService.instance.config = config
-      ApiService.instance.setup()
+      ApiService.instance.config = config;
+      ApiService.instance.setup();
     }
 
-    return ApiService.instance
+    return ApiService.instance;
   }
 
   /**
@@ -97,40 +97,38 @@ export class ApiService {
       baseURL: this.config.baseURL,
       timeout: this.config.timeout,
       headers: {
-        Accept: 'application/json',
+        Accept: "application/json",
         // "Content-Type": "application/json",
       },
-    })
+    });
 
     this.axios.interceptors.request.use((req: InternalAxiosRequestConfig) => {
-      const { url } = req
+      const { url } = req;
       if (
         url !== Slug.LOGIN &&
         url !== Slug.REGISTER &&
         url !== Slug.VERIFY_OTP
       ) {
-        const accessToken = load<string>(StorageKeys.ACCESS_TOKEN)
+        const accessToken = load<string>(StorageKeys.ACCESS_TOKEN);
 
         if (accessToken) {
-          req.headers.Authorization = `Bearer ${accessToken}`
+          req.headers.Authorization = `Bearer ${accessToken}`;
         }
       }
-      return req
-    })
+      return req;
+    });
 
     this.axios.interceptors.response.use(
       (response: AxiosResponse) => {
-        return response
+        return response;
       },
       (error: AxiosError) => {
         if (error.response && error.response.status === 401) {
-          remove(StorageKeys.ACCESS_TOKEN)
-          remove(StorageKeys.REFRESH_TOKEN)
-          window.location.href = '/login'
+          console.error("apiService 401 error: ", error.response);
         }
-        return Promise.reject(error)
+        return Promise.reject(error);
       }
-    )
+    );
   }
 
   /**
@@ -146,13 +144,13 @@ export class ApiService {
     queryParameters = {},
   }: APIParameters): Promise<T | undefined> {
     if (!this.axios) {
-      return
+      return;
     }
     const response = await this.axios.get<ApiResponse<T>>(slug, {
       ...axiosConfig,
       params: queryParameters,
-    })
-    return response.data as unknown as T
+    });
+    return response.data as unknown as T;
   }
 
   /**
@@ -168,14 +166,14 @@ export class ApiService {
     axiosConfig = {},
   }: APIParameters): Promise<T | undefined> {
     if (!this.axios) {
-      return
+      return;
     }
     const response = await this.axios.post<ApiResponse<T>>(
       slug,
       body,
       axiosConfig
-    )
-    return response.data as unknown as T
+    );
+    return response.data as unknown as T;
   }
 
   /**
@@ -191,14 +189,14 @@ export class ApiService {
     axiosConfig = {},
   }: APIParameters): Promise<T | undefined> {
     if (!this.axios) {
-      return
+      return;
     }
     const response = await this.axios.put<ApiResponse<T>>(
       slug,
       body,
       axiosConfig
-    )
-    return response.data as unknown as T
+    );
+    return response.data as unknown as T;
   }
 
   /**
@@ -214,13 +212,13 @@ export class ApiService {
     queryParameters = {},
   }: APIParameters): Promise<T | undefined> {
     if (!this.axios) {
-      return
+      return;
     }
     const response = await this.axios.delete<ApiResponse<T>>(slug, {
       ...axiosConfig,
       params: queryParameters,
-    })
-    return response.data as unknown as T
+    });
+    return response.data as unknown as T;
   }
 
   /**
@@ -236,19 +234,19 @@ export class ApiService {
     axiosConfig = {},
   }: APIParameters): Promise<T | undefined> {
     if (!this.axios) {
-      return
+      return;
     }
     const response = await this.axios.patch<ApiResponse<T>>(
       slug,
       body,
       axiosConfig
-    )
-    return response.data as unknown as T
+    );
+    return response.data as unknown as T;
   }
 }
 
 // Export a singleton instance of the ApiService.
 
-export const API = ApiService.getInstance(DEFAULT_API_CONFIG)
+export const API = ApiService.getInstance(DEFAULT_API_CONFIG);
 
-export type API_Request_Status = 'SUCCESS' | 'NOT_SUCCESS'
+export type API_Request_Status = "SUCCESS" | "NOT_SUCCESS";

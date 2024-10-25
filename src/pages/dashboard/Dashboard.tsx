@@ -1,98 +1,100 @@
-import React from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { fetchPortfolioStats, fetchEnquiriesStats } from '@/api/dashboard'
-import { format, startOfMonth, endOfDay } from 'date-fns'
-import DashboardSkelton from '@/components/loading-skelton/DashboardSkelton'
-import { Link, useNavigate } from 'react-router-dom'
-import { fetchAllVehicles } from '@/api/vehicle'
-import LazyLoader from '@/components/loading-skelton/LazyLoader'
-import { load, StorageKeys } from '@/utils/storage'
-import { jwtDecode } from 'jwt-decode'
-import { toast } from '@/components/ui/use-toast'
-import { DecodedRefreshToken } from '@/layout/ProtectedRoutes'
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchPortfolioStats, fetchEnquiriesStats } from "@/api/dashboard";
+import { format, startOfMonth, endOfDay } from "date-fns";
+import DashboardSkelton from "@/components/loading-skelton/DashboardSkelton";
+import { Link, useNavigate } from "react-router-dom";
+import { fetchAllVehicles } from "@/api/vehicle";
+import LazyLoader from "@/components/loading-skelton/LazyLoader";
+import { load, StorageKeys } from "@/utils/storage";
+import { jwtDecode } from "jwt-decode";
+import { toast } from "@/components/ui/use-toast";
+import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
 
 const AgentDashboard: React.FC = () => {
-  const navigate = useNavigate()
-  const currentDate = new Date()
-  const startOfMonthDate = startOfMonth(currentDate)
-  const endOfDayDate = endOfDay(currentDate)
+  const navigate = useNavigate();
+  const currentDate = new Date();
+  const startOfMonthDate = startOfMonth(currentDate);
+  const endOfDayDate = endOfDay(currentDate);
 
-  const dateStartRange = format(startOfMonthDate, 'yyyy-MM-dd')
-  const dateEndRange = format(endOfDayDate, 'yyyy-MM-dd')
+  const dateStartRange = format(startOfMonthDate, "yyyy-MM-dd");
+  const dateEndRange = format(endOfDayDate, "yyyy-MM-dd");
 
-  let userId = load<string>(StorageKeys.USER_ID)
+  let userId = load<string>(StorageKeys.USER_ID);
 
   // If not found, decode from refresh token
   if (!userId) {
-    const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN)
+    const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
     if (refreshToken) {
       try {
         const decodedRefreshToken = jwtDecode<DecodedRefreshToken>(
           refreshToken as string
-        )
-        userId = decodedRefreshToken?.userId
+        );
+        userId = decodedRefreshToken?.userId;
       } catch (error) {
-        console.error('Error decoding the refresh token', error)
+        console.error("Error decoding the refresh token", error);
         toast({
-          variant: 'destructive',
-          title: 'Invalid token! Login to continue',
-        })
-        navigate('/login', { replace: true })
-        return null
+          variant: "destructive",
+          title: "Invalid token! Login to continue",
+        });
+        navigate("/login", { replace: true });
+        return null;
       }
     }
   }
 
   // Fetch vehicles if userId is present
   const { data, isLoading } = useQuery({
-    queryKey: ['vehicles', 1, 10, 'ASC'],
+    queryKey: ["vehicles", 1, 10, "ASC"],
     queryFn: () =>
       fetchAllVehicles({
         page: 1,
         limit: 10,
-        sortOrder: 'ASC',
+        sortOrder: "ASC",
         userId: userId as string,
       }),
     enabled: !!userId,
-    refetchOnWindowFocus: 'always',
-  }) // Fetch from cached vehicle data
+    refetchOnWindowFocus: "always",
+  }); // Fetch from cached vehicle data
 
-  const vehiclesListLength = data?.result.list.length || 0
+  const vehiclesListLength = data?.result.list.length || 0;
 
   // Fetch all-time stats
   const { data: portfolioData, isLoading: isPortfolioLoading } = useQuery({
-    queryKey: ['portfolioStats'],
+    queryKey: ["portfolioStats"],
     queryFn: () => fetchPortfolioStats(),
-  })
+  });
 
   const { data: enquiriesData, isLoading: isEnquiriesLoading } = useQuery({
-    queryKey: ['enquiriesStats'],
+    queryKey: ["enquiriesStats"],
     queryFn: () => fetchEnquiriesStats(),
-  })
+  });
 
   // Fetch current month stats
   const { data: monthlyPortfolioData, isLoading: isMonthlyPortfolioLoading } =
     useQuery({
-      queryKey: ['monthlyPortfolioStats', dateStartRange, dateEndRange],
+      queryKey: ["monthlyPortfolioStats", dateStartRange, dateEndRange],
       queryFn: () => fetchPortfolioStats(dateStartRange, dateEndRange),
-    })
+    });
 
   const { data: monthlyEnquiriesData, isLoading: isMonthlyEnquiriesLoading } =
     useQuery({
-      queryKey: ['monthlyEnquiriesStats', dateStartRange, dateEndRange],
+      queryKey: ["monthlyEnquiriesStats", dateStartRange, dateEndRange],
       queryFn: () => fetchEnquiriesStats(dateStartRange, dateEndRange),
-    })
+    });
 
   if (isLoading) {
-    return <LazyLoader />
+    return <LazyLoader />;
   }
 
   return (
-    <section className="relative h-auto min-h-screen p-6 py-10 bg-gray-50">
-      <div className="max-w-5xl mx-auto">
-        <h2 className="mb-6 text-2xl font-bold">Agent Dashboard</h2>
+    <section className="relative p-6 py-10 h-auto min-h-screen bg-gray-50">
+      <div className="mx-auto max-w-5xl">
+        <h2 className="fixed top-[4.7rem] left-0 pl-10 lg:pl-80 bg-white/20 backdrop-blur-md  z-10 mb-4   text-2xl lg:text-3xl font-bold w-full h-14 flex items-center  shadow-sm ">
+          Agent Dashboard
+        </h2>
 
-        <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 mt-8 mb-6 md:grid-cols-2">
           {/* Total Portfolio Views */}
           <div className="p-4 text-center bg-white rounded-lg shadow">
             {isPortfolioLoading ? (
@@ -164,8 +166,8 @@ const AgentDashboard: React.FC = () => {
         </div>
 
         {/* Conditional Overlay */}
-        {vehiclesListLength === 0 && (
-          <div className="absolute inset-0 flex pt-0 justify-center  bg-gray-200 bg-opacity-30 backdrop-blur-md">
+        {/* {vehiclesListLength === 0 && (
+          <div className="flex absolute inset-0 justify-center pt-0 bg-gray-200 bg-opacity-30 backdrop-blur-md">
             <div className="flex flex-col text-center w-full max-sm:max-w-[90%] max-w-[500px]  mt-52 rounded-lg ">
               <h3 className="mb-4 text-2xl font-extrabold text-gray-800">
                 Add your first vehicle now and start tracking your dashboard
@@ -174,16 +176,16 @@ const AgentDashboard: React.FC = () => {
 
               <Link
                 to={`/listings/add/${userId}`}
-                className="inline-block px-6 py-3 font-semibold text-white transition-all bg-yellow rounded-md hover:bg-yellow focus:ring-4 focus:ring-yellow-300 focus:ring-opacity-50 focus:outline-none"
+                className="inline-block px-6 py-3 font-semibold text-white rounded-md transition-all bg-yellow hover:bg-yellow focus:ring-4 focus:ring-yellow-300 focus:ring-opacity-50 focus:outline-none"
               >
                 Add Your First Vehicle
               </Link>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default AgentDashboard
+export default AgentDashboard;

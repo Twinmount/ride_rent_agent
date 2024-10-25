@@ -16,14 +16,14 @@ export const sidebarContent = [
   { label: "Dashboard", icon: LayoutDashboard, link: "/" },
   { label: "My Listings", icon: List, link: "/listings" },
   {
-    label: "Profile",
-    icon: UserRoundPen,
-    link: "/profile",
-  },
-  {
     label: "SRM",
     icon: Box,
     link: "/srm",
+  },
+  {
+    label: "Profile",
+    icon: UserRoundPen,
+    link: "/profile",
   },
 ];
 
