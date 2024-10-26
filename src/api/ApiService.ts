@@ -7,7 +7,7 @@ import axios, {
 } from "axios";
 import { ApiConfig, DEFAULT_API_CONFIG } from "./Api-config";
 import { Slug } from "./Api-Endpoints";
-import { StorageKeys, load, remove } from "@/utils/storage";
+import { StorageKeys, load } from "@/utils/storage";
 
 /**
  * Represents the response structure of an API request.
