@@ -153,7 +153,7 @@ const LoginPage = () => {
                           }}
                           className="flex items-center"
                           inputClassName="input-field !w-full !text-base"
-                          placeholder="whatsapp number"
+                          placeholder="WhatsApp number"
                           countrySelectorStyleProps={{
                             className:
                               "bg-white !border-none outline-none !rounded-xl  mr-1 !text-lg",

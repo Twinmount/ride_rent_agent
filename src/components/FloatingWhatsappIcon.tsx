@@ -41,7 +41,7 @@ const FloatingWhatsAppButton: React.FC = () => {
           >
             <div className="font-semibold">Need help?</div>
             <div className="text-[0.65rem] leading-4 whitespace-nowrap">
-              Click to chat on Whatsapp
+              Click to chat on WhatsApp
             </div>
           </Link>
           <X

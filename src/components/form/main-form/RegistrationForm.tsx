@@ -23,7 +23,7 @@ import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
 import { register } from "@/api/auth";
 import { toast } from "@/components/ui/use-toast";
-import Spinner from "@/components/general/Spinner"
+import Spinner from "@/components/general/Spinner";
 
 const RegistrationForm = () => {
   const navigate = useNavigate();
@@ -120,7 +120,7 @@ const RegistrationForm = () => {
                       }}
                       className="flex items-center"
                       inputClassName="input-field !w-full !text-base"
-                      placeholder="whatsapp number"
+                      placeholder="WhatsApp number"
                       countrySelectorStyleProps={{
                         className:
                           "bg-white !border-none outline-none !rounded-xl  mr-1 !text-lg",
@@ -135,7 +135,7 @@ const RegistrationForm = () => {
                   <FormDescription className="mt-1 ml-2">
                     Enter your{" "}
                     <span className="italic font-semibold text-green-500">
-                      Whatsapp
+                      WhatsApp
                     </span>{" "}
                     number (for OTP )
                   </FormDescription>
@@ -196,7 +196,6 @@ const RegistrationForm = () => {
           </div>
         </div>
       </form>
-      
     </Form>
   );
 };

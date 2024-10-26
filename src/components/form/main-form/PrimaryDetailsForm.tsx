@@ -487,7 +487,7 @@ export default function PrimaryDetailsForm({
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Whatsapp/Mobile <span className="mr-5 max-sm:hidden">:</span>
+                  WhatsApp/Mobile <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
@@ -514,7 +514,7 @@ export default function PrimaryDetailsForm({
                   <FormDescription className="ml-2">
                     Enter the{" "}
                     <span className="font-semibold text-green-400">
-                      Whatsapp
+                      WhatsApp
                     </span>{" "}
                     mobile number. This number will receive the direct booking
                     details.
