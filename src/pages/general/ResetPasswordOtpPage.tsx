@@ -1,7 +1,7 @@
-import { useNavigate } from 'react-router-dom'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+import { useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import {
   Form,
   FormControl,
@@ -9,35 +9,43 @@ import {
   FormField,
   FormItem,
   FormMessage,
-} from '@/components/ui/form'
+} from "@/components/ui/form";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from '@/components/ui/input-otp'
-import { OTPFormSchema } from '@/lib/validator'
-import { Button } from '@/components/ui/button'
-import Spinner from '@/components/general/Spinner'
+} from "@/components/ui/input-otp";
+import { OTPFormSchema } from "@/lib/validator";
+import { Button } from "@/components/ui/button";
+import Spinner from "@/components/general/Spinner";
 
 const ResetPasswordOTPPage = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof OTPFormSchema>>({
     resolver: zodResolver(OTPFormSchema),
-    defaultValues: { otp: '' },
-  })
+    defaultValues: { otp: "" },
+  });
 
   async function onSubmit(values: z.infer<typeof OTPFormSchema>) {
-    sessionStorage.setItem('otp', values.otp)
-    navigate('/confirm-new-password')
+    sessionStorage.setItem("otp", values.otp);
+    navigate("/confirm-new-password");
   }
 
   return (
-    <section className="h-screen bg-gray-100 flex-center">
+    <section
+      className="h-screen bg-gray-100 flex-center"
+      style={{
+        backgroundImage: `url('/assets/img/bg/register-banner.webp')`,
+        backgroundSize: "cover", // This ensures the image covers the div
+        backgroundPosition: "center", // This centers the background image
+        backgroundRepeat: "no-repeat", // Prevent the image from repeating
+      }}
+    >
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex-1 bg-white shadow-lg p-4 pb-6 rounded-3xl w-full max-w-[500px] mx-auto"
+          className="flex-1 bg-white shadow-lg p-4 pb-6 rounded-3xl  max-md:mx-2 w-full max-w-[500px] mx-auto"
         >
           <h3 className="mb-4 text-3xl font-bold text-center text-yellow">
             OTP Verification
@@ -48,7 +56,7 @@ const ResetPasswordOTPPage = () => {
               control={form.control}
               name="otp"
               render={({ field }) => (
-                <FormItem className="flex flex-col items-center w-full mb-2">
+                <FormItem className="flex flex-col items-center mb-2 w-full">
                   <FormControl>
                     <InputOTP maxLength={4} {...field}>
                       <InputOTPGroup>
@@ -69,7 +77,7 @@ const ResetPasswordOTPPage = () => {
                     </InputOTP>
                   </FormControl>
                   <FormDescription className="text-center">
-                    Please enter the OTP sent to your{' '}
+                    Please enter the OTP sent to your{" "}
                     <span className="font-bold">registered</span> number.
                     <br />
                     OTP is valid for only 10 minutes
@@ -91,7 +99,7 @@ const ResetPasswordOTPPage = () => {
         </form>
       </Form>
     </section>
-  )
-}
+  );
+};
 
-export default ResetPasswordOTPPage
+export default ResetPasswordOTPPage;

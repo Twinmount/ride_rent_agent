@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import {
   Form,
   FormControl,
@@ -11,85 +11,93 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { ResetPasswordFormSchema } from '@/lib/validator'
-import { Button } from '@/components/ui/button'
+} from "@/components/ui/form";
+import { ResetPasswordFormSchema } from "@/lib/validator";
+import { Button } from "@/components/ui/button";
 
 // phone input
-import { PhoneInput } from 'react-international-phone'
-import 'react-international-phone/style.css'
-import Spinner from '@/components/general/Spinner'
-import { API } from '@/api/ApiService'
-import { Slug } from '@/api/Api-Endpoints'
-import { toast } from '@/components/ui/use-toast'
-import { ResetPasswordResponse } from '@/types/API-types'
+import { PhoneInput } from "react-international-phone";
+import "react-international-phone/style.css";
+import Spinner from "@/components/general/Spinner";
+import { API } from "@/api/ApiService";
+import { Slug } from "@/api/Api-Endpoints";
+import { toast } from "@/components/ui/use-toast";
+import { ResetPasswordResponse } from "@/types/API-types";
 
 const LoginPage = () => {
   // State to store the country code separately
-  const [countryCode, setCountryCode] = useState('')
-  const navigate = useNavigate()
+  const [countryCode, setCountryCode] = useState("");
+  const navigate = useNavigate();
 
   // for phone validation
 
   const form = useForm<z.infer<typeof ResetPasswordFormSchema>>({
     resolver: zodResolver(ResetPasswordFormSchema),
     defaultValues: {
-      phoneNumber: '',
+      phoneNumber: "",
     },
-  })
+  });
 
   // form submit handler
   async function onSubmit(values: z.infer<typeof ResetPasswordFormSchema>) {
     try {
       // Extract the phone number part without the country code
       const phoneNumber = values.phoneNumber
-        .replace(`+${countryCode}`, '')
-        .trim()
+        .replace(`+${countryCode}`, "")
+        .trim();
 
       // Construct the final request body to send to the backend
       const requestBody = {
         countryCode,
         phoneNumber,
-      }
+      };
 
       const data = await API.post<ResetPasswordResponse>({
         slug: Slug.POST_RESET_PASSWORD,
         body: requestBody,
-      })
+      });
 
       if (data) {
-        sessionStorage.setItem('otpId', data?.result.otpId)
-        navigate('/reset-password/verify-otp')
+        sessionStorage.setItem("otpId", data?.result.otpId);
+        navigate("/reset-password/verify-otp");
       }
     } catch (error: any) {
-      console.error('error : ', error)
+      console.error("error : ", error);
       if (error.response && error.response.status === 400) {
         toast({
-          variant: 'destructive',
-          title: 'Invalid mobile number',
+          variant: "destructive",
+          title: "Invalid mobile number",
           description:
-            'verify your mobile number and make sure it is the one you registered with',
-        })
-        form.setError('phoneNumber', {
-          type: 'manual',
+            "verify your mobile number and make sure it is the one you registered with",
+        });
+        form.setError("phoneNumber", {
+          type: "manual",
           message:
-            'verify your mobile number and make sure it is the one you registered with',
-        })
+            "verify your mobile number and make sure it is the one you registered with",
+        });
       } else {
         toast({
-          variant: 'destructive',
-          title: 'Something went wrong',
-        })
+          variant: "destructive",
+          title: "Something went wrong",
+        });
       }
     }
   }
 
   return (
-    <section className="h-screen bg-gray-100 flex-center">
+    <section
+      className="h-screen bg-gray-100 flex-center"
+      style={{
+        backgroundImage: `url('/assets/img/bg/register-banner.webp')`,
+        backgroundSize: "cover", // This ensures the image covers the div
+        backgroundPosition: "center", // This centers the background image
+        backgroundRepeat: "no-repeat", // Prevent the image from repeating
+      }}
+    >
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex-1 bg-white shadow-lg p-4 pb-6 rounded-[1rem] w-full max-w-[500px] mx-auto"
+          className="flex-1 bg-white shadow-lg p-4 pb-6 rounded-[1rem]  max-md:mx-2 w-full max-w-[500px] mx-auto"
         >
           <h3 className="mb-4 text-3xl font-bold text-center text-yellow">
             Reset Password
@@ -100,8 +108,8 @@ const LoginPage = () => {
               control={form.control}
               name="phoneNumber"
               render={({ field }) => (
-                <FormItem className="flex flex-col w-full mb-2">
-                  <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
+                <FormItem className="flex flex-col mb-2 w-full">
+                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
                     Mobile
                   </FormLabel>
                   <div className="flex-col items-start w-full">
@@ -110,22 +118,22 @@ const LoginPage = () => {
                         defaultCountry="ae"
                         value={field.value}
                         onChange={(value, country) => {
-                          field.onChange(value)
+                          field.onChange(value);
 
                           // Set the country code in state
-                          setCountryCode(country.country.dialCode)
+                          setCountryCode(country.country.dialCode);
                         }}
                         className="flex items-center"
                         inputClassName="input-field !w-full !text-base"
                         placeholder="whatsapp number"
                         countrySelectorStyleProps={{
                           className:
-                            'bg-white !border-none outline-none !rounded-xl  mr-1 !text-lg',
+                            "bg-white !border-none outline-none !rounded-xl  mr-1 !text-lg",
                           style: {
-                            border: 'none ',
+                            border: "none ",
                           },
                           buttonClassName:
-                            '!border-none outline-none !h-[52px] !w-[50px] !rounded-xl bg-gray-100',
+                            "!border-none outline-none !h-[52px] !w-[50px] !rounded-xl bg-gray-100",
                         }}
                       />
                     </FormControl>
@@ -139,8 +147,8 @@ const LoginPage = () => {
             />
 
             <div className="text-sm text-center">
-              An OTP will be sent to your registered{' '}
-              <span className="font-bold ">mobile</span> number
+              An OTP will be sent to your registered{" "}
+              <span className="font-bold">mobile</span> number
             </div>
 
             <Button
@@ -155,7 +163,7 @@ const LoginPage = () => {
         </form>
       </Form>
     </section>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;

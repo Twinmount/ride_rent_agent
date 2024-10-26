@@ -1,7 +1,7 @@
-import { useNavigate } from 'react-router-dom'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+import { useNavigate } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
 import {
   Form,
   FormControl,
@@ -10,88 +10,96 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { ConfirmPasswordFormSchema } from '@/lib/validator'
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import Spinner from '@/components/general/Spinner'
-import { API } from '@/api/ApiService'
-import { Slug } from '@/api/Api-Endpoints'
-import { toast } from '@/components/ui/use-toast'
-import { LoginResponse } from '@/types/API-types'
+} from "@/components/ui/form";
+import { ConfirmPasswordFormSchema } from "@/lib/validator";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import Spinner from "@/components/general/Spinner";
+import { API } from "@/api/ApiService";
+import { Slug } from "@/api/Api-Endpoints";
+import { toast } from "@/components/ui/use-toast";
+import { LoginResponse } from "@/types/API-types";
 
 const ConfirmNewPassword = () => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // for phone validation
 
   const form = useForm<z.infer<typeof ConfirmPasswordFormSchema>>({
     resolver: zodResolver(ConfirmPasswordFormSchema),
     defaultValues: {
-      password: '',
-      confirmPassword: '',
+      password: "",
+      confirmPassword: "",
     },
-  })
+  });
 
   // form submit handler
   async function onSubmit(values: z.infer<typeof ConfirmPasswordFormSchema>) {
     try {
-      const otpId = sessionStorage.getItem('otpId')
-      const otp = sessionStorage.getItem('otp')
+      const otpId = sessionStorage.getItem("otpId");
+      const otp = sessionStorage.getItem("otp");
       // Construct the final request body to send to the backend
       const requestBody = {
         password: values.password,
         confirmPassword: values.confirmPassword,
         otpId,
         otp,
-      }
+      };
 
       const data = await API.post<LoginResponse>({
         slug: Slug.POST_VERIFY_RESET_PASSWORD,
         body: requestBody,
-      })
+      });
 
       if (data) {
         toast({
-          title: 'Password changed successfully',
-          description: 'Now you can login with your new password',
-          className: 'bg-yellow text-white',
-        })
+          title: "Password changed successfully",
+          description: "Now you can login with your new password",
+          className: "bg-yellow text-white",
+        });
 
-        navigate('/')
+        navigate("/");
       }
     } catch (error: any) {
-      console.error('error : ', error)
+      console.error("error : ", error);
       if (error.response && error.response.status === 400) {
         toast({
-          variant: 'destructive',
-          title: 'Password change failed',
-          description: 'Something went wrong when changing password',
-        })
-        form.setError('password', {
-          type: 'manual',
-          message: '',
-        })
-        form.setError('confirmPassword', {
-          type: 'manual',
-          message: '',
-        })
+          variant: "destructive",
+          title: "Password change failed",
+          description: "Something went wrong when changing password",
+        });
+        form.setError("password", {
+          type: "manual",
+          message: "",
+        });
+        form.setError("confirmPassword", {
+          type: "manual",
+          message: "",
+        });
       } else {
         toast({
-          variant: 'destructive',
-          title: 'Login Failed',
-          description: 'something went wrong :(',
-        })
+          variant: "destructive",
+          title: "Login Failed",
+          description: "something went wrong :(",
+        });
       }
     }
   }
 
   return (
-    <section className="h-screen bg-gray-100 flex-center">
+    <section
+      className="h-screen bg-gray-100 flex-center"
+      style={{
+        backgroundImage: `url('/assets/img/bg/register-banner.webp')`,
+        backgroundSize: "cover", // This ensures the image covers the div
+        backgroundPosition: "center", // This centers the background image
+        backgroundRepeat: "no-repeat", // Prevent the image from repeating
+      }}
+    >
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex-1 bg-white shadow-lg p-4 pb-6 rounded-[1rem] w-full max-w-[500px] mx-auto"
+          className="flex-1 bg-white shadow-lg p-4 pb-6 rounded-[1rem] w-full  max-md:mx-2 max-w-[500px] mx-auto"
         >
           <h3 className="mb-4 text-3xl font-bold text-center text-yellow">
             New Password
@@ -102,8 +110,8 @@ const ConfirmNewPassword = () => {
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem className="flex flex-col w-full mb-2 ">
-                  <FormLabel className="flex justify-between ml-2 text-base w-72 lg:text-lg">
+                <FormItem className="flex flex-col mb-2 w-full">
+                  <FormLabel className="flex justify-between ml-2 w-72 text-base lg:text-lg">
                     New Password
                   </FormLabel>
                   <div className="flex-col items-start w-full">
@@ -129,8 +137,8 @@ const ConfirmNewPassword = () => {
               control={form.control}
               name="confirmPassword"
               render={({ field }) => (
-                <FormItem className="flex flex-col w-full mb-2 ">
-                  <FormLabel className="flex justify-between ml-2 text-base w-72 lg:text-lg">
+                <FormItem className="flex flex-col mb-2 w-full">
+                  <FormLabel className="flex justify-between ml-2 w-72 text-base lg:text-lg">
                     Confirm Password
                   </FormLabel>
                   <div className="flex-col items-start w-full">
@@ -163,7 +171,7 @@ const ConfirmNewPassword = () => {
         </form>
       </Form>
     </section>
-  )
-}
+  );
+};
 
-export default ConfirmNewPassword
+export default ConfirmNewPassword;
