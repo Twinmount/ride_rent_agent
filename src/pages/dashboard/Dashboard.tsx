@@ -55,6 +55,7 @@ const AgentDashboard: React.FC = () => {
       }),
     enabled: !!userId,
     refetchOnWindowFocus: "always",
+    staleTime: 0,
   }); // Fetch from cached vehicle data
 
   const vehiclesListLength = data?.result.list.length || 0;
@@ -63,11 +64,13 @@ const AgentDashboard: React.FC = () => {
   const { data: portfolioData, isLoading: isPortfolioLoading } = useQuery({
     queryKey: ["portfolioStats"],
     queryFn: () => fetchPortfolioStats(),
+    staleTime: 0,
   });
 
   const { data: enquiriesData, isLoading: isEnquiriesLoading } = useQuery({
     queryKey: ["enquiriesStats"],
     queryFn: () => fetchEnquiriesStats(),
+    staleTime: 0,
   });
 
   // Fetch current month stats
@@ -75,12 +78,14 @@ const AgentDashboard: React.FC = () => {
     useQuery({
       queryKey: ["monthlyPortfolioStats", dateStartRange, dateEndRange],
       queryFn: () => fetchPortfolioStats(dateStartRange, dateEndRange),
+      staleTime: 0,
     });
 
   const { data: monthlyEnquiriesData, isLoading: isMonthlyEnquiriesLoading } =
     useQuery({
       queryKey: ["monthlyEnquiriesStats", dateStartRange, dateEndRange],
       queryFn: () => fetchEnquiriesStats(dateStartRange, dateEndRange),
+      staleTime: 0,
     });
 
   if (isLoading) {

@@ -108,13 +108,16 @@ const LoginPage = () => {
           backgroundRepeat: "no-repeat", // Prevent the image from repeating
         }}
       >
-        <div className="absolute left-4 top-6 z-10 w-32 lg:left-20 md:w-40 lg:w-44">
+        <Link
+          to={"/"}
+          className="absolute left-4 top-6 z-10 z-20 w-32 lg:left-20 md:w-40 lg:w-44"
+        >
           <img
             src="/assets/logo/header/agent_white_logo.webp"
             alt="riderent logo"
             className="object-contain w-full h-full"
           />
-        </div>
+        </Link>
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <h1 className="z-10 mt-20 mb-3 text-5xl font-extrabold text-white max-lg:text-4xl max-md:text-3xl max-lg:text-center">
           SHOWCASE YOUR FLEET TO THE WORLD

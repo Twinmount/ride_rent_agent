@@ -29,7 +29,7 @@ const Social = () => {
 
       {/* social */}
       <div className="flex flex-col gap-2 flex-center">
-        <div className="text-xl font-bold text-white">We are Social!</div>
+        <div className="text-xl font-bold text-yellow">We are Social!</div>
         <div className="flex gap-x-2">
           {socials.map((social) => {
             const Icon = social.icon;

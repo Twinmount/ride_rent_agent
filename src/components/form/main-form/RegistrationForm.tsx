@@ -164,7 +164,7 @@ const RegistrationForm = () => {
                     />
                   </FormControl>
                   <FormDescription className="mt-1 ml-2">
-                    Enter a password of at least 6 characters long
+                    Enter a password of at least 4 characters long
                   </FormDescription>
                   <FormMessage className="ml-2" />
                 </div>

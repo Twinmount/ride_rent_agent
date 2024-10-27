@@ -13,7 +13,7 @@ const SignUpFeatures = () => {
         <li className="flex gap-x-1 items-center">
           <Check className="mb-auto text-yellow" /> No Middlemen or Commission
         </li>
-        <li className="flex relative gap-x-1 items-center">
+        <li className="flex relative gap-x-1 items-center max-sm:w-[95%]">
           <Check className="mb-auto text-yellow" /> Ai-driven Fraud Detection
           For Secure Rentals
           <span className="absolute -top-1 -right-7 px-1 text-[0.6rem] leading-[1rem] text-black rounded-lg bg-[linear-gradient(110deg,#b78628,35%,#ffd700,45%,#fffacd,55%,#b78628)] bg-[length:200%_100%] animate-shimmer">

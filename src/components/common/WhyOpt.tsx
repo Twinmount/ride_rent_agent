@@ -1,5 +1,5 @@
-import Cities from './Locations'
-import MotionSection from '../framer-motion/MotionSection'
+import Cities from "./Locations";
+import MotionSection from "../framer-motion/MotionSection";
 
 const WhyOpt = () => {
   return (
@@ -9,7 +9,7 @@ const WhyOpt = () => {
         {/* in {location.label}  */}?
       </h2>
 
-      <div className="w-full m-auto mb-8 md:max-w-[80%]">
+      <div className="w-full m-auto mb-4 md:max-w-[80%]">
         <p className="text-center font-[400]">
           Discover the premier car rental experience with RIDE.RENT, where a
           vast array of vehicles awaits. From timeless classics to the pinnacle
@@ -32,6 +32,6 @@ const WhyOpt = () => {
       {/* cities */}
       <Cities />
     </MotionSection>
-  )
-}
-export default WhyOpt
+  );
+};
+export default WhyOpt;

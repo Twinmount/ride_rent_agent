@@ -8,6 +8,7 @@ import RegistrationForm from "@/components/form/main-form/RegistrationForm";
 import Footer from "@/components/footer/Footer";
 import { Helmet } from "react-helmet-async";
 import FloatingWhatsAppButton from "@/components/FloatingWhatsappIcon";
+import { Link } from "react-router-dom";
 
 export default function RegistrationPage() {
   return (
@@ -40,13 +41,16 @@ export default function RegistrationPage() {
             backgroundRepeat: "no-repeat",
           }}
         >
-          <div className="absolute left-4 top-6 w-32 lg:left-20 md:w-40 lg:w-44">
+          <Link
+            to={"/"}
+            className="absolute left-4 top-6 z-20 w-32 lg:left-20 md:w-40 lg:w-44"
+          >
             <img
               src="/assets/logo/header/agent_white_logo.webp"
               alt="riderent logo"
               className="object-contain w-full h-full"
             />
-          </div>
+          </Link>
           <MotionDiv className="flex z-10 flex-col items-center justify-center gap-4 mx-auto mb-12 lg:flex-row W-[95%] lg:w-[85%]">
             {/* sign up features */}
             <SignUpFeatures />

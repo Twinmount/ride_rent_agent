@@ -95,14 +95,14 @@ export default function ProfilePage() {
   };
 
   return (
-    <section className="min-h-screen flex-center">
-      <dl className="flex flex-col gap-y-3 p-3 max-w-4xl text-lg bg-white rounded-xl shadow-md md:text-xl lg:px-10 lg:py-10">
+    <section className="py-10 min-h-screen flex-center">
+      <dl className="flex flex-col gap-y-6 p-3 max-w-4xl text-lg max-sm:w-[95%] bg-white rounded-xl shadow-md md:text-xl lg:px-10 lg:py-10">
         {/* agent id */}
-        <div className="flex items-center">
-          <dt className="w-44 font-semibold flex-between">
-            Agent ID <span className="mr-2">:</span>
+        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
+          <dt className="w-44 text-base font-semibold text-gray-800">
+            Agent ID
           </dt>
-          <dd className="flex gap-x-3 items-center ml-4">
+          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
             <span className="font-bold">{profileData.agentId}</span>
             <button
               className="px-2 h-6 text-base rounded-lg border-none outline-none flex-center text-yellow"
@@ -114,11 +114,11 @@ export default function ProfilePage() {
         </div>
 
         {/* company logo */}
-        <div className="flex items-center">
-          <dt className="w-44 font-semibold flex-between">
-            Company Logo <span className="mr-2">:</span>
+        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
+          <dt className="w-44 text-base font-semibold text-gray-800">
+            Company Logo
           </dt>
-          <dd className="flex gap-x-3 items-center ml-4">
+          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
             <div className="overflow-hidden relative w-16 h-16 rounded-2xl border-2 border-yellow">
               <PreviewImageComponent imagePath={profileData.companyLogo} />
               <DropdownMenu>
@@ -147,22 +147,22 @@ export default function ProfilePage() {
         </div>
 
         {/* company name */}
-        <div className="flex items-start">
-          <dt className="w-44 font-semibold flex-between">
-            Company Name <span className="mr-2">:</span>
+        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
+          <dt className="w-44 text-base font-semibold text-gray-800">
+            Company Name
           </dt>
-          <dd className="flex gap-x-3 items-center ml-4 max-md:flex-col">
+          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
             {profileData.companyName}
             <NeedHelpToolTip content="Contact Support to Change Company Name" />
           </dd>
         </div>
 
         {/* Company Registration Card */}
-        <div className="flex items-start">
-          <dt className="w-44 font-semibold flex-between">
-            Registration Card <span className="mr-2">:</span>
+        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
+          <dt className="w-44 text-base font-semibold text-gray-800">
+            Registration Card
           </dt>
-          <dd className="flex gap-x-3 items-center ml-4">
+          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
             <div className="overflow-hidden relative w-16 h-16 rounded-2xl border-2 border-yellow">
               <PreviewImageComponent
                 imagePath={profileData.commercialLicense}
@@ -198,9 +198,9 @@ export default function ProfilePage() {
         </div>
 
         {/* expiry date */}
-        <div className="flex items-center">
-          <dt className="w-44 font-semibold flex-between">
-            Expiry Date <span className="mr-2">:</span>
+        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
+          <dt className="w-44 text-base font-semibold text-gray-800">
+            Expiry Date
           </dt>
           <dd className="flex gap-x-3 items-center ml-4 text-base">
             {new Date(profileData.expireDate).toLocaleDateString()}
@@ -208,22 +208,20 @@ export default function ProfilePage() {
         </div>
 
         {/* email */}
-        <div className="flex items-start">
-          <dt className="w-44 font-semibold flex-between">
-            Email<span className="mr-2">:</span>
-          </dt>
-          <dd className="flex flex-col gap-x-3 ml-4">
+        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
+          <dt className="w-44 text-base font-semibold text-gray-800">Email</dt>
+          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
             <span className="text-base">{userData?.emailId}</span>
             <NeedHelpToolTip content="Contact Support to Change Company Email" />
           </dd>
         </div>
 
         {/* phone number */}
-        <div className="flex items-start">
-          <dt className="w-44 font-semibold flex-between">
-            Phone Number<span className="mr-2">:</span>
+        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
+          <dt className="w-44 text-base font-semibold text-gray-800">
+            Phone Number
           </dt>
-          <dd className="flex flex-col gap-x-3 ml-4">
+          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
             <span className="text-base">
               +{userData?.countryCode} {userData?.phoneNumber}
             </span>
@@ -231,21 +229,21 @@ export default function ProfilePage() {
         </div>
 
         {/* registration number */}
-        <div className="flex items-center">
-          <dt className="w-44 font-semibold flex-between">
-            Registration Number <span className="mr-2">:</span>
+        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
+          <dt className="text-sm font-semibold w-fit flex-between">
+            Company Registration Number
           </dt>
-          <dd className="flex gap-x-3 items-center ml-4">
+          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
             {profileData.regNumber}
           </dd>
         </div>
 
         {/* password */}
-        <div className="flex items-center">
-          <dt className="w-44 font-semibold flex-between">
-            Password<span className="mr-2">:</span>
+        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
+          <dt className="w-44 text-base font-semibold text-gray-800">
+            Password
           </dt>
-          <dd className="flex gap-x-3 items-center ml-4">
+          <dd className="flex gap-x-3 justify-between items-center p-2 w-full rounded-lg bg-slate-50">
             <span className="font-bold">{"**********"}</span>
             <Link to={"/reset-password"} className="text-base text-blue-600">
               Reset password?

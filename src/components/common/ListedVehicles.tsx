@@ -1,21 +1,21 @@
-import { useState } from 'react'
-import { Share2 } from 'lucide-react'
-import { Switch } from '../ui/switch'
-import { useToast } from '../ui/use-toast'
-import { Link } from 'react-router-dom'
-import ConfirmationDialog from './ConfirmationDialog'
-import { SingleVehicleType } from '@/types/API-types'
-import ListingsGridSkelton from '../loading-skelton/ListingsGridSkelton'
-import { toggleVehicleVisibility } from '@/api/vehicle'
-import VehicleStatusOverlay from '../VehicleStatusOverlay'
-import { useQueryClient } from '@tanstack/react-query'
-import AddVehiclePlaceholder from '../AddVehiclePlaceholder'
+import { useState } from "react";
+import { Share2 } from "lucide-react";
+import { Switch } from "../ui/switch";
+import { useToast } from "../ui/use-toast";
+import { Link } from "react-router-dom";
+import ConfirmationDialog from "./ConfirmationDialog";
+import { SingleVehicleType } from "@/types/API-types";
+import ListingsGridSkelton from "../loading-skelton/ListingsGridSkelton";
+import { toggleVehicleVisibility } from "@/api/vehicle";
+import VehicleStatusOverlay from "../VehicleStatusOverlay";
+import { useQueryClient } from "@tanstack/react-query";
+import AddVehiclePlaceholder from "../AddVehiclePlaceholder";
 
 interface ListedVehiclesProps {
-  vehicles: SingleVehicleType[]
-  isLoading: boolean
-  userId: string
-  companyId: string
+  vehicles: SingleVehicleType[];
+  isLoading: boolean;
+  userId: string;
+  companyId: string;
 }
 
 export default function ListedVehicles({
@@ -24,14 +24,14 @@ export default function ListedVehicles({
   userId,
   companyId,
 }: ListedVehiclesProps) {
-  const { toast } = useToast()
-  const queryClient = useQueryClient()
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const [selectedVehicle, setSelectedVehicle] =
-    useState<SingleVehicleType | null>(null)
-  const [isUpdating, setIsUpdating] = useState<boolean>(false) // To handle the update process
+    useState<SingleVehicleType | null>(null);
+  const [isUpdating, setIsUpdating] = useState<boolean>(false); // To handle the update process
 
   const handleShare = (vehicle: SingleVehicleType) => {
-    const vehiclePublicUrl = `https://ride.rent/${vehicle.state.stateValue}/${vehicle.vehicleCategory.value}/${vehicle.vehicleId}`
+    const vehiclePublicUrl = `https://ride.rent/${vehicle.state.stateValue}/${vehicle.vehicleCategory.value}/${vehicle.vehicleId}`;
 
     if (navigator.share) {
       navigator
@@ -40,52 +40,52 @@ export default function ListedVehicles({
           text: `Check out this vehicle: ${vehicle.vehicleModel}`,
           url: vehiclePublicUrl,
         })
-        .catch((error) => console.error('Error sharing', error))
+        .catch((error) => console.error("Error sharing", error));
     } else {
       toast({
-        description: 'Share Option is not supported in your browser.',
-        className: 'text-white font-semibold text-lg bg-red-500',
-      })
+        description: "Share Option is not supported in your browser.",
+        className: "text-white font-semibold text-lg bg-red-500",
+      });
     }
-  }
+  };
 
   const handleSwitchChange = (vehicle: SingleVehicleType) => {
-    setSelectedVehicle(vehicle)
-  }
+    setSelectedVehicle(vehicle);
+  };
 
   const handleConfirmChange = async (
     vehicle: SingleVehicleType,
     isEnabled: boolean
   ) => {
-    setIsUpdating(true)
+    setIsUpdating(true);
     try {
       await toggleVehicleVisibility({
         vehicleId: vehicle.vehicleId,
         isDisabled: isEnabled,
-      })
+      });
       toast({
         description: `${vehicle.vehicleModel} is ${
-          !isEnabled ? 'enabled' : 'disabled'
+          !isEnabled ? "enabled" : "disabled"
         }`,
         className: `text-white font-semibold text-lg bg-yellow
        `,
-      })
+      });
       // Invalidate the query to refresh the vehicles list
       queryClient.invalidateQueries({
-        queryKey: ['vehicles'],
-      })
+        queryKey: ["vehicles"],
+      });
     } catch (error) {
       toast({
-        description: `Failed to ${isEnabled ? 'enable' : 'disable'} ${
+        description: `Failed to ${isEnabled ? "enable" : "disable"} ${
           vehicle.vehicleModel
         }`,
-        className: 'text-white font-semibold text-lg bg-red-500',
-      })
+        className: "text-white font-semibold text-lg bg-red-500",
+      });
     } finally {
-      setIsUpdating(false)
-      setSelectedVehicle(null)
+      setIsUpdating(false);
+      setSelectedVehicle(null);
     }
-  }
+  };
 
   return (
     <div className="">
@@ -99,7 +99,7 @@ export default function ListedVehicles({
           {vehicles.map((vehicle) => (
             <div
               key={vehicle.vehicleId}
-              className="h-full overflow-hidden transition-all border rounded-lg shadow-lg max-h-72 group"
+              className="overflow-hidden h-full max-h-72 rounded-lg border shadow-lg transition-all group"
             >
               <div className="w-full h-[70%] min-h-[170px] max-h-[70%] overflow-hidden relative">
                 <Link
@@ -126,15 +126,15 @@ export default function ListedVehicles({
                     {vehicle.vehicleModel}
                   </h3>
                 </Link>
-                <div className="flex items-center justify-between mt-2">
+                <div className="flex justify-between items-center mt-2">
                   <button
                     className={`text-black ${
-                      vehicle.approvalStatus !== 'APPROVED'
-                        ? 'cursor-not-allowed text-gray-600'
-                        : 'hover:text-yellow'
+                      vehicle.approvalStatus !== "APPROVED"
+                        ? "cursor-not-allowed text-gray-600"
+                        : "hover:text-yellow"
                     }`}
                     onClick={() => handleShare(vehicle)}
-                    disabled={vehicle.approvalStatus !== 'APPROVED'}
+                    disabled={vehicle.approvalStatus !== "APPROVED"}
                   >
                     <Share2 size={20} />
                   </button>
@@ -143,9 +143,9 @@ export default function ListedVehicles({
                     checked={!vehicle.isDisabled}
                     onCheckedChange={() => handleSwitchChange(vehicle)}
                     disabled={
-                      vehicle.approvalStatus !== 'APPROVED' ||
+                      vehicle.approvalStatus !== "APPROVED" ||
                       isUpdating ||
-                      (vehicle.disabledBy === 'admin' && vehicle.isDisabled)
+                      (vehicle.disabledBy === "admin" && vehicle.isDisabled)
                     }
                   />
                 </div>
@@ -170,5 +170,5 @@ export default function ListedVehicles({
         />
       )}
     </div>
-  )
+  );
 }
