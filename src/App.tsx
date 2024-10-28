@@ -13,14 +13,17 @@ import { toast } from "./components/ui/use-toast";
 import ProtectedRoute from "./layout/ProtectedRoutes";
 import LazyLoader from "./components/loading-skelton/LazyLoader";
 import { HelmetProvider } from "react-helmet-async";
+import RouteErrorBoundary from "./layout/RouteErrorBoundary";
 
 // dynamic import
 const RegistrationPage = lazy(
   () => import("./pages/register/RegistrationPage")
 );
+
 const CompanyRegistration = lazy(
   () => import("./pages/register/CompanyRegistration")
 );
+
 const RegistrationComplete = lazy(
   () => import("./pages/register/RegistrationComplete")
 );
@@ -55,13 +58,7 @@ axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 const router = createBrowserRouter([
   {
-    element: (
-      <Suspense fallback={<LazyLoader />}>
-        <HelmetProvider>
-          <Outlet />
-        </HelmetProvider>
-      </Suspense>
-    ),
+    element: <Outlet />,
     errorElement: <ErrorPage />,
     children: [
       {
@@ -142,7 +139,13 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AgentProvider>
-        <RouterProvider router={router} />
+        <RouteErrorBoundary>
+          <Suspense fallback={<LazyLoader />}>
+            <HelmetProvider>
+              <RouterProvider router={router} />
+            </HelmetProvider>
+          </Suspense>
+        </RouteErrorBoundary>
       </AgentProvider>
     </QueryClientProvider>
   );

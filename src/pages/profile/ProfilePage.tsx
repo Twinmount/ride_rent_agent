@@ -95,14 +95,14 @@ export default function ProfilePage() {
   };
 
   return (
-    <section className="py-10 min-h-screen flex-center">
-      <dl className="flex flex-col gap-y-6 p-3 max-w-4xl text-lg max-sm:w-[95%] bg-white rounded-xl shadow-md md:text-xl lg:px-10 lg:py-10">
+    <section className="py-10 min-h-screen text-base flex-center">
+      <dl className="flex flex-col gap-y-6 p-3 max-w-lg  w-full text-lg max-sm:w-[95%] bg-white rounded-xl shadow-md md:text-xl lg:px-10 lg:py-10">
         {/* agent id */}
-        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
-          <dt className="w-44 text-base font-semibold text-gray-800">
-            Agent ID
+        <div className="flex gap-y-2 justify-start items-start w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Agent ID <span className="font-bold">:</span>
           </dt>
-          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
+          <dd className="flex gap-x-3 items-center px-2 ml-4 w-full rounded-lg bg-slate-50">
             <span className="font-bold">{profileData.agentId}</span>
             <button
               className="px-2 h-6 text-base rounded-lg border-none outline-none flex-center text-yellow"
@@ -114,11 +114,11 @@ export default function ProfilePage() {
         </div>
 
         {/* company logo */}
-        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
-          <dt className="w-44 text-base font-semibold text-gray-800">
-            Company Logo
+        <div className="flex gap-y-2 justify-start items-start w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Company Logo <span className="font-bold">:</span>
           </dt>
-          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
+          <dd className="flex gap-x-3 items-center ml-4 w-full rounded-lg">
             <div className="overflow-hidden relative w-16 h-16 rounded-2xl border-2 border-yellow">
               <PreviewImageComponent imagePath={profileData.companyLogo} />
               <DropdownMenu>
@@ -147,22 +147,22 @@ export default function ProfilePage() {
         </div>
 
         {/* company name */}
-        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
-          <dt className="w-44 text-base font-semibold text-gray-800">
-            Company Name
+        <div className="flex gap-y-2 justify-start items-start w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Company Name <span className="font-bold">:</span>
           </dt>
-          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
-            {profileData.companyName}
+          <dd className="flex flex-col gap-x-3 items-start px-2 ml-4 w-full rounded-lg bg-slate-50">
+            <span className="line-clamp-1">{profileData.companyName}</span>
             <NeedHelpToolTip content="Contact Support to Change Company Name" />
           </dd>
         </div>
 
         {/* Company Registration Card */}
-        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
-          <dt className="w-44 text-base font-semibold text-gray-800">
-            Registration Card
+        <div className="flex gap-y-2 justify-start items-start w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Registration Card <span className="font-bold">:</span>
           </dt>
-          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
+          <dd className="flex gap-x-3 items-center ml-4 w-full rounded-lg">
             <div className="overflow-hidden relative w-16 h-16 rounded-2xl border-2 border-yellow">
               <PreviewImageComponent
                 imagePath={profileData.commercialLicense}
@@ -198,30 +198,34 @@ export default function ProfilePage() {
         </div>
 
         {/* expiry date */}
-        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
-          <dt className="w-44 text-base font-semibold text-gray-800">
-            Expiry Date
+        <div className="flex gap-y-2 justify-start items-start w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Expiry Date <span className="font-bold">:</span>
           </dt>
-          <dd className="flex gap-x-3 items-center ml-4 text-base">
+          <dd className="flex gap-x-3 items-center px-2 ml-4 w-full rounded-lg bg-slate-50">
             {new Date(profileData.expireDate).toLocaleDateString()}
           </dd>
         </div>
 
         {/* email */}
-        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
-          <dt className="w-44 text-base font-semibold text-gray-800">Email</dt>
-          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
-            <span className="text-base">{userData?.emailId}</span>
+        <div className="flex gap-y-2 justify-start items-start w-full max-w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Email <span className="font-bold">:</span>
+          </dt>
+          <dd className="flex flex-col gap-x-3 items-start px-2 ml-4 w-full rounded-lg bg-slate-50">
+            <span className="w-full max-w-full text-base line-clamp-1">
+              {userData?.emailId}
+            </span>
             <NeedHelpToolTip content="Contact Support to Change Company Email" />
           </dd>
         </div>
 
         {/* phone number */}
-        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
-          <dt className="w-44 text-base font-semibold text-gray-800">
-            Phone Number
+        <div className="flex gap-y-2 justify-start items-start w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Phone Number <span className="font-bold">:</span>
           </dt>
-          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
+          <dd className="flex gap-x-3 items-center px-2 ml-4 w-full rounded-lg bg-slate-50">
             <span className="text-base">
               +{userData?.countryCode} {userData?.phoneNumber}
             </span>
@@ -229,23 +233,27 @@ export default function ProfilePage() {
         </div>
 
         {/* registration number */}
-        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
-          <dt className="text-sm font-semibold w-fit flex-between">
-            Company Registration Number
+        <div className="flex gap-y-2 justify-start items-start w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Registration Number
+            <span className="font-bold">:</span>
           </dt>
-          <dd className="flex gap-x-3 items-center p-2 w-full rounded-lg bg-slate-50">
+          <dd className="flex gap-x-3 items-center px-2 ml-4 w-full text-base rounded-lg bg-slate-50">
             {profileData.regNumber}
           </dd>
         </div>
 
         {/* password */}
-        <div className="flex flex-col gap-y-2 justify-start items-start w-full">
-          <dt className="w-44 text-base font-semibold text-gray-800">
-            Password
+        <div className="flex gap-y-2 justify-start items-start w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Password <span className="font-bold">:</span>
           </dt>
-          <dd className="flex gap-x-3 justify-between items-center p-2 w-full rounded-lg bg-slate-50">
+          <dd className="flex flex-col gap-x-3 items-start px-2 ml-4 w-full rounded-lg bg-slate-50">
             <span className="font-bold">{"**********"}</span>
-            <Link to={"/reset-password"} className="text-base text-blue-600">
+            <Link
+              to={"/reset-password"}
+              className="ml-auto text-base text-blue-600 w-fit"
+            >
               Reset password?
             </Link>
           </dd>
