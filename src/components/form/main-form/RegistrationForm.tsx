@@ -24,9 +24,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { register } from "@/api/auth";
 import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
+import { Eye, EyeOff } from "lucide-react";
 
 const RegistrationForm = () => {
   const navigate = useNavigate();
+  const [isView, setIsView] = useState(false);
 
   // Retrieve stored values from sessionStorage
   const storedPhoneNumber = sessionStorage.getItem("phoneNumber") || "";
@@ -156,12 +158,28 @@ const RegistrationForm = () => {
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
-                    <Input
-                      placeholder="Password"
-                      {...field}
-                      className={`input-field !text-lg`}
-                      type="password"
-                    />
+                    <div className="relative">
+                      <Input
+                        type={isView ? "text" : "password"}
+                        id="password"
+                        className={`input-field !text-lg`}
+                        placeholder="password"
+                        {...field}
+                      />
+                      {isView ? (
+                        <Eye
+                          className="absolute top-4 right-4 z-10 text-gray-500 cursor-pointer"
+                          onClick={() => {
+                            setIsView(!isView);
+                          }}
+                        />
+                      ) : (
+                        <EyeOff
+                          className="absolute top-4 right-4 z-10 text-gray-500 cursor-pointer"
+                          onClick={() => setIsView(!isView)}
+                        />
+                      )}
+                    </div>
                   </FormControl>
                   <FormDescription className="mt-1 ml-2">
                     Enter a password of at least 4 characters long
