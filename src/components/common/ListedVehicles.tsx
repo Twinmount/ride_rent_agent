@@ -36,8 +36,6 @@ export default function ListedVehicles({
 
     const vehiclePublicUrl = `https://ride.rent/${vehicle.state.stateValue}/${vehicle.vehicleCategory.value}/${modelDetails}/${vehicle.vehicleId}`;
 
-    console.log(vehiclePublicUrl);
-
     if (navigator.share) {
       navigator
         .share({
