@@ -48,7 +48,9 @@ export default function ListedVehicles({
         .catch((error) => console.error("Error sharing", error));
     } else {
       toast({
-        description: "Share Option is not supported in your browser.",
+        title: "Share option is not supported in your browser",
+        description:
+          "Visit the vehicle in the official website and share it from there.",
         className: "text-white font-semibold text-lg bg-red-500",
       });
     }
