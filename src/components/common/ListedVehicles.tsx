@@ -10,6 +10,7 @@ import { toggleVehicleVisibility } from "@/api/vehicle";
 import VehicleStatusOverlay from "../VehicleStatusOverlay";
 import { useQueryClient } from "@tanstack/react-query";
 import AddVehiclePlaceholder from "../AddVehiclePlaceholder";
+import { generateModelDetailsUrl } from "@/helpers";
 
 interface ListedVehiclesProps {
   vehicles: SingleVehicleType[];
@@ -31,7 +32,11 @@ export default function ListedVehicles({
   const [isUpdating, setIsUpdating] = useState<boolean>(false); // To handle the update process
 
   const handleShare = (vehicle: SingleVehicleType) => {
-    const vehiclePublicUrl = `https://ride.rent/${vehicle.state.stateValue}/${vehicle.vehicleCategory.value}/${vehicle.vehicleId}`;
+    const modelDetails = generateModelDetailsUrl(vehicle);
+
+    const vehiclePublicUrl = `https://ride.rent/${vehicle.state.stateValue}/${vehicle.vehicleCategory.value}/${modelDetails}/${vehicle.vehicleId}`;
+
+    console.log(vehiclePublicUrl);
 
     if (navigator.share) {
       navigator
