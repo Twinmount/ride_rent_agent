@@ -27,8 +27,10 @@ import { toast } from "@/components/ui/use-toast";
 import { remove, save, StorageKeys } from "@/utils/storage";
 import { LoginResponse } from "@/types/API-types";
 import Footer from "@/components/footer/Footer";
+import { Eye, EyeOff } from "lucide-react";
 
 const LoginPage = () => {
+  const [isView, setIsView] = useState(false);
   // State to store the country code separately
   const [countryCode, setCountryCode] = useState("");
   const navigate = useNavigate();
@@ -110,7 +112,7 @@ const LoginPage = () => {
       >
         <Link
           to={"/"}
-          className="absolute left-4 top-6 z-10 z-20 w-32 lg:left-20 md:w-40 lg:w-44"
+          className="absolute left-4 top-6 z-20 w-32 lg:left-20 md:w-40 lg:w-44"
         >
           <img
             src="/assets/logo/header/agent_white_logo.webp"
@@ -185,12 +187,28 @@ const LoginPage = () => {
                     </FormLabel>
                     <div className="flex-col items-start w-full">
                       <FormControl>
-                        <Input
-                          placeholder="Password"
-                          {...field}
-                          className={`input-field !text-lg`}
-                          type="password"
-                        />
+                        <div className="relative">
+                          <Input
+                            type={isView ? "text" : "password"}
+                            id="password"
+                            className={`input-field !text-lg`}
+                            placeholder="password"
+                            {...field}
+                          />
+                          {isView ? (
+                            <Eye
+                              className="absolute top-4 right-4 z-10 text-gray-500 cursor-pointer"
+                              onClick={() => {
+                                setIsView(!isView);
+                              }}
+                            />
+                          ) : (
+                            <EyeOff
+                              className="absolute top-4 right-4 z-10 text-gray-500 cursor-pointer"
+                              onClick={() => setIsView(!isView)}
+                            />
+                          )}
+                        </div>
                       </FormControl>
                       <FormMessage className="ml-2" />
                     </div>
