@@ -6,11 +6,15 @@ interface RouteErrorBoundaryProps {
 
 class RouteErrorBoundary extends Component<RouteErrorBoundaryProps> {
   componentDidCatch(error: Error) {
+    const hasReloaded = sessionStorage.getItem("hasReloaded");
+
     if (
-      error.message.includes("Failed to fetch dynamically imported module") ||
-      error.message.includes("Importing a module script failed")
+      !hasReloaded && // Check if reload has already happened
+      (error.message.includes("Failed to fetch dynamically imported module") ||
+        error.message.includes("Importing a module script failed"))
     ) {
-      // Force a hard reload to fetch new module versions
+      // Set flag in sessionStorage to indicate reload has occurred
+      sessionStorage.setItem("hasReloaded", "true");
       window.location.reload();
     }
   }

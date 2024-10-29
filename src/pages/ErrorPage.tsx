@@ -15,13 +15,17 @@ const ErrorPage = () => {
     navigate(-1);
   };
 
-  // Check if the error is related to a failed dynamic import and reload if necessary
+  // Check if the error is related to a failed dynamic import and reload only once
   useEffect(() => {
+    const hasReloaded = sessionStorage.getItem("hasReloaded");
+
     if (
+      !hasReloaded && // Check if reload has already happened
       error instanceof Error &&
-      (error.message.includes("Failed to fetch dynamically imported module") ||
-        error.message.includes("Importing a module script failed"))
+      error.message.includes("Failed to fetch dynamically imported module")
     ) {
+      // Set flag in sessionStorage to indicate reload has occurred
+      sessionStorage.setItem("hasReloaded", "true");
       window.location.reload();
     }
   }, [error]);
