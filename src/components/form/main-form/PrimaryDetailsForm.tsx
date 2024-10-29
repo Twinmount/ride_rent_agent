@@ -25,15 +25,14 @@ import { Label } from "@/components/ui/label";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import RentalDetailsFormField from "../RentalDetailsFormField";
-import MultipleFileUpload from "../MultipleFileUpload";
 import { deleteMultipleFiles, validateRentalDetails } from "@/helpers/form";
-import BrandsDropdown from "../BrandsDropdown";
+import BrandsDropdown from "../dropdowns/BrandsDropdown";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import CitiesDropdown from "../CitiesDropdown";
-import CategoryDropdown from "../CategoryDropdown";
-import VehicleTypesDropdown from "../VehicleTypesDropdown";
-import StatesDropdown from "../StatesDropdown";
+import CitiesDropdown from "../dropdowns/CitiesDropdown";
+import CategoryDropdown from "../dropdowns/CategoryDropdown";
+import VehicleTypesDropdown from "../dropdowns/VehicleTypesDropdown";
+import StatesDropdown from "../dropdowns/StatesDropdown";
 import { save, StorageKeys } from "@/utils/storage";
 import { toast } from "@/components/ui/use-toast";
 import { addPrimaryDetailsForm, updatePrimaryDetailsForm } from "@/api/vehicle";
@@ -41,6 +40,7 @@ import Spinner from "@/components/general/Spinner";
 import { useParams } from "react-router-dom";
 import { ApiError } from "@/types/types";
 import { GcsFilePaths } from "@/constants/enum";
+import MultipleFileUpload from "../file-uploads/MultipleFileUpload";
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
@@ -56,7 +56,8 @@ export default function PrimaryDetailsForm({
   initialCountryCode,
 }: PrimaryFormProps) {
   const [countryCode, setCountryCode] = useState<string>("");
-  const [isFileUploading, setIsFileUploading] = useState(false);
+  const [isPhotosUploading, setIsPhotosUploading] = useState(false);
+  const [isLicenseUploading, setIsLicenseUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
 
   const { vehicleId, userId } = useParams<{
@@ -87,7 +88,7 @@ export default function PrimaryDetailsForm({
       return;
     }
 
-    if (isFileUploading) {
+    if (isPhotosUploading || isLicenseUploading) {
       toast({
         title: "File Upload in Progress",
         description:
@@ -344,9 +345,9 @@ export default function PrimaryDetailsForm({
                 existingFiles={initialValues.vehiclePhotos || []}
                 description="Add Vehicle Photos. Up to 8 photos can be added."
                 maxSizeMB={30}
-                setIsFileUploading={setIsFileUploading}
+                setIsFileUploading={setIsPhotosUploading}
                 bucketFilePath={GcsFilePaths.IMAGE_VEHICLES}
-                isFileUploading={isFileUploading}
+                isFileUploading={isPhotosUploading}
                 downloadFileName={
                   formData?.vehicleModel
                     ? ` ${formData.vehicleModel}`
@@ -374,9 +375,9 @@ export default function PrimaryDetailsForm({
                   </>
                 }
                 maxSizeMB={15}
-                setIsFileUploading={setIsFileUploading}
+                setIsFileUploading={setIsLicenseUploading}
                 bucketFilePath={GcsFilePaths.COMMERCIAL_LICENSES}
-                isFileUploading={isFileUploading}
+                isFileUploading={isLicenseUploading}
                 downloadFileName={
                   formData?.vehicleModel
                     ? `[commercial-license] - ${formData.vehicleModel}`
