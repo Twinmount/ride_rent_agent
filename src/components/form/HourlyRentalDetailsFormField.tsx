@@ -1,21 +1,24 @@
+// HourlyRentalDetailFormField.tsx
 import { useFormContext, Controller } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { FormDescription } from "../ui/form";
-import HourlyRentalDetailFormField from "./HourlyRentalDetailsFormField";
+import { FormDescription } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-const RentalDetailField = ({
-  period,
-}: {
-  period: "day" | "week" | "month";
-}) => {
+const HourlyRentalDetailFormField = () => {
   const { control, watch, clearErrors } = useFormContext();
-  const isEnabled = watch(`rentalDetails.${period}.enabled`);
+  const isEnabled = watch("rentalDetails.hour.enabled");
 
   return (
     <div className="p-2 mb-2 rounded-lg border-b shadow">
       <Controller
-        name={`rentalDetails.${period}.enabled`}
+        name="rentalDetails.hour.enabled"
         control={control}
         render={({ field }) => (
           <div className="flex items-center mt-3 space-x-2">
@@ -24,83 +27,77 @@ const RentalDetailField = ({
               onCheckedChange={(value) => {
                 field.onChange(value);
                 if (!value) {
-                  clearErrors([`rentalDetails`]); // Clear related errors when checkbox is unchecked
+                  clearErrors([`rentalDetails`]);
                 }
               }}
               className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
-              id={`rentalDetails-${period}-enabled`}
+              id="rentalDetails-hour-enabled"
             />
             <label
-              htmlFor={`rentalDetails-${period}-enabled`}
+              htmlFor="rentalDetails-hour-enabled"
               className="text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              {period.charAt(0).toUpperCase() + period.slice(1)}
+              Hour
             </label>
           </div>
         )}
       />
+
       {isEnabled && (
         <>
+          {/* Minimum Required Booking (Select) */}
           <Controller
-            name={`rentalDetails.${period}.rentInAED`}
+            name="rentalDetails.hour.minBookingHours"
             control={control}
             render={({ field }) => (
-              <div className="flex items-center mt-2">
-                <label
-                  htmlFor={`rentalDetails-${period}-rentInAED`}
-                  className="block mr-1 mb-5 w-28 text-sm font-medium"
-                >
-                  Rent in AED
+              <div className="flex items-start mt-4 space-x-2">
+                <label className="flex items-start w-36 font-medium max-md:text-sm">
+                  Minimum Booking Hours <span className="mt-3">:</span>
                 </label>
-                <div className="w-full">
-                  <Input
-                    id={`rentalDetails-${period}-rentInAED`}
-                    {...field}
-                    placeholder="Rent in AED"
-                    className="input-field"
-                    type="text"
-                    inputMode="numeric"
-                    onKeyDown={(e) => {
-                      if (
-                        !/^\d*$/.test(e.key) &&
-                        ![
-                          "Backspace",
-                          "Delete",
-                          "ArrowLeft",
-                          "ArrowRight",
-                        ].includes(e.key)
-                      ) {
-                        e.preventDefault();
-                      }
+                <div className="flex flex-col w-full">
+                  <Select
+                    onValueChange={(value) => {
+                      field.onChange(value);
+                      clearErrors("rentalDetails");
                     }}
-                    onChange={(e) => {
-                      field.onChange(e);
-                      clearErrors(`rentalDetails`);
-                    }}
-                  />
+                    value={field.value || ""}
+                  >
+                    <SelectTrigger className="ring-0 select-field focus:ring-0 input-fields">
+                      <SelectValue
+                        className="!font-bold !text-black"
+                        placeholder="Select hour"
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {[...Array(10)].map((_, index) => (
+                        <SelectItem
+                          key={index + 1}
+                          value={(index + 1).toString()}
+                        >
+                          {index + 1} hour{index + 1 > 1 ? "s" : ""}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormDescription>
-                    {`Rent of the Vehicle in AED per ${period} `}
+                    Select the minimum required booking hours (1–10 hours).
                   </FormDescription>
                 </div>
               </div>
             )}
           />
+
+          {/* Rent in AED */}
           <Controller
-            name={`rentalDetails.${period}.mileageLimit`}
+            name="rentalDetails.hour.rentInAED"
             control={control}
             render={({ field }) => (
-              <div className="flex items-center mt-2">
-                <label
-                  htmlFor={`rentalDetails-${period}-mileageLimit`}
-                  className="block mb-6 w-28 text-sm font-medium"
-                >
-                  Mileage Limit
-                </label>
-                <div className="w-full">
+              <div className="flex items-center mt-4 space-x-2">
+                <label className="w-36 font-medium">Rent in AED:</label>
+                <div className="flex flex-col w-full">
                   <Input
-                    id={`rentalDetails-${period}-mileageLimit`}
                     {...field}
-                    placeholder="Mileage Limit"
+                    placeholder="Enter rent in AED"
                     className="input-field"
                     type="text"
                     inputMode="numeric"
@@ -123,7 +120,48 @@ const RentalDetailField = ({
                     }}
                   />
                   <FormDescription>
-                    {`Mileage of the vehicle per ${period} (KM)`}
+                    Specify the hourly rental price in AED.
+                  </FormDescription>
+                </div>
+              </div>
+            )}
+          />
+
+          {/* Mileage Limit */}
+          <Controller
+            name="rentalDetails.hour.mileageLimit"
+            control={control}
+            render={({ field }) => (
+              <div className="flex items-center mt-4 space-x-2">
+                <label className="w-36 font-medium">Mileage Limit:</label>
+                <div className="flex flex-col w-full">
+                  <Input
+                    {...field}
+                    placeholder="Enter mileage limit"
+                    className="input-field"
+                    type="text"
+                    inputMode="numeric"
+                    onKeyDown={(e) => {
+                      if (
+                        !/^\d*$/.test(e.key) &&
+                        ![
+                          "Backspace",
+                          "Delete",
+                          "ArrowLeft",
+                          "ArrowRight",
+                        ].includes(e.key)
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      clearErrors(`rentalDetails`);
+                    }}
+                  />
+                  <FormDescription>
+                    Specify the mileage limit for hourly rentals &#40;in
+                    KM&#41;.
                   </FormDescription>
                 </div>
               </div>
@@ -135,15 +173,4 @@ const RentalDetailField = ({
   );
 };
 
-const RentalDetailsFormField = () => {
-  return (
-    <div className="flex flex-col">
-      <RentalDetailField period="day" />
-      <RentalDetailField period="week" />
-      <RentalDetailField period="month" />
-      <HourlyRentalDetailFormField />
-    </div>
-  );
-};
-
-export default RentalDetailsFormField;
+export default HourlyRentalDetailFormField;

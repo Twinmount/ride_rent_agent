@@ -100,8 +100,21 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
     day: { enabled: false, rentInAED: "", mileageLimit: "" },
     week: { enabled: false, rentInAED: "", mileageLimit: "" },
     month: { enabled: false, rentInAED: "", mileageLimit: "" },
+    hour: {
+      enabled: false,
+      minBookingHours: "",
+      rentInAED: "",
+      mileageLimit: "",
+    },
   },
   phoneNumber: "",
   stateId: "",
   cityIds: [],
+  additionalTypes: [],
+  securityDeposit: {
+    enabled: false,
+    amountInAED: "",
+  },
+  creditDebitCards: false,
+  tabby: false,
 };

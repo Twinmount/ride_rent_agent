@@ -1,97 +1,114 @@
-import * as z from 'zod'
-import { PhoneNumberUtil } from 'google-libphonenumber'
+import * as z from "zod";
+import { PhoneNumberUtil } from "google-libphonenumber";
 import {
   FeaturesFormData,
   GetPrimaryForm,
   SpecificationFormData,
-} from '@/types/API-types'
-import { PrimaryFormType, TabsTypes } from '@/types/types'
-import { deleteFile } from '@/api/file-upload'
+} from "@/types/API-types";
+import { PrimaryFormType, TabsTypes } from "@/types/types";
+import { deleteFile } from "@/api/file-upload";
 
-type SpecificationOption = { label: string; value: string }
+type SpecificationOption = { label: string; value: string };
 
 // function to create dynamic specification form zod schema based on the currently choose vehicle category
 const createSpecificationSchemaForCategory = (
   fields: Record<string, SpecificationOption[]>
 ) => {
   const schemaObject = Object.keys(fields).reduce((acc, field) => {
-    acc[field] = z.string() // Adjust type according to your needs
-    return acc
-  }, {} as Record<string, z.ZodTypeAny>)
-  return z.object({ specifications: z.object(schemaObject) })
-}
+    acc[field] = z.string(); // Adjust type according to your needs
+    return acc;
+  }, {} as Record<string, z.ZodTypeAny>);
+  return z.object({ specifications: z.object(schemaObject) });
+};
 
-export default createSpecificationSchemaForCategory
+export default createSpecificationSchemaForCategory;
 
-type FeatureOption = { label: string; value: string }
+type FeatureOption = { label: string; value: string };
 
 // Function to create dynamic feature form zod schema based on the currently chosen vehicle category
 export const createFeatureSchemaForCategory = (
   fields: Record<string, FeatureOption[]>
 ) => {
   const schemaObject = Object.keys(fields).reduce((acc, field) => {
-    acc[field] = z.array(z.string()) // Each field should be an array of strings
-    return acc
-  }, {} as Record<string, z.ZodTypeAny>)
-  return z.object({ features: z.object(schemaObject) })
-}
+    acc[field] = z.array(z.string()); // Each field should be an array of strings
+    return acc;
+  }, {} as Record<string, z.ZodTypeAny>);
+  return z.object({ features: z.object(schemaObject) });
+};
 
 // mapping function to format the label name .
 // For example, "year_of_manufacture" will be converted to "Year Of Manufacturer
 export const formatFieldName = (field: string): string => {
   return field
-    .replace(/_/g, ' ') // Replace underscores with spaces
-    .split(' ') // Split into words
+    .replace(/_/g, " ") // Replace underscores with spaces
+    .split(" ") // Split into words
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()) // Capitalize each word
-    .join(' ') // Join words with spaces
-}
+    .join(" "); // Join words with spaces
+};
 
 // rental detail type
 type RentalDetailType = {
-  enabled?: boolean | undefined
-  rentInAED?: string | undefined
-  mileageLimit?: string | undefined
-}
+  enabled?: boolean | undefined;
+  rentInAED?: string | undefined;
+  mileageLimit?: string | undefined;
+};
 
 type RentalDetailsType = {
-  day: RentalDetailType
-  week: RentalDetailType
-  month: RentalDetailType
-}
+  day: RentalDetailType;
+  week: RentalDetailType;
+  month: RentalDetailType;
+};
 
 // rental details form field validation helper function
 export const validateRentalDetails = (
   rentalDetails: RentalDetailsType
 ): string | null => {
-  const { day, week, month } = rentalDetails
+  const { day, week, month } = rentalDetails;
 
   let message =
-    'Rent in AED as well as Mileage should be provided for the checked values'
+    "Rent in AED as well as Mileage should be provided for the checked values";
 
   if (!day.enabled && !week.enabled && !month.enabled) {
-    return 'At least one rental period (day, week, or month) must be enabled'
+    return "At least one rental period (day, week, or month) must be enabled";
   }
 
   if (day.enabled && (!day.rentInAED || !day.mileageLimit)) {
-    return message
+    return message;
   }
 
   if (week.enabled && (!week.rentInAED || !week.mileageLimit)) {
-    return message
+    return message;
   }
 
   if (month.enabled && (!month.rentInAED || !month.mileageLimit)) {
-    return message
+    return message;
   }
 
-  return null
-}
+  return null;
+};
+
+type SecurityDepositType = {
+  enabled: boolean;
+  amountInAED?: string;
+};
+
+// security deposit form field validation helper function
+export const validateSecurityDeposit = (
+  securityDeposit: SecurityDepositType
+): string | null => {
+  if (securityDeposit.enabled && !securityDeposit.amountInAED) {
+    return "Please enter a valid deposit amount in AED.";
+  }
+
+  // If all validations pass, return null (no error)
+  return null;
+};
 
 // file upload image file size validator
 export const validateFileSize = (file: File, maxSizeMB: number) => {
-  const maxSizeBytes = maxSizeMB * 1024 * 1024
-  return file.size <= maxSizeBytes
-}
+  const maxSizeBytes = maxSizeMB * 1024 * 1024;
+  return file.size <= maxSizeBytes;
+};
 
 // file upload image file dimension validator
 export const validateImageDimensions = (
@@ -100,25 +117,25 @@ export const validateImageDimensions = (
   maxHeight: number
 ) => {
   return new Promise<boolean>((resolve) => {
-    const img = new Image()
+    const img = new Image();
     img.onload = () => {
-      const isValid = img.width <= maxWidth && img.height <= maxHeight
-      resolve(isValid)
-    }
-    img.onerror = () => resolve(false)
-    img.src = URL.createObjectURL(file)
-  })
-}
+      const isValid = img.width <= maxWidth && img.height <= maxHeight;
+      resolve(isValid);
+    };
+    img.onerror = () => resolve(false);
+    img.src = URL.createObjectURL(file);
+  });
+};
 
 // phone number validation
-const phoneUtil = PhoneNumberUtil.getInstance()
+const phoneUtil = PhoneNumberUtil.getInstance();
 export const isPhoneValid = (phone: string) => {
   try {
-    return phoneUtil.isValidNumber(phoneUtil.parseAndKeepRawInput(phone))
+    return phoneUtil.isValidNumber(phoneUtil.parseAndKeepRawInput(phone));
   } catch (error) {
-    return false
+    return false;
   }
-}
+};
 
 /**
  * Formats the features data into the required POST request structure.
@@ -135,21 +152,21 @@ export function formatFeatures(
     if (selectedValues && selectedValues.length > 0) {
       const featureOptions = featureData.find(
         (feature) => feature.name === key
-      )?.values
+      )?.values;
 
       if (featureOptions) {
         acc[key] = selectedValues.map((value) => {
-          const option = featureOptions.find((v) => v.name === value)
+          const option = featureOptions.find((v) => v.name === value);
           return {
             name: option?.name || value, // The name from the dropdown
             value: option?.label || value, // The label from the dropdown or value if not found
             selected: true, // Always true as it's selected
-          }
-        })
+          };
+        });
       }
     }
-    return acc
-  }, {} as Record<string, { name: string; value: string; selected: boolean }[]>)
+    return acc;
+  }, {} as Record<string, { name: string; value: string; selected: boolean }[]>);
 }
 
 /**
@@ -167,13 +184,13 @@ export function formatSpecifications(
   { name: string; value: string; selected: boolean; hoverInfo: string }
 > {
   return Object.keys(values).reduce((acc, key) => {
-    const selectedLabel = values[key] as string
-    const specItem = specData.find((spec) => spec.name === key)
+    const selectedLabel = values[key] as string;
+    const specItem = specData.find((spec) => spec.name === key);
 
     if (specItem) {
       const selectedValueObj = specItem.values.find(
         (value) => value.name === selectedLabel
-      )
+      );
 
       if (selectedValueObj) {
         acc[key] = {
@@ -181,11 +198,11 @@ export function formatSpecifications(
           value: selectedValueObj.label,
           selected: true,
           hoverInfo: specItem.hoverInfo, // Adding hoverInfo to the object
-        }
+        };
       }
     }
-    return acc
-  }, {} as Record<string, { name: string; value: string; selected: boolean; hoverInfo: string }>) // Updated return type to include hoverInfo
+    return acc;
+  }, {} as Record<string, { name: string; value: string; selected: boolean; hoverInfo: string }>); // Updated return type to include hoverInfo
 }
 
 /**
@@ -203,12 +220,13 @@ export function mapGetPrimaryFormToPrimaryFormType(
   data: GetPrimaryForm
 ): PrimaryFormType {
   // Combine countryCode and phoneNumber into a single phoneNumber string
-  const formattedPhoneNumber = `+${data.countryCode}${data.phoneNumber}`
+  const formattedPhoneNumber = `+${data.countryCode}${data.phoneNumber}`;
 
   return {
     vehicleId: data.vehicleId,
     vehicleCategoryId: data.vehicleCategoryId,
     vehicleTypeId: data.vehicleTypeId,
+    additionalTypes: data?.additionalTypes || [],
     vehicleBrandId: data.vehicleBrandId,
     vehicleModel: data.vehicleModel,
     vehiclePhotos: data.vehiclePhotos,
@@ -217,19 +235,22 @@ export function mapGetPrimaryFormToPrimaryFormType(
     commercialLicenses: data.commercialLicenses,
     commercialLicenseExpireDate: new Date(data.commercialLicenseExpireDate), // Convert string to Date
     isLease: data.isLease,
+    securityDeposit: data.securityDeposit,
     isCryptoAccepted: data.isCryptoAccepted,
     isSpotDeliverySupported: data.isSpotDeliverySupported,
-    specification: data.specification as 'UAE_SPEC' | 'USA_SPEC' | 'OTHERS',
+    specification: data.specification as "UAE_SPEC" | "USA_SPEC" | "OTHERS",
     rentalDetails: data.rentalDetails,
     phoneNumber: formattedPhoneNumber, // Set the combined phone number
     stateId: data.stateId,
     cityIds: data.cityIds,
-  }
+    creditDebitCards: data.creditDebitCards,
+    tabby: data.tabby,
+  };
 }
 
 interface TabValidationProps {
-  tab: TabsTypes
-  levelsFilled: number
+  tab: TabsTypes;
+  levelsFilled: number;
 }
 
 /**
@@ -244,53 +265,53 @@ export const validateTabAccess = ({
   tab,
   levelsFilled,
 }: TabValidationProps): { canAccess: boolean; message: string } => {
-  if (tab === 'primary' && levelsFilled > 0) {
+  if (tab === "primary" && levelsFilled > 0) {
     return {
       canAccess: false,
-      message: 'The Primary Details form is already completed.',
-    }
+      message: "The Primary Details form is already completed.",
+    };
   }
 
-  if (tab === 'specifications') {
+  if (tab === "specifications") {
     if (levelsFilled >= 1 && levelsFilled < 2) {
       return {
         canAccess: true,
-        message: '',
-      } // Access allowed
+        message: "",
+      }; // Access allowed
     } else if (levelsFilled >= 2) {
       return {
         canAccess: false,
-        message: 'The Specifications form is already completed.',
-      }
+        message: "The Specifications form is already completed.",
+      };
     } else {
       return {
         canAccess: false,
-        message: 'Please complete the Primary Details form to proceed.',
-      }
+        message: "Please complete the Primary Details form to proceed.",
+      };
     }
   }
 
-  if (tab === 'features') {
+  if (tab === "features") {
     if (levelsFilled >= 2 && levelsFilled < 3) {
       return {
         canAccess: true,
-        message: '',
-      } // Access allowed
+        message: "",
+      }; // Access allowed
     } else if (levelsFilled === 3) {
       return {
         canAccess: false,
-        message: 'The Features form is already completed.',
-      }
+        message: "The Features form is already completed.",
+      };
     } else {
       return {
         canAccess: false,
-        message: 'Please complete the Specifications form to proceed.',
-      }
+        message: "Please complete the Specifications form to proceed.",
+      };
     }
   }
 
-  return { canAccess: true, message: '' } // Default case
-}
+  return { canAccess: true, message: "" }; // Default case
+};
 
 // Type guard to check if a value has the 'selected' property for specification form
 export function hasSelected(
@@ -298,7 +319,7 @@ export function hasSelected(
     | { name: string; label: string; _id?: string }
     | { name: string; label: string; selected: boolean }
 ): value is { name: string; label: string; selected: boolean } {
-  return (value as { selected: boolean }).selected !== undefined
+  return (value as { selected: boolean }).selected !== undefined;
 }
 
 // image download helper function
@@ -307,68 +328,68 @@ export const downloadFileFromStream = async (
   fileName: string
 ) => {
   try {
-    const apiBaseUrl = import.meta.env.VITE_API_URL
-    const url = `${apiBaseUrl}/file/stream?path=${imagePath}` // Stream endpoint for download
+    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const url = `${apiBaseUrl}/file/stream?path=${imagePath}`; // Stream endpoint for download
 
     // Fetch the image stream from the backend API
-    const response = await fetch(url)
-    const reader = response.body?.getReader()
+    const response = await fetch(url);
+    const reader = response.body?.getReader();
 
     if (!reader) {
-      throw new Error('Failed to get reader from stream')
+      throw new Error("Failed to get reader from stream");
     }
 
-    let chunks: Uint8Array[] = []
+    let chunks: Uint8Array[] = [];
     const stream = new ReadableStream({
       async start(controller) {
         while (true) {
-          const { done, value } = await reader.read()
+          const { done, value } = await reader.read();
           if (done) {
-            controller.close()
-            break
+            controller.close();
+            break;
           }
-          controller.enqueue(value)
-          chunks.push(value)
+          controller.enqueue(value);
+          chunks.push(value);
         }
       },
-    })
+    });
 
     // Create a blob from the stream
-    const blob = await new Response(stream).blob()
+    const blob = await new Response(stream).blob();
 
     // Extract the file extension directly from the image path
-    const extension = imagePath.split('.').pop() // e.g., 'jpg', 'png'
+    const extension = imagePath.split(".").pop(); // e.g., 'jpg', 'png'
 
     // Create an object URL for the blob
-    const objectURL = URL.createObjectURL(blob)
+    const objectURL = URL.createObjectURL(blob);
 
     // Trigger the download directly with the correct extension
-    const link = document.createElement('a')
-    link.href = objectURL
-    link.download = `${fileName}.${extension}` // Use the extension from the path
-    document.body.appendChild(link)
-    link.click()
+    const link = document.createElement("a");
+    link.href = objectURL;
+    link.download = `${fileName}.${extension}`; // Use the extension from the path
+    document.body.appendChild(link);
+    link.click();
 
     // Clean up
-    document.body.removeChild(link)
-    URL.revokeObjectURL(objectURL)
+    document.body.removeChild(link);
+    URL.revokeObjectURL(objectURL);
   } catch (error) {
-    throw new Error('Download failed')
+    throw new Error("Download failed");
   }
-}
+};
 
 // Helper function to delete multiple files
 export const deleteMultipleFiles = async (
   imagePaths: string[]
 ): Promise<void> => {
-  if (imagePaths.length === 0) return
+  if (imagePaths.length === 0) return;
 
   try {
     for (const imagePath of imagePaths) {
-      await deleteFile(imagePath) // Call deleteFile API for each image path
+      await deleteFile(imagePath); // Call deleteFile API for each image path
     }
   } catch (error) {
-    console.error('Error deleting files:', error)
-    throw error // Optional: re-throw the error if you want to handle it in the form
+    console.error("Error deleting files:", error);
+    throw error; // Optional: re-throw the error if you want to handle it in the form
   }
-}
+};

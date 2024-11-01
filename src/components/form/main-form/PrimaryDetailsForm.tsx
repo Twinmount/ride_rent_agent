@@ -25,7 +25,11 @@ import { Label } from "@/components/ui/label";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import RentalDetailsFormField from "../RentalDetailsFormField";
-import { deleteMultipleFiles, validateRentalDetails } from "@/helpers/form";
+import {
+  deleteMultipleFiles,
+  validateRentalDetails,
+  validateSecurityDeposit,
+} from "@/helpers/form";
 import BrandsDropdown from "../dropdowns/BrandsDropdown";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -41,6 +45,8 @@ import { useParams } from "react-router-dom";
 import { ApiError } from "@/types/types";
 import { GcsFilePaths } from "@/constants/enum";
 import MultipleFileUpload from "../file-uploads/MultipleFileUpload";
+import AdditionalTypesDropdown from "../dropdowns/AdditionalTypesDropdown";
+import SecurityDepositField from "../SecurityDepositField";
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
@@ -59,6 +65,7 @@ export default function PrimaryDetailsForm({
   const [isPhotosUploading, setIsPhotosUploading] = useState(false);
   const [isLicenseUploading, setIsLicenseUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
+  const [isCarsCategory, setIsCarsCategory] = useState(false);
 
   const { vehicleId, userId } = useParams<{
     vehicleId: string;
@@ -74,6 +81,7 @@ export default function PrimaryDetailsForm({
   const form = useForm<z.infer<typeof PrimaryFormSchema>>({
     resolver: zodResolver(PrimaryFormSchema),
     defaultValues: initialValues as PrimaryFormType,
+    shouldFocusError: true,
   });
 
   // Define a submit handler.
@@ -85,6 +93,19 @@ export default function PrimaryDetailsForm({
         message: rentalError,
       });
       form.setFocus("rentalDetails");
+      return;
+    }
+
+    const securityDepositError = validateSecurityDeposit(
+      values.securityDeposit
+    );
+
+    if (securityDepositError) {
+      form.setError("securityDeposit", {
+        type: "manual",
+        message: securityDepositError,
+      });
+      form.setFocus("securityDeposit");
       return;
     }
 
@@ -106,13 +127,15 @@ export default function PrimaryDetailsForm({
         data = await addPrimaryDetailsForm(
           values as PrimaryFormType,
           countryCode,
-          userId as string
+          userId as string,
+          isCarsCategory
         );
       } else if (type === "Update") {
         data = await updatePrimaryDetailsForm(
           vehicleId as string,
           values as PrimaryFormType,
-          initialCountryCode as string
+          initialCountryCode as string,
+          isCarsCategory
         );
       }
 
@@ -196,6 +219,7 @@ export default function PrimaryDetailsForm({
                         form.setValue("vehicleBrandId", "");
                       }}
                       value={initialValues.vehicleCategoryId}
+                      setIsCarsCategory={setIsCarsCategory}
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
@@ -234,6 +258,41 @@ export default function PrimaryDetailsForm({
               </FormItem>
             )}
           />
+
+          {/* services dropdown for cars */}
+          {isCarsCategory && (
+            <FormField
+              control={form.control}
+              name="additionalTypes"
+              render={({ field }) => (
+                <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
+                    <div>
+                      Services Offered <br />
+                      <span>&#40;optional&#41;</span>
+                    </div>
+
+                    <span className="mr-5 max-sm:hidden">:</span>
+                  </FormLabel>
+                  <div className="flex-col items-start w-full">
+                    <FormControl>
+                      <AdditionalTypesDropdown
+                        value={field.value || []}
+                        onChangeHandler={field.onChange}
+                        vehicleTypeId={form.watch("vehicleTypeId")}
+                        isDisabled={!form.watch("vehicleTypeId")}
+                      />
+                    </FormControl>
+                    <FormDescription className="ml-2">
+                      &#40;optional&#41; Select additional services for this
+                      vehicle if available
+                    </FormDescription>
+                    <FormMessage className="ml-2" />
+                  </div>
+                </FormItem>
+              )}
+            />
+          )}
 
           {/* brand name */}
           <FormField
@@ -641,41 +700,134 @@ export default function PrimaryDetailsForm({
               </FormItem>
             )}
           />
-          {/* crypto details */}
+
+          {/* security deposit */}
           <FormField
             control={form.control}
-            name="isCryptoAccepted"
-            render={({ field }) => (
+            name="securityDeposit"
+            render={() => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Crypto? <span className="mr-5 max-sm:hidden">:</span>
+                  Security Deposit <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
-                    <div className="flex items-center mt-3 space-x-2">
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
-                        id="isCryptoAccepted"
-                      />
-                      <label
-                        htmlFor="isCryptoAccepted"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Accept cryptocurrency payments?
-                      </label>
-                    </div>
+                    <SecurityDepositField />
                   </FormControl>
-                  <FormDescription className="mt-1 ml-2">
-                    Select this option if your company accepts payments via
-                    cryptocurrency.
+                  <FormDescription className="ml-2">
+                    Specify if a security deposit is required and provide the
+                    amount if applicable.
                   </FormDescription>
                   <FormMessage className="ml-2" />
                 </div>
               </FormItem>
             )}
           />
+
+          {/* payment details */}
+          <div className="flex mb-2 w-full max-sm:flex-col max-sm:space-y-1">
+            <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
+              Payment Info <span className="mr-5 max-sm:hidden">:</span>
+            </FormLabel>
+            <div className="p-2 w-full rounded-lg border-b shadow">
+              <FormField
+                control={form.control}
+                name="isCryptoAccepted"
+                render={({ field }) => (
+                  <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                    <div className="flex-col items-start w-full">
+                      <FormControl>
+                        <div className="flex items-center mt-3 space-x-2">
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
+                            id="isCryptoAccepted"
+                          />
+                          <label
+                            htmlFor="isCryptoAccepted"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            Crypto
+                          </label>
+                        </div>
+                      </FormControl>
+                      <FormDescription className="mt-1 ml-7">
+                        Select if your company accepts payments via
+                        cryptocurrency.
+                      </FormDescription>
+                      <FormMessage className="ml-2" />
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              {/* credit/debit details */}
+              <FormField
+                control={form.control}
+                name="creditDebitCards"
+                render={({ field }) => (
+                  <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                    <div className="flex-col items-start w-full">
+                      <FormControl>
+                        <div className="flex items-center mt-3 space-x-2">
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
+                            id="isCreditDebitCard"
+                          />
+                          <label
+                            htmlFor="isCreditDebitCard"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            Credit / Debit card
+                          </label>
+                        </div>
+                      </FormControl>
+                      <FormDescription className="mt-1 ml-7">
+                        Select if your company accepts payments via credit or
+                        debit card.
+                      </FormDescription>
+                      <FormMessage className="ml-2" />
+                    </div>
+                  </FormItem>
+                )}
+              />
+
+              {/*Tabby */}
+              <FormField
+                control={form.control}
+                name="tabby"
+                render={({ field }) => (
+                  <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                    <div className="flex-col items-start w-full">
+                      <FormControl>
+                        <div className="flex items-center mt-3 space-x-2">
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
+                            id="isTabby"
+                          />
+                          <label
+                            htmlFor="isTabby"
+                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                          >
+                            Tabby
+                          </label>
+                        </div>
+                      </FormControl>
+                      <FormDescription className="mt-1 ml-7">
+                        Select if your company accepts payments via Tabby.
+                      </FormDescription>
+                      <FormMessage className="ml-2" />
+                    </div>
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
 
           {/* spot delivery */}
           <FormField
