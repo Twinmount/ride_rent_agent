@@ -46,42 +46,63 @@ export const formatFieldName = (field: string): string => {
     .join(" "); // Join words with spaces
 };
 
-// rental detail type
+// Rental detail type
 type RentalDetailType = {
-  enabled?: boolean | undefined;
-  rentInAED?: string | undefined;
-  mileageLimit?: string | undefined;
+  enabled?: boolean;
+  rentInAED?: string;
+  mileageLimit?: string;
 };
 
+// Hourly rental detail type (with minBookingHours)
+type HourlyRentalDetailType = {
+  enabled?: boolean;
+  rentInAED?: string;
+  mileageLimit?: string;
+  minBookingHours?: string; // Only for hourly rentals
+};
+
+// Rental details type, incorporating hour as an HourlyRentalDetailType
 type RentalDetailsType = {
   day: RentalDetailType;
   week: RentalDetailType;
   month: RentalDetailType;
+  hour: HourlyRentalDetailType; // Uses HourlyRentalDetailType with minBookingHours
 };
 
 // rental details form field validation helper function
 export const validateRentalDetails = (
   rentalDetails: RentalDetailsType
 ): string | null => {
-  const { day, week, month } = rentalDetails;
+  const { day, week, month, hour } = rentalDetails;
 
-  let message =
+  const message =
     "Rent in AED as well as Mileage should be provided for the checked values";
 
-  if (!day.enabled && !week.enabled && !month.enabled) {
-    return "At least one rental period (day, week, or month) must be enabled";
+  // Check if at least one rental period is enabled
+  if (!day.enabled && !week.enabled && !month.enabled && !hour.enabled) {
+    return "At least one rental period (day, week, month, or hour) must be enabled";
   }
 
+  // Validate day
   if (day.enabled && (!day.rentInAED || !day.mileageLimit)) {
     return message;
   }
 
+  // Validate week
   if (week.enabled && (!week.rentInAED || !week.mileageLimit)) {
     return message;
   }
 
+  // Validate month
   if (month.enabled && (!month.rentInAED || !month.mileageLimit)) {
     return message;
+  }
+
+  // Validate hour, including minBookingHours
+  if (hour.enabled) {
+    if (!hour.rentInAED || !hour.mileageLimit || !hour.minBookingHours) {
+      return "Rent in AED, Mileage Limit, and Minimum Booking Hours are required for hourly rental";
+    }
   }
 
   return null;

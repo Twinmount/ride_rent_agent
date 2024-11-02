@@ -184,6 +184,7 @@ export default function PrimaryDetailsForm({
   useEffect(() => {
     // Check for validation errors and scroll to the top if errors are present
     if (Object.keys(form.formState.errors).length > 0) {
+      console.log(form.formState.errors);
       toast({
         variant: "destructive",
         title: `Validation Error`,
@@ -692,7 +693,7 @@ export default function PrimaryDetailsForm({
                       </label>
                     </div>
                   </FormControl>
-                  <FormDescription className="mt-1 ml-2">
+                  <FormDescription className="mt-1 ml-6">
                     Select if this vehicle is available for lease.
                   </FormDescription>
                   <FormMessage className="ml-2" />
@@ -714,7 +715,7 @@ export default function PrimaryDetailsForm({
                   <FormControl>
                     <SecurityDepositField />
                   </FormControl>
-                  <FormDescription className="ml-2">
+                  <FormDescription className="ml-8">
                     Specify if a security deposit is required and provide the
                     amount if applicable.
                   </FormDescription>
@@ -855,7 +856,7 @@ export default function PrimaryDetailsForm({
                       </label>
                     </div>
                   </FormControl>
-                  <FormDescription className="mt-1 ml-2">
+                  <FormDescription className="mt-1 ml-7">
                     Select this option if your company offers on-the-spot
                     delivery services.
                   </FormDescription>
