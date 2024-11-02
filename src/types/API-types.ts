@@ -342,13 +342,13 @@ export type GetPrimaryForm = {
   description: string;
   vehiclePhotos: string[];
   commercialLicenses: string[];
-  additionalTypes?: string[];
+  additionalVehicleTypes?: string[];
   securityDeposit: {
     enabled: boolean;
     amountInAED?: string;
   };
-  creditDebitCards: boolean;
-  tabby: boolean;
+  isCreditOrDebitCardsSupported: boolean;
+  isTabbySupported: boolean;
 };
 
 // Primary form get all response

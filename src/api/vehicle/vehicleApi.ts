@@ -47,13 +47,14 @@ export const addPrimaryDetailsForm = async (
       vehiclePhotos: values.vehiclePhotos,
       commercialLicenses: values.commercialLicenses,
       securityDeposit: values.securityDeposit,
-      creditDebitCards: values.creditDebitCards,
-      tabby: values.tabby,
+      isCreditOrDebitCardsSupported:
+        values.isCreditOrDebitCardsSupported.toString(),
+      isTabbySupported: values.isTabbySupported.toString(),
     };
 
-    // Include additionalTypes only if isCarsCategory is true
+    // Include additionalVehicleTypes only if isCarsCategory is true
     if (isCarsCategory) {
-      requestBody.additionalTypes = values.additionalTypes || [];
+      requestBody.additionalVehicleTypes = values.additionalVehicleTypes || [];
     }
 
     // Send the request as a JSON object
@@ -114,13 +115,14 @@ export const updatePrimaryDetailsForm = async (
       vehiclePhotos: values.vehiclePhotos,
       commercialLicenses: values.commercialLicenses,
       securityDeposit: values.securityDeposit,
-      creditDebitCards: values.creditDebitCards,
-      tabby: values.tabby,
+      isCreditOrDebitCardsSupported:
+        values.isCreditOrDebitCardsSupported.toString(),
+      isTabbySupported: values.isTabbySupported.toString(),
     };
 
-    // Include additionalTypes only if isCarsCategory is true
+    // Include additionalVehicleTypes only if isCarsCategory is true
     if (isCarsCategory) {
-      requestBody.additionalTypes = values.additionalTypes || [];
+      requestBody.additionalVehicleTypes = values.additionalVehicleTypes || [];
     }
 
     // Send the request as a JSON object

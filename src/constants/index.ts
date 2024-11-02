@@ -110,11 +110,11 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
   phoneNumber: "",
   stateId: "",
   cityIds: [],
-  additionalTypes: [],
+  additionalVehicleTypes: [],
   securityDeposit: {
     enabled: false,
     amountInAED: "",
   },
-  creditDebitCards: false,
-  tabby: false,
+  isCreditOrDebitCardsSupported: false,
+  isTabbySupported: false,
 };

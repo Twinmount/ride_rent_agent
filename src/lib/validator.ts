@@ -97,11 +97,11 @@ export const PrimaryFormSchema = z.object({
   cityIds: z
     .array(z.string().min(1, "City ID is required"))
     .min(1, "At least one city must be selected"),
-  additionalTypes: z.array(z.string()).optional(),
+  additionalVehicleTypes: z.array(z.string()).optional(),
   securityDeposit: z.object({
     enabled: z.boolean().default(false),
     amountInAED: z.string().optional().default(""),
   }),
-  creditDebitCards: z.boolean().default(false),
-  tabby: z.boolean().default(false),
+  isCreditOrDebitCardsSupported: z.boolean().default(false),
+  isTabbySupported: z.boolean().default(false),
 });

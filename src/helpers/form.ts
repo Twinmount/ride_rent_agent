@@ -247,7 +247,6 @@ export function mapGetPrimaryFormToPrimaryFormType(
     vehicleId: data.vehicleId,
     vehicleCategoryId: data.vehicleCategoryId,
     vehicleTypeId: data.vehicleTypeId,
-    additionalTypes: data?.additionalTypes || [],
     vehicleBrandId: data.vehicleBrandId,
     vehicleModel: data.vehicleModel,
     vehiclePhotos: data.vehiclePhotos,
@@ -256,7 +255,6 @@ export function mapGetPrimaryFormToPrimaryFormType(
     commercialLicenses: data.commercialLicenses,
     commercialLicenseExpireDate: new Date(data.commercialLicenseExpireDate), // Convert string to Date
     isLease: data.isLease,
-    securityDeposit: data.securityDeposit,
     isCryptoAccepted: data.isCryptoAccepted,
     isSpotDeliverySupported: data.isSpotDeliverySupported,
     specification: data.specification as "UAE_SPEC" | "USA_SPEC" | "OTHERS",
@@ -264,8 +262,10 @@ export function mapGetPrimaryFormToPrimaryFormType(
     phoneNumber: formattedPhoneNumber, // Set the combined phone number
     stateId: data.stateId,
     cityIds: data.cityIds,
-    creditDebitCards: data.creditDebitCards,
-    tabby: data.tabby,
+    additionalVehicleTypes: data?.additionalVehicleTypes || [],
+    securityDeposit: data.securityDeposit,
+    isCreditOrDebitCardsSupported: data.isCreditOrDebitCardsSupported,
+    isTabbySupported: data.isTabbySupported,
   };
 }
 

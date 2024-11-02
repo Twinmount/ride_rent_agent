@@ -184,7 +184,6 @@ export default function PrimaryDetailsForm({
   useEffect(() => {
     // Check for validation errors and scroll to the top if errors are present
     if (Object.keys(form.formState.errors).length > 0) {
-      console.log(form.formState.errors);
       toast({
         variant: "destructive",
         title: `Validation Error`,
@@ -264,7 +263,7 @@ export default function PrimaryDetailsForm({
           {isCarsCategory && (
             <FormField
               control={form.control}
-              name="additionalTypes"
+              name="additionalVehicleTypes"
               render={({ field }) => (
                 <FormItem className="flex mb-2 w-full max-sm:flex-col">
                   <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
@@ -766,7 +765,7 @@ export default function PrimaryDetailsForm({
               {/* credit/debit details */}
               <FormField
                 control={form.control}
-                name="creditDebitCards"
+                name="isCreditOrDebitCardsSupported"
                 render={({ field }) => (
                   <FormItem className="flex mb-2 w-full max-sm:flex-col">
                     <div className="flex-col items-start w-full">
@@ -799,7 +798,7 @@ export default function PrimaryDetailsForm({
               {/*Tabby */}
               <FormField
                 control={form.control}
-                name="tabby"
+                name="isTabbySupported"
                 render={({ field }) => (
                   <FormItem className="flex mb-2 w-full max-sm:flex-col">
                     <div className="flex-col items-start w-full">

@@ -59,13 +59,13 @@ export type PrimaryFormType = {
   phoneNumber: string;
   stateId: string;
   cityIds: string[];
-  additionalTypes?: string[];
+  additionalVehicleTypes?: string[];
   securityDeposit: {
     enabled: boolean;
     amountInAED?: string;
   };
-  creditDebitCards: boolean;
-  tabby: boolean;
+  isCreditOrDebitCardsSupported: boolean;
+  isTabbySupported: boolean;
 };
 
 export type SpecificationFormData = {
