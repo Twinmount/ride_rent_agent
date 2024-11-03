@@ -79,8 +79,8 @@ export const validateRentalDetails = (
     "Rent in AED as well as Mileage should be provided for the checked values";
 
   // Check if at least one rental period is enabled
-  if (!day.enabled && !week.enabled && !month.enabled && !hour.enabled) {
-    return "At least one rental period (day, week, month, or hour) must be enabled";
+  if (!day.enabled && !week.enabled && !month.enabled) {
+    return "At least one rental period (day, week, or month) must be enabled";
   }
 
   // Validate day

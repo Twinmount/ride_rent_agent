@@ -37,7 +37,10 @@ const HourlyRentalDetailFormField = () => {
               htmlFor="rentalDetails-hour-enabled"
               className="text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              Hour
+              Hour{" "}
+              <span className="text-sm italic text-gray-700">
+                &#40;select to set hourly rental rates&#41;
+              </span>
             </label>
           </div>
         )}

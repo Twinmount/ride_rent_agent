@@ -6,8 +6,10 @@ import HourlyRentalDetailFormField from "./HourlyRentalDetailsFormField";
 
 const RentalDetailField = ({
   period,
+  description,
 }: {
   period: "day" | "week" | "month";
+  description: string;
 }) => {
   const { control, watch, clearErrors } = useFormContext();
   const isEnabled = watch(`rentalDetails.${period}.enabled`);
@@ -34,7 +36,10 @@ const RentalDetailField = ({
               htmlFor={`rentalDetails-${period}-enabled`}
               className="text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
             >
-              {period.charAt(0).toUpperCase() + period.slice(1)}
+              {period.charAt(0).toUpperCase() + period.slice(1)}{" "}
+              <span className="text-sm italic text-gray-700">
+                {description}
+              </span>
             </label>
           </div>
         )}
@@ -138,9 +143,18 @@ const RentalDetailField = ({
 const RentalDetailsFormField = () => {
   return (
     <div className="flex flex-col">
-      <RentalDetailField period="day" />
-      <RentalDetailField period="week" />
-      <RentalDetailField period="month" />
+      <RentalDetailField
+        period="day"
+        description="(Select to set daily rental rates)"
+      />
+      <RentalDetailField
+        period="week"
+        description="(Select to set weekly rental rates)"
+      />
+      <RentalDetailField
+        period="month"
+        description="(Select to set monthly rental rates)"
+      />
       <HourlyRentalDetailFormField />
     </div>
   );

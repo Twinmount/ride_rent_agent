@@ -600,8 +600,8 @@ export default function PrimaryDetailsForm({
                       <RentalDetailsFormField />
                     </FormControl>
                     <FormDescription className="ml-2">
-                      Provide rent details. At least one value should be
-                      selected.
+                      Provide rent details. At least one of "day," "week," or
+                      "month" must be selected.
                     </FormDescription>
                     <FormMessage className="ml-2" />
                   </div>
