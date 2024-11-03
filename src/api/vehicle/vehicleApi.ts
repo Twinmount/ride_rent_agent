@@ -47,9 +47,8 @@ export const addPrimaryDetailsForm = async (
       vehiclePhotos: values.vehiclePhotos,
       commercialLicenses: values.commercialLicenses,
       securityDeposit: values.securityDeposit,
-      isCreditOrDebitCardsSupported:
-        values.isCreditOrDebitCardsSupported.toString(),
-      isTabbySupported: values.isTabbySupported.toString(),
+      isCreditOrDebitCardsSupported: values.isCreditOrDebitCardsSupported,
+      isTabbySupported: values.isTabbySupported,
     };
 
     // Include additionalVehicleTypes only if isCarsCategory is true
@@ -70,12 +69,12 @@ export const addPrimaryDetailsForm = async (
     });
 
     if (!data) {
-      throw new Error("Failed to get registration response");
+      throw new Error("Failed to add vehicle");
     }
 
     return data;
   } catch (error) {
-    console.error("Error on agent registration", error);
+    console.error("Error on vehicle listing", error);
     throw error;
   }
 };
@@ -115,9 +114,8 @@ export const updatePrimaryDetailsForm = async (
       vehiclePhotos: values.vehiclePhotos,
       commercialLicenses: values.commercialLicenses,
       securityDeposit: values.securityDeposit,
-      isCreditOrDebitCardsSupported:
-        values.isCreditOrDebitCardsSupported.toString(),
-      isTabbySupported: values.isTabbySupported.toString(),
+      isCreditOrDebitCardsSupported: values.isCreditOrDebitCardsSupported,
+      isTabbySupported: values.isTabbySupported,
     };
 
     // Include additionalVehicleTypes only if isCarsCategory is true
@@ -143,7 +141,7 @@ export const updatePrimaryDetailsForm = async (
 
     return data;
   } catch (error) {
-    console.error("Error updating agent details", error);
+    console.error("Error updating vehicle details", error);
     throw error;
   }
 };

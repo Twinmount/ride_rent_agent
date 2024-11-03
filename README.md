@@ -40,7 +40,8 @@ npm run dev
 To build the project, use the following command:
 
 ```bash
-npm run build
+npm run build:prod
+npm run build:dev
 ```
 
 ## Run the build version
