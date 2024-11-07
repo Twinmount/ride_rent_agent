@@ -1,5 +1,5 @@
-import { useForm } from 'react-hook-form'
-import { useQuery } from '@tanstack/react-query'
+import { useForm } from "react-hook-form";
+import { useQuery } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
@@ -7,32 +7,32 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Button } from '@/components/ui/button'
-import SpecificationDropdown from '../SpecificationDropdown'
-import { useVehicleIdentifiers } from '@/hooks/useVehicleIdentifiers'
+} from "@/components/ui/form";
+import { Button } from "@/components/ui/button";
+import SpecificationDropdown from "../dropdowns/SpecificationDropdown";
+import { useVehicleIdentifiers } from "@/hooks/useVehicleIdentifiers";
 import {
   addSpecifications,
   getSpecificationFormData,
   getSpecificationFormFieldData,
   updateSpecifications,
-} from '@/api/vehicle'
-import FormSkelton from '@/components/loading-skelton/FormSkelton'
-import Spinner from '@/components/general/Spinner'
-import { toast } from '@/components/ui/use-toast'
-import { formatSpecifications, hasSelected } from '@/helpers/form'
-import { SpecificationFormData } from '@/types/API-types'
-import { useParams } from 'react-router-dom'
-import { useEffect } from 'react'
+} from "@/api/vehicle";
+import FormSkelton from "@/components/loading-skelton/FormSkelton";
+import Spinner from "@/components/general/Spinner";
+import { toast } from "@/components/ui/use-toast";
+import { formatSpecifications, hasSelected } from "@/helpers/form";
+import { SpecificationFormData } from "@/types/API-types";
+import { useParams } from "react-router-dom";
+import { useEffect } from "react";
 
-type SpecificationFormType = Record<string, string | null>
+type SpecificationFormType = Record<string, string | null>;
 
 type SpecificationFormProps = {
-  type: 'Add' | 'Update'
-  onNextTab?: () => void
-  refetchLevels?: () => void
-  isAddOrIncomplete?: boolean
-}
+  type: "Add" | "Update";
+  onNextTab?: () => void;
+  refetchLevels?: () => void;
+  isAddOrIncomplete?: boolean;
+};
 
 export default function SpecificationsForm({
   type,
@@ -41,20 +41,20 @@ export default function SpecificationsForm({
   isAddOrIncomplete,
 }: SpecificationFormProps) {
   const { vehicleId, vehicleCategoryId, vehicleTypeId } =
-    useVehicleIdentifiers(type)
+    useVehicleIdentifiers(type);
 
-  const { userId } = useParams<{ userId: string }>()
+  const { userId } = useParams<{ userId: string }>();
 
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [])
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
 
   // useQuery for fetching form data, now relying on levelsFilled
   const { data, isLoading } = useQuery({
     queryKey: [
       isAddOrIncomplete
-        ? 'specification-form-data'
-        : 'specification-update-form-data',
+        ? "specification-form-data"
+        : "specification-update-form-data",
       vehicleId,
     ],
     queryFn: async () => {
@@ -62,49 +62,49 @@ export default function SpecificationsForm({
         const data = await getSpecificationFormFieldData({
           vehicleCategoryId: vehicleCategoryId as string,
           vehicleTypeId: vehicleTypeId as string,
-        })
+        });
         return {
           ...data,
           result: data.result.list,
-        }
+        };
       } else {
-        return await getSpecificationFormData(vehicleId)
+        return await getSpecificationFormData(vehicleId);
       }
     },
     enabled: !!vehicleId,
-  })
+  });
 
-  const fields = data?.result || []
+  const fields = data?.result || [];
 
   const form = useForm<SpecificationFormType>({
     defaultValues: {},
-  })
+  });
 
   useEffect(() => {
     if (data) {
-      const formDefaultValues: Record<string, string> = {}
+      const formDefaultValues: Record<string, string> = {};
 
       data.result.forEach((spec) => {
         const selectedValue = spec.values
           .filter((value) => value !== null) // Filter out null values
-          .find((value) => hasSelected(value) && value.selected)
+          .find((value) => hasSelected(value) && value.selected);
 
         if (selectedValue) {
-          formDefaultValues[spec.name] = selectedValue.name
+          formDefaultValues[spec.name] = selectedValue.name;
         }
-      })
+      });
 
-      form.reset(formDefaultValues)
+      form.reset(formDefaultValues);
     }
-  }, [data])
+  }, [data]);
 
   // Custom validation logic: Ensures at least one option is selected for each specification
   const validateSpecifications = (values: SpecificationFormType) => {
-    let isValid = true
-    const updatedErrors: Record<string, string> = {}
+    let isValid = true;
+    const updatedErrors: Record<string, string> = {};
 
     data?.result.forEach((spec) => {
-      const validValues = spec.values.filter((value) => value !== null) // Filter out null values
+      const validValues = spec.values.filter((value) => value !== null); // Filter out null values
 
       if (
         !values[spec.name] ||
@@ -113,39 +113,39 @@ export default function SpecificationsForm({
       ) {
         updatedErrors[
           spec.name
-        ] = `Please select at least one option for ${spec.name}`
-        isValid = false
+        ] = `Please select at least one option for ${spec.name}`;
+        isValid = false;
       }
-    })
+    });
 
     if (!isValid) {
       Object.keys(updatedErrors).forEach((key) => {
         form.setError(key, {
-          type: 'manual',
+          type: "manual",
           message: updatedErrors[key],
-        })
-      })
+        });
+      });
 
       // Scroll to the top of the page
-      window.scrollTo({ top: 0, behavior: 'smooth' })
+      window.scrollTo({ top: 0, behavior: "smooth" });
 
       // Show a toast message indicating the validation error
       toast({
-        title: 'Validation Error',
-        description: 'Please fill in all required fields.',
-        variant: 'destructive',
-        className: 'bg-red-500 text-white',
-      })
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive",
+        className: "bg-red-500 text-white",
+      });
     } else {
-      form.clearErrors() // Clear all errors if valid
+      form.clearErrors(); // Clear all errors if valid
     }
 
-    return isValid
-  }
+    return isValid;
+  };
 
   async function onSubmit(values: SpecificationFormType) {
     if (!validateSpecifications(values)) {
-      return
+      return;
     }
 
     // Transform data.result to match SpecificationFormData[]
@@ -153,49 +153,49 @@ export default function SpecificationsForm({
       ...spec,
       values: spec.values.map((value) => ({
         ...value,
-        _id: '',
+        _id: "",
       })),
-    })) as SpecificationFormData[]
+    })) as SpecificationFormData[];
 
     // Format the data as per the backend requirement
-    const specs = formatSpecifications(values, transformedData)
+    const specs = formatSpecifications(values, transformedData);
 
     const requestBody = {
       specs,
       userId: userId as string,
       vehicleId,
       vehicleCategoryId: vehicleCategoryId as string,
-    }
+    };
 
     try {
-      let response
+      let response;
       if (isAddOrIncomplete) {
-        response = await addSpecifications(requestBody)
-      } else if (type === 'Update') {
+        response = await addSpecifications(requestBody);
+      } else if (type === "Update") {
         response = await updateSpecifications({
           specs,
           vehicleId: vehicleId as string,
-        })
+        });
       }
 
       if (response) {
         toast({
           title: `Specifications ${type.toLowerCase()}ed successfully`,
-          className: 'bg-yellow text-white',
-        })
+          className: "bg-yellow text-white",
+        });
 
-        refetchLevels?.()
+        refetchLevels?.();
         if (isAddOrIncomplete && onNextTab) {
-          onNextTab()
+          onNextTab();
         }
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
       toast({
-        variant: 'destructive',
+        variant: "destructive",
         title: `${type} Specifications failed`,
-        description: 'Something went wrong',
-      })
+        description: "Something went wrong",
+      });
     }
   }
 
@@ -222,11 +222,11 @@ export default function SpecificationsForm({
                       (
                         option
                       ): option is {
-                        name: string
-                        label: string
-                        selected: boolean
-                      } => option && 'selected' in option && option.selected
-                    )
+                        name: string;
+                        label: string;
+                        selected: boolean;
+                      } => option && "selected" in option && option.selected
+                    );
 
                   return (
                     <FormItem className="flex w-full mb-2 max-sm:flex-col">
@@ -238,7 +238,7 @@ export default function SpecificationsForm({
                         <FormControl>
                           <SpecificationDropdown
                             onChangeHandler={field.onChange}
-                            value={field.value || selectedOption?.name || ''}
+                            value={field.value || selectedOption?.name || ""}
                             options={spec.values
                               .filter((value) => value !== null)
                               .map((value) => ({
@@ -250,7 +250,7 @@ export default function SpecificationsForm({
                         <FormMessage className="ml-2" />
                       </div>
                     </FormItem>
-                  )
+                  );
                 }}
               />
             ))
@@ -265,10 +265,10 @@ export default function SpecificationsForm({
           disabled={form.formState.isSubmitting}
           className="w-full md:w-10/12 lg:w-8/12 mx-auto flex-center col-span-2 mt-3 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow"
         >
-          {isAddOrIncomplete ? 'Add Specifications' : 'Update Specifications'}
+          {isAddOrIncomplete ? "Add Specifications" : "Update Specifications"}
           {form.formState.isSubmitting && <Spinner />}
         </Button>
       </form>
     </Form>
-  )
+  );
 }

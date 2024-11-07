@@ -1,91 +1,107 @@
-import * as z from 'zod'
+import * as z from "zod";
 
 // company registration form schema
 export const RegistrationFormSchema = z.object({
-  phoneNumber: z.string().min(6, 'Provide a valid mobile  number'),
-  password: z.string().min(4, 'Password must be at least 4 characters'),
-})
+  phoneNumber: z.string().min(6, "Provide a valid mobile  number"),
+  password: z.string().min(4, "Password must be at least 4 characters"),
+});
 
 // Company Form Schema
 export const CompanyFormSchema = z.object({
   companyName: z
     .string()
-    .min(1, 'Company name is required')
-    .max(50, 'Maximum 50 characters allowed'),
-  companyLogo: z.string().min(1, 'Company logo is required'),
-  commercialLicense: z.string().min(1, 'Commercial License is required'),
+    .min(1, "Company name is required")
+    .max(50, "Maximum 50 characters allowed"),
+  companyLogo: z.string().min(1, "Company logo is required"),
+  commercialLicense: z.string().min(1, "Commercial License is required"),
   expireDate: z.date(),
-  regNumber: z.string().min(1, 'Registration number is required'),
-})
+  regNumber: z.string().min(1, "Registration number is required"),
+});
 
 // otp page form schema
 export const OTPFormSchema = z.object({
-  otp: z.string().min(4, 'Provide a valid OTP'),
-})
+  otp: z.string().min(4, "Provide a valid OTP"),
+});
 
 // login form schema
 export const LoginFormSchema = z.object({
-  phoneNumber: z.string().min(1, 'Provide your registered phone number'),
-  password: z.string().min(1, 'Password is required'),
-})
+  phoneNumber: z.string().min(1, "Provide your registered phone number"),
+  password: z.string().min(1, "Password is required"),
+});
 
 // confirm password schema
 export const ConfirmPasswordFormSchema = z
   .object({
-    password: z.string().min(1, 'Password is required'),
-    confirmPassword: z.string().min(1, 'Password is required'),
+    password: z.string().min(1, "Password is required"),
+    confirmPassword: z.string().min(1, "Password is required"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'], // This sets the error on the confirmPassword field
-  })
+    message: "Passwords do not match",
+    path: ["confirmPassword"], // This sets the error on the confirmPassword field
+  });
 
 // reset password schema
 export const ResetPasswordFormSchema = z.object({
-  phoneNumber: z.string().min(1, 'Provide your registered phone number'),
-})
+  phoneNumber: z.string().min(1, "Provide your registered phone number"),
+});
 
-// RentalDetailType Schema
+// RentalDetailType Schema for day, week, and month rentals )
 const RentalDetailTypeSchema = z.object({
-  enabled: z.boolean().optional(),
-  rentInAED: z.string().optional(),
-  mileageLimit: z.string().optional(),
-})
+  enabled: z.boolean().optional().default(false),
+  rentInAED: z.string().optional().default(""),
+  mileageLimit: z.string().optional().default(""),
+});
+
+// HourlyRentalDetailType Schema with minBookingHours
+const HourlyRentalDetailTypeSchema = z.object({
+  enabled: z.boolean().optional().default(false),
+  rentInAED: z.string().optional().default(""),
+  mileageLimit: z.string().optional().default(""),
+  minBookingHours: z.string().optional().default(""), // Only for hourly rentals
+});
 
 // Primary Form Schema
 export const PrimaryFormSchema = z.object({
-  vehicleCategoryId: z.string().min(1, 'Category is required'),
-  vehicleTypeId: z.string().min(1, 'Type is required'),
-  vehicleBrandId: z.string().min(1, 'Brand is required'),
-  vehicleModel: z.string().min(1, 'Model is required'),
+  vehicleCategoryId: z.string().min(1, "Category is required"),
+  vehicleTypeId: z.string().min(1, "Type is required"),
+  vehicleBrandId: z.string().min(1, "Brand is required"),
+  vehicleModel: z.string().min(1, "Model is required"),
   vehicleRegistrationNumber: z
     .string()
-    .min(1, 'Vehicle registration number is required')
-    .max(15, 'Vehicle registration number cannot exceed 15 characters'),
-  vehicleRegisteredYear: z.string().min(1, 'Registered Year is required'),
+    .min(1, "Vehicle registration number is required")
+    .max(15, "Vehicle registration number cannot exceed 15 characters"),
+  vehicleRegisteredYear: z.string().min(1, "Registered Year is required"),
   vehiclePhotos: z
-    .array(z.string().min(1, 'vehicle photo is required'))
-    .min(1, 'At least one vehicle photo is required'),
+    .array(z.string().min(1, "vehicle photo is required"))
+    .min(1, "At least one vehicle photo is required"),
   commercialLicenses: z
-    .array(z.string().min(1, 'Commercial license photo is required'))
-    .length(2, 'Exactly two commercial license images are required'),
+    .array(z.string().min(1, "Commercial license photo is required"))
+    .length(2, "Exactly two commercial license images are required"),
   commercialLicenseExpireDate: z.date(),
   isLease: z.boolean().default(false),
   isCryptoAccepted: z.boolean().default(false),
   isSpotDeliverySupported: z.boolean().default(false),
   specification: z
-    .enum(['USA_SPEC', 'UAE_SPEC', 'OTHERS'], {
-      required_error: 'Specification is required',
+    .enum(["USA_SPEC", "UAE_SPEC", "OTHERS"], {
+      required_error: "Specification is required",
     })
-    .default('UAE_SPEC'),
+    .default("UAE_SPEC"),
   rentalDetails: z.object({
     day: RentalDetailTypeSchema,
     week: RentalDetailTypeSchema,
     month: RentalDetailTypeSchema,
+    hour: HourlyRentalDetailTypeSchema,
   }),
-  phoneNumber: z.string().min(6, 'Provide a valid mobile number'),
-  stateId: z.string().min(1, 'State  is required'),
+  phoneNumber: z.string().min(6, "Provide a valid mobile number"),
+  stateId: z.string().min(1, "State  is required"),
   cityIds: z
-    .array(z.string().min(1, 'City ID is required'))
-    .min(1, 'At least one city must be selected'),
-})
+    .array(z.string().min(1, "City ID is required"))
+    .min(1, "At least one city must be selected"),
+  additionalVehicleTypes: z.array(z.string()).optional(),
+  securityDeposit: z.object({
+    enabled: z.boolean().default(false),
+    amountInAED: z.string().optional().default(""),
+  }),
+  isCreditOrDebitCardsSupported: z.boolean().default(false),
+  isTabbySupported: z.boolean().default(false),
+});

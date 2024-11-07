@@ -325,6 +325,12 @@ export type GetPrimaryForm = {
       rentInAED: string;
       mileageLimit: string;
     };
+    hour: {
+      enabled: boolean;
+      rentInAED: string;
+      mileageLimit: string;
+      minBookingHours: string;
+    };
   };
   stateId: string;
   cityIds: string[];
@@ -336,6 +342,13 @@ export type GetPrimaryForm = {
   description: string;
   vehiclePhotos: string[];
   commercialLicenses: string[];
+  additionalVehicleTypes?: string[];
+  securityDeposit: {
+    enabled: boolean;
+    amountInAED?: string;
+  };
+  isCreditOrDebitCardsSupported: boolean;
+  isTabbySupported: boolean;
 };
 
 // Primary form get all response

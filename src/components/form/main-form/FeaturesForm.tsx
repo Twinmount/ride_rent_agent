@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import MultiSelectDropdown from "../MultiSelectDropdown";
+import MultiSelectDropdown from "../dropdowns/MultiSelectDropdown";
 import { useVehicleIdentifiers } from "@/hooks/useVehicleIdentifiers";
 import {
   addFeatures,

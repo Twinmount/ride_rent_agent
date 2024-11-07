@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
-import 'react-datepicker/dist/react-datepicker.css'
+import { useState, useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import "react-datepicker/dist/react-datepicker.css";
 
 import {
   Form,
@@ -12,230 +12,231 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
+} from "@/components/ui/form";
 
-import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { CompanyFormDefaultValues } from '@/constants'
-import { CompanyFormSchema } from '@/lib/validator'
-import { ApiError, CompanyFormType } from '@/types/types'
-import { ShieldCheck } from 'lucide-react'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
-import SingleFileUpload from '../SingleFileUpload'
-import { useNavigate } from 'react-router-dom'
-import { toast } from '../../ui/use-toast'
-import { addCompany, sendOtp, updateCompany, verifyOtp } from '@/api/company'
-import Spinner from '../../general/Spinner'
-import { load, StorageKeys } from '@/utils/storage'
-import { jwtDecode } from 'jwt-decode'
-import { DecodedRefreshToken } from '@/layout/ProtectedRoutes'
-import { useMutation } from '@tanstack/react-query'
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { CompanyFormDefaultValues } from "@/constants";
+import { CompanyFormSchema } from "@/lib/validator";
+import { ApiError, CompanyFormType } from "@/types/types";
+import { ShieldCheck } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+
+import { useNavigate } from "react-router-dom";
+import { toast } from "../../ui/use-toast";
+import { addCompany, sendOtp, updateCompany, verifyOtp } from "@/api/company";
+import Spinner from "../../general/Spinner";
+import { load, StorageKeys } from "@/utils/storage";
+import { jwtDecode } from "jwt-decode";
+import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
+import { useMutation } from "@tanstack/react-query";
 
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSlot,
-} from '@/components/ui/input-otp'
-import { GcsFilePaths } from '@/constants/enum'
-import { deleteMultipleFiles } from '@/helpers/form'
+} from "@/components/ui/input-otp";
+import { GcsFilePaths } from "@/constants/enum";
+import { deleteMultipleFiles } from "@/helpers/form";
+import SingleFileUpload from "../file-uploads/SingleFileUpload";
 
 type CompanyRegistrationFormProps = {
-  type: 'Add' | 'Update'
-  formData?: CompanyFormType | null
-  agentId: string
-}
+  type: "Add" | "Update";
+  formData?: CompanyFormType | null;
+  agentId: string;
+};
 
 export default function CompanyRegistrationForm({
   type,
   formData,
   agentId,
 }: CompanyRegistrationFormProps) {
-  const [email, setEmail] = useState('')
-  const [otp, setOtp] = useState('')
-  const [isOtpVerified, setIsOtpVerified] = useState(false)
-  const [isTimerActive, setIsTimerActive] = useState(false)
-  const [isEmailSent, setIsEmailSent] = useState(false)
-  const [isFileUploading, setIsFileUploading] = useState(false)
-  const [deletedImages, setDeletedImages] = useState<string[]>([])
-  const [timer, setTimer] = useState(60)
-  const navigate = useNavigate()
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [isOtpVerified, setIsOtpVerified] = useState(false);
+  const [isTimerActive, setIsTimerActive] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
+  const [isLogoUploading, setIsLogoUploading] = useState(false);
+  const [isLicenseUploading, setIsLicenseUploading] = useState(false);
+  const [deletedImages, setDeletedImages] = useState<string[]>([]);
+  const [timer, setTimer] = useState(60);
+  const navigate = useNavigate();
 
   const initialValues =
-    formData && type === 'Update' ? formData : CompanyFormDefaultValues
+    formData && type === "Update" ? formData : CompanyFormDefaultValues;
 
   // accessing refresh token to get the userId
-  const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN)
+  const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
   const decodedRefreshToken = jwtDecode<DecodedRefreshToken>(
     refreshToken as string
-  )
-  const { userId } = decodedRefreshToken
+  );
+  const { userId } = decodedRefreshToken;
 
   // creating form
   const form = useForm<z.infer<typeof CompanyFormSchema>>({
     resolver: zodResolver(CompanyFormSchema),
     defaultValues: initialValues,
-  })
+  });
 
   const sendOtpMutation = useMutation({
     mutationFn: (variables: { email: string }) => sendOtp(variables.email),
     onSuccess: () => {
       toast({
-        title: 'OTP sent successfully',
-        className: 'bg-green-500 text-white',
-      })
-      setIsTimerActive(true)
+        title: "OTP sent successfully",
+        className: "bg-green-500 text-white",
+      });
+      setIsTimerActive(true);
     },
     onError: () => {
       toast({
-        variant: 'destructive',
-        title: 'Failed to send OTP',
-        description: 'Something went wrong',
-      })
+        variant: "destructive",
+        title: "Failed to send OTP",
+        description: "Something went wrong",
+      });
     },
-  })
+  });
 
   const verifyOtpMutation = useMutation({
     mutationFn: (variables: { otp: string }) => verifyOtp(variables.otp),
     onSuccess: () => {
-      setIsOtpVerified(true)
-      setOtp('') // Clear the OTP field
+      setIsOtpVerified(true);
+      setOtp(""); // Clear the OTP field
       toast({
-        title: 'OTP verified successfully',
-        className: 'bg-green-500 text-white',
-      })
+        title: "OTP verified successfully",
+        className: "bg-green-500 text-white",
+      });
     },
     onError: () => {
       toast({
-        variant: 'destructive',
-        title: 'Failed to verify OTP',
-        description: 'Invalid OTP or something went wrong',
-      })
+        variant: "destructive",
+        title: "Failed to verify OTP",
+        description: "Invalid OTP or something went wrong",
+      });
     },
-  })
+  });
 
   const handleSendOtp = () => {
     if (email) {
       // Start the timer and disable the button immediately when the button is clicked
-      setIsEmailSent(true)
-      setIsTimerActive(true)
+      setIsEmailSent(true);
+      setIsTimerActive(true);
 
       sendOtpMutation.mutateAsync({ email }).catch((error) => {
-        const apiError = error as ApiError
+        const apiError = error as ApiError;
 
         if (apiError.response?.data?.error?.message) {
           toast({
-            variant: 'destructive',
-            title: 'Email failed',
+            variant: "destructive",
+            title: "Email failed",
             description: apiError.response?.data?.error?.message,
-          })
+          });
         }
-        setIsEmailSent(false)
-        setIsTimerActive(false)
-        setTimer(60)
-      })
+        setIsEmailSent(false);
+        setIsTimerActive(false);
+        setTimer(60);
+      });
     } else {
       toast({
-        variant: 'destructive',
-        title: 'Email required',
-        description: 'Please enter a valid email to send OTP',
-      })
+        variant: "destructive",
+        title: "Email required",
+        description: "Please enter a valid email to send OTP",
+      });
     }
-  }
+  };
 
   const handleVerifyOtp = () => {
     if (otp) {
-      verifyOtpMutation.mutateAsync({ otp })
+      verifyOtpMutation.mutateAsync({ otp });
     } else {
       toast({
-        variant: 'destructive',
-        title: 'OTP required',
-        description: 'Please enter the OTP sent to your email',
-      })
+        variant: "destructive",
+        title: "OTP required",
+        description: "Please enter the OTP sent to your email",
+      });
     }
-  }
+  };
 
   async function onSubmit(values: z.infer<typeof CompanyFormSchema>) {
     // Check if OTP is verified before submitting the form
     if (!isOtpVerified) {
       toast({
-        variant: 'destructive',
-        title: 'OTP not verified',
+        variant: "destructive",
+        title: "OTP not verified",
         description:
-          'Please verify the OTP sent to your email before submitting the form.',
-      })
+          "Please verify the OTP sent to your email before submitting the form.",
+      });
 
       window.scrollTo({
         top: 0,
-        behavior: 'smooth', // This will create a smooth scrolling effect
-      })
+        behavior: "smooth", // This will create a smooth scrolling effect
+      });
 
-      return
+      return;
     }
 
-    if (isFileUploading) {
+    if (isLogoUploading || isLicenseUploading) {
       toast({
-        title: 'File Upload in Progress',
+        title: "File Upload in Progress",
         description:
-          'Please wait until the file upload completes before submitting the form.',
+          "Please wait until the file upload completes before submitting the form.",
         duration: 3000,
-        className: 'bg-orange',
-      })
-      return
+        className: "bg-orange",
+      });
+      return;
     }
 
     try {
-      let data
-      if (type === 'Add') {
-        data = await addCompany(values, userId)
-      } else if (type === 'Update') {
-        data = await updateCompany(values, userId)
+      let data;
+      if (type === "Add") {
+        data = await addCompany(values, userId);
+      } else if (type === "Update") {
+        data = await updateCompany(values, userId);
       }
 
       if (data) {
-
-        await deleteMultipleFiles(deletedImages)
+        await deleteMultipleFiles(deletedImages);
       }
 
       if (data) {
         toast({
           title: `Company ${type}ed successfully`,
-          className: 'bg-yellow text-white',
-        })
-        navigate('/listings')
+          className: "bg-yellow text-white",
+        });
+        navigate("/listings");
       }
     } catch (error) {
-      console.error(error)
+      console.error(error);
       toast({
-        variant: 'destructive',
+        variant: "destructive",
         title: `${type} Company failed`,
-        description: 'Something went wrong',
-      })
+        description: "Something went wrong",
+      });
     }
   }
 
   useEffect(() => {
-    let interval: number | undefined
+    let interval: number | undefined;
 
     if (isTimerActive) {
       interval = window.setInterval(() => {
         setTimer((prev) => {
           if (prev === 1) {
-            clearInterval(interval)
-            setIsTimerActive(false)
-            setTimer(60)
+            clearInterval(interval);
+            setIsTimerActive(false);
+            setTimer(60);
           }
-          return prev - 1
-        })
-      }, 1000)
+          return prev - 1;
+        });
+      }, 1000);
     }
 
     return () => {
       if (interval) {
-        clearInterval(interval)
+        clearInterval(interval);
       }
-    }
-  }, [isTimerActive])
+    };
+  }, [isTimerActive]);
 
   return (
     <Form {...form}>
@@ -250,7 +251,7 @@ export default function CompanyRegistrationForm({
               Your Agent Id <span className="mr-5 max-sm:hidden">:</span>
             </div>
             <div className="flex items-center mt-4 w-full text-lg font-semibold text-gray-500 cursor-default">
-              {agentId}{' '}
+              {agentId}{" "}
               <ShieldCheck className="ml-3 text-green-500" size={20} />
             </div>
           </div>
@@ -305,13 +306,13 @@ export default function CompanyRegistrationForm({
                         className="button bg-yellow hover:bg-darkYellow"
                         disabled={isTimerActive || !email}
                       >
-                        {isTimerActive ? `Resend OTP in ${timer}s` : 'Send OTP'}
+                        {isTimerActive ? `Resend OTP in ${timer}s` : "Send OTP"}
                       </Button>
                     )}
                   </div>
 
                   <FormDescription className="mt-1 ml-1">
-                    Enter the email for your company. An{' '}
+                    Enter the email for your company. An{" "}
                     <span className="font-semibold text-yellow">OTP</span> will
                     send to it.
                   </FormDescription>
@@ -360,7 +361,7 @@ export default function CompanyRegistrationForm({
                           {verifyOtpMutation.isPending ? (
                             <Spinner />
                           ) : (
-                            'Verify OTP'
+                            "Verify OTP"
                           )}
                         </Button>
                       </div>
@@ -385,13 +386,13 @@ export default function CompanyRegistrationForm({
                 description="Company logo can have a maximum size of 5MB."
                 existingFile={formData?.companyLogo}
                 maxSizeMB={5}
-                setIsFileUploading={setIsFileUploading}
+                setIsFileUploading={setIsLogoUploading}
                 bucketFilePath={GcsFilePaths.LOGOS}
                 isDownloadable={true}
                 downloadFileName={
                   formData?.companyName
                     ? `[${formData.companyName}] - company-logo`
-                    : 'company-logo'
+                    : "company-logo"
                 }
                 setDeletedImages={setDeletedImages}
               />
@@ -408,20 +409,20 @@ export default function CompanyRegistrationForm({
                 label="Commercial License"
                 description={
                   <>
-                    Please upload a <strong>PHOTO</strong> or a{' '}
+                    Please upload a <strong>PHOTO</strong> or a{" "}
                     <strong>SCREENSHOT</strong> of your commercial license,
                     maximum file size 5MB.
                   </>
                 }
                 existingFile={formData?.commercialLicense}
                 maxSizeMB={5}
-                setIsFileUploading={setIsFileUploading}
+                setIsFileUploading={setIsLicenseUploading}
                 bucketFilePath={GcsFilePaths.DOCUMENTS}
                 isDownloadable={true}
                 downloadFileName={
                   formData?.companyName
                     ? `[${formData.companyName}] - commercial-license`
-                    : 'commercial-license'
+                    : "commercial-license"
                 }
                 setDeletedImages={setDeletedImages}
               />
@@ -462,7 +463,7 @@ export default function CompanyRegistrationForm({
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
-                  Registration Number{' '}
+                  Registration Number{" "}
                   <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
@@ -492,10 +493,10 @@ export default function CompanyRegistrationForm({
           disabled={form.formState.isSubmitting}
           className="w-full  mx-auto flex-center col-span-2 mt-3 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow"
         >
-          {type === 'Add' ? 'Add Company' : 'Update Company'}
+          {type === "Add" ? "Add Company" : "Update Company"}
           {form.formState.isSubmitting && <Spinner />}
         </Button>
       </form>
     </Form>
-  )
+  );
 }

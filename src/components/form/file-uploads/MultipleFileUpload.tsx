@@ -10,7 +10,6 @@ import {
 import { Download, Eye, Trash2, MoreVertical } from 'lucide-react'
 import { toast } from '@/components/ui/use-toast'
 import { downloadFileFromStream, validateFileSize } from '@/helpers/form'
-import ImagePreviewModal from '../modal/ImagePreviewModal'
 import { uploadMultipleFiles } from '@/api/file-upload'
 import { GcsFilePaths } from '@/constants/enum'
 import {
@@ -19,8 +18,10 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu'
-import PreviewImageComponent from './PreviewImageComponent'
-import ImagePlaceholder from '../ImagePlaceholder'
+import PreviewImageComponent from '../PreviewImageComponent'
+import ImagePlaceholder from '@/components/ImagePlaceholder'
+import ImagePreviewModal from '@/components/modal/ImagePreviewModal'
+
 
 type MultipleFileUploadProps = {
   name: string
@@ -157,8 +158,8 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
 
   return (
     <>
-      <FormItem className="flex w-full mb-2 max-sm:flex-col">
-        <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
+      <FormItem className="flex mb-2 w-full max-sm:flex-col">
+        <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
           {label} <span className="mr-5 max-sm:hidden">:</span>
         </FormLabel>
         <div className="flex-col items-start w-full">
@@ -175,12 +176,12 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
                       files.map((filePath, index) => (
                         <div
                           key={index}
-                          className="relative w-16 h-16 overflow-hidden rounded-lg "
+                          className="overflow-hidden relative w-16 h-16 rounded-lg"
                         >
                           <PreviewImageComponent imagePath={filePath} />
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                              <button className="absolute p-1 bg-white border rounded-full shadow-md outline-none h-fit right-1 top-1 ring-0">
+                              <button className="absolute top-1 right-1 p-1 bg-white rounded-full border ring-0 shadow-md outline-none h-fit">
                                 <MoreVertical className="w-5 h-5 text-gray-600" />
                               </button>
                             </DropdownMenuTrigger>
@@ -188,7 +189,7 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
                               <DropdownMenuItem
                                 onClick={() => handlePreviewImage(filePath)}
                               >
-                                <Eye className="w-5 h-5 mr-2 text-blue-600" />
+                                <Eye className="mr-2 w-5 h-5 text-blue-600" />
                                 Preview
                               </DropdownMenuItem>
                               <DropdownMenuItem
@@ -196,13 +197,13 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
                                   handleDownloadImage(filePath, index)
                                 }
                               >
-                                <Download className="w-5 h-5 mr-2 text-green-600" />
+                                <Download className="mr-2 w-5 h-5 text-green-600" />
                                 Download
                               </DropdownMenuItem>
                               <DropdownMenuItem
                                 onClick={() => handleDeleteFile(filePath)}
                               >
-                                <Trash2 className="w-5 h-5 mr-2 text-red-600" />
+                                <Trash2 className="mr-2 w-5 h-5 text-red-600" />
                                 Delete
                               </DropdownMenuItem>
                             </DropdownMenuContent>
