@@ -1,0 +1,292 @@
+import { useEffect } from "react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import * as z from "zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { SRMVehicleDetailsFormDefaultValues } from "@/constants";
+import { SRMVehicleDetailsFormSchema } from "@/lib/validator";
+import { SRMVehicleDetailsFormType } from "@/types/types";
+import "react-international-phone/style.css";
+import CategoryDropdown from "../dropdowns/CategoryDropdown";
+import { toast } from "@/components/ui/use-toast";
+import Spinner from "@/components/general/Spinner";
+import { useParams } from "react-router-dom";
+import {
+  addVehicleDetailsForm,
+  updateVehicleDetailsForm,
+} from "@/api/srm/srmFormApi";
+import BrandsDropdown from "../dropdowns/BrandsDropdown";
+import DatePicker from "react-datepicker";
+
+type SRMVehicleDetailsFormProps = {
+  type: "Add" | "Update";
+  formData?: SRMVehicleDetailsFormType | null;
+  onNextTab?: () => void;
+  initialCountryCode?: string;
+  isAddOrIncomplete: boolean;
+};
+
+export default function SRMVehicleDetailsForm({
+  type,
+  onNextTab,
+  formData,
+}: SRMVehicleDetailsFormProps) {
+  const {} = useParams<{}>();
+
+  // Call the useLoadingMessages hook to manage loading messages
+
+  const initialValues =
+    formData && type === "Update"
+      ? formData
+      : SRMVehicleDetailsFormDefaultValues;
+
+  // Define your form.
+  const form = useForm<z.infer<typeof SRMVehicleDetailsFormSchema>>({
+    resolver: zodResolver(SRMVehicleDetailsFormSchema),
+    defaultValues: initialValues as SRMVehicleDetailsFormType,
+  });
+
+  // Define a submit handler.
+  async function onSubmit(values: z.infer<typeof SRMVehicleDetailsFormSchema>) {
+    // Append other form data
+    try {
+      let data;
+      if (type === "Add") {
+        data = await addVehicleDetailsForm(values);
+      } else if (type === "Update") {
+        data = await updateVehicleDetailsForm(values);
+      }
+
+      if (data) {
+        toast({
+          title: `Vehicle ${type.toLowerCase()}ed successfully`,
+          className: "bg-yellow text-white",
+        });
+
+        if (type === "Add") {
+          if (onNextTab) onNextTab();
+        }
+      }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: `${type} Vehicle failed`,
+        description: "Something went wrong",
+      });
+
+      console.error(error);
+    }
+  }
+
+  useEffect(() => {
+    // Check for validation errors and scroll to the top if errors are present
+    if (Object.keys(form.formState.errors).length > 0) {
+      toast({
+        variant: "destructive",
+        title: `Validation Error`,
+        description: "Please make sure values are provided",
+      });
+      window.scrollTo({ top: 65, behavior: "smooth" }); // Scroll to the top of the page
+    }
+  }, [form.formState.errors]);
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="flex flex-col w-full gap-5  mx-auto bg-white  rounded-3xl p-2 md:p-4 py-8 !pb-8  "
+      >
+        <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto ">
+          <FormField
+            control={form.control}
+            name="vehicleCategoryId"
+            render={({ field }) => (
+              <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
+                  Vehicle Category <span className="mr-5 max-sm:hidden">:</span>
+                </FormLabel>
+
+                <div className="flex-col items-start w-full">
+                  <FormControl>
+                    <CategoryDropdown
+                      onChangeHandler={(value) => {
+                        field.onChange(value);
+
+                        form.setValue("vehicleBrandId", "");
+                      }}
+                      value={initialValues.vehicleCategoryId}
+                    />
+                  </FormControl>
+                  <FormDescription className="ml-2">
+                    select vehicle category
+                  </FormDescription>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+
+          {/* brand name */}
+          <FormField
+            control={form.control}
+            name="vehicleBrandId"
+            render={({ field }) => (
+              <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
+                  Brand Name <span className="mr-5 max-sm:hidden">:</span>
+                </FormLabel>
+                <div className="flex-col items-start w-full">
+                  <FormControl>
+                    <BrandsDropdown
+                      vehicleCategoryId={form.watch("vehicleCategoryId")}
+                      value={field.value}
+                      onChangeHandler={field.onChange}
+                      isDisabled={!form.watch("vehicleCategoryId")}
+                    />
+                  </FormControl>
+                  <FormDescription className="ml-2">
+                    Select the vehicle's Brand
+                  </FormDescription>
+                  <FormMessage className="ml-2" />
+                </div>
+              </FormItem>
+            )}
+          />
+
+          {/* vehicle registration number */}
+          <FormField
+            control={form.control}
+            name="vehicleRegistrationNumber"
+            render={({ field }) => (
+              <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
+                  Registration Number{" "}
+                  <span className="mr-5 max-sm:hidden">:</span>
+                </FormLabel>
+                <div className="flex-col items-start w-full">
+                  <FormControl>
+                    <Input
+                      placeholder="eg: ABC12345"
+                      {...field}
+                      className={`input-field`}
+                      type="text"
+                      onKeyDown={(e) => {
+                        // Allow only alphanumeric characters and control keys like Backspace, Delete, and Arrow keys
+                        if (
+                          !/[a-zA-Z0-9]/.test(e.key) &&
+                          ![
+                            "Backspace",
+                            "Delete",
+                            "ArrowLeft",
+                            "ArrowRight",
+                            "Tab", // To allow tabbing between fields
+                          ].includes(e.key)
+                        ) {
+                          e.preventDefault();
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormDescription className="ml-2">
+                    Enter your vehicle registration number (e.g., ABC12345). The
+                    number should be a combination of letters and numbers,
+                    without any spaces or special characters, up to 15
+                    characters.
+                  </FormDescription>
+                  <FormMessage className="ml-2" />
+                </div>
+              </FormItem>
+            )}
+          />
+
+          <div className="flex flex-col gap-5 md:flex-row">
+            <FormField
+              control={form.control}
+              name="bookingStartDate"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormControl>
+                    <div className="flex-center h-[54px] w-full overflow-hidden rounded-full bg-grey-50 px-4 py-2">
+                      <img
+                        src="/assets/icons/calendar.svg"
+                        alt="calendar"
+                        width={24}
+                        height={24}
+                        className="filter-grey"
+                      />
+                      <p className="ml-3 whitespace-nowrap text-grey-600">
+                        Start Date:
+                      </p>
+                      <DatePicker
+                        selected={field.value}
+                        onChange={(date: Date | null) => field.onChange(date)}
+                        showTimeSelect
+                        timeInputLabel="Time:"
+                        dateFormat="MM/dd/yyyy h:mm aa"
+                        wrapperClassName="datePicker"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="bookingEndDate"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormControl>
+                    <div className="flex-center h-[54px] w-full overflow-hidden rounded-full bg-grey-50 px-4 py-2">
+                      <img
+                        src="/assets/icons/calendar.svg"
+                        alt="calendar"
+                        width={24}
+                        height={24}
+                        className="filter-grey"
+                      />
+                      <p className="ml-3 whitespace-nowrap text-grey-600">
+                        End Date:
+                      </p>
+                      <DatePicker
+                        selected={field.value}
+                        onChange={(date: Date | null) => field.onChange(date)}
+                        showTimeSelect
+                        timeInputLabel="Time:"
+                        dateFormat="MM/dd/yyyy h:mm aa"
+                        wrapperClassName="datePicker"
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        {/* submit  */}
+        <Button
+          type="submit"
+          size="lg"
+          disabled={form.formState.isSubmitting}
+          className="w-full md:w-10/12 lg:w-8/12 mx-auto flex-center col-span-2 mt-3 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow"
+        >
+          {type === "Add" ? "Continue" : "Update Vehicle Details"}
+          {form.formState.isSubmitting && <Spinner />}
+        </Button>
+      </form>
+    </Form>
+  );
+}

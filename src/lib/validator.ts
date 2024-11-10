@@ -105,3 +105,32 @@ export const PrimaryFormSchema = z.object({
   isCreditOrDebitCardsSupported: z.boolean().default(false),
   isTabbySupported: z.boolean().default(false),
 });
+
+// SRM : User Details Form Schema
+export const SRMUserDetailsFormSchema = z.object({
+  userProfile: z.string().optional(),
+  userName: z.string().min(1, "User name is required"),
+  nationality: z.string().min(1, "Nationality is required"),
+  passportNum: z.string().min(1, "Passport number is required"),
+  drivingLicenseNum: z.string().min(1, "Driving license number is required"),
+  phoneNumber: z.string().min(6, "Provide a valid mobile number"),
+});
+
+// SRM : Vehicle Details Form Schema
+export const SRMVehicleDetailsFormSchema = z.object({
+  vehicleCategoryId: z.string().min(1, "Category is required"),
+  vehicleBrandId: z.string().min(1, "Brand is required"),
+  vehicleRegistrationNumber: z
+    .string()
+    .min(1, "Vehicle registration number is required")
+    .max(15, "Vehicle registration number cannot exceed 15 characters"),
+  bookingStartDate: z.date(),
+  bookingEndDate: z.date(),
+});
+
+// SRM : User Details Form Schema
+export const SRMPaymentDetailsFormSchema = z.object({
+  currency: z.string().min(1, "Currency is required"),
+  advanceAmount: z.string().min(1, "Advance amount is required"),
+  remainingAmount: z.string().min(1, "Remaining amount is required"),
+});

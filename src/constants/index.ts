@@ -118,3 +118,29 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
   isCreditOrDebitCardsSupported: false,
   isTabbySupported: false,
 };
+
+// srm user details form default values
+export const SRMUserDetailsFormDefaultValues = {
+  userProfile: "", // Optional field
+  userName: "", // Name of the user
+  nationality: "", // Nationality of the user
+  passportNum: "", // Passport number
+  drivingLicenseNum: "", // Driving license number
+  phoneNumber: "", // Phone number with validation on minimum characters
+};
+
+// srm vehicle details form default values
+export const SRMVehicleDetailsFormDefaultValues = {
+  vehicleCategoryId: "",
+  vehicleBrandId: "",
+  vehicleRegistrationNumber: "",
+  startDateTime: new Date(),
+  endDateTime: new Date(),
+};
+
+// SRM payment details form default values
+export const SRMPaymentDetailsFormDefaultValues = {
+  currency: "", // Default empty string for currency
+  advanceAmount: "", // Default empty string for advance amount
+  remainingAmount: "", // Default empty string for remaining amount
+};

@@ -76,6 +76,7 @@ export type SpecificationFormData = {
 };
 
 export type TabsTypes = "primary" | "specifications" | "features";
+export type SRMTabsTypes = "user" | "vehicle" | "payment";
 
 export interface ApiError {
   response?: {
@@ -86,3 +87,26 @@ export interface ApiError {
     };
   };
 }
+
+export type SRMUserDetailsFormType = {
+  userProfile?: string; // Optional field for profile photo or identifier
+  userName: string; // User name
+  nationality: string; // Nationality of the user
+  passportNum: string; // Passport number of the user
+  drivingLicenseNum: string; // Driving license number of the user
+  phoneNumber: string; // Mobile number of the user
+};
+
+export type SRMVehicleDetailsFormType = {
+  vehicleCategoryId: string;
+  vehicleBrandId: string;
+  vehicleRegistrationNumber: string;
+  startDateTime: Date;
+  endDateTime: Date;
+};
+
+export type SRMPaymentDetailsFormType = {
+  currency: string;
+  advancePaid: string;
+  remainingAmount: string;
+};

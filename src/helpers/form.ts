@@ -5,7 +5,7 @@ import {
   GetPrimaryForm,
   SpecificationFormData,
 } from "@/types/API-types";
-import { PrimaryFormType, TabsTypes } from "@/types/types";
+import { PrimaryFormType, SRMTabsTypes, TabsTypes } from "@/types/types";
 import { deleteFile } from "@/api/file-upload";
 
 type SpecificationOption = { label: string; value: string };
@@ -327,6 +327,64 @@ export const validateTabAccess = ({
       return {
         canAccess: false,
         message: "Please complete the Specifications form to proceed.",
+      };
+    }
+  }
+
+  return { canAccess: true, message: "" }; // Default case
+};
+
+interface SRMTabValidationProps {
+  tab: SRMTabsTypes;
+  levelsFilled: number;
+}
+
+// srm tab validation
+export const validateSRMTabAccess = ({
+  tab,
+  levelsFilled,
+}: SRMTabValidationProps): { canAccess: boolean; message: string } => {
+  if (tab === "user" && levelsFilled > 0) {
+    return {
+      canAccess: false,
+      message: "The User Details form is already completed.",
+    };
+  }
+
+  if (tab === "vehicle") {
+    if (levelsFilled >= 1 && levelsFilled < 2) {
+      return {
+        canAccess: true,
+        message: "",
+      }; // Access allowed
+    } else if (levelsFilled >= 2) {
+      return {
+        canAccess: false,
+        message: "The Vehicle Details form is already completed.",
+      };
+    } else {
+      return {
+        canAccess: false,
+        message: "Please complete the User Details form to proceed.",
+      };
+    }
+  }
+
+  if (tab === "payment") {
+    if (levelsFilled >= 2 && levelsFilled < 3) {
+      return {
+        canAccess: true,
+        message: "",
+      }; // Access allowed
+    } else if (levelsFilled === 3) {
+      return {
+        canAccess: false,
+        message: "The Payment details form is already completed.",
+      };
+    } else {
+      return {
+        canAccess: false,
+        message: "Please complete the Vehicle Details form to proceed.",
       };
     }
   }

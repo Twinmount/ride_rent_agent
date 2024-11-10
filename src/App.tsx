@@ -54,6 +54,10 @@ const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 const ListingsPage = lazy(() => import("./pages/listings/ListingsPage"));
 const ProfilePage = lazy(() => import("./pages/profile/ProfilePage"));
 
+// yet to lazy load
+import SRMDashboard from "./pages/srm/SRM";
+import SRMDataAddPage from "./pages/srm/SRMFormAddPage";
+
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 const router = createBrowserRouter([
@@ -114,6 +118,14 @@ const router = createBrowserRouter([
               {
                 path: "/srm",
                 element: <SRMIntroduction />,
+              },
+              {
+                path: "/srm/dashboard",
+                element: <SRMDashboard />,
+              },
+              {
+                path: "/srm/trips/new",
+                element: <SRMDataAddPage />,
               },
             ],
           },
