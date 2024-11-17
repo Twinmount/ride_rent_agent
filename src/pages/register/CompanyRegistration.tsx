@@ -18,6 +18,7 @@ export default function CompanyRegistration() {
       <h2 className="my-3 text-base text-center text-gray-500">
         Provide your company details to complete the registration
       </h2>
+
       {isLoading ? (
         <FormSkelton />
       ) : !data || isError ? (

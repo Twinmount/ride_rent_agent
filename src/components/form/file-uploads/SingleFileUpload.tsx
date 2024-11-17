@@ -18,10 +18,20 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+
 import { downloadFileFromStream } from "@/helpers/form";
 import PreviewImageComponent from "../PreviewImageComponent";
 import { Progress } from "@/components/ui/progress";
 import ImagePreviewModal from "@/components/modal/ImagePreviewModal";
+import { Button } from "@/components/ui/button";
 
 type SingleFileUploadProps = {
   name: string;
@@ -55,6 +65,8 @@ const SingleFileUpload = ({
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [imagePath, setImagePath] = useState<string | null>(existingFile);
   const [progress, setProgress] = useState<number>(0);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
 
   // Sync loading state with parent if necessary
   useEffect(() => {
@@ -134,6 +146,7 @@ const SingleFileUpload = ({
 
     setImagePath(null); // Remove image path for PreviewImageComponent
     setValue(name, null); // Remove the value from form
+    setIsDeleteConfirmationOpen(false);
   };
 
   // Handle image preview in modal
@@ -197,7 +210,9 @@ const SingleFileUpload = ({
                               <DropdownMenuContent className="w-28">
                                 {/* Delete */}
                                 <DropdownMenuItem
-                                  onClick={handleDeleteImage}
+                                  onClick={() =>
+                                    setIsDeleteConfirmationOpen(true)
+                                  } // Open the modal instead of directly calling delete
                                   disabled={isDisabled || isUploading}
                                 >
                                   <Trash2 className="mr-2 w-5 h-5 text-red-600" />
@@ -266,6 +281,29 @@ const SingleFileUpload = ({
           imagePath={previewImage}
           setSelectedImage={setPreviewImage} // Close modal function
         />
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteConfirmationOpen && (
+        <Dialog
+          open={isDeleteConfirmationOpen}
+          onOpenChange={setIsDeleteConfirmationOpen}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Deletion</DialogTitle>
+            </DialogHeader>
+            <p>Are you sure you want to delete this image?</p>
+            <DialogFooter>
+              <Button onClick={() => setIsDeleteConfirmationOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleDeleteImage} variant="destructive">
+                Confirm
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
     </>
   );

@@ -1,16 +1,16 @@
-import { Slug } from '../Api-Endpoints'
-import { API } from '../ApiService'
+import { Slug } from "../Api-Endpoints";
+import { API } from "../ApiService";
 import {
   FetchSpecificCompanyResponse,
   SendOTPResponse,
-} from '@/types/API-types'
+} from "@/types/API-types";
 
 export interface CompanyType {
-  companyName: string
-  companyLogo: string
-  commercialLicense: string
-  expireDate: Date
-  regNumber: string
+  companyName: string;
+  companyLogo: string;
+  commercialLicense: string;
+  expireDate: Date;
+  regNumber: string;
 }
 
 // add company
@@ -22,21 +22,19 @@ export const addCompany = async (values: CompanyType, userId: string) => {
       body: {
         userId: userId,
         companyName: values.companyName,
-        expireDate: values.expireDate
-          ? values.expireDate.toISOString()
-          : undefined,
+        expireDate: values.expireDate!.toISOString(),
         regNumber: values.regNumber,
         companyLogo: values.companyLogo, // Assuming this is a URL or string
         commercialLicense: values.commercialLicense, // Assuming this is a URL or string
       },
-    })
+    });
 
-    return data
+    return data;
   } catch (error) {
-    console.error('Error adding company:', error)
-    throw error
+    console.error("Error adding company:", error);
+    throw error;
   }
-}
+};
 
 // update company
 export const updateCompany = async (values: CompanyType, companyId: string) => {
@@ -46,21 +44,19 @@ export const updateCompany = async (values: CompanyType, companyId: string) => {
       body: {
         companyId: companyId,
         companyName: values.companyName,
-        expireDate: values.expireDate
-          ? values.expireDate.toISOString()
-          : undefined,
+        expireDate: values.expireDate!.toISOString(),
         regNumber: values.regNumber,
         companyLogo: values.companyLogo, // Assuming this is a URL or string
         commercialLicense: values.commercialLicense, // Assuming this is a URL or string
       },
-    })
+    });
 
-    return data
+    return data;
   } catch (error) {
-    console.error('Error updating company:', error)
-    throw error
+    console.error("Error updating company:", error);
+    throw error;
   }
-}
+};
 
 // fetch company
 export const getCompany = async (
@@ -69,18 +65,18 @@ export const getCompany = async (
   try {
     const data = await API.get<FetchSpecificCompanyResponse>({
       slug: `${Slug.GET_COMPANY}?userId=${userId}`,
-    })
+    });
 
     if (!data) {
-      throw new Error('Failed to fetch Company data')
+      throw new Error("Failed to fetch Company data");
     }
 
-    return data
+    return data;
   } catch (error) {
-    console.error('Error fetching Company:', error)
-    throw error
+    console.error("Error fetching Company:", error);
+    throw error;
   }
-}
+};
 
 // Send OTP function
 export const sendOtp = async (email: string): Promise<SendOTPResponse> => {
@@ -90,18 +86,18 @@ export const sendOtp = async (email: string): Promise<SendOTPResponse> => {
       body: {
         email,
       },
-    })
+    });
 
     if (!data) {
-      throw new Error('Failed to send otp data')
+      throw new Error("Failed to send otp data");
     }
 
-    return data
+    return data;
   } catch (error) {
-    console.error('Error sending OTP:', error)
-    throw error
+    console.error("Error sending OTP:", error);
+    throw error;
   }
-}
+};
 
 // Verify OTP function
 export const verifyOtp = async (otp: string) => {
@@ -111,11 +107,11 @@ export const verifyOtp = async (otp: string) => {
       body: {
         otp,
       },
-    })
+    });
 
-    return data
+    return data;
   } catch (error) {
-    console.error('Error verifying OTP:', error)
-    throw error
+    console.error("Error verifying OTP:", error);
+    throw error;
   }
-}
+};

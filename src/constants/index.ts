@@ -66,7 +66,7 @@ export const CompanyFormDefaultValues: CompanyFormType = {
   companyName: "",
   companyLogo: "",
   commercialLicense: "",
-  expireDate: new Date(),
+  expireDate: undefined,
   regNumber: "",
 };
 
@@ -91,7 +91,7 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
   vehicleRegistrationNumber: "",
   vehicleRegisteredYear: "",
   commercialLicenses: [],
-  commercialLicenseExpireDate: new Date(),
+  commercialLicenseExpireDate: undefined,
   isLease: false,
   isCryptoAccepted: false,
   isSpotDeliverySupported: false,
