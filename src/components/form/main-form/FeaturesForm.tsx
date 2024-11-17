@@ -132,6 +132,9 @@ export default function FeaturesForm({
       if (response) {
         toast({
           title: `Features ${type.toLowerCase()}ed successfully`,
+          description: isAddOrIncomplete
+            ? "Vehicle will be live once the admin approves your listing"
+            : "Changes will be reflected once the admin approves it",
           className: "bg-yellow text-white",
         });
         queryClient.invalidateQueries({
@@ -210,6 +213,12 @@ export default function FeaturesForm({
           {isAddOrIncomplete ? "List Vehicle" : "Update Listing"}
           {form.formState.isSubmitting && <Spinner />}
         </Button>
+        {isAddOrIncomplete && (
+          <p className="-mt-4 text-sm italic text-center text-gray-700">
+            After submitting the form, your vehicle will be live once the admin
+            approves it
+          </p>
+        )}
       </form>
     </Form>
   );
