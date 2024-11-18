@@ -10,7 +10,7 @@ import {
   GetSpecificationFormDataResponse,
   GetSpecificationFormFieldsResponse,
 } from "@/types/API-types";
-import { PrimaryFormType } from "@/types/types";
+import { ApprovalStatusTypes, PrimaryFormType } from "@/types/types";
 
 export const addPrimaryDetailsForm = async (
   values: PrimaryFormType,
@@ -35,7 +35,7 @@ export const addPrimaryDetailsForm = async (
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
       vehicleRegisteredYear: values.vehicleRegisteredYear,
       commercialLicenseExpireDate:
-        values.commercialLicenseExpireDate.toISOString(),
+        values.commercialLicenseExpireDate!.toISOString(),
       isLease: values.isLease.toString(), // Convert boolean to string
       isCryptoAccepted: values.isCryptoAccepted.toString(), // Convert boolean to string
       isSpotDeliverySupported: values.isSpotDeliverySupported.toString(), // Convert boolean to string
@@ -102,7 +102,7 @@ export const updatePrimaryDetailsForm = async (
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
       vehicleRegisteredYear: values.vehicleRegisteredYear,
       commercialLicenseExpireDate:
-        values.commercialLicenseExpireDate.toISOString(),
+        values.commercialLicenseExpireDate!.toISOString(),
       isLease: values.isLease.toString(), // Convert boolean to string
       isCryptoAccepted: values.isCryptoAccepted.toString(), // Convert boolean to string
       isSpotDeliverySupported: values.isSpotDeliverySupported.toString(), // Convert boolean to string
@@ -398,9 +398,10 @@ export const fetchAllVehicles = async (urlParams: {
   page: number;
   limit: number;
   sortOrder: string;
-  approvalStatus?: "ALL" | "APPROVED" | "REJECTED" | "PENDING" | "UNDER_REVIEW";
+  approvalStatus?: ApprovalStatusTypes;
   isModified?: boolean;
   userId: string;
+  search?: string;
 }): Promise<FetchAllVehiclesResponse> => {
   try {
     // generating query params
@@ -411,13 +412,16 @@ export const fetchAllVehicles = async (urlParams: {
       userId: urlParams.userId,
     });
 
-    if (urlParams.approvalStatus) {
+    if (urlParams.approvalStatus && urlParams.approvalStatus !== "ALL") {
       queryParams.append("approvalStatus", urlParams.approvalStatus);
     }
+
     if (urlParams.isModified === true || urlParams.isModified === false) {
       queryParams.append("isModified", urlParams.isModified.toString());
     }
-
+    if (urlParams.search) {
+      queryParams.append("search", urlParams.search); // Add search param if available
+    }
     const slugWithParams = `${Slug.GET_ALL_VEHICLES}?${queryParams}`;
 
     const data = await API.get<FetchAllVehiclesResponse>({

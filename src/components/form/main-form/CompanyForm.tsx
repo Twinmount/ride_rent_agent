@@ -84,6 +84,7 @@ export default function CompanyRegistrationForm({
     onSuccess: () => {
       toast({
         title: "OTP sent successfully",
+        description: "Please don't refresh or close the page ",
         className: "bg-green-500 text-white",
       });
       setIsTimerActive(true);
@@ -315,6 +316,11 @@ export default function CompanyRegistrationForm({
                     Enter the email for your company. An{" "}
                     <span className="font-semibold text-yellow">OTP</span> will
                     send to it.
+                    <br />
+                    <span className="italic font-medium">
+                      Please do not close or reload the page after email
+                      verification
+                    </span>
                   </FormDescription>
                 </div>
               </div>
@@ -366,7 +372,8 @@ export default function CompanyRegistrationForm({
                         </Button>
                       </div>
                       <FormDescription className="mt-1 ml-1">
-                        Enter your OTP sent to your email address
+                        Enter your OTP sent to your email address. Do not
+                        refresh or close the page,
                       </FormDescription>
                     </div>
                   </div>
@@ -443,12 +450,14 @@ export default function CompanyRegistrationForm({
                     <DatePicker
                       selected={field.value}
                       onChange={(date: Date | null) => field.onChange(date)}
-                      dateFormat="MM/dd/yyyy"
+                      dateFormat="dd/MM/yyyy"
                       wrapperClassName="datePicker text-base  "
+                      placeholderText="DD/MM/YYYY"
                     />
                   </FormControl>
                   <FormDescription className="mt-1 ml-1">
                     Enter the expiry of your Commercial License/Trade License
+                    &#40;DD/MM/YYYY&#41;.
                   </FormDescription>
                   <FormMessage />
                 </div>

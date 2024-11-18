@@ -9,7 +9,7 @@ import {
 import { Mail, MessageCircleMore, Phone } from "lucide-react";
 
 export default function SupportModal({
-  classes = "px-3 py-1 text-white transition-colors bg-black shadow-lg hover:text-yellow rounded-2xl flex-center gap-x-2",
+  classes = "px-3 py-1 text-white transition-colors bg-black shadow-lg hover:text-yellow rounded-2xl flex-center gap-x-2 max-sm:text-sm max-sm:-mr-4",
 }: {
   classes?: string;
 }) {

@@ -11,12 +11,15 @@ import VehicleStatusOverlay from "../VehicleStatusOverlay";
 import { useQueryClient } from "@tanstack/react-query";
 import AddVehiclePlaceholder from "../AddVehiclePlaceholder";
 import { generateModelDetailsUrl } from "@/helpers";
+import { ApprovalStatusTypes } from "@/types/types";
 
 interface ListedVehiclesProps {
   vehicles: SingleVehicleType[];
   isLoading: boolean;
   userId: string;
   companyId: string;
+  search: string;
+  filters: { approvalStatus: ApprovalStatusTypes };
 }
 
 export default function ListedVehicles({
@@ -24,6 +27,8 @@ export default function ListedVehicles({
   isLoading,
   userId,
   companyId,
+  search,
+  filters,
 }: ListedVehiclesProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -104,9 +109,9 @@ export default function ListedVehicles({
           {vehicles.map((vehicle) => (
             <div
               key={vehicle.vehicleId}
-              className="overflow-hidden h-full max-h-72 rounded-lg border shadow-lg transition-all group"
+              className="overflow-hidden h-full max-h-60 rounded-lg border shadow-lg transition-all group"
             >
-              <div className="w-full h-[70%] min-h-[170px] max-h-[70%] overflow-hidden relative">
+              <div className="w-full h-[67%] min-h-[130px] max-h-[70%] overflow-hidden relative">
                 <Link
                   to={`/listings/view/${vehicle.vehicleId}/${companyId}/${userId}`}
                   className="w-full cursor-pointer"
@@ -159,11 +164,29 @@ export default function ListedVehicles({
           ))}
 
           {/* AddVehiclePlaceholder should always be rendered as the last item */}
+          {/* Conditionally render AddVehiclePlaceholder */}
+          {(filters.approvalStatus === "ALL" ||
+            filters.approvalStatus === "APPROVED") && (
+            <AddVehiclePlaceholder userId={userId} />
+          )}
+        </div>
+      ) : vehicles.length === 0 && search ? (
+        <div className="pt-28 text-center text-gray-500">
+          <p className="text-lg font-semibold">
+            No results found for "{search}"
+          </p>
+        </div>
+      ) : // Render "No Vehicles" message or AddVehiclePlaceholder based on approvalStatus
+      filters.approvalStatus === "ALL" ||
+        filters.approvalStatus === "APPROVED" ? (
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
           <AddVehiclePlaceholder userId={userId} />
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-          <AddVehiclePlaceholder userId={userId} />
+        <div className="pt-28 text-center text-gray-500">
+          <p className="text-lg font-semibold">
+            No vehicles found in this category
+          </p>
         </div>
       )}
 

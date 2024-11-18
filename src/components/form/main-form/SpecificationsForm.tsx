@@ -229,8 +229,8 @@ export default function SpecificationsForm({
                     );
 
                   return (
-                    <FormItem className="flex w-full mb-2 max-sm:flex-col">
-                      <FormLabel className="flex justify-between mt-4 ml-2 text-base w-72 lg:text-lg">
+                    <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                      <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
                         {spec.name}
                         <span className="mr-5 max-sm:hidden">:</span>
                       </FormLabel>
@@ -245,6 +245,7 @@ export default function SpecificationsForm({
                                 label: value!.label, // Non-null assertion
                                 value: value!.name,
                               }))}
+                            isEngineType={spec.name === "Engine Type"}
                           />
                         </FormControl>
                         <FormMessage className="ml-2" />
