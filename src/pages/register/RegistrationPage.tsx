@@ -8,9 +8,23 @@ import RegistrationForm from "@/components/form/main-form/RegistrationForm";
 import Footer from "@/components/footer/Footer";
 import { Helmet } from "react-helmet-async";
 import FloatingWhatsAppButton from "@/components/FloatingWhatsappIcon";
-import { Link } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+
+import { Link, useLocation } from "react-router-dom";
 
 export default function RegistrationPage() {
+  const location = useLocation();
+
+  console.log(location);
+
+  // Check if the current pathname is "/register"
+  const isRegisterPage = location.pathname === "/register";
+
   return (
     <>
       <section className="pb-10 bg-white">
@@ -41,16 +55,55 @@ export default function RegistrationPage() {
             backgroundRepeat: "no-repeat",
           }}
         >
-          <Link
-            to={"/"}
-            className="absolute left-4 top-6 z-20 w-32 lg:left-20 md:w-40 lg:w-44"
-          >
-            <img
-              src="/assets/logo/header/agent_white_logo.webp"
-              alt="riderent logo"
-              className="object-contain w-full h-full"
-            />
-          </Link>
+          {isRegisterPage ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="absolute left-4 top-6 z-20 w-32 border-none ring-0 cursor-pointer outline-none focus:ring-0 lg:left-20 md:w-40 lg:w-44">
+                <img
+                  src="/assets/logo/header/agent_white_logo.webp"
+                  alt="riderent logo"
+                  className="object-contain w-full h-full"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                className="z-50 p-4 bg-gray-800 rounded-md border border-none shadow-md outline-none"
+                sideOffset={10}
+                align="start"
+              >
+                <div className="flex flex-col gap-3">
+                  <DropdownMenuItem
+                    className="text-sm font-bold text-gray-300 transition-colors cursor-pointer hover:text-yellow"
+                    onSelect={() => {}}
+                  >
+                    Stay on Registration
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    asChild
+                    className="text-sm font-bold text-gray-300 transition-colors cursor-pointer hover:text-yellow"
+                  >
+                    <a
+                      href="https://ride.rent"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Ride.Rent Booking Portal
+                    </a>
+                  </DropdownMenuItem>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link
+              to="/"
+              className="absolute left-4 top-6 z-20 w-32 lg:left-20 md:w-40 lg:w-44"
+            >
+              <img
+                src="/assets/logo/header/agent_white_logo.webp"
+                alt="riderent logo"
+                className="object-contain w-full h-full"
+              />
+            </Link>
+          )}
+
           <MotionDiv className="flex z-10 flex-col items-center justify-center gap-4 mx-auto mb-12 lg:flex-row W-[95%] lg:w-[85%]">
             {/* sign up features */}
             <SignUpFeatures />
