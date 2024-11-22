@@ -462,12 +462,14 @@ export default function PrimaryDetailsForm({
                     <DatePicker
                       selected={field.value}
                       onChange={(date: Date | null) => field.onChange(date)}
-                      dateFormat="MM/dd/yyyy"
+                      dateFormat="dd/MM/yyyy"
                       wrapperClassName="datePicker text-base -ml-4 "
+                      placeholderText="DD/MM/YYYY"
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
                     Enter Registration Card/Mulkia expiry date
+                    &#40;DD/MM/YYYY&#41;.
                   </FormDescription>
                   <FormMessage className="ml-2" />
                 </div>

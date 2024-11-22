@@ -9,9 +9,19 @@ import { fetchAllVehicles } from "@/api/vehicle";
 import { getCompany } from "@/api/company";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
+import SearchVehicle from "@/components/SearchVehicle";
+import VehicleFilters from "@/components/VehicleFilters";
+import { ApprovalStatusTypes } from "@/types/types";
 
 export default function ListingsPage() {
   const [page, setPage] = useState(1);
+  const [search, setSearch] = useState("");
+  const [filters, setFilters] = useState<{
+    approvalStatus: ApprovalStatusTypes;
+  }>({
+    approvalStatus: "ALL",
+  });
+
   const navigate = useNavigate();
 
   let limit: 10 | 15 | 20 | 30 | 50 = 10;
@@ -50,14 +60,24 @@ export default function ListingsPage() {
   const companyId = companyData?.result?.companyId;
 
   // Fetch vehicles if userId is present
-  const { data, isLoading } = useQuery({
-    queryKey: ["vehicles", page, limit, sortOrder],
+  const { data, isLoading, isRefetching } = useQuery({
+    queryKey: [
+      "vehicles",
+      page,
+      limit,
+      sortOrder,
+      search,
+      filters.approvalStatus,
+    ],
     queryFn: () =>
       fetchAllVehicles({
         page,
         limit,
         sortOrder,
         userId: userId as string,
+        search: search || undefined,
+        approvalStatus:
+          filters.approvalStatus !== "ALL" ? filters.approvalStatus : undefined,
       }),
     enabled: !!userId,
     refetchOnWindowFocus: "always",
@@ -75,20 +95,32 @@ export default function ListingsPage() {
 
   return (
     <section className="p-3 pt-8 h-auto min-h-screen lg:p-6">
-      <div className="flex mb-12 max-md:flex-col flex-between">
+      <div className="flex mb-10 max-md:mb-6 max-md:flex-col flex-between">
         <div className="flex flex-col justify-center items-start">
-          <h2 className="fixed top-[4.7rem] left-0 pl-10 lg:pl-80 bg-white/20 backdrop-blur-md  z-10 mb-4   text-2xl lg:text-3xl font-bold w-full h-14 flex items-center">
+          <h2 className="fixed top-[4.9rem] left-0 pl-10 lg:pl-64 bg-white/20 backdrop-blur-lg  z-10   text-2xl lg:text-3xl font-bold w-full h-14 flex items-center">
             Your Listed Vehicles
           </h2>
         </div>
       </div>
 
+      {/* search vehicle */}
+      <SearchVehicle
+        search={search}
+        setSearch={setSearch}
+        placeholder="Search model..."
+      />
+
+      {/* filters */}
+      <VehicleFilters filters={filters} setFilters={setFilters} />
+
       {/* Listed Vehicles */}
       <ListedVehicles
         vehicles={data?.result.list || []}
-        isLoading={isLoading || isCompanyLoading}
+        isLoading={isLoading || isCompanyLoading || isRefetching}
         userId={userId}
         companyId={companyId as string}
+        search={search}
+        filters={filters}
       />
 
       {(data?.result.totalNumberOfPages as number) > 0 && (

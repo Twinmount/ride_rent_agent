@@ -14,7 +14,7 @@ export type CompanyFormType = {
   companyName: string;
   companyLogo: string;
   commercialLicense: string;
-  expireDate: Date;
+  expireDate: Date | undefined;
   regNumber: string;
 };
 
@@ -44,7 +44,7 @@ export type PrimaryFormType = {
   vehicleRegistrationNumber: string;
   vehicleRegisteredYear: string;
   commercialLicenses: string[]; // Array of  URLs
-  commercialLicenseExpireDate: Date;
+  commercialLicenseExpireDate: Date | undefined;
   isLease: boolean;
   isCryptoAccepted: boolean;
   isSpotDeliverySupported: boolean;
@@ -87,6 +87,13 @@ export interface ApiError {
     };
   };
 }
+
+export type ApprovalStatusTypes =
+  | "ALL"
+  | "APPROVED"
+  | "REJECTED"
+  | "PENDING"
+  | "UNDER_REVIEW";
 
 export type SRMUserDetailsFormType = {
   userProfile?: string; // Optional field for profile photo or identifier

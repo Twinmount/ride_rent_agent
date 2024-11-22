@@ -1,40 +1,49 @@
-import React, { useState, useEffect } from 'react'
-import { useFormContext, Controller } from 'react-hook-form'
+import React, { useState, useEffect } from "react";
+import { useFormContext, Controller } from "react-hook-form";
 import {
   FormControl,
   FormDescription,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form'
-import { Download, Eye, Trash2, MoreVertical } from 'lucide-react'
-import { toast } from '@/components/ui/use-toast'
-import { downloadFileFromStream, validateFileSize } from '@/helpers/form'
-import { uploadMultipleFiles } from '@/api/file-upload'
-import { GcsFilePaths } from '@/constants/enum'
+} from "@/components/ui/form";
+import { Download, Eye, Trash2, MoreVertical } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
+import { downloadFileFromStream, validateFileSize } from "@/helpers/form";
+import { uploadMultipleFiles } from "@/api/file-upload";
+import { GcsFilePaths } from "@/constants/enum";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
   DropdownMenuItem,
-} from '@/components/ui/dropdown-menu'
-import PreviewImageComponent from '../PreviewImageComponent'
-import ImagePlaceholder from '@/components/ImagePlaceholder'
-import ImagePreviewModal from '@/components/modal/ImagePreviewModal'
+} from "@/components/ui/dropdown-menu";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+
+import PreviewImageComponent from "../PreviewImageComponent";
+import ImagePlaceholder from "@/components/ImagePlaceholder";
+import ImagePreviewModal from "@/components/modal/ImagePreviewModal";
 
 type MultipleFileUploadProps = {
-  name: string
-  label: string
-  existingFiles?: string[]
-  description: React.ReactNode
-  maxSizeMB?: number
-  isFileUploading?: boolean
-  setIsFileUploading?: (isUploading: boolean) => void
-  bucketFilePath: GcsFilePaths
-  downloadFileName?: string
-  setDeletedFiles: (deletedPaths: (prev: string[]) => string[]) => void
-}
+  name: string;
+  label: string;
+  existingFiles?: string[];
+  description: React.ReactNode;
+  maxSizeMB?: number;
+  isFileUploading?: boolean;
+  setIsFileUploading?: (isUploading: boolean) => void;
+  bucketFilePath: GcsFilePaths;
+  downloadFileName?: string;
+  setDeletedFiles: (deletedPaths: (prev: string[]) => string[]) => void;
+};
 
 const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
   name,
@@ -48,113 +57,122 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
   downloadFileName,
   setDeletedFiles,
 }) => {
-  const { control, setValue, clearErrors } = useFormContext()
-  const [files, setFiles] = useState<string[]>(existingFiles)
-  const [previewImage, setPreviewImage] = useState<string | null>(null)
-  const [uploadingCount, setUploadingCount] = useState(0)
+  const { control, setValue, clearErrors } = useFormContext();
+  const [files, setFiles] = useState<string[]>(existingFiles);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [uploadingCount, setUploadingCount] = useState(0);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
+  const [fileToDelete, setFileToDelete] = useState<string | null>(null);
 
   // Get max file count based on name
   const getMaxCount = () => {
-    if (name === 'vehiclePhotos') return 8
-    if (name === 'commercialLicenses') return 2
-    return 0
-  }
+    if (name === "vehiclePhotos") return 8;
+    if (name === "commercialLicenses") return 2;
+    return 0;
+  };
 
-  const maxCount = getMaxCount()
+  const maxCount = getMaxCount();
 
   // Sync files state with form value
   useEffect(() => {
-    setValue(name, files)
-  }, [files, setValue, name])
+    setValue(name, files);
+  }, [files, setValue, name]);
 
   // Handle file selection and upload
   const handleFilesChange = async (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
-    const selectedFiles = Array.from(event.target.files || [])
-    const validFiles: File[] = []
+    const selectedFiles = Array.from(event.target.files || []);
+    const validFiles: File[] = [];
 
-    const remainingLimit = maxCount - files.length - uploadingCount
+    const remainingLimit = maxCount - files.length - uploadingCount;
     if (selectedFiles.length > remainingLimit) {
       toast({
-        variant: 'destructive',
-        title: 'File limit exceeded',
+        variant: "destructive",
+        title: "File limit exceeded",
         description: `You can only upload a maximum of ${maxCount} files.`,
-      })
-      selectedFiles.splice(remainingLimit)
+      });
+      selectedFiles.splice(remainingLimit);
     }
 
     // Validate file sizes
     for (const file of selectedFiles) {
       if (!validateFileSize(file, maxSizeMB)) {
         toast({
-          variant: 'destructive',
-          title: 'Invalid file size',
+          variant: "destructive",
+          title: "Invalid file size",
           description: `File ${file.name} exceeds the size limit of ${maxSizeMB}MB`,
-        })
-        continue
+        });
+        continue;
       }
-      validFiles.push(file)
+      validFiles.push(file);
     }
 
-    if (validFiles.length === 0) return
+    if (validFiles.length === 0) return;
 
-    if (setIsFileUploading) setIsFileUploading(true)
+    if (setIsFileUploading) setIsFileUploading(true);
 
     // Increment uploading count by the number of files being uploaded
-    setUploadingCount((prev) => prev + validFiles.length)
+    setUploadingCount((prev) => prev + validFiles.length);
 
     try {
       // Upload all files at once
       const uploadResponse = await uploadMultipleFiles(
         bucketFilePath,
         validFiles
-      )
+      );
 
-      const uploadedPaths = uploadResponse.result.paths
+      const uploadedPaths = uploadResponse.result.paths;
 
       // Update the form state with new paths
-      setFiles((prevFiles) => [...prevFiles, ...uploadedPaths])
-      clearErrors(name)
+      setFiles((prevFiles) => [...prevFiles, ...uploadedPaths]);
+      clearErrors(name);
     } catch (error) {
       toast({
-        variant: 'destructive',
-        title: 'File upload failed',
-        description: 'Please try again.',
-      })
-      console.error('Error uploading multiple files:', error)
+        variant: "destructive",
+        title: "File upload failed",
+        description: "Please try again.",
+      });
+      console.error("Error uploading multiple files:", error);
     } finally {
-      setUploadingCount((prev) => prev - validFiles.length) // Decrement count after all files are uploaded
-      if (setIsFileUploading) setIsFileUploading(false)
-      event.target.value = '' // Reset the input
+      setUploadingCount((prev) => prev - validFiles.length); // Decrement count after all files are uploaded
+      if (setIsFileUploading) setIsFileUploading(false);
+      event.target.value = ""; // Reset the input
     }
-  }
+  };
 
-  const handleDeleteFile = (filePath: string) => {
-    setFiles((prevFiles) => prevFiles.filter((path) => path !== filePath))
-    setDeletedFiles((prev) => [...prev, filePath])
-  }
+  const handleDeleteFile = () => {
+    if (fileToDelete) {
+      setFiles((prevFiles) =>
+        prevFiles.filter((path) => path !== fileToDelete)
+      );
+      setDeletedFiles((prev) => [...prev, fileToDelete]);
+      setFileToDelete(null); // Clear the file to delete
+    }
+    setIsDeleteConfirmationOpen(false); // Close the confirmation modal
+  };
 
   const handlePreviewImage = (filePath: string) => {
-    setPreviewImage(filePath)
-  }
+    setPreviewImage(filePath);
+  };
 
   // Handle image download using the helper function
   const handleDownloadImage = async (filePath: string, index: number) => {
     try {
-      const fileName = downloadFileName || label
-      const formattedFileName = `[${index + 1}] - ${fileName}`
+      const fileName = downloadFileName || label;
+      const formattedFileName = `[${index + 1}] - ${fileName}`;
 
-      await downloadFileFromStream(filePath, formattedFileName)
+      await downloadFileFromStream(filePath, formattedFileName);
     } catch (error) {
       toast({
-        variant: 'destructive',
-        title: 'Download failed',
-        description: 'Unable to download the image. Please try again.',
-      })
-      console.error('Error downloading image:', error)
+        variant: "destructive",
+        title: "Download failed",
+        description: "Unable to download the image. Please try again.",
+      });
+      console.error("Error downloading image:", error);
     }
-  }
+  };
 
   return (
     <>
@@ -201,7 +219,10 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
                                 Download
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => handleDeleteFile(filePath)}
+                                onClick={() => {
+                                  setFileToDelete(filePath); // Set the file to be deleted
+                                  setIsDeleteConfirmationOpen(true); // Open the confirmation modal
+                                }}
                               >
                                 <Trash2 className="mr-2 w-5 h-5 text-red-600" />
                                 Delete
@@ -240,8 +261,31 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
           setSelectedImage={setPreviewImage} // Close modal function
         />
       )}
-    </>
-  )
-}
 
-export default MultipleFileUpload
+      {/* delete confirmation modal */}
+      {isDeleteConfirmationOpen && (
+        <Dialog
+          open={isDeleteConfirmationOpen}
+          onOpenChange={setIsDeleteConfirmationOpen}
+        >
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Confirm Deletion</DialogTitle>
+            </DialogHeader>
+            <p>Are you sure you want to delete this file?</p>
+            <DialogFooter>
+              <Button onClick={() => setIsDeleteConfirmationOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleDeleteFile} variant="destructive">
+                Confirm
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
+  );
+};
+
+export default MultipleFileUpload;
