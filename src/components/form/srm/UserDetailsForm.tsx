@@ -91,8 +91,7 @@ export default function SRMUserDetailsForm({
       }
 
       if (data) {
-        // actually delete the images from the db, if any
-        console.log("deleted multiple files", deletedFiles);
+
         await deleteMultipleFiles(deletedFiles);
       }
 
