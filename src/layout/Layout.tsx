@@ -8,7 +8,6 @@ import { load, remove, StorageKeys } from "@/utils/storage";
 import { DecodedRefreshToken } from "./ProtectedRoutes";
 import { jwtDecode } from "jwt-decode";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
-import ProtectedPage from "@/pages/general/ProtectedPage";
 import ApprovalStatusPage from "@/pages/general/ApprovalStatusPage";
 import ScrollToTop from "@/helpers/ScrollToTop";
 

@@ -1,45 +1,45 @@
-import { CircleArrowLeft } from 'lucide-react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { lazy, Suspense, useEffect, useState } from 'react'
-import LazyLoader from '@/components/loading-skelton/LazyLoader'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import FormSkelton from '@/components/loading-skelton/FormSkelton'
-import { getLevelsFilled, getPrimaryDetailsFormData } from '@/api/vehicle'
-import { mapGetPrimaryFormToPrimaryFormType } from '@/helpers/form'
-import { save, StorageKeys } from '@/utils/storage'
+import { CircleArrowLeft } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { lazy, Suspense, useEffect, useState } from "react";
+import LazyLoader from "@/components/loading-skelton/LazyLoader";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import FormSkelton from "@/components/loading-skelton/FormSkelton";
+import { getLevelsFilled, getPrimaryDetailsFormData } from "@/api/vehicle";
+import { mapGetPrimaryFormToPrimaryFormType } from "@/helpers/form";
+import { save, StorageKeys } from "@/utils/storage";
 
 // Lazy-loaded components
 const PrimaryDetailsForm = lazy(
-  () => import('@/components/form/main-form/PrimaryDetailsForm')
-)
+  () => import("@/components/form/main-form/PrimaryDetailsForm")
+);
 const SpecificationsForm = lazy(
-  () => import('@/components/form/main-form/SpecificationsForm')
-)
+  () => import("@/components/form/main-form/SpecificationsForm")
+);
 const FeaturesForm = lazy(
-  () => import('@/components/form/main-form/FeaturesForm')
-)
+  () => import("@/components/form/main-form/FeaturesForm")
+);
 
-type TabsTypes = 'primary' | 'specifications' | 'features'
+type TabsTypes = "primary" | "specifications" | "features";
 
 export default function VehiclesFormUpdatePage() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const { vehicleId } = useParams<{
-    vehicleId: string
-  }>()
-  const [activeTab, setActiveTab] = useState<TabsTypes>('primary')
+    vehicleId: string;
+  }>();
+  const [activeTab, setActiveTab] = useState<TabsTypes>("primary");
 
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
 
   const handleTabChange = (value: string) => {
-    setActiveTab(value as TabsTypes)
-  }
+    setActiveTab(value as TabsTypes);
+  };
 
   const { data, isLoading } = useQuery({
-    queryKey: ['primary-details-form', vehicleId],
+    queryKey: ["primary-details-form", vehicleId],
     queryFn: () => getPrimaryDetailsFormData(vehicleId as string),
     staleTime: 60000,
-  })
+  });
 
   // Fetch levelsFilled only if the type is "Update"
   const {
@@ -47,44 +47,46 @@ export default function VehiclesFormUpdatePage() {
     refetch: refetchLevels,
     isFetching: isLevelsFetching,
   } = useQuery({
-    queryKey: ['getLevelsFilled', vehicleId],
+    queryKey: ["getLevelsFilled", vehicleId],
     queryFn: () => getLevelsFilled(vehicleId as string),
     enabled: !!vehicleId,
-  })
+  });
 
   const levelsFilled = levelsData
     ? parseInt(levelsData.result.levelsFilled, 10)
-    : 1
+    : 1;
 
-  const isAddOrIncompleteSpecifications = levelsFilled < 2 // true if only level 1 is filled
-  const isAddOrIncompleteFeatures = levelsFilled < 3
+  const isAddOrIncompleteSpecifications = levelsFilled < 2; // true if only level 1 is filled
+  const isAddOrIncompleteFeatures = levelsFilled < 3;
 
-  const formData = data ? mapGetPrimaryFormToPrimaryFormType(data.result) : null
-  const countryCode = data?.result?.countryCode || ''
-  const vehicleCategoryId = data?.result?.vehicleCategoryId
-  const vehicleTypeId = data?.result?.vehicleTypeId
+  const formData = data
+    ? mapGetPrimaryFormToPrimaryFormType(data.result)
+    : null;
+  const countryCode = data?.result?.countryCode || "";
+  const vehicleCategoryId = data?.result?.vehicleCategoryId;
+  const vehicleTypeId = data?.result?.vehicleTypeId;
 
   // Store vehicleCategoryId in localStorage if levelsFilled < 3
   useEffect(() => {
     if (levelsFilled < 3 && vehicleCategoryId && vehicleTypeId) {
-      save(StorageKeys.CATEGORY_ID, vehicleCategoryId)
-      save(StorageKeys.VEHICLE_TYPE_ID, vehicleTypeId)
+      save(StorageKeys.CATEGORY_ID, vehicleCategoryId);
+      save(StorageKeys.VEHICLE_TYPE_ID, vehicleTypeId);
     }
-  }, [levelsFilled, vehicleCategoryId])
+  }, [levelsFilled, vehicleCategoryId]);
 
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ['getLevelsFilled', vehicleId],
+      queryKey: ["getLevelsFilled", vehicleId],
       queryFn: () => getLevelsFilled(vehicleId as string),
-    })
-  }, [vehicleId])
+    });
+  }, [vehicleId]);
 
   return (
-    <section className="container h-auto min-h-screen pb-10 bg-white">
-      <div className="mb-5 ml-5 flex-center w-fit gap-x-4">
+    <section className="container pb-10 h-auto min-h-screen bg-white">
+      <div className="gap-x-4 mb-5 ml-5 flex-center w-fit">
         <button
           onClick={() => navigate(-1)}
-          className="transition-colors border-none outline-none w-fit flex-center hover:text-yellow"
+          className="border-none transition-colors outline-none w-fit flex-center hover:text-yellow"
         >
           <CircleArrowLeft />
         </button>
@@ -97,7 +99,7 @@ export default function VehiclesFormUpdatePage() {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <TabsList className="bg-white flex-center gap-x-2">
+          <TabsList className="gap-x-2 bg-white flex-center">
             <TabsTrigger
               value="primary"
               className="h-9 max-sm:text-sm max-sm:px-2"
@@ -163,5 +165,5 @@ export default function VehiclesFormUpdatePage() {
         </Tabs>
       </div>
     </section>
-  )
+  );
 }

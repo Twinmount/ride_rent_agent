@@ -1,77 +1,77 @@
-import { useQuery } from '@tanstack/react-query'
-import { getCompany } from '@/api/company'
-import { getUser } from '@/api/user'
-import { load, StorageKeys } from '@/utils/storage'
-import { jwtDecode } from 'jwt-decode'
-import { DecodedRefreshToken } from '@/layout/ProtectedRoutes'
-import { CheckCheck, Files } from 'lucide-react'
-import { useState } from 'react'
-import LazyLoader from '@/components/loading-skelton/LazyLoader'
+import { useQuery } from "@tanstack/react-query";
+import { getCompany } from "@/api/company";
+import { getUser } from "@/api/user";
+import { load, StorageKeys } from "@/utils/storage";
+import { jwtDecode } from "jwt-decode";
+import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
+import { CheckCheck, Files } from "lucide-react";
+import { useState } from "react";
+import LazyLoader from "@/components/loading-skelton/LazyLoader";
 
 export default function RegistrationComplete() {
-  const [isCopied, setIsCopied] = useState(false)
+  const [isCopied, setIsCopied] = useState(false);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(
       () => {
-        setIsCopied(true)
+        setIsCopied(true);
         setTimeout(() => {
-          setIsCopied(false)
-        }, 3000)
+          setIsCopied(false);
+        }, 3000);
       },
       (err) => {
-        console.error('Could not copy text: ', err)
+        console.error("Could not copy text: ", err);
       }
-    )
-  }
+    );
+  };
 
-  const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN)
-  const { userId } = jwtDecode<DecodedRefreshToken>(refreshToken as string)
+  const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
+  const { userId } = jwtDecode<DecodedRefreshToken>(refreshToken as string);
 
   // Query to get company data
   const { data: companyData, isLoading: isCompanyLoading } = useQuery({
-    queryKey: ['company'],
+    queryKey: ["company"],
     queryFn: () => getCompany(userId),
-  })
+  });
 
   // Query to get user data
   const { data: agentData, isLoading: isAgentLoading } = useQuery({
-    queryKey: ['users'],
+    queryKey: ["users"],
     queryFn: getUser,
-  })
+  });
 
   if (isCompanyLoading || isAgentLoading) {
     return (
       <section className="w-full min-h-screen bg-white flex-center">
         <LazyLoader />
       </section>
-    )
+    );
   }
 
-  const profileData = companyData?.result
-  const userData = agentData?.result
+  const profileData = companyData?.result;
+  const userData = agentData?.result;
 
   if (!profileData) {
     return (
       <section className="min-h-screen flex-center">
         <p>No company data found.</p>
       </section>
-    )
+    );
   }
 
   return (
-    <section className="flex flex-col items-center justify-center h-screen p-4 bg-gray-100">
+    <section className="flex flex-col justify-center items-center p-4 h-screen bg-gray-100">
       <div className="relative">
         <h1 className="mb-8 text-3xl font-bold">Registration Complete</h1>
       </div>
 
-      <div className="flex flex-col w-full max-w-4xl overflow-hidden bg-white rounded-lg shadow-lg md:flex-row">
+      <div className="flex overflow-hidden flex-col w-full max-w-4xl bg-white rounded-lg shadow-lg md:flex-row">
         {/* Left */}
-        <div className="flex flex-col items-center justify-center p-6 md:w-1/2 bg-gray-50">
+        <div className="flex flex-col justify-center items-center p-6 bg-gray-50 md:w-1/2">
           <img
             src={profileData.companyLogo}
             alt="Company Logo"
-            className="object-cover w-32 h-32 mb-4 rounded-full"
+            className="object-cover mb-4 w-32 h-32 rounded-full"
           />
           <h2 className="text-2xl font-semibold">{profileData.companyName}</h2>
         </div>
@@ -104,7 +104,7 @@ export default function RegistrationComplete() {
             {profileData.agentId}
           </span>
           <button
-            className="h-6 px-2 text-base border-none rounded-lg outline-none flex-center text-yellow"
+            className="px-2 h-6 text-base rounded-lg border-none outline-none flex-center text-yellow"
             onClick={() => copyToClipboard(profileData.agentId)}
           >
             {isCopied ? <CheckCheck size={18} /> : <Files size={18} />}
@@ -117,11 +117,11 @@ export default function RegistrationComplete() {
         <p className="text-lg text-gray-700 md:px-10">
           Your company registration is completed and is currently waiting for
           approval from the admin.
-          <br /> You will be notified via{' '}
+          <br /> You will be notified via{" "}
           <span className="font-semibold text-green-500">WhatsApp</span> once
           the approval process is complete.
         </p>
       </div>
     </section>
-  )
+  );
 }
