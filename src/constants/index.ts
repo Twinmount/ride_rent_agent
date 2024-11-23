@@ -1,4 +1,10 @@
-import { CompanyFormType, PrimaryFormType } from "@/types/types";
+import {
+  CompanyFormType,
+  PrimaryFormType,
+  SRMPaymentDetailsFormType,
+  SRMUserDetailsFormType,
+  SRMVehicleDetailsFormType,
+} from "@/types/types";
 import {
   Box,
   LayoutDashboard,
@@ -120,9 +126,9 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
 };
 
 // srm user details form default values
-export const SRMUserDetailsFormDefaultValues = {
-  userProfile: "", // Optional field
-  userName: "", // Name of the user
+export const SRMUserDetailsFormDefaultValues: SRMUserDetailsFormType = {
+  customerProfile: "", // Optional field
+  customerName: "", // Name of the user
   nationality: "", // Nationality of the user
   passportNum: "", // Passport number
   drivingLicenseNum: "", // Driving license number
@@ -130,16 +136,16 @@ export const SRMUserDetailsFormDefaultValues = {
 };
 
 // srm vehicle details form default values
-export const SRMVehicleDetailsFormDefaultValues = {
+export const SRMVehicleDetailsFormDefaultValues: SRMVehicleDetailsFormType = {
   vehicleCategoryId: "",
   vehicleBrandId: "",
   vehicleRegistrationNumber: "",
-  startDateTime: new Date(),
-  endDateTime: new Date(),
+  bookingStartDate: new Date(),
+  bookingEndDate: new Date(),
 };
 
 // SRM payment details form default values
-export const SRMPaymentDetailsFormDefaultValues = {
+export const SRMPaymentDetailsFormDefaultValues: SRMPaymentDetailsFormType = {
   currency: "", // Default empty string for currency
   advanceAmount: "", // Default empty string for advance amount
   remainingAmount: "", // Default empty string for remaining amount

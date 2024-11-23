@@ -4,38 +4,12 @@ import {
   AddPaymentFormResponse,
   AddUserFormResponse,
   AddVehicleFormResponse,
-} from "@/types/srm-types";
-
-// rental details sub type
-export type RentalDetailType = {
-  enabled: boolean;
-  rentInAED?: string;
-  mileageLimit?: string;
-};
-export type SRMUserDetailsFormType = {
-  userProfile?: string; // Optional field for profile photo or identifier
-  userName: string; // User name
-  nationality: string; // Nationality of the user
-  passportNum: string; // Passport number
-  drivingLicenseNum: string; // Driving license number
-  phoneNumber: string; // Mobile number of the user
-};
-
-// Define the vehicle details form type
-export type SRMVehicleDetailsFormType = {
-  vehicleCategoryId: string; // Vehicle category ID
-  vehicleBrandId: string; // Vehicle brand ID
-  vehicleRegistrationNumber: string; // Registration number, max 15 characters
-  bookingStartDate: Date; // Start date of booking
-  bookingEndDate: Date; // End date of booking
-};
-
-// Define the payment details form type
-export type SRMPaymentDetailsFormType = {
-  currency: string; // Currency code, e.g., USD, AED
-  advanceAmount: string; // Advance payment amount as a string
-  remainingAmount: string; // Remaining payment amount as a string
-};
+} from "@/types/srm-api-types";
+import {
+  SRMPaymentDetailsFormType,
+  SRMUserDetailsFormType,
+  SRMVehicleDetailsFormType,
+} from "@/types/types";
 
 export const addUserDetailsForm = async (
   values: SRMUserDetailsFormType,
@@ -50,12 +24,12 @@ export const addUserDetailsForm = async (
     // Prepare the request body for the API
     const requestBody = {
       countryCode,
-      userName: values.userName,
+      customerName: values.customerName,
       nationality: values.nationality,
       passportNum: values.passportNum,
       drivingLicenseNum: values.drivingLicenseNum,
       phoneNumber,
-      userProfile: values.userProfile || null, // Optional field for user profile, default to null if not provided
+      customerProfile: values.customerProfile || null, // Optional field for user profile, default to null if not provided
     };
 
     // Sending the request as a JSON object
@@ -94,12 +68,12 @@ export const updateUserDetailsForm = async (
     // Prepare the request body for the API
     const requestBody = {
       countryCode,
-      userName: values.userName,
+      customerName: values.customerName,
       nationality: values.nationality,
       passportNum: values.passportNum,
       drivingLicenseNum: values.drivingLicenseNum,
       phoneNumber,
-      userProfile: values.userProfile || null, // Optional field for user profile, default to null if not provided
+      customerProfile: values.customerProfile || null, // Optional field for user profile, default to null if not provided
     };
 
     // Sending the request as a JSON object

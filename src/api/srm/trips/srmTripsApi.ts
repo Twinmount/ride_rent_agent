@@ -1,0 +1,157 @@
+import { Slug } from "@/api/Api-Endpoints";
+import { API } from "@/api/ApiService";
+import {
+  FetchActiveTripsResponse,
+  FetchCompletedTripsResponse,
+  FetchCustomerListResponse,
+  FetchVehicleListResponse,
+} from "@/types/srm-api-types";
+
+export interface CompletedTripDetails {
+  tripId: string;
+  brandName: string;
+  customerName: string;
+  nationality: string;
+  passportNumber: string;
+  licenseNumber: string;
+  amountPaid: number;
+  amountPending: number;
+  customerStatus: "Banned" | "Active";
+}
+
+export const fetchActiveTrips = async (urlParams: {
+  page: number;
+  limit: number;
+  sortOrder: string;
+  search?: string;
+}): Promise<FetchActiveTripsResponse> => {
+  try {
+    // generating query params
+    const queryParams = new URLSearchParams({
+      page: urlParams.page.toString(),
+      limit: urlParams.limit.toString(),
+      sortOrder: urlParams.sortOrder,
+    });
+
+    if (urlParams.search) {
+      queryParams.append("search", urlParams.search);
+    }
+
+    const slugWithParams = `${Slug.GET_SRM_ACTIVE_TRIPS}?${queryParams}`;
+
+    const data = await API.get<FetchActiveTripsResponse>({
+      slug: slugWithParams,
+    });
+
+    if (!data) {
+      throw new Error("Failed to fetch vehicles data");
+    }
+    return data;
+  } catch (error) {
+    console.error("Error fetching vehicles:", error);
+    throw error;
+  }
+};
+
+export const endTrip = async ({ tripId }: { tripId: string }) => {
+  try {
+    const data = await API.put({
+      slug: Slug.PUT_SRM_END_ACTIVE_TRIP,
+      body: {
+        tripId,
+      },
+    });
+
+    return data;
+  } catch (error) {
+    console.error("Error ending trip", error);
+    throw error;
+  }
+};
+
+export const fetchCompletedTrips = async (urlParams: {
+  page: number;
+  limit: number;
+  sortOrder: string;
+}): Promise<FetchCompletedTripsResponse> => {
+  const queryParams = new URLSearchParams({
+    page: urlParams.page.toString(),
+    limit: urlParams.limit.toString(),
+    sortOrder: urlParams.sortOrder,
+  });
+
+  const slugWithParams = `/completedTrips?${queryParams}`;
+
+  const data = await API.get<FetchCompletedTripsResponse>({
+    slug: slugWithParams,
+  });
+  if (!data) throw new Error("Failed to fetch completed trips");
+  return data;
+};
+
+export const updateCompletedTrip = async (
+  tripDetails: CompletedTripDetails
+) => {
+  const slug = `/completedTrips/${tripDetails.tripId}`;
+  await API.put({ slug, body: tripDetails });
+};
+
+export const downloadCompletedTrip = async ({ tripId }: { tripId: string }) => {
+  const slug = `/completedTrips/download/${tripId}`;
+  const response = await API.get({ slug });
+  if (!response) throw new Error("Failed to download trip");
+  return response;
+};
+
+// Vehicle list table api
+export const fetchVehicleList = async (urlParams: {
+  page: number;
+  limit: number;
+  sortOrder: string;
+}): Promise<FetchVehicleListResponse> => {
+  try {
+    const queryParams = new URLSearchParams({
+      page: urlParams.page.toString(),
+      limit: urlParams.limit.toString(),
+      sortOrder: urlParams.sortOrder,
+    });
+
+    const slugWithParams = `/vehicleList?${queryParams}`;
+
+    const data = await API.get<FetchVehicleListResponse>({
+      slug: slugWithParams,
+    });
+    if (!data) throw new Error("Failed to fetch vehicle list");
+    return data;
+  } catch (error) {
+    console.error("Error fetching vehicle list:", error);
+    throw error;
+  }
+};
+
+// customer list api
+
+export const fetchCustomerList = async (urlParams: {
+  page: number;
+  limit: number;
+  sortOrder: string;
+}): Promise<FetchCustomerListResponse> => {
+  try {
+    const queryParams = new URLSearchParams({
+      page: urlParams.page.toString(),
+      limit: urlParams.limit.toString(),
+      sortOrder: urlParams.sortOrder,
+    });
+
+    const slugWithParams = `/customerList?${queryParams}`;
+
+    const data = await API.get<FetchCustomerListResponse>({
+      slug: slugWithParams,
+    });
+    if (!data) throw new Error("Failed to fetch customer list");
+    return data;
+  } catch (error) {
+    console.error("Error fetching customer list:", error);
+    throw error;
+  }
+};

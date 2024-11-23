@@ -96,24 +96,35 @@ export type ApprovalStatusTypes =
   | "UNDER_REVIEW";
 
 export type SRMUserDetailsFormType = {
-  userProfile?: string; // Optional field for profile photo or identifier
-  userName: string; // User name
+  customerProfile?: string; // Optional field for profile photo or identifier
+  customerName: string; // User name
   nationality: string; // Nationality of the user
   passportNum: string; // Passport number of the user
   drivingLicenseNum: string; // Driving license number of the user
   phoneNumber: string; // Mobile number of the user
 };
 
+// VehicleDetailsFormType  (level 2)
 export type SRMVehicleDetailsFormType = {
   vehicleCategoryId: string;
   vehicleBrandId: string;
   vehicleRegistrationNumber: string;
-  startDateTime: Date;
-  endDateTime: Date;
+  bookingStartDate: Date;
+  bookingEndDate: Date;
 };
 
+// PaymentDetailsFormType (level 3)
 export type SRMPaymentDetailsFormType = {
   currency: string;
-  advancePaid: string;
+  advanceAmount: string;
   remainingAmount: string;
 };
+
+export enum CustomerStatus {
+  SUCCESSFUL = "Successfully Completed Trip",
+  PAYMENT_PENDING = "Payment Pending",
+  UNPAID_FINES = "Unpaid Fines",
+  DAMAGE_UNCLEARED = "Vehicle Damage Reported/Uncleared",
+  DAMAGE_CLEARED = "Vehicle Damage Reported/Cleared",
+  VEHICLE_LOST = "Vehicle Lost",
+}

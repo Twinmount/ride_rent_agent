@@ -73,6 +73,13 @@ export default function CompanyRegistrationForm({
   );
   const { userId } = decodedRefreshToken;
 
+  useEffect(() => {
+    const isVerified = sessionStorage.getItem("isOtpVerified");
+    if (isVerified === "true") {
+      setIsOtpVerified(true);
+    }
+  }, []);
+
   // creating form
   const form = useForm<z.infer<typeof CompanyFormSchema>>({
     resolver: zodResolver(CompanyFormSchema),
@@ -102,6 +109,7 @@ export default function CompanyRegistrationForm({
     mutationFn: (variables: { otp: string }) => verifyOtp(variables.otp),
     onSuccess: () => {
       setIsOtpVerified(true);
+      sessionStorage.setItem("isOtpVerified", "true");
       setOtp(""); // Clear the OTP field
       toast({
         title: "OTP verified successfully",

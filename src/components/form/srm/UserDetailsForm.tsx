@@ -91,7 +91,6 @@ export default function SRMUserDetailsForm({
       }
 
       if (data) {
-
         await deleteMultipleFiles(deletedFiles);
       }
 
@@ -138,11 +137,11 @@ export default function SRMUserDetailsForm({
           {/* user name */}
           <FormField
             control={form.control}
-            name="userName"
+            name="customerName"
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
-                  User Name <span className="mr-5 max-sm:hidden">:</span>
+                  Customer Name <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
 
                 <div className="flex-col items-start w-full">
@@ -151,11 +150,11 @@ export default function SRMUserDetailsForm({
                       onChangeHandler={(value) => {
                         field.onChange(value);
                       }}
-                      value={initialValues.userName}
+                      value={initialValues.customerName}
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    select user name
+                    Provide customer name.
                   </FormDescription>
                   <FormMessage />
                 </div>
@@ -166,13 +165,13 @@ export default function SRMUserDetailsForm({
           {/* user profile */}
           <FormField
             control={form.control}
-            name="userProfile"
+            name="customerProfile"
             render={({ field }) => (
               <SingleFileUpload
                 name={field.name}
-                label="User Profile (optional)"
-                description="User profile can have a maximum size of 5MB."
-                existingFile={formData?.userProfile}
+                label="Customer Profile (optional)"
+                description="Customer profile can have a maximum size of 5MB."
+                existingFile={formData?.customerProfile}
                 maxSizeMB={5}
                 setIsFileUploading={setIsFileUploading}
                 bucketFilePath={GcsFilePaths.LOGOS}

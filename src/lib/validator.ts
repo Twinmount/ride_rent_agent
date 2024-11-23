@@ -108,8 +108,8 @@ export const PrimaryFormSchema = z.object({
 
 // SRM : User Details Form Schema
 export const SRMUserDetailsFormSchema = z.object({
-  userProfile: z.string().optional(),
-  userName: z.string().min(1, "User name is required"),
+  customerProfile: z.string().optional(),
+  customerName: z.string().min(1, "User name is required"),
   nationality: z.string().min(1, "Nationality is required"),
   passportNum: z.string().min(1, "Passport number is required"),
   drivingLicenseNum: z.string().min(1, "Driving license number is required"),

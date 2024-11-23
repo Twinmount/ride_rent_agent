@@ -77,4 +77,8 @@ export enum Slug {
   POST_SRM_PAYMENT_FORM = "/vehicle/level-three",
   PUT_SRM_PAYMENT_FORM = "/vehicle/level-three",
   GET_SRM_PAYMENT_FORM = "/vehicle/level-three",
+
+  // SRM TRIPS
+  GET_SRM_ACTIVE_TRIPS = "/trips/active",
+  PUT_SRM_END_ACTIVE_TRIP = "/trips/end",
 }
