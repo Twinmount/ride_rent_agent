@@ -61,47 +61,67 @@ const HourlyRentalDetailTypeSchema = z.object({
 });
 
 // Primary Form Schema
-export const PrimaryFormSchema = z.object({
-  vehicleCategoryId: z.string().min(1, "Category is required"),
-  vehicleTypeId: z.string().min(1, "Type is required"),
-  vehicleBrandId: z.string().min(1, "Brand is required"),
-  vehicleModel: z.string().min(1, "Model is required"),
-  vehicleRegistrationNumber: z
-    .string()
-    .min(1, "Vehicle registration number is required")
-    .max(15, "Vehicle registration number cannot exceed 15 characters"),
-  vehicleRegisteredYear: z.string().min(1, "Registered Year is required"),
-  vehiclePhotos: z
-    .array(z.string().min(1, "vehicle photo is required"))
-    .min(1, "At least one vehicle photo is required"),
-  commercialLicenses: z
-    .array(z.string().min(1, "Commercial license photo is required"))
-    .length(2, "Exactly two commercial license images are required"),
-  commercialLicenseExpireDate: z.date(),
-  isLease: z.boolean().default(false),
-  isCryptoAccepted: z.boolean().default(false),
-  isSpotDeliverySupported: z.boolean().default(false),
-  specification: z
-    .enum(["USA_SPEC", "UAE_SPEC", "OTHERS"], {
-      required_error: "Specification is required",
-    })
-    .default("UAE_SPEC"),
-  rentalDetails: z.object({
-    day: RentalDetailTypeSchema,
-    week: RentalDetailTypeSchema,
-    month: RentalDetailTypeSchema,
-    hour: HourlyRentalDetailTypeSchema,
-  }),
-  phoneNumber: z.string().min(6, "Provide a valid mobile number"),
-  stateId: z.string().min(1, "State  is required"),
-  cityIds: z
-    .array(z.string().min(1, "City ID is required"))
-    .min(1, "At least one city must be selected"),
-  additionalVehicleTypes: z.array(z.string()).optional(),
-  securityDeposit: z.object({
-    enabled: z.boolean().default(false),
-    amountInAED: z.string().optional().default(""),
-  }),
-  isCreditOrDebitCardsSupported: z.boolean().default(false),
-  isTabbySupported: z.boolean().default(false),
-});
+export const PrimaryFormSchema = z
+  .object({
+    vehicleCategoryId: z.string().min(1, "Category is required"),
+    vehicleTypeId: z.string().min(1, "Type is required"),
+    vehicleBrandId: z.string().min(1, "Brand is required"),
+    vehicleModel: z.string().min(1, "Model is required"),
+    vehicleRegistrationNumber: z
+      .string()
+      .min(1, "Vehicle registration number is required")
+      .max(15, "Vehicle registration number cannot exceed 15 characters"),
+    vehicleRegisteredYear: z.string().min(1, "Registered Year is required"),
+    vehiclePhotos: z
+      .array(z.string().min(1, "vehicle photo is required"))
+      .min(1, "At least one vehicle photo is required"),
+    commercialLicenses: z.array(z.string().optional()),
+    commercialLicenseExpireDate: z.date(),
+    isLease: z.boolean().default(false),
+    isCryptoAccepted: z.boolean().default(false),
+    isSpotDeliverySupported: z.boolean().default(false),
+    specification: z
+      .enum(["USA_SPEC", "UAE_SPEC", "OTHERS"], {
+        required_error: "Specification is required",
+      })
+      .default("UAE_SPEC"),
+    rentalDetails: z.object({
+      day: RentalDetailTypeSchema,
+      week: RentalDetailTypeSchema,
+      month: RentalDetailTypeSchema,
+      hour: HourlyRentalDetailTypeSchema,
+    }),
+    phoneNumber: z.string().min(6, "Provide a valid mobile number"),
+    stateId: z.string().min(1, "State  is required"),
+    cityIds: z
+      .array(z.string().min(1, "City ID is required"))
+      .min(1, "At least one city must be selected"),
+    additionalVehicleTypes: z.array(z.string()).optional(),
+    securityDeposit: z.object({
+      enabled: z.boolean().default(false),
+      amountInAED: z.string().optional().default(""),
+    }),
+    isCreditOrDebitCardsSupported: z.boolean().default(false),
+    isTabbySupported: z.boolean().default(false),
+  })
+  .refine(
+    (data) => {
+      const categoriesExemptFromLicenses = [
+        "0ad5ac71-5f8f-43c3-952f-a325e362ad87", // Bicycles
+        "b21e0a75-37bc-430b-be3a-c8c0939ef3ec", // Buggies
+      ];
+
+      // If the category is Bicycles or Buggies, commercialLicenses can be skipped
+      if (categoriesExemptFromLicenses.includes(data.vehicleCategoryId)) {
+        return true;
+      }
+
+      // For other categories, ensure exactly 2 commercialLicenses are provided
+      return data.commercialLicenses?.length === 2;
+    },
+    {
+      message:
+        "Commercial License is  required and must contain both front and back of the document",
+      path: ["commercialLicenses"], // Attach error to the correct field
+    }
+  );

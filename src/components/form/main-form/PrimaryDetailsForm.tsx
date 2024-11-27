@@ -66,6 +66,7 @@ export default function PrimaryDetailsForm({
   const [isLicenseUploading, setIsLicenseUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
   const [isCarsCategory, setIsCarsCategory] = useState(false);
+  const [hideCommercialLicenses, setHideCommercialLicenses] = useState(false);
 
   const { vehicleId, userId } = useParams<{
     vehicleId: string;
@@ -193,6 +194,15 @@ export default function PrimaryDetailsForm({
     }
   }, [form.formState.errors]);
 
+  const vehicleCategoryId = form.watch("vehicleCategoryId");
+
+  // boolean to check whether custom label should show or not
+  const isCustomCommercialLicenseLabel = [
+    "ff31e5e3-9879-464f-a0dd-97ead07a9f67", // Yachts
+    "dd7b3369-688c-471a-b2dc-585d60a757f2", // Leisure Boats
+    "3f249138-f0ee-48f2-bc70-db5dcf20f0f3", // Charters
+  ].includes(vehicleCategoryId);
+
   return (
     <Form {...form}>
       <form
@@ -217,9 +227,20 @@ export default function PrimaryDetailsForm({
                         field.onChange(value);
                         form.setValue("vehicleTypeId", "");
                         form.setValue("vehicleBrandId", "");
+
+                        // Reset `commercialLicenses` if the category is bicycles or buggies
+                        if (
+                          [
+                            "b21e0a75-37bc-430b-be3a-c8c0939ef3ec", //buggies
+                            "0ad5ac71-5f8f-43c3-952f-a325e362ad87", //bicycles
+                          ].includes(value)
+                        ) {
+                          form.setValue("commercialLicenses", []);
+                        }
                       }}
                       value={initialValues.vehicleCategoryId}
                       setIsCarsCategory={setIsCarsCategory}
+                      setHideCommercialLicenses={setHideCommercialLicenses}
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
@@ -418,34 +439,44 @@ export default function PrimaryDetailsForm({
           />
 
           {/* Mulkia */}
-          <FormField
-            control={form.control}
-            name="commercialLicenses"
-            render={() => (
-              <MultipleFileUpload
-                name="commercialLicenses"
-                label="Registration Card / Mulkia"
-                existingFiles={initialValues.commercialLicenses || []}
-                description={
-                  <>
-                    Upload <span className="font-bold text-yellow">front</span>{" "}
-                    & <span className="font-bold text-yellow">back</span> images
-                    of the Registration Card / Mulkia
-                  </>
-                }
-                maxSizeMB={15}
-                setIsFileUploading={setIsLicenseUploading}
-                bucketFilePath={GcsFilePaths.COMMERCIAL_LICENSES}
-                isFileUploading={isLicenseUploading}
-                downloadFileName={
-                  formData?.vehicleModel
-                    ? `[commercial-license] - ${formData.vehicleModel}`
-                    : "[commercial-license]"
-                }
-                setDeletedFiles={setDeletedFiles}
-              />
-            )}
-          />
+          {!hideCommercialLicenses && (
+            <FormField
+              control={form.control}
+              name="commercialLicenses"
+              render={() => (
+                <MultipleFileUpload
+                  name="commercialLicenses"
+                  label={
+                    isCustomCommercialLicenseLabel
+                      ? "Registration Card / Certificate"
+                      : "Registration Card / Mulkia"
+                  }
+                  existingFiles={initialValues.commercialLicenses || []}
+                  description={
+                    <>
+                      Upload{" "}
+                      <span className="font-bold text-yellow">front</span> &{" "}
+                      <span className="font-bold text-yellow">back</span> images
+                      of the Registration Card /{" "}
+                      {isCustomCommercialLicenseLabel
+                        ? "Certificate"
+                        : "Mulkia"}
+                    </>
+                  }
+                  maxSizeMB={15}
+                  setIsFileUploading={setIsLicenseUploading}
+                  bucketFilePath={GcsFilePaths.COMMERCIAL_LICENSES}
+                  isFileUploading={isLicenseUploading}
+                  downloadFileName={
+                    formData?.vehicleModel
+                      ? `[commercial-license] - ${formData.vehicleModel}`
+                      : "[commercial-license]"
+                  }
+                  setDeletedFiles={setDeletedFiles}
+                />
+              )}
+            />
+          )}
 
           {/* Mulkia Expiry */}
           <FormField
