@@ -55,9 +55,9 @@ const ListingsPage = lazy(() => import("./pages/listings/ListingsPage"));
 const ProfilePage = lazy(() => import("./pages/profile/ProfilePage"));
 
 // yet to lazy load
-import SRMDashboard from "./pages/srm/SRM";
+import SRMDashboard from "./pages/srm/SRMDashboard";
 import SRMDataAddPage from "./pages/srm/SRMFormAddPage";
-import ActiveTripsPage from "./pages/srm/trip-data/ActiveTripsPage";
+import OngoingTripsPage from "./pages/srm/trip-data/ActiveTripsPage";
 import CompletedTripsPage from "./pages/srm/trip-data/CompletedTripsPage";
 import VehicleListPage from "./pages/srm/trip-data/VehicleListPage";
 import CustomerListPage from "./pages/srm/trip-data/CustomerListPage";
@@ -120,11 +120,11 @@ const router = createBrowserRouter([
                 element: <VehiclesFormUpdatePage />,
               },
               {
-                path: "/srm",
+                path: "/srm/intro",
                 element: <SRMIntroduction />,
               },
               {
-                path: "/srm/dashboard",
+                path: "/srm",
                 element: <SRMDashboard />,
               },
               {
@@ -136,8 +136,8 @@ const router = createBrowserRouter([
                 element: <SRMDataAddPage />,
               },
               {
-                path: "/srm/active-trips",
-                element: <ActiveTripsPage />,
+                path: "/srm/ongoing-trips",
+                element: <OngoingTripsPage />,
               },
               {
                 path: "/srm/completed-trips",

@@ -44,7 +44,7 @@ export interface AddPaymentFormResponse {
 }
 
 // active trips
-interface ActiveTrip {
+interface OngoingTrip {
   tripId: string;
   brandName: string;
   customerName: string;
@@ -52,9 +52,9 @@ interface ActiveTrip {
   bookingEndDate: string;
 }
 
-export interface FetchActiveTripsResponse {
+export interface FetchOngoingTripsResponse {
   result: {
-    list: ActiveTrip[];
+    list: OngoingTrip[];
     page: number;
     limit: number;
     total: number;

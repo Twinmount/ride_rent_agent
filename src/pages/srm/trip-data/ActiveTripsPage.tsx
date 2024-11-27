@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
-import { ActiveTripsTable } from "@/components/table/ActiveTripsTable";
-import { ActiveTripsColumns } from "@/components/table/columns/ActiveTripsColumn";
+import { OngoingTripsTable } from "@/components/table/OngoingTrips";
+import { OngoingTripsColumns } from "@/components/table/columns/OngoingTripsColumn";
 
 import { toast } from "@/components/ui/use-toast";
 import { SortDropdown } from "@/components/SortDropdown";
 import { LimitDropdown } from "@/components/LimitDropdown";
 import TripEndModal from "@/components/modal/srm-modal/TripEndModal";
-import { endTrip, fetchActiveTrips } from "@/api/srm/trips";
+import { endTrip, fetchOngoingTrips } from "@/api/srm/trips";
 import { CustomerStatus } from "@/types/types"; // Import the enum
 
 interface Trip {
@@ -19,7 +19,7 @@ interface Trip {
   amountRemaining: number;
 }
 
-export default function ActiveTripsPage() {
+export default function OngoingTripsPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState<10 | 15 | 20 | 30>(10);
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
@@ -30,7 +30,7 @@ export default function ActiveTripsPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["activeTrips", page, limit],
     queryFn: () =>
-      fetchActiveTrips({
+      fetchOngoingTrips({
         page,
         limit,
         sortOrder,
@@ -86,7 +86,7 @@ export default function ActiveTripsPage() {
   return (
     <section className="container py-5 mx-auto min-h-screen md:py-7">
       <h1 className="text-center h3-bold max-sm:text-xl sm:text-left">
-        Active Trips
+        Ongoing Trips
       </h1>
       <div className="flex gap-x-2 justify-end mb-4 w-full max-sm:mt-3">
         <SortDropdown
@@ -101,8 +101,8 @@ export default function ActiveTripsPage() {
         />
       </div>
 
-      <ActiveTripsTable
-        columns={ActiveTripsColumns(handleOpenModal)}
+      <OngoingTripsTable
+        columns={OngoingTripsColumns(handleOpenModal)}
         data={data?.result?.list || []}
         loading={isLoading}
       />

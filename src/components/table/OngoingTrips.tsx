@@ -18,17 +18,17 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 
-interface ActiveTripsTableProps {
+interface OngoingTripsTableProps {
   columns: ColumnDef<any>[]; // Replace `any` with your trip type if available
   data: any[]; // Replace `any` with your trip type
   loading: boolean;
 }
 
-export function ActiveTripsTable({
+export function OngoingTripsTable({
   columns,
   data,
   loading,
-}: ActiveTripsTableProps) {
+}: OngoingTripsTableProps) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({
@@ -45,7 +45,7 @@ export function ActiveTripsTable({
 
   return (
     <div>
-      <div className="bg-white border rounded-md">
+      <div className="bg-white rounded-md border">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

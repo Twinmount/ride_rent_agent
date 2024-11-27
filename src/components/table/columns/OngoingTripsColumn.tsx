@@ -1,7 +1,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 
-export const ActiveTripsColumns = (
+export const OngoingTripsColumns = (
   handleOpenModal: (trip: any) => void // Replace `any` with your trip type
 ): ColumnDef<any>[] => [
   {

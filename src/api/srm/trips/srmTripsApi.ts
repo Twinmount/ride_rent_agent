@@ -1,7 +1,7 @@
 import { Slug } from "@/api/Api-Endpoints";
 import { API } from "@/api/ApiService";
 import {
-  FetchActiveTripsResponse,
+  FetchOngoingTripsResponse,
   FetchCompletedTripsResponse,
   FetchCustomerListResponse,
   FetchVehicleListResponse,
@@ -19,12 +19,12 @@ export interface CompletedTripDetails {
   customerStatus: "Banned" | "Active";
 }
 
-export const fetchActiveTrips = async (urlParams: {
+export const fetchOngoingTrips = async (urlParams: {
   page: number;
   limit: number;
   sortOrder: string;
   search?: string;
-}): Promise<FetchActiveTripsResponse> => {
+}): Promise<FetchOngoingTripsResponse> => {
   try {
     // generating query params
     const queryParams = new URLSearchParams({
@@ -39,7 +39,7 @@ export const fetchActiveTrips = async (urlParams: {
 
     const slugWithParams = `${Slug.GET_SRM_ACTIVE_TRIPS}?${queryParams}`;
 
-    const data = await API.get<FetchActiveTripsResponse>({
+    const data = await API.get<FetchOngoingTripsResponse>({
       slug: slugWithParams,
     });
 
