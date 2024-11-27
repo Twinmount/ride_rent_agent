@@ -7,9 +7,9 @@ import { validateSRMTabAccess } from "@/helpers/form";
 import { SRMTabsTypes } from "@/types/types";
 import { toast } from "@/components/ui/use-toast";
 
-// Lazy-loaded components
+// Lazy-loaded form components
 const SRMUserDetailsForm = lazy(
-  () => import("@/components/form/srm/UserDetailsForm")
+  () => import("@/components/form/srm/CustomerDetailsForm")
 );
 const SRMVehicleDetailsForm = lazy(
   () => import("@/components/form/srm/VehicleDetailsForm")
@@ -71,24 +71,33 @@ export default function SRMDataAddPage() {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <TabsList className="gap-x-2 w-full bg-white flex-center">
+          <TabsList className="gap-x-2 w-full bg-white flex-center max-sm:gap-x-4">
             <TabsTrigger
-              value="user"
-              className="h-9 max-sm:text-sm max-sm:px-2"
+              value="customer"
+              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
             >
-              User
+              Customer
+              <span className="text-xs">details</span>
             </TabsTrigger>
 
-            <TabsTrigger value="vehicle" className="max-sm:px-2">
+            <TabsTrigger
+              value="vehicle"
+              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
+            >
               Vehicle
+              <span className="text-xs">details</span>
             </TabsTrigger>
 
-            <TabsTrigger value="payment" className="max-sm:px-2">
+            <TabsTrigger
+              value="payment"
+              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
+            >
               Payment
+              <span className="text-xs">details</span>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="user" className="flex-center">
+          <TabsContent value="customer" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
               <SRMUserDetailsForm
                 type="Add"
@@ -96,6 +105,7 @@ export default function SRMDataAddPage() {
               />
             </Suspense>
           </TabsContent>
+
           <TabsContent value="vehicle" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
               <SRMVehicleDetailsForm
@@ -105,6 +115,7 @@ export default function SRMDataAddPage() {
               />
             </Suspense>
           </TabsContent>
+
           <TabsContent value="payment" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
               <SRMPaymentDetailsForm type={"Add"} isAddOrIncomplete={true} />

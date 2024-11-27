@@ -126,10 +126,25 @@ export const PrimaryFormSchema = z
     }
   );
 
-// SRM : User Details Form Schema
-export const SRMUserDetailsFormSchema = z.object({
+// RentalDetailType Schema for day, week, and month rentals )
+const SRMRentalDetailTypeSchema = z.object({
+  enabled: z.boolean().default(false),
+  rentInAED: z.string().optional().default(""),
+  mileageLimit: z.string().optional().default(""),
+});
+
+// HourlyRentalDetailType Schema with minBookingHours
+const SRMHourlyRentalDetailTypeSchema = z.object({
+  enabled: z.boolean().default(false),
+  rentInAED: z.string().optional().default(""),
+  mileageLimit: z.string().optional().default(""),
+  minBookingHours: z.string().optional().default(""), // Only for hourly rentals
+});
+
+// SRM : Customer Details Form Schema
+export const SRMCustomerDetailsFormSchema = z.object({
   customerProfile: z.string().optional(),
-  customerName: z.string().min(1, "User name is required"),
+  customerName: z.string().min(1, "Customer name is required"),
   nationality: z.string().min(1, "Nationality is required"),
   passportNum: z.string().min(1, "Passport number is required"),
   drivingLicenseNum: z.string().min(1, "Driving license number is required"),
@@ -146,6 +161,12 @@ export const SRMVehicleDetailsFormSchema = z.object({
     .max(15, "Vehicle registration number cannot exceed 15 characters"),
   bookingStartDate: z.date(),
   bookingEndDate: z.date(),
+  rentalDetails: z.object({
+    day: SRMRentalDetailTypeSchema,
+    week: SRMRentalDetailTypeSchema,
+    month: SRMRentalDetailTypeSchema,
+    hour: SRMHourlyRentalDetailTypeSchema,
+  }),
 });
 
 // SRM : User Details Form Schema
@@ -153,4 +174,10 @@ export const SRMPaymentDetailsFormSchema = z.object({
   currency: z.string().min(1, "Currency is required"),
   advanceAmount: z.string().min(1, "Advance amount is required"),
   remainingAmount: z.string().min(1, "Remaining amount is required"),
+  securityDeposit: z.object({
+    enabled: z.boolean().default(false),
+    amountInAED: z.string().optional().default(""),
+  }),
+  bookingStartDate: z.date(),
+  bookingEndDate: z.date(),
 });

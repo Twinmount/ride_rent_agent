@@ -15,55 +15,60 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { SRMUserDetailsFormDefaultValues } from "@/constants";
-import { SRMUserDetailsFormSchema } from "@/lib/validator";
-import { SRMUserDetailsFormType } from "@/types/types";
+import { SRMCustomerDetailsFormDefaultValues } from "@/constants";
+import { SRMCustomerDetailsFormSchema } from "@/lib/validator";
+import { SRMCustomerDetailsFormType } from "@/types/types";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { deleteMultipleFiles } from "@/helpers/form";
-import CategoryDropdown from "../dropdowns/CategoryDropdown";
 import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
 import { useParams } from "react-router-dom";
 import { GcsFilePaths } from "@/constants/enum";
 import SingleFileUpload from "../file-uploads/SingleFileUpload";
 import {
-  addUserDetailsForm,
-  updateUserDetailsForm,
+  addCustomerDetailsForm,
+  updateCustomerDetailsForm,
 } from "@/api/srm/srmFormApi";
 
-type SRMUserDetailsFormProps = {
+type SRMCustomerDetailsFormProps = {
   type: "Add" | "Update";
-  formData?: SRMUserDetailsFormType | null;
+  formData?: SRMCustomerDetailsFormType | null;
   onNextTab?: () => void;
   initialCountryCode?: string;
 };
 
-export default function SRMUserDetailsForm({
+export default function SRMCustomerDetailsForm({
   type,
   onNextTab,
   formData,
   initialCountryCode,
-}: SRMUserDetailsFormProps) {
+}: SRMCustomerDetailsFormProps) {
   const [countryCode, setCountryCode] = useState<string>("");
   const [isFileUploading, setIsFileUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>(""); // Search input value
+  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
 
   const {} = useParams<{}>();
 
   // Call the useLoadingMessages hook to manage loading messages
 
   const initialValues =
-    formData && type === "Update" ? formData : SRMUserDetailsFormDefaultValues;
+    formData && type === "Update"
+      ? formData
+      : SRMCustomerDetailsFormDefaultValues;
 
   // Define your form.
-  const form = useForm<z.infer<typeof SRMUserDetailsFormSchema>>({
-    resolver: zodResolver(SRMUserDetailsFormSchema),
-    defaultValues: initialValues as SRMUserDetailsFormType,
+  const form = useForm<z.infer<typeof SRMCustomerDetailsFormSchema>>({
+    resolver: zodResolver(SRMCustomerDetailsFormSchema),
+    defaultValues: initialValues as SRMCustomerDetailsFormType,
   });
 
   // Define a submit handler.
-  async function onSubmit(values: z.infer<typeof SRMUserDetailsFormSchema>) {
+  async function onSubmit(
+    values: z.infer<typeof SRMCustomerDetailsFormSchema>
+  ) {
     if (isFileUploading) {
       toast({
         title: "File Upload in Progress",
@@ -79,13 +84,13 @@ export default function SRMUserDetailsForm({
     try {
       let data;
       if (type === "Add") {
-        data = await addUserDetailsForm(
-          values as SRMUserDetailsFormType,
+        data = await addCustomerDetailsForm(
+          values as SRMCustomerDetailsFormType,
           countryCode
         );
       } else if (type === "Update") {
-        data = await updateUserDetailsForm(
-          values as SRMUserDetailsFormType,
+        data = await updateCustomerDetailsForm(
+          values as SRMCustomerDetailsFormType,
           initialCountryCode as string
         );
       }
@@ -127,12 +132,52 @@ export default function SRMUserDetailsForm({
     }
   }, [form.formState.errors]);
 
+  // Handle selecting a customer from the results
+  const handleCustomerSelect = (customer: any) => {
+    setSelectedCustomer(customer);
+    setSearchTerm("");
+
+    // Update form values with the selected customer's details
+    form.setValue("customerName", customer.name);
+    form.setValue("customerProfile", customer.customerProfile);
+    form.setValue("nationality", customer.nationality);
+    form.setValue("passportNum", customer.passportNum);
+    form.setValue("drivingLicenseNum", customer.drivingLicenseNum);
+    form.setValue("phoneNumber", customer.phoneNumber);
+  };
+
+  const customers = [
+    {
+      id: 1,
+      name: "John Doe",
+      customerProfile:
+        "https://media.istockphoto.com/id/1370772148/photo/track-and-mountains-in-valle-del-lago-somiedo-nature-park-asturias-spain.jpg?s=612x612&w=0&k=20&c=QJn62amhOddkJSbihcjWKHXShMAfcKM0hPN65aCloco=",
+      nationality: "American",
+      passportNum: "A12345678",
+      drivingLicenseNum: "D12345678",
+      phoneNumber: "+1234567890",
+    },
+    {
+      id: 2,
+      name: "Jane Smith",
+      customerProfile: "profile2.jpg",
+      nationality: "British",
+      passportNum: "B87654321",
+      drivingLicenseNum: "D87654321",
+      phoneNumber: "+9876543210",
+    },
+  ];
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex flex-col w-full gap-5  mx-auto bg-white  rounded-3xl p-2 md:p-4 py-8 !pb-8  "
       >
+        <p className="text-sm italic text-center text-gray-600">
+          Add customer details here. You can choose existing customer &#40;if
+          any&#41; by searching customer name
+        </p>
         <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto ">
           {/* user name */}
           <FormField
@@ -146,17 +191,40 @@ export default function SRMUserDetailsForm({
 
                 <div className="flex-col items-start w-full">
                   <FormControl>
-                    <CategoryDropdown
-                      onChangeHandler={(value) => {
-                        field.onChange(value);
+                    <Input
+                      placeholder="Enter / Search customer name"
+                      {...field}
+                      className="input-field"
+                      onChange={(e) => {
+                        setSearchTerm(e.target.value); // Update searchTerm for future use
+                        field.onChange(e); // Update form field value
                       }}
-                      value={initialValues.customerName}
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
                     Provide customer name.
                   </FormDescription>
                   <FormMessage />
+
+                  {searchTerm && customers.length > 0 && (
+                    <ul className="overflow-y-auto absolute z-10 w-full max-h-60 bg-white rounded-md border border-gray-300 shadow-md">
+                      {customers
+                        .filter((customer) =>
+                          customer.name
+                            .toLowerCase()
+                            .includes(searchTerm.toLowerCase())
+                        )
+                        .map((customer) => (
+                          <li
+                            key={customer.id}
+                            className="px-4 py-2 cursor-pointer hover:bg-gray-100"
+                            onClick={() => handleCustomerSelect(customer)}
+                          >
+                            {customer.name}
+                          </li>
+                        ))}
+                    </ul>
+                  )}
                 </div>
               </FormItem>
             )}
@@ -298,7 +366,6 @@ export default function SRMUserDetailsForm({
             )}
           />
         </div>
-
         {/* submit  */}
         <Button
           type="submit"
@@ -306,7 +373,7 @@ export default function SRMUserDetailsForm({
           disabled={form.formState.isSubmitting}
           className="w-full md:w-10/12 lg:w-8/12 mx-auto flex-center col-span-2 mt-3 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow"
         >
-          {type === "Add" ? "Add User" : "Update User"}
+          {type === "Add" ? "Continue to Vehicle Details" : "Update User"}
           {form.formState.isSubmitting && <Spinner />}
         </Button>
       </form>

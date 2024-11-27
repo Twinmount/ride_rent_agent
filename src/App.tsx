@@ -124,7 +124,7 @@ const router = createBrowserRouter([
                 element: <SRMIntroduction />,
               },
               {
-                path: "/srm",
+                path: "/srm/dashboard",
                 element: <SRMDashboard />,
               },
               {

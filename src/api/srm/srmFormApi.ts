@@ -2,17 +2,17 @@ import { Slug } from "@/api/Api-Endpoints";
 import { API } from "@/api/ApiService";
 import {
   AddPaymentFormResponse,
-  AddUserFormResponse,
+  AddCustomerFormResponse,
   AddVehicleFormResponse,
 } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
-  SRMUserDetailsFormType,
+  SRMCustomerDetailsFormType,
   SRMVehicleDetailsFormType,
 } from "@/types/types";
 
-export const addUserDetailsForm = async (
-  values: SRMUserDetailsFormType,
+export const addCustomerDetailsForm = async (
+  values: SRMCustomerDetailsFormType,
   countryCode: string
 ): Promise<AddUserFormResponse> => {
   try {
@@ -55,8 +55,8 @@ export const addUserDetailsForm = async (
   }
 };
 
-export const updateUserDetailsForm = async (
-  values: SRMUserDetailsFormType,
+export const updateCustomerDetailsForm = async (
+  values: SRMCustomerDetailsFormType,
   countryCode: string
 ): Promise<AddUserFormResponse> => {
   try {

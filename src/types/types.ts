@@ -95,7 +95,8 @@ export type ApprovalStatusTypes =
   | "PENDING"
   | "UNDER_REVIEW";
 
-export type SRMUserDetailsFormType = {
+// CustomerDetailsFormType (level 1)
+export type SRMCustomerDetailsFormType = {
   customerProfile?: string; // Optional field for profile photo or identifier
   customerName: string; // User name
   nationality: string; // Nationality of the user
@@ -109,15 +110,25 @@ export type SRMVehicleDetailsFormType = {
   vehicleCategoryId: string;
   vehicleBrandId: string;
   vehicleRegistrationNumber: string;
-  bookingStartDate: Date;
-  bookingEndDate: Date;
+  rentalDetails: {
+    day: RentalDetailType;
+    week: RentalDetailType;
+    month: RentalDetailType;
+    hour: HourlyRentalDetailType;
+  };
 };
 
 // PaymentDetailsFormType (level 3)
 export type SRMPaymentDetailsFormType = {
-  currency: string;
   advanceAmount: string;
   remainingAmount: string;
+  securityDeposit: {
+    enabled: boolean;
+    amountInAED?: string;
+  };
+  bookingStartDate: Date | undefined;
+  bookingEndDate: Date | undefined;
+  currency: string;
 };
 
 export enum CustomerStatus {

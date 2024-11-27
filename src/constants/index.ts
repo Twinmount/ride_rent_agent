@@ -2,7 +2,7 @@ import {
   CompanyFormType,
   PrimaryFormType,
   SRMPaymentDetailsFormType,
-  SRMUserDetailsFormType,
+  SRMCustomerDetailsFormType,
   SRMVehicleDetailsFormType,
 } from "@/types/types";
 import {
@@ -126,9 +126,9 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
 };
 
 // srm user details form default values
-export const SRMUserDetailsFormDefaultValues: SRMUserDetailsFormType = {
+export const SRMCustomerDetailsFormDefaultValues: SRMCustomerDetailsFormType = {
   customerProfile: "", // Optional field
-  customerName: "", // Name of the user
+  customerName: "", // Name of the Customer
   nationality: "", // Nationality of the user
   passportNum: "", // Passport number
   drivingLicenseNum: "", // Driving license number
@@ -140,13 +140,28 @@ export const SRMVehicleDetailsFormDefaultValues: SRMVehicleDetailsFormType = {
   vehicleCategoryId: "",
   vehicleBrandId: "",
   vehicleRegistrationNumber: "",
-  bookingStartDate: new Date(),
-  bookingEndDate: new Date(),
+  rentalDetails: {
+    day: { enabled: false, rentInAED: "", mileageLimit: "" },
+    week: { enabled: false, rentInAED: "", mileageLimit: "" },
+    month: { enabled: false, rentInAED: "", mileageLimit: "" },
+    hour: {
+      enabled: false,
+      minBookingHours: "",
+      rentInAED: "",
+      mileageLimit: "",
+    },
+  },
 };
 
 // SRM payment details form default values
 export const SRMPaymentDetailsFormDefaultValues: SRMPaymentDetailsFormType = {
-  currency: "", // Default empty string for currency
-  advanceAmount: "", // Default empty string for advance amount
-  remainingAmount: "", // Default empty string for remaining amount
+  advanceAmount: "",
+  remainingAmount: "",
+  securityDeposit: {
+    enabled: false,
+    amountInAED: "",
+  },
+  bookingStartDate: undefined,
+  bookingEndDate: undefined,
+  currency: "",
 };

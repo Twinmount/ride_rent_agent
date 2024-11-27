@@ -124,3 +124,8 @@
   color: #ffffff !important;
   border-radius: 4px;
 }
+
+.filter-yellow-orange {
+  filter: brightness(1.1) saturate(200%) invert(50%) sepia(100%) saturate(500%)
+    hue-rotate(-20deg) brightness(95%) contrast(90%);
+}

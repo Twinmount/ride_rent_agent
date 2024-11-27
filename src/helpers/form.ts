@@ -108,6 +108,43 @@ export const validateRentalDetails = (
   return null;
 };
 
+// rental details form field validation helper function
+export const validateSRMRentalDetails = (
+  rentalDetails: RentalDetailsType
+): string | null => {
+  const { day, week, month, hour } = rentalDetails;
+
+  const message =
+    "Rent in AED as well as Mileage Limit must be provided for all rental periods";
+
+  // Check if all rental periods are enabled
+  if (!day.enabled || !week.enabled || !month.enabled || !hour.enabled) {
+    return "All rental periods (day, week, month, and hour) must be enabled";
+  }
+
+  // Validate day
+  if (!day.rentInAED || !day.mileageLimit) {
+    return message;
+  }
+
+  // Validate week
+  if (!week.rentInAED || !week.mileageLimit) {
+    return message;
+  }
+
+  // Validate month
+  if (!month.rentInAED || !month.mileageLimit) {
+    return message;
+  }
+
+  // Validate hour, including minBookingHours
+  if (!hour.rentInAED || !hour.mileageLimit || !hour.minBookingHours) {
+    return "Rent in AED, Mileage Limit, and Minimum Booking Hours are required for hourly rental";
+  }
+
+  return null;
+};
+
 type SecurityDepositType = {
   enabled: boolean;
   amountInAED?: string;

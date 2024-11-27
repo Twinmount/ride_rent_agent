@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { X } from "lucide-react";
 import { useAgentContext } from "@/context/AgentContext";
 import LogoutModal from "../modal/LogoutModal";
+import SRMSidebarBox from "./SRMSidebarBox";
 
 const Sidebar = () => {
   const { isSidebarOpen, toggleSidebar, isSmallScreen } = useAgentContext();
@@ -51,6 +52,9 @@ const Sidebar = () => {
         }`}
       >
         {sidebarContent.map((item) => {
+          if (item.label === "SRM")
+            return <SRMSidebarBox key={item.link} icon={item.icon} />;
+
           const Icon = item.icon;
           const isActive =
             item.link === "/"

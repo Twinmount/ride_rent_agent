@@ -1,4 +1,4 @@
-export interface AddUserFormResponse {
+export interface AddCustomerFormResponse {
   result: {
     userId: string; // Unique identifier for the user
     customerName: string; // User's name
