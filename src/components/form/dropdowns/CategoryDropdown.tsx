@@ -15,6 +15,7 @@ type CategoryDropdownProps = {
   placeholder?: string;
   isDisabled?: boolean;
   setIsCarsCategory?: (isCars: boolean) => void;
+  setHideCommercialLicenses: (value: boolean) => void;
 };
 
 type CategoryType = {
@@ -28,6 +29,7 @@ const CategoryDropdown = ({
   onChangeHandler,
   isDisabled = false,
   setIsCarsCategory,
+  setHideCommercialLicenses,
 }: CategoryDropdownProps) => {
   const { data, isLoading } = useQuery({
     queryKey: ["categories"],
@@ -42,26 +44,32 @@ const CategoryDropdown = ({
     }
   }, [data]);
 
-  // Set isCarsCategory based on the initial value
+  // Set isCarsCategory and hideCommercialLicenses based on the initial value
   useEffect(() => {
-    if (value && categories.length > 0 && setIsCarsCategory) {
+    if (value && categories.length > 0) {
       const selectedCategory = categories.find(
         (category) => category.categoryId === value
       );
-      setIsCarsCategory(selectedCategory?.value === "cars");
+      setIsCarsCategory?.(selectedCategory?.value === "cars");
+      setHideCommercialLicenses?.(
+        ["bicycles", "buggies"].includes(selectedCategory?.value || "")
+      );
     }
-  }, [value, categories, setIsCarsCategory]);
+  }, [value, categories, setIsCarsCategory, setHideCommercialLicenses]);
 
   const handleChange = (selectedCategoryId: string) => {
     onChangeHandler(selectedCategoryId);
 
     // Find the selected category object
-    if (setIsCarsCategory) {
-      const selectedCategory = categories.find(
-        (category) => category.categoryId === selectedCategoryId
-      );
-      setIsCarsCategory(selectedCategory?.value === "cars");
-    }
+    const selectedCategory = categories.find(
+      (category) => category.categoryId === selectedCategoryId
+    );
+
+    // Update states based on the selected category
+    setIsCarsCategory?.(selectedCategory?.value === "cars");
+    setHideCommercialLicenses?.(
+      ["bicycles", "buggies"].includes(selectedCategory?.value || "")
+    );
   };
 
   return (
