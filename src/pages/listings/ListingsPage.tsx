@@ -97,7 +97,7 @@ export default function ListingsPage() {
     <section className="p-3 pt-8 h-auto min-h-screen lg:p-6">
       <div className="flex mb-10 max-md:mb-6 max-md:flex-col flex-between">
         <div className="flex flex-col justify-center items-start">
-          <h2 className="fixed top-[4.9rem] left-0 pl-10 lg:pl-64 bg-white/20 backdrop-blur-lg  z-30   text-2xl lg:text-3xl font-bold w-full h-14 flex items-center">
+          <h2 className="fixed top-[4.8rem] left-0 pl-10 lg:pl-64 bg-white/20 backdrop-blur-lg  z-30   text-2xl lg:text-3xl font-bold w-full h-14 flex items-center">
             Your Listed Vehicles
           </h2>
         </div>
