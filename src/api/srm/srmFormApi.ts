@@ -14,7 +14,7 @@ import {
 export const addCustomerDetailsForm = async (
   values: SRMCustomerDetailsFormType,
   countryCode: string
-): Promise<AddUserFormResponse> => {
+): Promise<AddCustomerFormResponse> => {
   try {
     // Extracting phone number and removing country code
     const phoneNumber = values.phoneNumber
@@ -33,7 +33,7 @@ export const addCustomerDetailsForm = async (
     };
 
     // Sending the request as a JSON object
-    const data = await API.post<AddUserFormResponse>({
+    const data = await API.post<AddCustomerFormResponse>({
       slug: Slug.POST_SRM_USER_FORM,
       body: requestBody,
       axiosConfig: {
@@ -58,7 +58,7 @@ export const addCustomerDetailsForm = async (
 export const updateCustomerDetailsForm = async (
   values: SRMCustomerDetailsFormType,
   countryCode: string
-): Promise<AddUserFormResponse> => {
+): Promise<AddCustomerFormResponse> => {
   try {
     // Extracting phone number and removing country code
     const phoneNumber = values.phoneNumber
@@ -77,7 +77,7 @@ export const updateCustomerDetailsForm = async (
     };
 
     // Sending the request as a JSON object
-    const data = await API.put<AddUserFormResponse>({
+    const data = await API.put<AddCustomerFormResponse>({
       slug: Slug.PUT_SRM_USER_FORM,
       body: requestBody,
       axiosConfig: {
@@ -109,8 +109,7 @@ export const addVehicleDetailsForm = async (
       vehicleCategoryId: values.vehicleCategoryId,
       vehicleBrandId: values.vehicleBrandId,
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
-      bookingStartDate: values.bookingStartDate.toISOString(),
-      bookingEndDate: values.bookingEndDate.toISOString(),
+      rentalDetails: values.rentalDetails,
     };
 
     // Sending the request as a JSON object
@@ -146,8 +145,7 @@ export const updateVehicleDetailsForm = async (
       vehicleCategoryId: values.vehicleCategoryId,
       vehicleBrandId: values.vehicleBrandId,
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
-      bookingStartDate: values.bookingStartDate.toISOString(),
-      bookingEndDate: values.bookingEndDate.toISOString(),
+      rentalDetails: values.rentalDetails,
     };
 
     // Sending the request as a JSON object

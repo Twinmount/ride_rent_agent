@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
-import { OngoingTripsTable } from "@/components/table/OngoingTrips";
+import { OngoingTripsTable } from "@/components/table/OngoingTripsTable";
 import { OngoingTripsColumns } from "@/components/table/columns/OngoingTripsColumn";
 
 import { toast } from "@/components/ui/use-toast";
@@ -9,7 +9,10 @@ import { SortDropdown } from "@/components/SortDropdown";
 import { LimitDropdown } from "@/components/LimitDropdown";
 import TripEndModal from "@/components/modal/srm-modal/TripEndModal";
 import { endTrip, fetchOngoingTrips } from "@/api/srm/trips";
-import { CustomerStatus } from "@/types/types"; // Import the enum
+import { CustomerStatus } from "@/types/types";
+import DownloadExcelModal from "@/components/srm/DownloadSRMExcelData";
+import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
 
 interface Trip {
   id: string;
@@ -18,6 +21,36 @@ interface Trip {
   advancePaid: number;
   amountRemaining: number;
 }
+
+const mockData = [
+  {
+    id: "1",
+    brandName: "Tesla",
+    customerName: "John Doe",
+    bookingStartDate: "2024-01-10",
+    BookingEndDate: "2024-01-20",
+    advancePaid: 2000,
+    amountRemaining: 1500,
+  },
+  {
+    id: "2",
+    brandName: "BMW",
+    customerName: "Jane Smith",
+    bookingStartDate: "2024-02-01",
+    BookingEndDate: "2024-02-15",
+    advancePaid: 3000,
+    amountRemaining: 1200,
+  },
+  {
+    id: "3",
+    brandName: "Mercedes",
+    customerName: "Alice Johnson",
+    bookingStartDate: "2024-03-05",
+    BookingEndDate: "2024-03-25",
+    advancePaid: 5000,
+    amountRemaining: 1000,
+  },
+];
 
 export default function OngoingTripsPage() {
   const [page, setPage] = useState(1);
@@ -89,6 +122,10 @@ export default function OngoingTripsPage() {
         Ongoing Trips
       </h1>
       <div className="flex gap-x-2 justify-end mb-4 w-full max-sm:mt-3">
+        <DownloadExcelModal
+          title="Excel Data Download"
+          onDownload={async () => {}}
+        />
         <SortDropdown
           sortOrder={sortOrder}
           setSortOrder={setSortOrder}
@@ -103,8 +140,8 @@ export default function OngoingTripsPage() {
 
       <OngoingTripsTable
         columns={OngoingTripsColumns(handleOpenModal)}
-        data={data?.result?.list || []}
-        loading={isLoading}
+        data={mockData}
+        loading={false}
       />
 
       {data?.result && data?.result.totalNumberOfPages > 0 && (
@@ -126,6 +163,16 @@ export default function OngoingTripsPage() {
           onSubmit={handleEndTrip}
         />
       )}
+
+      <Link
+        to="/srm/trips/new"
+        className="fixed right-10 bottom-10 px-6 py-3 text-white rounded-full shadow-lg transition-transform duration-300 ease-in-out transform hover:scale-105 bg-yellow"
+        aria-label="add new record"
+      >
+        <span className="flex gap-x-2 items-center">
+          Add Trip <Plus />
+        </span>
+      </Link>
     </section>
   );
 }

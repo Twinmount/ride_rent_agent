@@ -20,7 +20,7 @@ const SRMPaymentDetailsForm = lazy(
 
 export default function SRMDataAddPage() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<SRMTabsTypes>("user");
+  const [activeTab, setActiveTab] = useState<SRMTabsTypes>("customer");
   const [levelsFilled, setLevelsFilled] = useState<number>(0); // Default starting level
 
   // Handle tab change based on levelsFilled state
@@ -52,7 +52,7 @@ export default function SRMDataAddPage() {
   };
 
   return (
-    <section className="container py-10 h-auto min-h-screen bg-white">
+    <section className="container py-10 pb-44 h-auto min-h-screen bg-white">
       <div className="gap-x-4 mb-5 ml-5 flex-center w-fit">
         <button
           onClick={() => navigate(-1)}
@@ -61,7 +61,7 @@ export default function SRMDataAddPage() {
           <CircleArrowLeft />
         </button>
         <h1 className="text-center h3-bold max-sm:text-xl sm:text-left">
-          Add New Data
+          Add New Record
         </h1>
       </div>
 

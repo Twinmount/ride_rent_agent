@@ -57,10 +57,11 @@ const ProfilePage = lazy(() => import("./pages/profile/ProfilePage"));
 // yet to lazy load
 import SRMDashboard from "./pages/srm/SRMDashboard";
 import SRMDataAddPage from "./pages/srm/SRMFormAddPage";
-import OngoingTripsPage from "./pages/srm/trip-data/ActiveTripsPage";
+import OngoingTripsPage from "./pages/srm/trip-data/OngoingTripsPage";
 import CompletedTripsPage from "./pages/srm/trip-data/CompletedTripsPage";
 import VehicleListPage from "./pages/srm/trip-data/VehicleListPage";
 import CustomerListPage from "./pages/srm/trip-data/CustomerListPage";
+import TripEndForm from "./components/form/srm/TripEndForm";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
@@ -132,11 +133,15 @@ const router = createBrowserRouter([
                 element: <SRMDataAddPage />,
               },
               {
-                path: "/srm/trips/edit/:tripId",
-                element: <SRMDataAddPage />,
+                path: "/srm/ongoing-trips/:tripId",
+                element: <TripEndForm type="Add" />,
               },
               {
                 path: "/srm/ongoing-trips",
+                element: <OngoingTripsPage />,
+              },
+              {
+                path: "/srm/ongoing-trips/:tripId",
                 element: <OngoingTripsPage />,
               },
               {

@@ -20,12 +20,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   Select,
+  SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { CustomerStatus } from "@/types/types";
-import { SelectContent } from "@radix-ui/react-select";
 
 interface TripEndModalProps {
   brandName: string;

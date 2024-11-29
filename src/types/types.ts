@@ -76,7 +76,7 @@ export type SpecificationFormData = {
 };
 
 export type TabsTypes = "primary" | "specifications" | "features";
-export type SRMTabsTypes = "user" | "vehicle" | "payment";
+export type SRMTabsTypes = "customer" | "vehicle" | "payment";
 
 export interface ApiError {
   response?: {

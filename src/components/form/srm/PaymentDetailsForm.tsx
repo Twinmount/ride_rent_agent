@@ -137,7 +137,7 @@ export default function SRMPaymentDetailsForm({
             >
               Booking Period<span className="mr-5 max-sm:hidden">:</span>
             </label>
-            <div className="flex flex-col gap-5 lg:flex-row">
+            <div className="flex flex-col gap-5">
               <FormField
                 control={form.control}
                 name="bookingStartDate"
@@ -153,16 +153,18 @@ export default function SRMPaymentDetailsForm({
                           className="filter-yellow-orange"
                         />
                         <label
-                          htmlFor="bookingStartDate"
-                          className="mr-1 whitespace-nowrap text-grey-600"
+                          htmlFor="bookingEndDate"
+                          className="flex justify-between items-center mr-1 w-14 whitespace-nowrap text-grey-600"
                         >
-                          Start On:
+                          Start <span>:</span>
                         </label>
                         <DatePicker
                           selected={field.value}
                           onChange={(date: Date | null) => field.onChange(date)}
-                          dateFormat="dd/MM/yyyy"
-                          wrapperClassName="datePicker text-base  "
+                          showTimeSelect
+                          timeInputLabel="Time:"
+                          dateFormat="dd/MM/yyyy h:mm aa"
+                          wrapperClassName="datePicker text-base w-full"
                           placeholderText="DD/MM/YYYY"
                           id="bookingStartDate"
                           minDate={minAllowedDate}
@@ -190,14 +192,16 @@ export default function SRMPaymentDetailsForm({
                         />
                         <label
                           htmlFor="bookingEndDate"
-                          className="mr-1 whitespace-nowrap text-grey-600"
+                          className="flex justify-between items-center mr-1 w-14 whitespace-nowrap text-grey-600"
                         >
-                          End Date:
+                          End <span>:</span>
                         </label>
                         <DatePicker
                           selected={field.value}
                           onChange={(date: Date | null) => field.onChange(date)}
-                          dateFormat="dd/MM/yyyy"
+                          showTimeSelect
+                          timeInputLabel="Time:"
+                          dateFormat="dd/MM/yyyy h:mm aa"
                           wrapperClassName="datePicker text-base"
                           placeholderText="DD/MM/YYYY"
                           id="bookingEndDate"
