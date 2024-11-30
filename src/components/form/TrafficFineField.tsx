@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { FormDescription, FormMessage } from "@/components/ui/form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { Label } from "../ui/label";
 
 const TrafficFineField = () => {
   const { control, watch, clearErrors } = useFormContext();
@@ -65,12 +66,12 @@ const TrafficFineField = () => {
             control={control}
             render={({ field, fieldState }) => (
               <div className="flex items-center">
-                <label
+                <Label
                   htmlFor="trafficFineAmount"
-                  className="block mr-1 mb-5 w-28 text-[0.8rem] font-medium"
+                  className="block mr-1 mb-5 w-28 min-w-24 text-[0.8rem] font-medium"
                 >
                   Fine Amount (AED)
-                </label>
+                </Label>
                 <div className="w-full h-fit">
                   <Input
                     id="trafficFineAmount"
@@ -115,18 +116,18 @@ const TrafficFineField = () => {
             control={control}
             render={({ field, fieldState }) => (
               <div className="flex items-center">
-                <label
+                <Label
                   htmlFor="dateOfTrafficFine"
-                  className="block mr-1 mb-5 w-28 text-[0.8rem] font-medium"
+                  className="block mr-1 mb-5 w-24 min-w-24  text-[0.8rem] font-medium"
                 >
                   Date of Fine
-                </label>
+                </Label>
                 <div className="w-full h-fit">
                   <DatePicker
                     selected={field.value}
                     onChange={(date: Date | null) => field.onChange(date)}
                     dateFormat="dd/MM/yyyy"
-                    wrapperClassName="datePicker text-base -ml-4"
+                    wrapperClassName="datePicker text-base"
                     placeholderText="DD/MM/YYYY"
                   />
                   {fieldState.error && (

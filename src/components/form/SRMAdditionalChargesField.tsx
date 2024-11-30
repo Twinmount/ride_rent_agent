@@ -18,6 +18,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/ui/command";
+import { Label } from "../ui/label";
 
 const ADDITIONAL_CHARGES_OPTIONS = [
   "Fuel Charges",
@@ -33,7 +34,7 @@ const ADDITIONAL_CHARGES_OPTIONS = [
   "Roadside Assistance",
   "Cross-Border Fee",
   "Smoking Penalty",
-  "Lost Registration Card (Mulkiya)",
+  "Lost Registration Card (Mulkia)",
   "Replacement Car Delivery Fee",
   "Car Delivery Fee",
   "Car Return Fee",
@@ -41,7 +42,7 @@ const ADDITIONAL_CHARGES_OPTIONS = [
 ];
 
 const AdditionalChargesField = () => {
-  const { control, watch, setValue, clearErrors } = useFormContext();
+  const { control, watch, setValue } = useFormContext();
   const [isEnabled, setIsEnabled] = useState(false);
   const [selectedCharges, setSelectedCharges] = useState<string[]>([]);
 
@@ -70,21 +71,38 @@ const AdditionalChargesField = () => {
   };
 
   return (
-    <div className="p-2 mb-2 rounded-lg border-b shadow">
+    <div className="p-2 mb-2 rounded-lg border-b shadow bg-slate-50">
       {/* Additional Charges Checkbox */}
-      <div className="flex items-center mb-4 space-x-2">
-        <Checkbox
-          checked={isEnabled}
-          onCheckedChange={handleCheckboxChange}
-          className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
-          id="additionalChargesEnabled"
-        />
-        <label
-          htmlFor="additionalChargesEnabled"
-          className="text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-        >
-          Any Other Charges?
-        </label>
+      <div className="flex gap-x-4 items-center">
+        <div className="flex items-center mb-4 space-x-2">
+          <Checkbox
+            checked={isEnabled}
+            onCheckedChange={handleCheckboxChange}
+            className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
+            id="additionalChargesEnabled"
+          />
+          <Label
+            htmlFor="additionalChargesEnabled"
+            className="text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            Yes
+          </Label>
+        </div>
+
+        <div className="flex items-center mb-4 space-x-2">
+          <Checkbox
+            checked={!isEnabled}
+            onCheckedChange={handleCheckboxChange}
+            className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
+            id="additionalChargesEnabledNo"
+          />
+          <Label
+            htmlFor="additionalChargesEnabledNo"
+            className="text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          >
+            No
+          </Label>
+        </div>
       </div>
 
       {/* Multi-Select Dropdown */}
@@ -106,7 +124,7 @@ const AdditionalChargesField = () => {
                     <CommandItem
                       key={charge}
                       onSelect={() => handleChargeSelection(charge)}
-                      className="flex items-center space-x-2"
+                      className="flex gap-x-2 items-center"
                     >
                       <Checkbox
                         checked={selectedCharges.includes(charge)}
@@ -126,7 +144,10 @@ const AdditionalChargesField = () => {
       {/* Dynamic Fields for Selected Charges */}
       {isEnabled &&
         selectedCharges.map((charge) => (
-          <div key={charge} className="p-2 mt-4 rounded-lg border shadow">
+          <div
+            key={charge}
+            className="p-2 mt-4 bg-white rounded-lg border shadow"
+          >
             <p className="mb-2 font-medium">{charge}</p>
 
             {/* Amount Input */}
@@ -138,7 +159,7 @@ const AdditionalChargesField = () => {
                 <div className="flex items-center space-x-4">
                   <label
                     htmlFor={`additionalCharges-${charge}-amount`}
-                    className="w-28 text-sm font-medium"
+                    className="w-24 text-sm font-medium min-w-24"
                   >
                     Amount (AED)
                   </label>
@@ -178,7 +199,7 @@ const AdditionalChargesField = () => {
                 <div className="flex items-center mt-4 space-x-4">
                   <label
                     htmlFor={`additionalCharges-${charge}-date`}
-                    className="w-28 text-sm font-medium"
+                    className="w-24 text-sm font-medium min-w-24"
                   >
                     Date
                   </label>
@@ -187,7 +208,7 @@ const AdditionalChargesField = () => {
                     onChange={(date: Date | null) => field.onChange(date)}
                     dateFormat="dd/MM/yyyy"
                     placeholderText="DD/MM/YYYY"
-                    className="p-2 w-full rounded border"
+                    wrapperClassName="datePicker text-base"
                   />
                   {fieldState.error && (
                     <FormMessage>{fieldState.error.message}</FormMessage>

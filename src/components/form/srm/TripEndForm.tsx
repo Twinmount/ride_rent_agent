@@ -127,6 +127,7 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
                         placeholder="eg: 'Model'"
                         {...field}
                         className={`input-field`}
+                        readOnly
                       />
                     </FormControl>
                     <FormDescription className="ml-2">
@@ -171,6 +172,11 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
                     <FormControl>
                       <SalikField />
                     </FormControl>
+                    <FormDescription>
+                      Specify if a security deposit is required and provide the
+                      amount if applicable.
+                    </FormDescription>
+                    <FormMessage />
                   </div>
                 </FormItem>
               )}
@@ -189,6 +195,11 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
                     <FormControl>
                       <AdditionalChargesField />
                     </FormControl>
+                    <FormDescription>
+                      Specify if a security deposit is required and provide the
+                      amount if applicable.
+                    </FormDescription>
+                    <FormMessage />
                   </div>
                 </FormItem>
               )}
@@ -294,7 +305,7 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
                         }
                         value={field.value}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="ring-0 select-field focus:ring-0 input-fields">
                           <SelectValue placeholder="Select a status" />
                         </SelectTrigger>
                         <SelectContent className="bg-white">

@@ -573,6 +573,7 @@ export default function PrimaryDetailsForm({
               </FormItem>
             )}
           />
+
           {/* mobile */}
           <FormField
             control={form.control}

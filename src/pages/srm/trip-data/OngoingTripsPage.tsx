@@ -7,7 +7,7 @@ import { OngoingTripsColumns } from "@/components/table/columns/OngoingTripsColu
 import { toast } from "@/components/ui/use-toast";
 import { SortDropdown } from "@/components/SortDropdown";
 import { LimitDropdown } from "@/components/LimitDropdown";
-import TripEndModal from "@/components/modal/srm-modal/TripEndModal";
+import ExtendTripModal from "@/components/modal/srm-modal/ExtendTripModal";
 import { endTrip, fetchOngoingTrips } from "@/api/srm/trips";
 import { CustomerStatus } from "@/types/types";
 import DownloadExcelModal from "@/components/srm/DownloadSRMExcelData";
@@ -18,17 +18,20 @@ interface Trip {
   id: string;
   brandName: string;
   customerName: string;
+  bookingStartDate: Date;
+  BookingEndDate: Date;
   advancePaid: number;
   amountRemaining: number;
 }
 
+// sample data to show in the table. (backend will be only integrated later)
 const mockData = [
   {
     id: "1",
     brandName: "Tesla",
     customerName: "John Doe",
-    bookingStartDate: "2024-01-10",
-    BookingEndDate: "2024-01-20",
+    bookingStartDate: new Date(),
+    BookingEndDate: new Date(),
     advancePaid: 2000,
     amountRemaining: 1500,
   },
@@ -41,22 +44,13 @@ const mockData = [
     advancePaid: 3000,
     amountRemaining: 1200,
   },
-  {
-    id: "3",
-    brandName: "Mercedes",
-    customerName: "Alice Johnson",
-    bookingStartDate: "2024-03-05",
-    BookingEndDate: "2024-03-25",
-    advancePaid: 5000,
-    amountRemaining: 1000,
-  },
 ];
 
 export default function OngoingTripsPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState<10 | 15 | 20 | 30>(10);
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
-  const [selectedTrip, setSelectedTrip] = useState<Trip | null>(null);
+  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
 
@@ -71,18 +65,12 @@ export default function OngoingTripsPage() {
     staleTime: 0,
   });
 
-  const handleOpenModal = (trip: any) => {
-    setSelectedTrip({
-      id: trip.id,
-      brandName: trip.brandName,
-      customerName: trip.customerName,
-      advancePaid: trip.advancePaid,
-      amountRemaining: trip.amountRemaining,
-    });
+  const handleOpenModal = (trip: Trip) => {
+    setSelectedTripId(trip.id);
   };
 
   const handleCloseModal = () => {
-    setSelectedTrip(null);
+    setSelectedTripId(null);
   };
 
   const handleEndTrip = async (values: {
@@ -90,11 +78,11 @@ export default function OngoingTripsPage() {
     totalAmountCollected: number;
     customerStatus: CustomerStatus;
   }) => {
-    if (selectedTrip) {
+    if (selectedTripId) {
       try {
         // Call the API with necessary details
         await endTrip({
-          tripId: selectedTrip.id,
+          tripId: selectedTripId,
         });
 
         queryClient.invalidateQueries({ queryKey: ["activeTrips"] });
@@ -152,16 +140,9 @@ export default function OngoingTripsPage() {
         />
       )}
 
-      {selectedTrip && (
-        <TripEndModal
-          brandName={selectedTrip.brandName}
-          customerName={selectedTrip.customerName}
-          advancePaid={selectedTrip.advancePaid}
-          amountRemaining={selectedTrip.amountRemaining}
-          isOpen={!!selectedTrip}
-          onClose={handleCloseModal}
-          onSubmit={handleEndTrip}
-        />
+      {/* ExtendTripModal */}
+      {selectedTripId && (
+        <ExtendTripModal tripId={selectedTripId} onClose={handleCloseModal} />
       )}
 
       <Link

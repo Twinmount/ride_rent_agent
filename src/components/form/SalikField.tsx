@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { FormDescription, FormMessage } from "@/components/ui/form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { Label } from "../ui/label";
 
 const SalikField = () => {
   const { control, watch, clearErrors } = useFormContext();
@@ -27,12 +28,12 @@ const SalikField = () => {
                 className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
                 id="salikYes"
               />
-              <label
+              <Label
                 htmlFor="salikYes"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 Yes
-              </label>
+              </Label>
             </div>
 
             {/* No Checkbox */}
@@ -45,12 +46,12 @@ const SalikField = () => {
                 className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
                 id="salikNo"
               />
-              <label
+              <Label
                 htmlFor="salikNo"
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
                 No
-              </label>
+              </Label>
             </div>
           </div>
         )}
@@ -65,12 +66,12 @@ const SalikField = () => {
             control={control}
             render={({ field, fieldState }) => (
               <div className="flex items-center">
-                <label
+                <Label
                   htmlFor="salikAmount"
-                  className="block mr-1 mb-5 w-28 text-[0.8rem] font-medium"
+                  className="block mr-1 mb-5 w-24 min-w-24 text-[0.8rem] font-medium"
                 >
                   Salik Amount (AED)
-                </label>
+                </Label>
                 <div className="w-full h-fit">
                   <Input
                     id="salikAmount"
@@ -115,18 +116,18 @@ const SalikField = () => {
             control={control}
             render={({ field, fieldState }) => (
               <div className="flex items-center">
-                <label
+                <Label
                   htmlFor="dateOfSalik"
-                  className="block mr-1 mb-5 w-28 text-[0.8rem] font-medium"
+                  className="block mr-1 mb-5 w-24 min-w-24 text-[0.8rem] font-medium"
                 >
-                  Date of Salik
-                </label>
+                  Date of activity
+                </Label>
                 <div className="w-full h-fit">
                   <DatePicker
                     selected={field.value}
                     onChange={(date: Date | null) => field.onChange(date)}
                     dateFormat="dd/MM/yyyy"
-                    wrapperClassName="datePicker text-base -ml-4"
+                    wrapperClassName="datePicker text-base "
                     placeholderText="DD/MM/YYYY"
                   />
                   {fieldState.error && (
