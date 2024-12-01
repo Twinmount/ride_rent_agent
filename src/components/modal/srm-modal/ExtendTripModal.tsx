@@ -65,8 +65,8 @@ export default function ExtendTripModal({
       vehicleBrand: "",
       vehicleRegistrationNumber: "sample data",
       customerName: "",
-      bookingStartDate: "" || undefined,
-      bookingEndDate: "" || undefined,
+      bookingStartDate: undefined,
+      bookingEndDate: undefined,
       advanceAmount: "",
       remainingAmount: "",
     },
@@ -82,14 +82,14 @@ export default function ExtendTripModal({
 
   return (
     <Dialog open={!!tripId} onOpenChange={onClose}>
-      <DialogContent className="">
-        <DialogHeader>
+      <DialogContent className="max-h-[90vh] overflow-hidden">
+        <DialogHeader className="">
           <DialogTitle>Extend Trip</DialogTitle>
           <DialogDescription>
             Update the trip details below to extend the booking period.
           </DialogDescription>
         </DialogHeader>
-        <ScrollArea className="h-[80vh]">
+        <ScrollArea className="h-[75vh]">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}

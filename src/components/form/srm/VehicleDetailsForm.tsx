@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -27,6 +27,8 @@ import {
 import BrandsDropdown from "../dropdowns/BrandsDropdown";
 import RentalDetailsFormField from "../RentalDetailsFormField";
 import { validateSRMRentalDetails } from "@/helpers/form";
+import SingleFileUpload from "../file-uploads/SingleFileUpload";
+import { GcsFilePaths } from "@/constants/enum";
 
 type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";
@@ -42,6 +44,8 @@ export default function SRMVehicleDetailsForm({
   formData,
 }: SRMVehicleDetailsFormProps) {
   const {} = useParams<{}>();
+  const [isFileUploading, setIsFileUploading] = useState(false);
+  const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
 
   // Call the useLoadingMessages hook to manage loading messages
 
@@ -71,9 +75,11 @@ export default function SRMVehicleDetailsForm({
     try {
       let data;
       if (type === "Add") {
-        data = await addVehicleDetailsForm(values);
+        data = await addVehicleDetailsForm(values as SRMVehicleDetailsFormType);
       } else if (type === "Update") {
-        data = await updateVehicleDetailsForm(values);
+        data = await updateVehicleDetailsForm(
+          values as SRMVehicleDetailsFormType
+        );
       }
 
       if (data) {
@@ -219,6 +225,27 @@ export default function SRMVehicleDetailsForm({
                   <FormMessage className="ml-2" />
                 </div>
               </FormItem>
+            )}
+          />
+
+          {/* user profile */}
+          <FormField
+            control={form.control}
+            name="vehiclePhoto"
+            render={({ field }) => (
+              <SingleFileUpload
+                name={field.name}
+                label="Vehicle Photo (optional)"
+                description="Vehicle Photo can have a maximum size of 5MB."
+                existingFile={formData?.vehiclePhoto}
+                maxSizeMB={5}
+                setIsFileUploading={setIsFileUploading}
+                bucketFilePath={GcsFilePaths.LOGOS}
+                isDownloadable={true}
+                downloadFileName={"vehicle-photo"}
+                setDeletedImages={setDeletedFiles}
+                additionalClasses="w-[18rem]"
+              />
             )}
           />
 

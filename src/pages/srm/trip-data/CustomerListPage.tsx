@@ -5,6 +5,7 @@ import { CustomerListTable } from "@/components/table/CustomerListTable";
 import { useNavigate } from "react-router-dom";
 import { fetchCustomerList } from "@/api/srm/trips";
 import { CustomerListColumns } from "@/components/table/columns/CustomerListColumn";
+import BannedUserPopup from "@/components/modal/srm-modal/BannedUserPopup";
 
 export default function CustomerListPage() {
   const [page, setPage] = useState(1);
@@ -28,15 +29,36 @@ export default function CustomerListPage() {
     navigate(`/customerDetails/${userId}`);
   };
 
+  const mockData = [
+    {
+      id: "1",
+      customerName: "John Doe",
+      email: "john@example.com",
+      passportNum: "A12345678",
+      drivingLicenseNum: "DL987654321",
+      phoneNumber: "+1234567890",
+    },
+  ];
+
   return (
     <section className="container py-5 mx-auto min-h-screen md:py-7">
       <h1 className="text-center h3-bold max-sm:text-xl sm:text-left">
         Customer List
       </h1>
 
+      <BannedUserPopup
+        isOpen={false}
+        onClose={() => {}}
+        customerName="John Doe"
+        passportNum="A12345678"
+        drivingLicenseNum="DL987654321"
+        phoneNumber="+1234567890"
+        customerStatus="Blacklisted"
+      />
+
       <CustomerListTable
         columns={CustomerListColumns(handleViewDetails)}
-        data={data?.result?.list || []}
+        data={data?.result?.list || mockData}
         loading={isLoading}
       />
 

@@ -23,6 +23,23 @@ export default function VehicleListPage() {
     staleTime: 0,
   });
 
+  const mockData = [
+    {
+      brandName: "Toyota",
+      vehicleRegistrationNumber: "AB123CD",
+      totalTrips: 50,
+      amountGenerated: 15000,
+      expense: 5000,
+    },
+    {
+      brandName: "Honda",
+      vehicleRegistrationNumber: "EF456GH",
+      totalTrips: 30,
+      amountGenerated: 10000,
+      expense: 3000,
+    },
+  ];
+
   return (
     <section className="container py-5 mx-auto min-h-screen md:py-7">
       <h1 className="text-center h3-bold max-sm:text-xl sm:text-left">
@@ -43,7 +60,7 @@ export default function VehicleListPage() {
 
       <VehicleListTable
         columns={VehicleListColumns}
-        data={data?.result?.list || []}
+        data={data?.result?.list || mockData}
         loading={isLoading}
       />
 

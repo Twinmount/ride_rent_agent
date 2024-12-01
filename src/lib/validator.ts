@@ -161,6 +161,7 @@ export const SRMVehicleDetailsFormSchema = z.object({
     .max(15, "Vehicle registration number cannot exceed 15 characters"),
   bookingStartDate: z.date(),
   bookingEndDate: z.date(),
+  vehiclePhoto: z.string().optional(),
   rentalDetails: z.object({
     day: SRMRentalDetailTypeSchema,
     week: SRMRentalDetailTypeSchema,

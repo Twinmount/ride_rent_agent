@@ -140,6 +140,7 @@ export const SRMVehicleDetailsFormDefaultValues: SRMVehicleDetailsFormType = {
   vehicleCategoryId: "",
   vehicleBrandId: "",
   vehicleRegistrationNumber: "",
+  vehiclePhoto: "",
   rentalDetails: {
     day: { enabled: false, rentInAED: "", mileageLimit: "" },
     week: { enabled: false, rentInAED: "", mileageLimit: "" },

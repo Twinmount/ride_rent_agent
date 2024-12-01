@@ -17,4 +17,8 @@ export const VehicleListColumns: ColumnDef<any>[] = [
     accessorKey: "amountGenerated",
     header: "Amount Generated",
   },
+  {
+    accessorKey: "expense",
+    header: "Expense",
+  },
 ];

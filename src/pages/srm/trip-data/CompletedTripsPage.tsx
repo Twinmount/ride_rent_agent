@@ -1,38 +1,39 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
-import { toast } from "@/components/ui/use-toast";
 import { SortDropdown } from "@/components/SortDropdown";
 import { LimitDropdown } from "@/components/LimitDropdown";
-import {
-  CompletedTripDetails,
-  downloadCompletedTrip,
-  fetchCompletedTrips,
-  updateCompletedTrip,
-} from "@/api/srm/trips";
 import { CompletedTripsTable } from "@/components/table/CompletedTripsTable";
 import { CompletedTripsColumns } from "@/components/table/columns/CompletedTripsColumn";
-import ViewCompletedTripModal from "@/components/modal/srm-modal/ViewCompletedTripModal";
-import DownloadCompletedTripModal from "@/components/modal/srm-modal/DownloadCompletedTripModal";
+import CompletedTripsInvoiceDownloadModal from "@/components/modal/srm-modal/CompletedTripsInvoiceDownloadModal";
+import { fetchCompletedTrips } from "@/api/srm/trips";
 
-interface Trip {
-  id: string;
-  brandName: string;
-  customerName: string;
-  tripStarted: string;
-  tripEnded: string;
-  amountCollected: number;
-  amountPending: number;
-}
+const mockData = [
+  {
+    id: "1",
+    brandName: "Toyota",
+    customerName: "John Doe",
+    tripStarted: "2023-12-01",
+    tripEnded: "2023-12-10",
+    amountCollected: 5000,
+    amountPending: 0,
+  },
+  {
+    id: "2",
+    brandName: "BMW",
+    customerName: "Jane Smith",
+    tripStarted: "2023-11-20",
+    tripEnded: "2023-11-30",
+    amountCollected: 7000,
+    amountPending: 200,
+  },
+];
 
 export default function CompletedTripsPage() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState<10 | 15 | 20 | 30>(10);
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
-  const [viewTrip, setViewTrip] = useState<CompletedTripDetails | null>(null);
   const [downloadTripId, setDownloadTripId] = useState<string | null>(null);
-
-  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ["completedTrips", page, limit],
@@ -41,52 +42,16 @@ export default function CompletedTripsPage() {
         page,
         limit,
         sortOrder,
-      }),
+      }), // Use mockData instead of API call for now
     staleTime: 0,
   });
 
-  const handleViewTrip = (trip: CompletedTripDetails) => {
-    setViewTrip(trip);
+  const handleDownloadModal = (tripId: string) => {
+    setDownloadTripId(tripId);
   };
 
-  const handleCloseViewModal = () => {
-    setViewTrip(null);
-  };
-
-  const handleDownloadTrip = async (tripId: string) => {
-    try {
-      await downloadCompletedTrip({ tripId });
-      toast({
-        title: "Download started",
-        className: "bg-green-500 text-white",
-      });
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Download failed",
-        description: "Something went wrong while downloading the trip.",
-      });
-    }
-  };
-
-  const handleUpdateTrip = async (updatedDetails: CompletedTripDetails) => {
-    if (viewTrip) {
-      try {
-        await updateCompletedTrip({ ...viewTrip, ...updatedDetails });
-        queryClient.invalidateQueries({ queryKey: ["completedTrips"] });
-        toast({
-          title: "Trip updated successfully",
-          className: "bg-green-500 text-white",
-        });
-        handleCloseViewModal();
-      } catch (error) {
-        toast({
-          variant: "destructive",
-          title: "Failed to update trip",
-          description: "Something went wrong while updating the trip.",
-        });
-      }
-    }
+  const handleCloseModal = () => {
+    setDownloadTripId(null);
   };
 
   return (
@@ -108,33 +73,27 @@ export default function CompletedTripsPage() {
       </div>
 
       <CompletedTripsTable
-        columns={CompletedTripsColumns(handleViewTrip, handleDownloadTrip)}
-        data={data?.result?.list || [{}]}
+        columns={CompletedTripsColumns(handleDownloadModal)}
+        data={data?.result?.list || mockData}
         loading={isLoading}
       />
+
+      {downloadTripId && (
+        <CompletedTripsInvoiceDownloadModal
+          isOpen={!!downloadTripId}
+          onClose={handleCloseModal}
+          onDownload={() => {
+            console.log(`Downloading trip with ID: ${downloadTripId}`);
+            handleCloseModal();
+          }}
+        />
+      )}
 
       {data?.result && data?.result.totalNumberOfPages > 0 && (
         <Pagination
           page={page}
           setPage={setPage}
           totalPages={data?.result.totalNumberOfPages}
-        />
-      )}
-
-      {viewTrip && (
-        <ViewCompletedTripModal
-          tripDetails={viewTrip}
-          isOpen={!!viewTrip}
-          onClose={handleCloseViewModal}
-          onSubmit={handleUpdateTrip}
-        />
-      )}
-
-      {downloadTripId && (
-        <DownloadCompletedTripModal
-          isOpen={!!downloadTripId}
-          onClose={() => setDownloadTripId(null)}
-          onDownload={() => handleDownloadTrip(downloadTripId)}
         />
       )}
     </section>

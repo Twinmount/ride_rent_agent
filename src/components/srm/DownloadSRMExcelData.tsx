@@ -12,11 +12,15 @@ import { CloudDownload } from "lucide-react";
 type DownloadExcelModalProps = {
   title: string; // Title of the dialog (e.g., "Excel Data Download")
   onDownload: () => Promise<void>; // Async function to handle the download
+  additionalClasses?: string;
+  label?: string;
 };
 
 const DownloadExcelModal: React.FC<DownloadExcelModalProps> = ({
   title,
   onDownload,
+  label,
+  additionalClasses,
 }) => {
   const [isOpen, setIsOpen] = useState(false); // State to control dialog visibility
   const [isDownloading, setIsDownloading] = useState(false); // State to show loading during download
@@ -40,8 +44,9 @@ const DownloadExcelModal: React.FC<DownloadExcelModalProps> = ({
         <Button
           variant="outline"
           aria-label="Download Excel"
-          className="text-yellow hover:text-yellow"
+          className={`gap-x-2 h-10 shadow-lg flex-center text-yellow hover:text-yellow ${additionalClasses}`}
         >
+          {label}
           <CloudDownload />
         </Button>
       </DialogTrigger>

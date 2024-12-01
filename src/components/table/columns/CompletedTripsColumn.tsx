@@ -1,9 +1,9 @@
 import { ColumnDef } from "@tanstack/react-table";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 
 export const CompletedTripsColumns = (
-  handleViewTrip: (trip: any) => void, // Replace `any` with your trip type
-  handleDownloadTrip: (tripId: string) => void
+  handleDownloadModal: (tripId: string) => void
 ): ColumnDef<any>[] => [
   {
     accessorKey: "brandName",
@@ -36,14 +36,17 @@ export const CompletedTripsColumns = (
 
       return (
         <div className="flex space-x-2">
-          <Button
-            onClick={() => handleViewTrip(trip)}
-            className="text-white bg-blue-500 hover:bg-blue-600"
+          {/* View as Link */}
+          <Link
+            to={`/completed-trips/${trip.id}`}
+            className="text-blue-500 underline hover:text-blue-700"
           >
             View
-          </Button>
+          </Link>
+
+          {/* Download Button */}
           <Button
-            onClick={() => handleDownloadTrip(trip.tripId)}
+            onClick={() => handleDownloadModal(trip.id)}
             className="text-white bg-green-500 hover:bg-green-600"
           >
             Download

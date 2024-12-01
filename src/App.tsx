@@ -62,6 +62,7 @@ import CompletedTripsPage from "./pages/srm/trip-data/CompletedTripsPage";
 import VehicleListPage from "./pages/srm/trip-data/VehicleListPage";
 import CustomerListPage from "./pages/srm/trip-data/CustomerListPage";
 import TripEndForm from "./components/form/srm/TripEndForm";
+import EndTripsPage from "./pages/srm/EndTripsPage";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
@@ -132,17 +133,14 @@ const router = createBrowserRouter([
                 path: "/srm/trips/new",
                 element: <SRMDataAddPage />,
               },
-              {
-                path: "/srm/ongoing-trips/:tripId",
-                element: <TripEndForm type="Add" />,
-              },
+
               {
                 path: "/srm/ongoing-trips",
                 element: <OngoingTripsPage />,
               },
               {
                 path: "/srm/ongoing-trips/:tripId",
-                element: <OngoingTripsPage />,
+                element: <EndTripsPage />,
               },
               {
                 path: "/srm/completed-trips",

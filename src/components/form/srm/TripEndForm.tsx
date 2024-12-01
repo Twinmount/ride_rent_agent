@@ -78,11 +78,11 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
   }, [form.formState.errors]);
 
   return (
-    <section className="container py-5 mx-auto min-h-screen md:py-7">
+    <section className="container py-5 mx-auto min-h-screen rounded-lg md:py-7">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col w-full gap-5  mx-auto bg-white  rounded-3xl p-2 md:p-4 py-8 !pb-8  "
+          className="flex flex-col w-full gap-5  mx-auto bg-white shadow-md rounded-3xl p-2 md:p-4 py-8 !pb-8  "
         >
           <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto ">
             {/* Brand and Customer Name */}

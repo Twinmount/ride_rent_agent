@@ -110,6 +110,7 @@ export type SRMVehicleDetailsFormType = {
   vehicleCategoryId: string;
   vehicleBrandId: string;
   vehicleRegistrationNumber: string;
+  vehiclePhoto: string;
   rentalDetails: {
     day: RentalDetailType;
     week: RentalDetailType;
