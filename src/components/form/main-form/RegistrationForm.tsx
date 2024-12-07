@@ -163,7 +163,7 @@ const RegistrationForm = () => {
                         type={isView ? "text" : "password"}
                         id="password"
                         className={`input-field !text-lg`}
-                        placeholder="password"
+                        placeholder="Password"
                         {...field}
                       />
                       {isView ? (
