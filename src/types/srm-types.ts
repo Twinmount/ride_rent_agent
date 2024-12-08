@@ -1,0 +1,88 @@
+// CustomerDetailsFormType (level 1)
+export type SRMCustomerDetailsFormType = {
+  customerProfile?: string; // Optional field for profile photo or identifier
+  customerName: string; // User name
+  nationality: string; // Nationality of the user
+  passportNum: string; // Passport number of the user
+  drivingLicenseNum: string; // Driving license number of the user
+  phoneNumber: string; // Mobile number of the user
+};
+
+// Rental detail type for day, week, and month
+type SRMRentalDetailType = {
+  enabled: boolean;
+  rentInAED: string;
+  mileageLimit: string;
+};
+
+// Hourly rental detail type, which includes minBookingHours
+type SRMHourlyRentalDetailType = {
+  enabled: boolean;
+  rentInAED: string;
+  mileageLimit: string;
+  minBookingHours: string;
+};
+
+// VehicleDetailsFormType  (level 2)
+export type SRMVehicleDetailsFormType = {
+  vehicleCategoryId: string;
+  vehicleBrandId: string;
+  vehicleRegistrationNumber: string;
+  vehiclePhoto: string;
+  rentalDetails: {
+    day: SRMRentalDetailType;
+    week: SRMRentalDetailType;
+    month: SRMRentalDetailType;
+    hour: SRMHourlyRentalDetailType;
+  };
+};
+
+// PaymentDetailsFormType (level 3)
+export type SRMPaymentDetailsFormType = {
+  advanceAmount: string;
+  remainingAmount: string;
+  securityDeposit: {
+    enabled: boolean;
+    amountInAED?: string;
+  };
+  bookingStartDate: Date | undefined;
+  bookingEndDate: Date | undefined;
+  currency: string;
+};
+
+export enum CustomerStatus {
+  SUCCESSFUL = "Successfully Completed Trip",
+  PAYMENT_PENDING = "Payment Pending",
+  UNPAID_FINES = "Unpaid Fines",
+  DAMAGE_UNCLEARED = "Vehicle Damage Reported/Uncleared",
+  DAMAGE_CLEARED = "Vehicle Damage Reported/Cleared",
+  VEHICLE_LOST = "Vehicle Lost",
+}
+
+export interface Trip {
+  id: string;
+  brandName: string;
+  vehicleRegistrationNumber: string;
+  passportNumber: string;
+  customerName: string;
+  bookingStartDate: Date;
+  BookingEndDate: Date;
+  nationality: string;
+  mobileNumber: string;
+  advancePaid: number;
+  amountRemaining: number;
+}
+
+export type TripEndFormType = {
+  brandName: string;
+  customerName: string;
+  customerStatus: CustomerStatus;
+  trafficFine: {
+    fineAmount: string;
+    dateOfFine: Date;
+  }[];
+  salik: { salikAmount: string; dateOfActivity: Date }[];
+  additionalCharges: Record<string, { amountInAed: string; date: Date }>;
+  discounts?: string;
+  totalAmountCollected: string;
+};

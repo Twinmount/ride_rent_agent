@@ -25,45 +25,35 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { CustomerStatus } from "@/types/types";
+
 import TrafficFineField from "../TrafficFineField";
 import SalikField from "../SalikField";
 import AdditionalChargesField from "../SRMAdditionalChargesField";
+import { CustomerStatus, TripEndFormType } from "@/types/srm-types";
+import { TripEndFormSchema } from "@/lib/validator";
+import { TripEndFormDefaultValues } from "@/constants";
 
 type TripEndFormProps = {
   type: "Add" | "Update";
-  formData?: null;
+  formData?: TripEndFormType | null;
 };
 
 export default function TripEndForm({ type, formData }: TripEndFormProps) {
   const {} = useParams<{}>();
 
-  // Call the useLoadingMessages hook to manage loading messages
-  const formSchema = z.object({
-    fineAmount: z.number().optional(),
-    totalAmountCollected: z
-      .number()
-      .min(0, "Total amount must be non-negative"),
-    customerStatus: z.nativeEnum(CustomerStatus),
-  });
-
   const initialValues =
-    formData && type === "Update"
-      ? formData
-      : {
-          fineAmount: undefined,
-          totalAmountCollected: 0,
-          customerStatus: CustomerStatus.SUCCESSFUL,
-        };
+    formData && type === "Update" ? formData : TripEndFormDefaultValues;
 
   // Define your form.
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<z.infer<typeof TripEndFormSchema>>({
+    resolver: zodResolver(TripEndFormSchema),
     defaultValues: initialValues,
   });
 
   // Define a submit handler.
-  async function onSubmit(values: z.infer<typeof formSchema>) {}
+  async function onSubmit(values: z.infer<typeof TripEndFormSchema>) {
+    console.log(values);
+  }
 
   useEffect(() => {
     // Check for validation errors and scroll to the top if errors are present
@@ -85,10 +75,10 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
           className="flex flex-col w-full gap-5  mx-auto bg-white shadow-md rounded-3xl p-2 md:p-4 py-8 !pb-8  "
         >
           <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto ">
-            {/* Brand and Customer Name */}
+            {/* Brand Name */}
             <FormField
               control={form.control}
-              name="vehicleModel"
+              name="brandName"
               render={({ field }) => (
                 <FormItem className="flex mb-2 w-full max-sm:flex-col">
                   <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
@@ -97,25 +87,24 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
                   <div className="flex-col items-start w-full">
                     <FormControl>
                       <Input
-                        placeholder="eg: 'Model'"
+                        placeholder="eg: 'Mercedes-Benz'"
                         {...field}
                         className={`input-field`}
-                        readOnly
                       />
                     </FormControl>
                     <FormDescription className="ml-2">
-                      Enter the model name, e.g., "Mercedes-Benz C-Class 2024
-                      Latest Model.
+                      Enter the brand name, e.g., "Mercedes-Benz".
                     </FormDescription>
                     <FormMessage className="ml-2" />
                   </div>
                 </FormItem>
               )}
             />
-            {/* customer */}
+
+            {/* Customer Name */}
             <FormField
               control={form.control}
-              name="vehicleModel"
+              name="customerName"
               render={({ field }) => (
                 <FormItem className="flex mb-2 w-full max-sm:flex-col">
                   <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
@@ -124,17 +113,53 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
                   <div className="flex-col items-start w-full">
                     <FormControl>
                       <Input
-                        placeholder="eg: 'Model'"
+                        placeholder="eg: 'John Doe'"
                         {...field}
                         className={`input-field`}
-                        readOnly
                       />
                     </FormControl>
                     <FormDescription className="ml-2">
-                      Enter the model name, e.g., "Mercedes-Benz C-Class 2024
-                      Latest Model.
+                      Enter the customer's name.
                     </FormDescription>
                     <FormMessage className="ml-2" />
+                  </div>
+                </FormItem>
+              )}
+            />
+
+            {/* Customer Remark Dropdown */}
+            <FormField
+              control={form.control}
+              name="customerStatus"
+              render={({ field }) => (
+                <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
+                    Customer Remark{" "}
+                    <span className="mr-5 max-sm:hidden">:</span>
+                  </FormLabel>
+                  <div className="flex-col items-start w-full">
+                    <FormControl>
+                      <Select
+                        onValueChange={(value) =>
+                          field.onChange(value as CustomerStatus)
+                        }
+                        value={field.value}
+                      >
+                        <SelectTrigger className="ring-0 select-field focus:ring-0 input-fields">
+                          <SelectValue placeholder="Select a status" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white">
+                          {Object.entries(CustomerStatus).map(
+                            ([key, value]) => (
+                              <SelectItem key={key} value={value}>
+                                {value}
+                              </SelectItem>
+                            )
+                          )}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
                   </div>
                 </FormItem>
               )}
@@ -182,6 +207,7 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
               )}
             />
 
+            {/* Additional Charges */}
             <FormField
               control={form.control}
               name="additionalCharges"
@@ -205,9 +231,10 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
               )}
             />
 
+            {/* Discounts / Adjustments */}
             <FormField
               control={form.control}
-              name="discount"
+              name="discounts"
               render={({ field }) => (
                 <FormItem className="flex mb-2 w-full max-sm:flex-col">
                   <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
@@ -221,20 +248,6 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
                         {...field}
                         className={`input-field`}
                         type="text"
-                        onKeyDown={(e) => {
-                          if (
-                            !/[a-zA-Z0-9]/.test(e.key) &&
-                            ![
-                              "Backspace",
-                              "Delete",
-                              "ArrowLeft",
-                              "ArrowRight",
-                              "Tab", // To allow tabbing between fields
-                            ].includes(e.key)
-                          ) {
-                            e.preventDefault();
-                          }
-                        }}
                       />
                     </FormControl>
                     <FormDescription className="ml-2">
@@ -246,9 +259,10 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
               )}
             />
 
+            {/* Total Amount to be Collected */}
             <FormField
               control={form.control}
-              name="discount"
+              name="totalAmountCollected"
               render={({ field }) => (
                 <FormItem className="flex mb-2 w-full max-sm:flex-col">
                   <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
@@ -258,19 +272,21 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
                   <div className="flex-col items-start w-full">
                     <FormControl>
                       <Input
-                        placeholder="eg: ABC12345"
+                        id="trafficFineAmount"
                         {...field}
-                        className={`input-field`}
+                        placeholder="Total Amount"
+                        className="input-field"
                         type="text"
+                        inputMode="numeric"
+                        onChange={(e) => field.onChange(e.target.value)}
                         onKeyDown={(e) => {
                           if (
-                            !/[a-zA-Z0-9]/.test(e.key) &&
+                            !/^\d*$/.test(e.key) &&
                             ![
                               "Backspace",
                               "Delete",
                               "ArrowLeft",
                               "ArrowRight",
-                              "Tab", // To allow tabbing between fields
                             ].includes(e.key)
                           ) {
                             e.preventDefault();
@@ -279,7 +295,7 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
                       />
                     </FormControl>
                     <FormDescription className="ml-2">
-                      &#40;optional&#41; provide value if any.
+                      Enter the total amount to be collected.
                     </FormDescription>
                     <FormMessage className="ml-2" />
                   </div>
@@ -287,46 +303,11 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
               )}
             />
 
-            {/* Customer Remark Dropdown */}
-            <FormField
-              control={form.control}
-              name="customerStatus"
-              render={({ field }) => (
-                <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                    Customer Remark
-                    <span className="mr-5 max-sm:hidden">:</span>
-                  </FormLabel>
-                  <div className="flex-col items-start w-full">
-                    <FormControl>
-                      <Select
-                        onValueChange={(value) =>
-                          field.onChange(value as CustomerStatus)
-                        }
-                        value={field.value}
-                      >
-                        <SelectTrigger className="ring-0 select-field focus:ring-0 input-fields">
-                          <SelectValue placeholder="Select a status" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          {Object.entries(CustomerStatus).map(
-                            ([key, value]) => (
-                              <SelectItem key={key} value={value}>
-                                {value}
-                              </SelectItem>
-                            )
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
-            />
-
             {/* Submit Button */}
-            <Button type="submit" className="w-full">
+            <Button
+              type="submit"
+              className="w-full rounded-xl hover:text-red-500 transition-colors"
+            >
               End Trip
             </Button>
           </div>

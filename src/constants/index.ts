@@ -1,10 +1,11 @@
 import {
-  CompanyFormType,
-  PrimaryFormType,
-  SRMPaymentDetailsFormType,
+  CustomerStatus,
   SRMCustomerDetailsFormType,
+  SRMPaymentDetailsFormType,
   SRMVehicleDetailsFormType,
-} from "@/types/types";
+  TripEndFormType,
+} from "@/types/srm-types";
+import { CompanyFormType, PrimaryFormType } from "@/types/types";
 import {
   Box,
   LayoutDashboard,
@@ -165,4 +166,16 @@ export const SRMPaymentDetailsFormDefaultValues: SRMPaymentDetailsFormType = {
   bookingStartDate: undefined,
   bookingEndDate: undefined,
   currency: "",
+};
+
+// trip end form default values
+export const TripEndFormDefaultValues: TripEndFormType = {
+  brandName: "",
+  customerName: "",
+  customerStatus: CustomerStatus.SUCCESSFUL,
+  trafficFine: [],
+  salik: [],
+  additionalCharges: {}, // Initially no additional charges
+  discounts: "", // Optional
+  totalAmountCollected: "",
 };
