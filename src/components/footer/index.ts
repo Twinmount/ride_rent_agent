@@ -9,7 +9,7 @@ export const socials = [
   {
     id: 1,
     icon: FaFacebookF,
-    link: "https://www.facebook.com/people/Ride-Rent/61567306207466/",
+    link: "https://www.facebook.com/people/Ride-Rent/61567306207466",
   },
   { id: 2, icon: FaXTwitter, link: "https://x.com/rentrideglobal" },
   {
