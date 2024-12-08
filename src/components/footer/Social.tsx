@@ -15,7 +15,7 @@ const Social = () => {
             href="tel:+971502972335"
             className="p-0 max-h-fit max-w-fit w-fit h-fit"
           >
-            +971 - 50-297-2335
+            +971 50 297 2335
           </a>
         </div>
         {/* mail */}

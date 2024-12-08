@@ -9,13 +9,13 @@ export const socials = [
   {
     id: 1,
     icon: FaFacebookF,
-    link: "https://www.facebook.com/profile.php?viewas=100000686899395&id=61567306207466",
+    link: "https://www.facebook.com/people/Ride-Rent/61567306207466/",
   },
   { id: 2, icon: FaXTwitter, link: "https://x.com/rentrideglobal" },
   {
     id: 3,
     icon: FaInstagram,
-    link: "https://www.instagram.com/ride.rentglobal",
+    link: "https://www.instagram.com/ride.rentofficial",
   },
   { id: 4, icon: FaYoutube, link: " https://www.youtube.com/@ride.rentglobal" },
   {
