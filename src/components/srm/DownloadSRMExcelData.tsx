@@ -42,9 +42,8 @@ const DownloadExcelModal: React.FC<DownloadExcelModalProps> = ({
       {/* Trigger Button */}
       <DialogTrigger>
         <Button
-          variant="outline"
           aria-label="Download Excel"
-          className={`gap-x-2 h-10 shadow-lg flex-center text-yellow hover:text-yellow ${additionalClasses}`}
+          className={`gap-x-2 h-10 shadow-lg flex-center text-yellow  bg-white hover:bg-yellow hover:text-white transition-colors ${additionalClasses}`}
         >
           {label}
           <CloudDownload />

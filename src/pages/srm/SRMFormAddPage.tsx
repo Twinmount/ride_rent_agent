@@ -8,7 +8,7 @@ import { SRMTabsTypes } from "@/types/types";
 import { toast } from "@/components/ui/use-toast";
 
 // Lazy-loaded form components
-const SRMUserDetailsForm = lazy(
+const SRMCustomerDetailsForm = lazy(
   () => import("@/components/form/srm/CustomerDetailsForm")
 );
 const SRMVehicleDetailsForm = lazy(
@@ -99,7 +99,7 @@ export default function SRMDataAddPage() {
 
           <TabsContent value="customer" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              <SRMUserDetailsForm
+              <SRMCustomerDetailsForm
                 type="Add"
                 onNextTab={() => handleNextTab("vehicle")}
               />

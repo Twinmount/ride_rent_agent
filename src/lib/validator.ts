@@ -130,16 +130,16 @@ export const PrimaryFormSchema = z
 // RentalDetailType Schema for day, week, and month rentals )
 const SRMRentalDetailTypeSchema = z.object({
   enabled: z.boolean().default(false),
-  rentInAED: z.string().optional().default(""),
-  mileageLimit: z.string().optional().default(""),
+  rentInAED: z.string().default(""),
+  mileageLimit: z.string().default(""),
 });
 
 // HourlyRentalDetailType Schema with minBookingHours
 const SRMHourlyRentalDetailTypeSchema = z.object({
   enabled: z.boolean().default(false),
-  rentInAED: z.string().optional().default(""),
-  mileageLimit: z.string().optional().default(""),
-  minBookingHours: z.string().optional().default(""), // Only for hourly rentals
+  rentInAED: z.string().default(""),
+  mileageLimit: z.string().default(""),
+  minBookingHours: z.string().default(""),
 });
 
 // SRM : Customer Details Form Schema

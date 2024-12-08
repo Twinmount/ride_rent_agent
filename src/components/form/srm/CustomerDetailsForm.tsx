@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SRMCustomerDetailsFormDefaultValues } from "@/constants";
 import { SRMCustomerDetailsFormSchema } from "@/lib/validator";
-import { SRMCustomerDetailsFormType } from "@/types/types";
+import { SRMCustomerDetailsFormType } from "@/types/srm-types";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { deleteMultipleFiles } from "@/helpers/form";
@@ -30,6 +30,7 @@ import {
   addCustomerDetailsForm,
   updateCustomerDetailsForm,
 } from "@/api/srm/srmFormApi";
+import NationalityDropdown from "../dropdowns/NationalityDropdown";
 
 type SRMCustomerDetailsFormProps = {
   type: "Add" | "Update";
@@ -262,12 +263,14 @@ export default function SRMCustomerDetailsForm({
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
-                    <Input
-                      placeholder="Enter your nationality"
-                      {...field}
-                      className="input-field"
+                    <NationalityDropdown
+                      value={field.value} // Pass the form's field value
+                      onChangeHandler={field.onChange} // Bind to form control's onChange
                     />
                   </FormControl>
+                  <FormDescription className="ml-2">
+                    Select customer's nationality
+                  </FormDescription>
                   <FormMessage />
                 </div>
               </FormItem>
@@ -291,7 +294,10 @@ export default function SRMCustomerDetailsForm({
                       className="input-field"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormDescription className="ml-2">
+                    Enter customers passport number
+                  </FormDescription>
+                  <FormMessage className="ml-2" />
                 </div>
               </FormItem>
             )}
@@ -315,7 +321,10 @@ export default function SRMCustomerDetailsForm({
                       className="input-field"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormDescription className="ml-2">
+                    Enter customers driving license number
+                  </FormDescription>
+                  <FormMessage className="ml-2" />
                 </div>
               </FormItem>
             )}
@@ -328,7 +337,7 @@ export default function SRMCustomerDetailsForm({
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Whatsapp/Mobile <span className="mr-5 max-sm:hidden">:</span>
+                  Mobile Number <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
@@ -353,12 +362,7 @@ export default function SRMCustomerDetailsForm({
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    Enter the{" "}
-                    <span className="font-semibold text-green-400">
-                      Whatsapp
-                    </span>{" "}
-                    mobile number. This number will receive the direct booking
-                    details.
+                    Enter the contact details of the customer
                   </FormDescription>
                   <FormMessage className="ml-2" />
                 </div>

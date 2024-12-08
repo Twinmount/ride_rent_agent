@@ -9,9 +9,9 @@ import { fetchAllVehicles } from "@/api/vehicle";
 import { getCompany } from "@/api/company";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
-import SearchVehicle from "@/components/SearchVehicle";
 import VehicleFilters from "@/components/VehicleFilters";
 import { ApprovalStatusTypes } from "@/types/types";
+import Search from "@/components/Search";
 
 export default function ListingsPage() {
   const [page, setPage] = useState(1);
@@ -104,7 +104,7 @@ export default function ListingsPage() {
       </div>
 
       {/* search vehicle */}
-      <SearchVehicle
+      <Search
         search={search}
         setSearch={setSearch}
         placeholder="Search model..."
