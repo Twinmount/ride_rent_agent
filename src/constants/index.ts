@@ -173,9 +173,9 @@ export const TripEndFormDefaultValues: TripEndFormType = {
   brandName: "",
   customerName: "",
   customerStatus: CustomerStatus.SUCCESSFUL,
-  trafficFine: [],
-  salik: [],
-  additionalCharges: {}, // Initially no additional charges
+  finesCollected: [],
+  salikCollected: [],
+  additionalCharges: [], // Initially no additional charges
   discounts: "", // Optional
   totalAmountCollected: "",
 };

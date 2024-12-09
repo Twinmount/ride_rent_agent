@@ -2,7 +2,7 @@ import { useFormContext, Controller } from "react-hook-form";
 import { useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { FormDescription, FormMessage } from "@/components/ui/form";
+import { FormMessage } from "@/components/ui/form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
@@ -46,14 +46,13 @@ const AdditionalChargesField = () => {
   const [isEnabled, setIsEnabled] = useState(false);
   const [selectedCharges, setSelectedCharges] = useState<string[]>([]);
 
-  // Watches for changes in additional charges
-  const additionalCharges = watch("additionalCharges") || {};
+  const additionalCharges = watch("additionalCharges") || [];
 
   const handleCheckboxChange = () => {
     setIsEnabled((prev) => !prev);
     if (!isEnabled) {
       setSelectedCharges([]); // Clear selections if disabled
-      setValue("additionalCharges", {});
+      setValue("additionalCharges", []);
     }
   };
 
@@ -61,11 +60,18 @@ const AdditionalChargesField = () => {
     let updatedCharges: string[];
     if (selectedCharges.includes(charge)) {
       updatedCharges = selectedCharges.filter((item) => item !== charge);
-      const newAdditionalCharges = { ...additionalCharges };
-      delete newAdditionalCharges[charge];
+      const newAdditionalCharges = additionalCharges.filter(
+        (item) => item.description !== charge
+      );
       setValue("additionalCharges", newAdditionalCharges);
     } else {
       updatedCharges = [...selectedCharges, charge];
+      const newCharge = {
+        amount: "",
+        description: charge,
+        paymentDate: new Date(),
+      };
+      setValue("additionalCharges", [...additionalCharges, newCharge]);
     }
     setSelectedCharges(updatedCharges);
   };
@@ -143,28 +149,28 @@ const AdditionalChargesField = () => {
 
       {/* Dynamic Fields for Selected Charges */}
       {isEnabled &&
-        selectedCharges.map((charge) => (
+        additionalCharges.map((charge, index) => (
           <div
-            key={charge}
+            key={index}
             className="p-2 mt-4 bg-white rounded-lg border shadow"
           >
-            <p className="mb-2 font-medium">{charge}</p>
+            <p className="mb-2 font-medium">{charge.description}</p>
 
             {/* Amount Input */}
             <Controller
-              name={`additionalCharges.${charge}.amount`}
+              name={`additionalCharges.${index}.amount`}
               control={control}
-              defaultValue=""
+              defaultValue={charge.amount}
               render={({ field, fieldState }) => (
                 <div className="flex items-center space-x-4">
                   <label
-                    htmlFor={`additionalCharges-${charge}-amount`}
+                    htmlFor={`additionalCharges-${charge.description}-amount`}
                     className="w-24 text-sm font-medium min-w-24"
                   >
                     Amount (AED)
                   </label>
                   <Input
-                    id={`additionalCharges-${charge}-amount`}
+                    id={`additionalCharges-${charge.description}-amount`}
                     {...field}
                     placeholder="Enter amount"
                     className="input-field"
@@ -192,13 +198,13 @@ const AdditionalChargesField = () => {
 
             {/* Date Input */}
             <Controller
-              name={`additionalCharges.${charge}.date`}
+              name={`additionalCharges.${index}.paymentDate`}
               control={control}
-              defaultValue={null}
+              defaultValue={charge.paymentDate}
               render={({ field, fieldState }) => (
                 <div className="flex items-center mt-4 space-x-4">
                   <label
-                    htmlFor={`additionalCharges-${charge}-date`}
+                    htmlFor={`additionalCharges-${charge.description}-date`}
                     className="w-24 text-sm font-medium min-w-24"
                   >
                     Date

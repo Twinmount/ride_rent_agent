@@ -6,21 +6,25 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Label } from "../ui/label";
 import { Button } from "@/components/ui/button";
-import { Trash2, X } from "lucide-react";
+import { X } from "lucide-react";
 
 const TrafficFineField = () => {
   const { control, setValue } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "trafficFine", // The field name for the array
+    name: "finesCollected", // The field name for the array
   });
 
   // Handle changes in the checkbox (yes/no)
   const handleCheckboxChange = (checked: boolean) => {
     if (checked) {
-      append({ fineAmount: "", dateOfFine: new Date() }); // Add a new traffic fine
+      append({
+        amount: "",
+        description: `TRAFFIC FINE`, // Internally set description
+        paymentDate: null,
+      }); // Add a new traffic fine
     } else {
-      setValue("trafficFine", []); // Reset the traffic fine array
+      setValue("finesCollected", []); // Reset the traffic fine array
     }
   };
 
@@ -75,19 +79,19 @@ const TrafficFineField = () => {
             >
               {/* Traffic Fine Amount */}
               <Controller
-                name={`trafficFine.${index}.fineAmount`}
+                name={`finesCollected.${index}.amount`}
                 control={control}
                 render={({ field, fieldState }) => (
                   <div className="flex items-center">
                     <Label
-                      htmlFor={`trafficFine.${index}.fineAmount`}
+                      htmlFor={`finesCollected.${index}.amount`}
                       className="block mr-1 mb-5 w-28 min-w-24 text-[0.8rem] font-medium"
                     >
                       Fine Amount (AED)
                     </Label>
                     <div className="w-full h-fit">
                       <Input
-                        id={`trafficFine.${index}.fineAmount`}
+                        id={`finesCollected.${index}.amount`}
                         {...field}
                         placeholder="Enter traffic fine amount"
                         className="input-field"
@@ -120,12 +124,12 @@ const TrafficFineField = () => {
 
               {/* Date of Traffic Fine */}
               <Controller
-                name={`trafficFine.${index}.dateOfFine`}
+                name={`finesCollected.${index}.paymentDate`}
                 control={control}
                 render={({ field, fieldState }) => (
                   <div className="flex items-center">
                     <Label
-                      htmlFor={`trafficFine.${index}.dateOfFine`}
+                      htmlFor={`finesCollected.${index}.paymentDate`}
                       className="block mr-1 mb-5 w-28 min-w-24 text-[0.8rem] font-medium"
                     >
                       Date of Fine
@@ -162,7 +166,13 @@ const TrafficFineField = () => {
           {/* Add More Button */}
           <Button
             type="button"
-            onClick={() => append({ fineAmount: "", dateOfFine: new Date() })}
+            onClick={() =>
+              append({
+                amount: "",
+                description: `TRAFFIC FINE - ${fields.length + 1}`,
+                paymentDate: new Date(),
+              })
+            }
             className="mt-4  text-white"
           >
             Add More

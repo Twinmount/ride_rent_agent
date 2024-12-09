@@ -6,21 +6,25 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Label } from "../ui/label";
 import { Button } from "@/components/ui/button";
-import { Trash2, X } from "lucide-react";
+import { X } from "lucide-react";
 
 const SalikField = () => {
   const { control, setValue } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "salik", // The field name for the array
+    name: "salikCollected", // The field name for the array
   });
 
   // Handle changes in the checkbox (yes/no)
   const handleCheckboxChange = (checked: boolean) => {
     if (checked) {
-      append({ salikAmount: "", dateOfActivity: new Date() }); // Add a new salik entry
+      append({
+        amount: "",
+        description: "SALIK", // Internally set description
+        paymentDate: null,
+      }); // Add a new salikCollected entry
     } else {
-      setValue("salik", []); // Reset the salik array
+      setValue("salikCollected", []); // Reset the salikCollected array
     }
   };
 
@@ -72,21 +76,21 @@ const SalikField = () => {
             >
               {/* Salik Amount */}
               <Controller
-                name={`salik.${index}.salikAmount`}
+                name={`salikCollected.${index}.amount`}
                 control={control}
                 render={({ field, fieldState }) => (
                   <div className="flex items-center">
                     <Label
-                      htmlFor={`salik.${index}.salikAmount`}
+                      htmlFor={`salikCollected.${index}.amount`}
                       className="block mr-1 mb-5 w-28 min-w-24 text-[0.8rem] font-medium"
                     >
                       Salik Amount (AED)
                     </Label>
                     <div className="w-full h-fit">
                       <Input
-                        id={`salik.${index}.salikAmount`}
+                        id={`salikCollected.${index}.amount`}
                         {...field}
-                        placeholder="Enter salik amount"
+                        placeholder="Enter salikCollected amount"
                         className="input-field"
                         type="text"
                         inputMode="numeric"
@@ -118,12 +122,12 @@ const SalikField = () => {
 
               {/* Date of Salik */}
               <Controller
-                name={`salik.${index}.dateOfActivity`}
+                name={`salikCollected.${index}.paymentDate`}
                 control={control}
                 render={({ field, fieldState }) => (
                   <div className="flex items-center">
                     <Label
-                      htmlFor={`salik.${index}.dateOfActivity`}
+                      htmlFor={`salikCollected.${index}.paymentDate`}
                       className="block mr-1 mb-5 w-28 min-w-24 text-[0.8rem] font-medium"
                     >
                       Date of Activity
@@ -161,7 +165,11 @@ const SalikField = () => {
           <Button
             type="button"
             onClick={() =>
-              append({ salikAmount: "", dateOfActivity: new Date() })
+              append({
+                amount: "",
+                description: "SALIK", // Internally set description
+                paymentDate: new Date(),
+              })
             }
             className="mt-4 text-white"
           >

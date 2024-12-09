@@ -73,16 +73,34 @@ export interface Trip {
   amountRemaining: number;
 }
 
+// Additional charge type
+export type AdditionalChargeType = {
+  amount: string;
+  description?: string;
+  paymentDate: Date;
+};
+
+// Traffic fine type
+export type TrafficFineType = {
+  amount: string;
+  description: string; // Internal description
+  paymentDate: Date;
+};
+
+// Salik type
+export type SalikType = {
+  amount: string;
+  description: string; // "SALIK" set internally
+  paymentDate: Date;
+};
+
 export type TripEndFormType = {
   brandName: string;
   customerName: string;
   customerStatus: CustomerStatus;
-  trafficFine: {
-    fineAmount: string;
-    dateOfFine: Date;
-  }[];
-  salik: { salikAmount: string; dateOfActivity: Date }[];
-  additionalCharges: Record<string, { amountInAed: string; date: Date }>;
+  finesCollected: TrafficFineType[];
+  salikCollected: SalikType[];
+  additionalCharges: AdditionalChargeType[];
   discounts?: string;
   totalAmountCollected: string;
 };

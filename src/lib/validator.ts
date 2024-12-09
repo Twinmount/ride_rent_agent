@@ -186,31 +186,33 @@ export const SRMPaymentDetailsFormSchema = z.object({
 
 // traffic fine sub schema
 const TrafficFineSchema = z.object({
-  fineAmount: z.string().optional().default(""),
-  dateOfFine: z.date(),
+  amount: z.string().min(1, "Amount is required"), // Fine amount
+  description: z.string().default("TRAFFIC FINE"), // Description (handled internally)
+  paymentDate: z.date(), // Date of the fine
 });
 
-// salik field sub schema
+// salikCollected field sub schema
 const SalikSchema = z.object({
-  salikAmount: z.string().optional().default(""),
-  dateOfActivity: z.date(),
+  amount: z.string().min(1, "Amount is required"), // Salik amount (AED)
+  description: z.string().default("SALIK"), // Internally set description (default "SALIK")
+  paymentDate: z.date(), // Date when Salik was collected
 });
 
 // additional charges sub schema
-const AdditionalChargesSchema = z.record(
+const AdditionalChargesSchema = z.array(
   z.object({
-    amountInAed: z.string().optional().default(""),
-    date: z.date(),
+    amount: z.string().min(1, "Amount is required"),
+    description: z.string().optional(),
+    paymentDate: z.date(),
   })
 );
-
 // Trip End Form Schema
 export const TripEndFormSchema = z.object({
   brandName: z.string().min(1, "Brand name is required"), // Example for brand name
   customerName: z.string().min(1, "Customer name is required"),
   customerStatus: z.nativeEnum(CustomerStatus),
-  trafficFine: z.array(TrafficFineSchema).optional(), // Using the traffic fine schema
-  salik: z.array(SalikSchema).optional(), // Using the salik schema
+  finesCollected: z.array(TrafficFineSchema).optional(), // Using the traffic fine schema
+  salikCollected: z.array(SalikSchema).optional(), // Using the salikCollected schema
   additionalCharges: AdditionalChargesSchema.optional(), // Optional field for additional charges
   discounts: z.string().optional(), // Example field for discounts
   totalAmountCollected: z.string().min(1, "Total amount is required"),

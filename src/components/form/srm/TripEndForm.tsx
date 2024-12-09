@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -168,7 +168,7 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
             {/* Traffic Fine */}
             <FormField
               control={form.control}
-              name="trafficFine"
+              name="finesCollected"
               render={() => (
                 <FormItem className="flex mb-2 w-full max-sm:flex-col">
                   <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
@@ -178,6 +178,11 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
                     <FormControl>
                       <TrafficFineField />
                     </FormControl>
+                    <FormDescription>
+                      Specify if a security deposit is required and provide the
+                      amount if applicable.
+                    </FormDescription>
+                    <FormMessage />
                   </div>
                 </FormItem>
               )}
@@ -186,7 +191,7 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
             {/* Salik */}
             <FormField
               control={form.control}
-              name="salik"
+              name="salikCollected"
               render={() => (
                 <FormItem className="flex mb-2 w-full max-sm:flex-col">
                   <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
@@ -306,7 +311,7 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full rounded-xl hover:text-red-500 transition-colors"
+              className="w-full rounded-xl text-red-500 transition-colors"
             >
               End Trip
             </Button>
