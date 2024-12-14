@@ -16,6 +16,8 @@ export type CompanyFormType = {
   commercialLicense: string;
   expireDate: Date | undefined;
   regNumber: string;
+  companyAddress: string;
+  companyLanguages: string[];
 };
 
 // Rental detail type for day, week, and month

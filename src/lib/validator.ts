@@ -16,6 +16,13 @@ export const CompanyFormSchema = z.object({
   commercialLicense: z.string().min(1, "Commercial License is required"),
   expireDate: z.date(),
   regNumber: z.string().min(1, "Registration number is required"),
+  companyAddress: z
+    .string()
+    .min(5, "Company address is required")
+    .max(150, "Address can be up to 150 characters"),
+  companyLanguages: z
+    .array(z.string())
+    .min(1, "At least one language must be selected"),
 });
 
 // otp page form schema

@@ -243,6 +243,27 @@ export default function ProfilePage() {
           </dd>
         </div>
 
+        {/* registration number */}
+        <div className="flex gap-y-2 justify-start items-start w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Company Address
+            <span className="font-bold">:</span>
+          </dt>
+          <dd className="flex gap-x-3 items-center px-2 ml-4 w-full text-base rounded-lg bg-slate-50">
+            {profileData.companyAddress}
+          </dd>
+        </div>
+        {/* registration number */}
+        <div className="flex gap-y-2 justify-start items-start w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Languages
+            <span className="font-bold">:</span>
+          </dt>
+          <dd className="flex gap-x-3 items-center px-2 ml-4 w-full text-base rounded-lg bg-slate-50">
+            {profileData.companyLanguages.join(", ")}
+          </dd>
+        </div>
+
         {/* password */}
         <div className="flex gap-y-2 justify-start items-start w-full">
           <dt className="flex justify-between items-start w-64 text-gray-800">
