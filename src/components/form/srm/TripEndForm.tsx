@@ -311,7 +311,7 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
             {/* Submit Button */}
             <Button
               type="submit"
-              className="w-full rounded-xl text-red-500 transition-colors"
+              className="w-full rounded-xl text-red-500 font-semibold transition-colors"
             >
               End Trip
             </Button>
