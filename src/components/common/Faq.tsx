@@ -1,17 +1,17 @@
-import MotionSection from '@/components/framer-motion/MotionSection'
+import MotionSection from "@/components/framer-motion/MotionSection";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion'
+} from "@/components/ui/accordion";
 
 type FAQProps = {
   data: {
-    question: string
-    answer: string
-  }[]
-}
+    question: string;
+    answer: string;
+  }[];
+};
 
 export default function FAQ({ data }: FAQProps) {
   return (
@@ -23,7 +23,7 @@ export default function FAQ({ data }: FAQProps) {
         <img
           width={50}
           height={50}
-          src={'/assets/img/general/title-head.png'}
+          src={"/assets/img/general/title-head.png"}
           alt="underline"
           className="absolute w-16 h-auto transform -translate-x-1/2 -bottom-5 left-1/2"
         />
@@ -44,5 +44,5 @@ export default function FAQ({ data }: FAQProps) {
         ))}
       </Accordion>
     </MotionSection>
-  )
+  );
 }

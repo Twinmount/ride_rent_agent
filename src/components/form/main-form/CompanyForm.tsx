@@ -40,6 +40,8 @@ import {
 import { GcsFilePaths } from "@/constants/enum";
 import { deleteMultipleFiles } from "@/helpers/form";
 import SingleFileUpload from "../file-uploads/SingleFileUpload";
+import CompanyLanguagesDropdown from "../dropdowns/CompanyLanguagesDropdown";
+import { Textarea } from "@/components/ui/textarea";
 
 type CompanyRegistrationFormProps = {
   type: "Add" | "Update";
@@ -159,6 +161,8 @@ export default function CompanyRegistrationForm({
   };
 
   async function onSubmit(values: z.infer<typeof CompanyFormSchema>) {
+    console.log(values);
+    return;
     // Check if OTP is verified before submitting the form
     if (!isOtpVerified) {
       toast({
@@ -492,6 +496,80 @@ export default function CompanyRegistrationForm({
                 </div>
               </FormItem>
             )}
+          />
+
+          <FormField
+            control={form.control}
+            name="companyLanguages"
+            render={({ field }) => (
+              <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
+                  Supported Languages{" "}
+                  <span className="mr-5 max-sm:hidden">:</span>
+                </FormLabel>
+                <div className="flex-col items-start w-full">
+                  <FormControl>
+                    <CompanyLanguagesDropdown
+                      value={field.value}
+                      onChangeHandler={field.onChange}
+                      placeholder="Languages"
+                    />
+                  </FormControl>
+                  <FormDescription className="mt-1 ml-1">
+                    Select all the languages your company operates in. This will
+                    be listed in your public company profile page.
+                  </FormDescription>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="companyAddress"
+            render={({ field }) => {
+              const [charCount, setCharCount] = useState(
+                field.value?.length || 0
+              ); // To track character count
+
+              const handleInputChange = (
+                e: React.ChangeEvent<HTMLTextAreaElement>
+              ) => {
+                const newValue = e.target.value;
+                if (newValue.length <= 150) {
+                  setCharCount(newValue.length);
+                  field.onChange(e);
+                }
+              };
+
+              return (
+                <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                  <FormLabel className="flex justify-between mt-4 ml-2 w-52 text-base h-fit min-w-52 lg:text-lg">
+                    Company Address
+                    <span className="mr-5 max-sm:hidden">:</span>
+                  </FormLabel>
+                  <div className="flex-col items-start w-full">
+                    <FormControl>
+                      <Textarea
+                        placeholder="Company Address"
+                        {...field}
+                        className={`textarea rounded-xl transition-all duration-300 h-28`} // Dynamic height
+                        onChange={handleInputChange} // Handle change to track character count
+                      />
+                    </FormControl>
+                    <FormDescription className="mt-1 ml-2 w-full flex-between">
+                      <span className="w-full max-w-[90%]">
+                        Provide company address. This will be showed in your
+                        public company profile page. 150 characters max.
+                      </span>{" "}
+                      <span className="ml-auto"> {`${charCount}/150`}</span>
+                    </FormDescription>
+                    <FormMessage className="ml-2" />
+                  </div>
+                </FormItem>
+              );
+            }}
           />
         </div>
 

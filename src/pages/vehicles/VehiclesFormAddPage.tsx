@@ -1,55 +1,109 @@
-import { CircleArrowLeft } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { lazy, Suspense, useState } from 'react'
-import LazyLoader from '@/components/loading-skelton/LazyLoader'
-import { validateTabAccess } from '@/helpers/form'
-import { TabsTypes } from '@/types/types'
-import { toast } from '@/components/ui/use-toast'
+import { CircleArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { lazy, Suspense, useState } from "react";
+import LazyLoader from "@/components/loading-skelton/LazyLoader";
+import {
+  mapGetPrimaryFormToPrimaryFormType,
+  validateTabAccess,
+} from "@/helpers/form";
+import { TabsTypes } from "@/types/types";
+import { toast } from "@/components/ui/use-toast";
+import { useQuery } from "@tanstack/react-query";
+import FormSkelton from "@/components/loading-skelton/FormSkelton";
+import { getPrimaryDetailsFormDefaultData } from "@/api/vehicle";
+import { getCompany } from "@/api/company";
+import { load, StorageKeys } from "@/utils/storage";
+import { jwtDecode } from "jwt-decode";
+import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
 
 // Lazy-loaded components
 const PrimaryDetailsForm = lazy(
-  () => import('@/components/form/main-form/PrimaryDetailsForm')
-)
+  () => import("@/components/form/main-form/PrimaryDetailsForm")
+);
 const SpecificationsForm = lazy(
-  () => import('@/components/form/main-form/SpecificationsForm')
-)
+  () => import("@/components/form/main-form/SpecificationsForm")
+);
 const FeaturesForm = lazy(
-  () => import('@/components/form/main-form/FeaturesForm')
-)
+  () => import("@/components/form/main-form/FeaturesForm")
+);
 
 export default function VehiclesFormAddPage() {
-  const navigate = useNavigate()
-  const [activeTab, setActiveTab] = useState<TabsTypes>('primary')
-  const [levelsFilled, setLevelsFilled] = useState<number>(0) // Default starting level
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState<TabsTypes>("primary");
+  const [levelsFilled, setLevelsFilled] = useState<number>(0); // Default starting level
+
+  let userId = load<string>(StorageKeys.USER_ID);
+
+  // If not found, decode from refresh token
+  if (!userId) {
+    const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
+    if (refreshToken) {
+      try {
+        const decodedRefreshToken = jwtDecode<DecodedRefreshToken>(
+          refreshToken as string
+        );
+        userId = decodedRefreshToken?.userId;
+      } catch (error) {
+        console.error("Error decoding the refresh token", error);
+        toast({
+          variant: "destructive",
+          title: "Invalid token! Login to continue",
+        });
+        navigate("/login", { replace: true });
+        return null;
+      }
+    }
+  }
+
+  // Fetch company data based on userId
+  const { data: companyData, isLoading: isCompanyLoading } = useQuery({
+    queryKey: ["company"],
+    queryFn: () => getCompany(userId as string),
+    enabled: !!userId,
+  });
+
+  const companyId = companyData?.result?.companyId;
+
+  // fetching primary form data default values
+  const { data, isLoading } = useQuery({
+    queryKey: ["primary-details-form-default", companyId],
+    queryFn: () => getPrimaryDetailsFormDefaultData(companyId as string),
+    staleTime: 60000,
+    enabled: !!companyId,
+  });
+
+  const formData = data
+    ? mapGetPrimaryFormToPrimaryFormType(data.result)
+    : null;
 
   // Handle tab change based on levelsFilled state
   const handleTabChange = (value: string) => {
-    const tab = value as TabsTypes
-    const { canAccess, message } = validateTabAccess({ tab, levelsFilled })
+    const tab = value as TabsTypes;
+    const { canAccess, message } = validateTabAccess({ tab, levelsFilled });
 
     if (canAccess) {
-      setActiveTab(tab)
+      setActiveTab(tab);
     } else {
       toast({
-        title: 'Access Restricted',
+        title: "Access Restricted",
         description: message,
-        className: 'bg-orange text-white',
-      })
+        className: "bg-orange text-white",
+      });
     }
-  }
+  };
 
   // Handle moving to the next tab and update levelsFilled state
   const handleNextTab = (nextTab: TabsTypes) => {
-    setActiveTab(nextTab)
+    setActiveTab(nextTab);
 
     // Update levelsFilled based on the next tab
-    if (nextTab === 'specifications' && levelsFilled < 1) {
-      setLevelsFilled(1) // Update to reflect PrimaryDetailsForm completion
-    } else if (nextTab === 'features' && levelsFilled < 2) {
-      setLevelsFilled(2) // Update to reflect SpecificationsForm completion
+    if (nextTab === "specifications" && levelsFilled < 1) {
+      setLevelsFilled(1); // Update to reflect PrimaryDetailsForm completion
+    } else if (nextTab === "features" && levelsFilled < 2) {
+      setLevelsFilled(2); // Update to reflect SpecificationsForm completion
     }
-  }
+  };
 
   return (
     <section className="container h-auto min-h-screen py-10 bg-white">
@@ -90,28 +144,33 @@ export default function VehiclesFormAddPage() {
 
           <TabsContent value="primary" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              <PrimaryDetailsForm
-                type="Add"
-                onNextTab={() => handleNextTab('specifications')}
-              />
+              {isLoading || isCompanyLoading ? (
+                <FormSkelton />
+              ) : (
+                <PrimaryDetailsForm
+                  type="Add"
+                  formData={formData}
+                  onNextTab={() => handleNextTab("specifications")}
+                />
+              )}
             </Suspense>
           </TabsContent>
           <TabsContent value="specifications" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
               <SpecificationsForm
-                type={'Add'}
-                onNextTab={() => handleNextTab('features')}
+                type={"Add"}
+                onNextTab={() => handleNextTab("features")}
                 isAddOrIncomplete={true}
               />
             </Suspense>
           </TabsContent>
           <TabsContent value="features" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              <FeaturesForm type={'Add'} isAddOrIncomplete={true} />
+              <FeaturesForm type={"Add"} isAddOrIncomplete={true} />
             </Suspense>
           </TabsContent>
         </Tabs>
       </div>
     </section>
-  )
+  );
 }
