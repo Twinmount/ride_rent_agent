@@ -250,7 +250,7 @@ export default function ProfilePage() {
             <span className="font-bold">:</span>
           </dt>
           <dd className="flex gap-x-3 items-center px-2 ml-4 w-full text-base rounded-lg bg-slate-50">
-            {profileData.companyAddress}
+            {profileData.companyAddress || "N/A"}
           </dd>
         </div>
         {/* registration number */}
@@ -260,7 +260,9 @@ export default function ProfilePage() {
             <span className="font-bold">:</span>
           </dt>
           <dd className="flex gap-x-3 items-center px-2 ml-4 w-full text-base rounded-lg bg-slate-50">
-            {profileData.companyLanguages.join(", ")}
+            {profileData.companyLanguages.length === 0
+              ? "N/A"
+              : profileData.companyLanguages.join(", ")}
           </dd>
         </div>
 
