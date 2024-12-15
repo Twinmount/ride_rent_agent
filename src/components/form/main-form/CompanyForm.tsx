@@ -474,7 +474,7 @@ export default function CompanyRegistrationForm({
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
-                  Registration Number{" "}
+                  Registration Number / Trade License Number{" "}
                   <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
@@ -514,8 +514,9 @@ export default function CompanyRegistrationForm({
                     />
                   </FormControl>
                   <FormDescription className="mt-1 ml-1">
-                    Select all the languages your company operates in. This will
-                    be listed in your public company profile page.
+                    Select all the languages your staff can speak or understand.
+                    These will be displayed on your company's public profile
+                    page, helping customers feel comfortable with communication.
                   </FormDescription>
                   <FormMessage />
                 </div>
