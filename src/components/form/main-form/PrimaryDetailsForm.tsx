@@ -73,10 +73,7 @@ export default function PrimaryDetailsForm({
     userId: string;
   }>();
 
-  // Call the useLoadingMessages hook to manage loading messages
-
-  const initialValues =
-    formData && type === "Update" ? formData : PrimaryFormDefaultValues;
+  const initialValues = formData ? formData : PrimaryFormDefaultValues;
 
   // Define your form.
   const form = useForm<z.infer<typeof PrimaryFormSchema>>({

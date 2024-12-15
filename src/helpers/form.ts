@@ -253,7 +253,9 @@ export function mapGetPrimaryFormToPrimaryFormType(
     vehicleRegistrationNumber: data.vehicleRegistrationNumber,
     vehicleRegisteredYear: data.vehicleRegisteredYear,
     commercialLicenses: data.commercialLicenses,
-    commercialLicenseExpireDate: new Date(data.commercialLicenseExpireDate), // Convert string to Date
+    commercialLicenseExpireDate: data.commercialLicenseExpireDate
+      ? new Date(data.commercialLicenseExpireDate)
+      : undefined,
     isLease: data.isLease,
     isCryptoAccepted: data.isCryptoAccepted,
     isSpotDeliverySupported: data.isSpotDeliverySupported,

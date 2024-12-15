@@ -74,6 +74,8 @@ export interface companyType {
   approvalStatus: string;
   rejectionReason: string;
   plan: string;
+  companyAddress: string;
+  companyLanguages: string[];
 }
 
 //  interface for the get-all-companies  API response
