@@ -20,8 +20,6 @@ import { Link, useLocation } from "react-router-dom";
 export default function RegistrationPage() {
   const location = useLocation();
 
-  console.log(location);
-
   // Check if the current pathname is "/register"
   const isRegisterPage = location.pathname === "/register";
 

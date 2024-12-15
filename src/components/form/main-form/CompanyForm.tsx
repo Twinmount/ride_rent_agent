@@ -161,8 +161,6 @@ export default function CompanyRegistrationForm({
   };
 
   async function onSubmit(values: z.infer<typeof CompanyFormSchema>) {
-    console.log(values);
-    return;
     // Check if OTP is verified before submitting the form
     if (!isOtpVerified) {
       toast({
