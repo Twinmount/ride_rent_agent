@@ -22,7 +22,6 @@ import { ApiError, CompanyFormType } from "@/types/types";
 import { ShieldCheck } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
 import { useNavigate } from "react-router-dom";
 import { toast } from "../../ui/use-toast";
 import { addCompany, sendOtp, updateCompany, verifyOtp } from "@/api/company";
