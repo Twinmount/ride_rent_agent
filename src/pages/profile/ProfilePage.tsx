@@ -106,7 +106,7 @@ export default function ProfilePage() {
             <span className="font-bold">{profileData.agentId}</span>
             <button
               className="px-2 h-6 text-base rounded-lg border-none outline-none flex-center text-yellow"
-              onClick={() => copyToClipboard(userId)}
+              onClick={() => copyToClipboard(profileData.agentId)}
             >
               {isCopied ? <CheckCheck size={18} /> : <Files size={18} />}
             </button>
