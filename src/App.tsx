@@ -133,6 +133,11 @@ const queryClient = new QueryClient({
       });
     },
   }),
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+    },
+  },
 });
 
 export default function App() {

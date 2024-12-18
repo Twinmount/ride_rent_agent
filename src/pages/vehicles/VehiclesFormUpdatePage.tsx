@@ -74,6 +74,7 @@ export default function VehiclesFormUpdatePage() {
     }
   }, [levelsFilled, vehicleCategoryId]);
 
+  // prefetching levels filled
   useEffect(() => {
     queryClient.prefetchQuery({
       queryKey: ["getLevelsFilled", vehicleId],
@@ -132,6 +133,7 @@ export default function VehiclesFormUpdatePage() {
                   type="Update"
                   formData={formData}
                   initialCountryCode={countryCode}
+                  levelsFilled={levelsFilled}
                 />
               )}
             </Suspense>

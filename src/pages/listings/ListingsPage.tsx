@@ -80,7 +80,6 @@ export default function ListingsPage() {
           filters.approvalStatus !== "ALL" ? filters.approvalStatus : undefined,
       }),
     enabled: !!userId,
-    refetchOnWindowFocus: "always",
   });
 
   // Redirect to login page if userId or companyId is not available
