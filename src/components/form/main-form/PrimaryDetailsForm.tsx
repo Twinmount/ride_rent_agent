@@ -145,7 +145,7 @@ export default function PrimaryDetailsForm({
 
       if (data) {
         toast({
-          title: `Vehicle ${type.toLowerCase()}ed successfully`,
+          title: `Vehicle ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
         });
 

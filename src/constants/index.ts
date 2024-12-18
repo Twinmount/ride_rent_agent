@@ -1,4 +1,8 @@
-import { CompanyFormType, PrimaryFormType } from "@/types/types";
+import {
+  CompanyFormType,
+  PrimaryFormType,
+  ProfileUpdateFormType,
+} from "@/types/types";
 import {
   Box,
   LayoutDashboard,
@@ -65,6 +69,15 @@ export const srmFeatures = [
 export const CompanyFormDefaultValues: CompanyFormType = {
   companyName: "",
   companyLogo: "",
+  commercialLicense: "",
+  expireDate: undefined,
+  regNumber: "",
+  companyAddress: "", // Default empty value
+  companyLanguages: [],
+};
+
+// Company profile update form default values
+export const ProfileUpdateFormDefaultValues: ProfileUpdateFormType = {
   commercialLicense: "",
   expireDate: undefined,
   regNumber: "",

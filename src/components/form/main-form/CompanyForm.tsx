@@ -24,7 +24,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate } from "react-router-dom";
 import { toast } from "../../ui/use-toast";
-import { addCompany, sendOtp, updateCompany, verifyOtp } from "@/api/company";
+import { addCompany, sendOtp, verifyOtp } from "@/api/company";
 import Spinner from "../../general/Spinner";
 import { load, StorageKeys } from "@/utils/storage";
 import { jwtDecode } from "jwt-decode";
@@ -43,13 +43,11 @@ import CompanyLanguagesDropdown from "../dropdowns/CompanyLanguagesDropdown";
 import { Textarea } from "@/components/ui/textarea";
 
 type CompanyRegistrationFormProps = {
-  type: "Add" | "Update";
   formData?: CompanyFormType | null;
   agentId: string;
 };
 
 export default function CompanyRegistrationForm({
-  type,
   formData,
   agentId,
 }: CompanyRegistrationFormProps) {
@@ -64,8 +62,7 @@ export default function CompanyRegistrationForm({
   const [timer, setTimer] = useState(60);
   const navigate = useNavigate();
 
-  const initialValues =
-    formData && type === "Update" ? formData : CompanyFormDefaultValues;
+  const initialValues = CompanyFormDefaultValues;
 
   // accessing refresh token to get the userId
   const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
@@ -189,12 +186,7 @@ export default function CompanyRegistrationForm({
     }
 
     try {
-      let data;
-      if (type === "Add") {
-        data = await addCompany(values, userId);
-      } else if (type === "Update") {
-        data = await updateCompany(values, userId);
-      }
+      let data = await addCompany(values, userId);
 
       if (data) {
         await deleteMultipleFiles(deletedImages);
@@ -202,7 +194,7 @@ export default function CompanyRegistrationForm({
 
       if (data) {
         toast({
-          title: `Company ${type}ed successfully`,
+          title: `Company Added successfully`,
           className: "bg-yellow text-white",
         });
         navigate("/listings");
@@ -211,7 +203,7 @@ export default function CompanyRegistrationForm({
       console.error(error);
       toast({
         variant: "destructive",
-        title: `${type} Company failed`,
+        title: `Add Company failed`,
         description: "Something went wrong",
       });
     }
@@ -578,7 +570,7 @@ export default function CompanyRegistrationForm({
           disabled={form.formState.isSubmitting}
           className="w-full  mx-auto flex-center col-span-2 mt-3 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow"
         >
-          {type === "Add" ? "Add Company" : "Update Company"}
+          {"Add Company"}
           {form.formState.isSubmitting && <Spinner />}
         </Button>
       </form>

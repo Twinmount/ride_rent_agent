@@ -20,7 +20,6 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { downloadFileFromStream } from "@/helpers/form";
 import ImagePreviewModal from "@/components/modal/ImagePreviewModal";
-import NeedHelpToolTip from "@/components/common/NeedHelpToolTip";
 
 export default function ProfilePage() {
   const [isCopied, setIsCopied] = useState(false);
@@ -153,7 +152,6 @@ export default function ProfilePage() {
           </dt>
           <dd className="flex flex-col gap-x-3 items-start px-2 ml-4 w-full rounded-lg bg-slate-50">
             <span className="line-clamp-1">{profileData.companyName}</span>
-            <NeedHelpToolTip content="Contact Support to Change Company Name" />
           </dd>
         </div>
 
@@ -193,7 +191,6 @@ export default function ProfilePage() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <NeedHelpToolTip content="Contact Support to Change Company Registration Card" />
           </dd>
         </div>
 
@@ -216,7 +213,6 @@ export default function ProfilePage() {
             <span className="w-full max-w-full text-base line-clamp-1">
               {userData?.emailId}
             </span>
-            <NeedHelpToolTip content="Contact Support to Change Company Email" />
           </dd>
         </div>
 
@@ -286,7 +282,18 @@ export default function ProfilePage() {
           <div className="gap-x-4 mr-6 flex-center">
             <SupportModal classes="text-blue-500 w-fit flex-center gap-x-2" />
           </div>
+          <Link
+            to={`/profile/edit/${profileData.agentId}`}
+            className="text-blue-500"
+          >
+            Edit Profile?
+          </Link>
         </div>
+
+        <p className="text-center text-xs bg-red-100 py-2 rounded-lg">
+          Note: For updating Company name, company profile, email or phone
+          number, please contact support
+        </p>
       </dl>
 
       {/* Image Preview Modal */}

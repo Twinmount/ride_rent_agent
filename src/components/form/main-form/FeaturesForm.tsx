@@ -131,7 +131,7 @@ export default function FeaturesForm({
       }
       if (response) {
         toast({
-          title: `Features ${type.toLowerCase()}ed successfully`,
+          title: `Features ${type.toLowerCase()} successful`,
           description: isAddOrIncomplete
             ? "Vehicle will be live once the admin approves your listing"
             : "Changes will be reflected once the admin approves it",

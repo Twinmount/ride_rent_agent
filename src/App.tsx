@@ -54,6 +54,11 @@ const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 const ListingsPage = lazy(() => import("./pages/listings/ListingsPage"));
 const ProfilePage = lazy(() => import("./pages/profile/ProfilePage"));
 
+// lazy importing profile update page
+const ProfileUpdatePage = lazy(
+  () => import("./pages/profile/ProfileUpdatePage")
+);
+
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
 const router = createBrowserRouter([
@@ -103,6 +108,10 @@ const router = createBrowserRouter([
               { path: "/", element: <Dashboard /> },
               { path: "/listings", element: <ListingsPage /> },
               { path: "/profile", element: <ProfilePage /> },
+              {
+                path: "/profile/edit/:agentId",
+                element: <ProfileUpdatePage />,
+              },
               {
                 path: "/listings/add/:userId",
                 element: <VehiclesFormAddPage />,
