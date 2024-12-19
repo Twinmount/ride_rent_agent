@@ -47,12 +47,12 @@ import { GcsFilePaths } from "@/constants/enum";
 import MultipleFileUpload from "../file-uploads/MultipleFileUpload";
 import AdditionalTypesDropdown from "../dropdowns/AdditionalTypesDropdown";
 import SecurityDepositField from "../SecurityDepositField";
+import { useQueryClient } from "@tanstack/react-query";
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
   formData?: PrimaryFormType | null;
   onNextTab?: () => void;
-  initialCountryCode?: string;
   levelsFilled?: number;
 };
 
@@ -60,7 +60,6 @@ export default function PrimaryDetailsForm({
   type,
   onNextTab,
   formData,
-  initialCountryCode,
   levelsFilled,
 }: PrimaryFormProps) {
   const [countryCode, setCountryCode] = useState<string>("");
@@ -69,6 +68,8 @@ export default function PrimaryDetailsForm({
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
   const [isCarsCategory, setIsCarsCategory] = useState(false);
   const [hideCommercialLicenses, setHideCommercialLicenses] = useState(false);
+
+  const queryClient = useQueryClient();
 
   const { vehicleId, userId } = useParams<{
     vehicleId: string;
@@ -134,7 +135,7 @@ export default function PrimaryDetailsForm({
         data = await updatePrimaryDetailsForm(
           vehicleId as string,
           values as PrimaryFormType,
-          initialCountryCode as string,
+          countryCode as string,
           isCarsCategory
         );
       }
@@ -178,6 +179,12 @@ export default function PrimaryDetailsForm({
         });
       }
       console.error(error);
+    } finally {
+      // invalidating cached data in the listing page
+      queryClient.invalidateQueries({
+        queryKey: ["primary-details-form", vehicleId],
+        exact: true,
+      });
     }
   }
 

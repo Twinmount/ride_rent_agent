@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
@@ -42,6 +42,8 @@ export default function SpecificationsForm({
 }: SpecificationFormProps) {
   const { vehicleId, vehicleCategoryId, vehicleTypeId } =
     useVehicleIdentifiers(type);
+
+  const queryClient = useQueryClient();
 
   const { userId } = useParams<{ userId: string }>();
 
@@ -195,6 +197,12 @@ export default function SpecificationsForm({
         variant: "destructive",
         title: `${type} Specifications failed`,
         description: "Something went wrong",
+      });
+    } finally {
+      // invalidating cached data in the listing page
+      queryClient.invalidateQueries({
+        queryKey: ["specification-update-form-data", vehicleId],
+        exact: true,
       });
     }
   }
