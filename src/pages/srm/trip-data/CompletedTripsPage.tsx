@@ -83,7 +83,6 @@ export default function CompletedTripsPage() {
           isOpen={!!downloadTripId}
           onClose={handleCloseModal}
           onDownload={() => {
-            console.log(`Downloading trip with ID: ${downloadTripId}`);
             handleCloseModal();
           }}
         />

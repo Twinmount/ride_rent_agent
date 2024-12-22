@@ -27,11 +27,11 @@ export const CustomerListColumns = (
     header: "Email",
   },
   {
-    accessorKey: "passportNum",
+    accessorKey: "passportNumber",
     header: "Passport Number",
   },
   {
-    accessorKey: "drivingLicenseNum",
+    accessorKey: "drivingLicenseNumber",
     header: "Driving License Number",
   },
   {

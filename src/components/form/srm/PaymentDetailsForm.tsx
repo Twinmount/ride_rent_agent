@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SRMPaymentDetailsFormDefaultValues } from "@/constants";
 import { SRMPaymentDetailsFormSchema } from "@/lib/validator";
-import { SRMPaymentDetailsFormType } from "@/types/types";
+import { SRMPaymentDetailsFormType } from "@/types/srm-types";
 import "react-international-phone/style.css";
 
 import { toast } from "@/components/ui/use-toast";
@@ -339,8 +339,6 @@ export default function SRMPaymentDetailsForm({
                     <CurrencyDropdown
                       onChangeHandler={(value) => {
                         field.onChange(value);
-
-                        form.setValue("currency", "");
                       }}
                       value={initialValues.currency}
                     />

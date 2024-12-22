@@ -1,10 +1,10 @@
 // CustomerDetailsFormType (level 1)
 export type SRMCustomerDetailsFormType = {
-  customerProfile?: string; // Optional field for profile photo or identifier
+  customerProfilePic?: string; // Optional field for profile photo or identifier
   customerName: string; // User name
   nationality: string; // Nationality of the user
-  passportNum: string; // Passport number of the user
-  drivingLicenseNum: string; // Driving license number of the user
+  passportNumber: string; // Passport number of the user
+  drivingLicenseNumber: string; // Driving license number of the user
   phoneNumber: string; // Mobile number of the user
 };
 

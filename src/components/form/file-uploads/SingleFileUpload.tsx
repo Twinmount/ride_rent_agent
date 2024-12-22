@@ -82,6 +82,11 @@ const SingleFileUpload = ({
     if (existingFile) {
       setImagePath(existingFile);
       setValue(name, existingFile);
+    } else {
+      {
+        setImagePath(null); // Reset the internal state of the imagePath
+        setValue(name, null); // Ensure the form value is cleared
+      }
     }
   }, [existingFile, setValue, name]);
 

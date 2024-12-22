@@ -28,9 +28,12 @@ import { GcsFilePaths } from "@/constants/enum";
 import SingleFileUpload from "../file-uploads/SingleFileUpload";
 import {
   addCustomerDetailsForm,
+  createCustomerBooking,
   updateCustomerDetailsForm,
 } from "@/api/srm/srmFormApi";
 import NationalityDropdown from "../dropdowns/NationalityDropdown";
+import CustomerSearch from "../dropdowns/CustomerSearch";
+import { CustomerListItem } from "@/types/srm-api-types";
 
 type SRMCustomerDetailsFormProps = {
   type: "Add" | "Update";
@@ -48,12 +51,14 @@ export default function SRMCustomerDetailsForm({
   const [countryCode, setCountryCode] = useState<string>("");
   const [isFileUploading, setIsFileUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>(""); // Search input value
-  const [selectedCustomer, setSelectedCustomer] = useState<any>(null);
+  const [currentProfilePic, setCurrentProfilePic] = useState<string | null>(
+    formData?.customerProfilePic || null
+  );
+  const [existingCustomerId, setExistingCustomerId] = useState<string | null>(
+    null
+  );
 
   const {} = useParams<{}>();
-
-  // Call the useLoadingMessages hook to manage loading messages
 
   const initialValues =
     formData && type === "Update"
@@ -85,10 +90,22 @@ export default function SRMCustomerDetailsForm({
     try {
       let data;
       if (type === "Add") {
-        data = await addCustomerDetailsForm(
-          values as SRMCustomerDetailsFormType,
-          countryCode
-        );
+        // creating the customer in the db
+        if (!!existingCustomerId) {
+          console.log("existing customer", existingCustomerId);
+          // Call only createCustomerBooking if the customer exists
+          await createCustomerBooking(existingCustomerId as string);
+        } else {
+          console.log("new customer");
+          // Add customer details and create a booking if the customer is new
+          data = await addCustomerDetailsForm(
+            values as SRMCustomerDetailsFormType,
+            countryCode
+          );
+
+          const customerId = data.result.customerId;
+          await createCustomerBooking(customerId);
+        }
       } else if (type === "Update") {
         data = await updateCustomerDetailsForm(
           values as SRMCustomerDetailsFormType,
@@ -134,41 +151,41 @@ export default function SRMCustomerDetailsForm({
   }, [form.formState.errors]);
 
   // Handle selecting a customer from the results
-  const handleCustomerSelect = (customer: any) => {
-    setSelectedCustomer(customer);
-    setSearchTerm("");
+  const handleCustomerSelect = (
+    customerName: string,
+    customerData: CustomerListItem | null
+  ) => {
+    form.setValue("customerName", customerName);
 
-    // Update form values with the selected customer's details
-    form.setValue("customerName", customer.name);
-    form.setValue("customerProfile", customer.customerProfile);
-    form.setValue("nationality", customer.nationality);
-    form.setValue("passportNum", customer.passportNum);
-    form.setValue("drivingLicenseNum", customer.drivingLicenseNum);
-    form.setValue("phoneNumber", customer.phoneNumber);
+    if (customerData) {
+      setExistingCustomerId(customerData?.customerId);
+      form.setValue(
+        "customerProfilePic",
+        customerData.customerProfilePic || ""
+      );
+      setCurrentProfilePic(customerData.customerProfilePic || "");
+      form.setValue("nationality", customerData.nationality || "");
+      form.setValue("passportNumber", customerData.passportNumber || "");
+      form.setValue(
+        "drivingLicenseNumber",
+        customerData.drivingLicenseNumber || ""
+      );
+      form.setValue(
+        "phoneNumber",
+        (customerData.countryCode || "971") + customerData.phoneNumber || ""
+      );
+      setCountryCode(customerData.countryCode || "");
+    } else {
+      setExistingCustomerId(null);
+      setCurrentProfilePic(null);
+      form.setValue("customerProfilePic", "");
+      form.resetField("nationality");
+      form.resetField("passportNumber");
+      form.resetField("drivingLicenseNumber");
+      form.resetField("phoneNumber");
+      setCountryCode("");
+    }
   };
-
-  const customers = [
-    {
-      id: 1,
-      name: "John Doe",
-      customerProfile:
-        "https://media.istockphoto.com/id/1370772148/photo/track-and-mountains-in-valle-del-lago-somiedo-nature-park-asturias-spain.jpg?s=612x612&w=0&k=20&c=QJn62amhOddkJSbihcjWKHXShMAfcKM0hPN65aCloco=",
-      nationality: "American",
-      passportNum: "A12345678",
-      drivingLicenseNum: "D12345678",
-      phoneNumber: "+1234567890",
-    },
-    {
-      id: 2,
-      name: "Jane Smith",
-      customerProfile: "profile2.jpg",
-      nationality: "British",
-      passportNum: "B87654321",
-      drivingLicenseNum: "D87654321",
-      phoneNumber: "+9876543210",
-    },
-  ];
-
   return (
     <Form {...form}>
       <form
@@ -180,7 +197,7 @@ export default function SRMCustomerDetailsForm({
           any&#41; by searching customer name
         </p>
         <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto ">
-          {/* user name */}
+          {/* customer name */}
           <FormField
             control={form.control}
             name="customerName"
@@ -189,43 +206,19 @@ export default function SRMCustomerDetailsForm({
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
                   Customer Name <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
-
                 <div className="flex-col items-start w-full">
                   <FormControl>
-                    <Input
+                    <CustomerSearch
+                      value={field.value} // Pass current field value
+                      onChangeHandler={handleCustomerSelect}
                       placeholder="Enter / Search customer name"
-                      {...field}
-                      className="input-field"
-                      onChange={(e) => {
-                        setSearchTerm(e.target.value); // Update searchTerm for future use
-                        field.onChange(e); // Update form field value
-                      }}
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    Provide customer name.
+                    Provide customer name. You can search existing customer
+                    also.
                   </FormDescription>
                   <FormMessage />
-
-                  {searchTerm && customers.length > 0 && (
-                    <ul className="overflow-y-auto absolute z-10 w-full max-h-60 bg-white rounded-md border border-gray-300 shadow-md">
-                      {customers
-                        .filter((customer) =>
-                          customer.name
-                            .toLowerCase()
-                            .includes(searchTerm.toLowerCase())
-                        )
-                        .map((customer) => (
-                          <li
-                            key={customer.id}
-                            className="px-4 py-2 cursor-pointer hover:bg-gray-100"
-                            onClick={() => handleCustomerSelect(customer)}
-                          >
-                            {customer.name}
-                          </li>
-                        ))}
-                    </ul>
-                  )}
                 </div>
               </FormItem>
             )}
@@ -234,16 +227,16 @@ export default function SRMCustomerDetailsForm({
           {/* user profile */}
           <FormField
             control={form.control}
-            name="customerProfile"
+            name="customerProfilePic"
             render={({ field }) => (
               <SingleFileUpload
                 name={field.name}
                 label="Customer Profile (optional)"
                 description="Customer profile can have a maximum size of 5MB."
-                existingFile={formData?.customerProfile}
+                existingFile={currentProfilePic}
                 maxSizeMB={5}
                 setIsFileUploading={setIsFileUploading}
-                bucketFilePath={GcsFilePaths.LOGOS}
+                bucketFilePath={GcsFilePaths.IMAGE}
                 isDownloadable={true}
                 downloadFileName={"user profile"}
                 setDeletedImages={setDeletedFiles}
@@ -280,7 +273,7 @@ export default function SRMCustomerDetailsForm({
           {/* Passport Number */}
           <FormField
             control={form.control}
-            name="passportNum"
+            name="passportNumber"
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
@@ -306,7 +299,7 @@ export default function SRMCustomerDetailsForm({
           {/* Driving License Number */}
           <FormField
             control={form.control}
-            name="drivingLicenseNum"
+            name="drivingLicenseNumber"
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">

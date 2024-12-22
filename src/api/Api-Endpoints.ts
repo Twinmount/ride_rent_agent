@@ -68,15 +68,27 @@ export enum Slug {
   GET_PORTFOLIO = "/portfolio",
 
   // SRM Form endpoints
-  POST_SRM_USER_FORM = "/vehicle/level-one",
-  PUT_SRM_USER_FORM = "/vehicle/level-one",
-  GET_SRM_USER_FORM = "/vehicle/level-one",
-  POST_SRM_VEHICLE_FORM = "/vehicle/level-two",
-  PUT_SRM_VEHICLE_FORM = "/vehicle/level-two",
-  GET_SRM_VEHICLE_FORM = "/vehicle/level-two",
-  POST_SRM_PAYMENT_FORM = "/vehicle/level-three",
-  PUT_SRM_PAYMENT_FORM = "/vehicle/level-three",
-  GET_SRM_PAYMENT_FORM = "/vehicle/level-three",
+  // SRM CUSTOMERS
+  POST_SRM_CUSTOMER_FORM = "/srm-customers",
+  PUT_SRM_CUSTOMER_FORM = "/srm-customers",
+  GET_SRM_CUSTOMER_FORM = "/srm-customers",
+  GET_SRM_CUSTOMER_LIST = "/srm-customers/list",
+
+  // SRM VEHICLES
+  POST_SRM_VEHICLE_FORM = "srm-vehicle",
+  GET_SRM_VEHICLE_FORM = "srm-vehicle",
+  GET_SRM_VEHICLE_LIST = "srm-vehicle/list",
+  PUT_SRM_VEHICLE_FORM = "srm-vehicle",
+
+  // SRM PAYMENTS
+  POST_SRM_PAYMENT_FORM = "/srm-payment",
+  GET_SRM_PAYMENT_FORM = "/srm-payment",
+  PUT_SRM_PAYMENT_FORM = "/srm-payment",
+
+  // SRM BOOKINGS (customer, vehicle and payment)
+  POST_SRM_BOOKING_CUSTOMER = "/srm-bookings/customer",
+  PUT_SRM_BOOKING_VEHICLE = "/srm-bookings/vehicle",
+  PUT_SRM_BOOKING_PAYMENT = "/srm-bookings/payment",
 
   // SRM TRIPS
   GET_SRM_ACTIVE_TRIPS = "/trips/active",

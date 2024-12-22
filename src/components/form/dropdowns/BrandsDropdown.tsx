@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAllBrands, fetchBrandById } from "@/api/brands";
+import { debounce } from "@/helpers";
 
 type BrandsDropdownProps = {
   value?: string;
@@ -75,17 +76,6 @@ const BrandsDropdown = ({
       setSelectedValue(value);
     }
   }, [value]);
-
-  const debounce = <T extends any[]>(
-    callback: (...args: T) => void,
-    delay: number
-  ) => {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: T) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => callback(...args), delay);
-    };
-  };
 
   // Debounced handle search
   const debouncedHandleSearch = React.useCallback(

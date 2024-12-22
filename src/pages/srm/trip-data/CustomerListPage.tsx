@@ -34,8 +34,8 @@ export default function CustomerListPage() {
       id: "1",
       customerName: "John Doe",
       email: "john@example.com",
-      passportNum: "A12345678",
-      drivingLicenseNum: "DL987654321",
+      passportNumber: "A12345678",
+      drivingLicenseNumber: "DL987654321",
       phoneNumber: "+1234567890",
     },
   ];
@@ -50,8 +50,8 @@ export default function CustomerListPage() {
         isOpen={false}
         onClose={() => {}}
         customerName="John Doe"
-        passportNum="A12345678"
-        drivingLicenseNum="DL987654321"
+        passportNumber="A12345678"
+        drivingLicenseNumber="DL987654321"
         phoneNumber="+1234567890"
         customerStatus="Blacklisted"
       />

@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SRMVehicleDetailsFormDefaultValues } from "@/constants";
 import { SRMVehicleDetailsFormSchema } from "@/lib/validator";
-import { SRMVehicleDetailsFormType } from "@/types/types";
+import { SRMVehicleDetailsFormType } from "@/types/srm-types";
 import CategoryDropdown from "../dropdowns/CategoryDropdown";
 import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
@@ -26,7 +26,7 @@ import {
 } from "@/api/srm/srmFormApi";
 import BrandsDropdown from "../dropdowns/BrandsDropdown";
 import RentalDetailsFormField from "../RentalDetailsFormField";
-import { validateSRMRentalDetails } from "@/helpers/form";
+import { deleteMultipleFiles, validateSRMRentalDetails } from "@/helpers/form";
 import SingleFileUpload from "../file-uploads/SingleFileUpload";
 import { GcsFilePaths } from "@/constants/enum";
 
@@ -62,6 +62,7 @@ export default function SRMVehicleDetailsForm({
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof SRMVehicleDetailsFormSchema>) {
+    // rental details validation
     const rentalError = validateSRMRentalDetails(values.rentalDetails);
     if (rentalError) {
       form.setError("rentalDetails", {
@@ -72,6 +73,19 @@ export default function SRMVehicleDetailsForm({
       return;
     }
 
+    // if file is being uploaded, show loading message
+    if (isFileUploading) {
+      toast({
+        title: "File Upload in Progress",
+        description:
+          "Please wait until the file upload completes before submitting the form.",
+        duration: 3000,
+        className: "bg-orange",
+      });
+      return;
+    }
+
+    // form submission
     try {
       let data;
       if (type === "Add") {
@@ -80,6 +94,10 @@ export default function SRMVehicleDetailsForm({
         data = await updateVehicleDetailsForm(
           values as SRMVehicleDetailsFormType
         );
+      }
+
+      if (data) {
+        await deleteMultipleFiles(deletedFiles);
       }
 
       if (data) {
@@ -103,6 +121,7 @@ export default function SRMVehicleDetailsForm({
     }
   }
 
+  // form error validation for complex fields
   useEffect(() => {
     // Check for validation errors and scroll to the top if errors are present
     if (Object.keys(form.formState.errors).length > 0) {

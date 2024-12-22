@@ -11,8 +11,8 @@ interface BannedUserPopupProps {
   isOpen: boolean;
   onClose: () => void;
   customerName: string;
-  passportNum: string;
-  drivingLicenseNum: string;
+  passportNumber: string;
+  drivingLicenseNumber: string;
   phoneNumber: string;
   customerStatus: string;
 }
@@ -21,8 +21,8 @@ export default function BannedUserPopup({
   isOpen,
   onClose,
   customerName,
-  passportNum,
-  drivingLicenseNum,
+  passportNumber,
+  drivingLicenseNumber,
   phoneNumber,
   customerStatus,
 }: BannedUserPopupProps) {
@@ -46,15 +46,15 @@ export default function BannedUserPopup({
             </div>
             <div>
               <p className="font-semibold">Nationality:</p>
-              <p>{passportNum ? "Available" : "Not Provided"}</p>
+              <p>{passportNumber ? "Available" : "Not Provided"}</p>
             </div>
             <div>
               <p className="font-semibold">Passport Number:</p>
-              <p>{passportNum || "Not Provided"}</p>
+              <p>{passportNumber || "Not Provided"}</p>
             </div>
             <div>
               <p className="font-semibold">Driving License Number:</p>
-              <p>{drivingLicenseNum || "Not Provided"}</p>
+              <p>{drivingLicenseNumber || "Not Provided"}</p>
             </div>
             <div>
               <p className="font-semibold">Mobile Number:</p>

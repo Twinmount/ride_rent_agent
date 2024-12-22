@@ -144,11 +144,11 @@ const SRMHourlyRentalDetailTypeSchema = z.object({
 
 // SRM : Customer Details Form Schema
 export const SRMCustomerDetailsFormSchema = z.object({
-  customerProfile: z.string().optional(),
+  customerProfilePic: z.string().optional(),
   customerName: z.string().min(1, "Customer name is required"),
   nationality: z.string().min(1, "Nationality is required"),
-  passportNum: z.string().min(1, "Passport number is required"),
-  drivingLicenseNum: z.string().min(1, "Driving license number is required"),
+  passportNumber: z.string().min(1, "Passport number is required"),
+  drivingLicenseNumber: z.string().min(1, "Driving license number is required"),
   phoneNumber: z.string().min(6, "Provide a valid mobile number"),
 });
 
@@ -160,9 +160,7 @@ export const SRMVehicleDetailsFormSchema = z.object({
     .string()
     .min(1, "Vehicle registration number is required")
     .max(15, "Vehicle registration number cannot exceed 15 characters"),
-  bookingStartDate: z.date(),
-  bookingEndDate: z.date(),
-  vehiclePhoto: z.string().optional(),
+  vehiclePhoto: z.string(),
   rentalDetails: z.object({
     day: SRMRentalDetailTypeSchema,
     week: SRMRentalDetailTypeSchema,

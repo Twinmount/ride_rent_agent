@@ -128,11 +128,11 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
 
 // srm user details form default values
 export const SRMCustomerDetailsFormDefaultValues: SRMCustomerDetailsFormType = {
-  customerProfile: "", // Optional field
+  customerProfilePic: "", // Optional field
   customerName: "", // Name of the Customer
   nationality: "", // Nationality of the user
-  passportNum: "", // Passport number
-  drivingLicenseNum: "", // Driving license number
+  passportNumber: "", // Passport number
+  drivingLicenseNumber: "", // Driving license number
   phoneNumber: "", // Phone number with validation on minimum characters
 };
 

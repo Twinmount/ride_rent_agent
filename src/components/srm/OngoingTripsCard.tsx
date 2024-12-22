@@ -8,7 +8,7 @@ import {
   Calendar,
 } from "lucide-react";
 import MotionDiv from "@/components/framer-motion/MotionDiv";
-import { Trip } from "@/types/types";
+import { Trip } from "@/types/srm-types";
 
 interface OngoingTripsCardProps {
   trip: Trip;
