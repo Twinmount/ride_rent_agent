@@ -158,6 +158,7 @@ export const fetchCustomerList = async (urlParams: {
       page: urlParams.page.toString(),
       limit: urlParams.limit.toString(),
       sortOrder: urlParams.sortOrder,
+      isFileUrlNeeded: "true",
     });
 
     if (urlParams.search) {

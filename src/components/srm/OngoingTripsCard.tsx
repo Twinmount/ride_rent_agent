@@ -27,7 +27,19 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
       className="flex items-center p-4 w-full max-w-3xl bg-white rounded-md border shadow-md"
     >
       {/* Left Section - Image Placeholder */}
-      <div className="mr-4 w-1/4 h-36 bg-gray-200 rounded-md max-md:hidden"></div>
+      <div className="mr-4 w-1/4 h-36 bg-gray-200 overflow-hidden rounded-md max-md:hidden">
+        {trip.vehicle.vehiclePhoto ? (
+          <img
+            src={trip.vehicle.vehiclePhoto}
+            className="object-cover w-full h-full"
+            alt={trip.vehicle.vehicleBrand.brandName + "image"}
+          />
+        ) : (
+          <span className="flex-center h-full text-sm italic  text-slate-500">
+            No Image
+          </span>
+        )}
+      </div>
 
       {/* Right Section - Trip Details */}
       <div className="flex flex-col gap-x-2 w-full">
@@ -37,14 +49,26 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
               {trip.vehicle.vehicleBrand.brandName}
             </h3>
             <p className="text-sm text-gray-600">
-              {trip.vehicle.vehicleRegistrationNumber}
+              Reg. No: &nbsp;{trip.vehicle.vehicleRegistrationNumber}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-2 w-full">
             <dl className="flex gap-x-2 items-center text-sm">
-              <dt>
-                <CircleUserRound />
+              <dt className="w-6 h-6 rounded-full overflow-hidden">
+                {trip.customer.customerProfilePic ? (
+                  <img
+                    src={trip.customer.customerProfilePic}
+                    alt={"profile"}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <img
+                    src={"/assets/img/user-profile.webp"}
+                    alt={"profile"}
+                    className="w-full h-full object-cover"
+                  />
+                )}
               </dt>
               <dd>{trip.customer.customerName}</dd>
             </dl>
@@ -64,7 +88,9 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
               <dt>
                 <Phone />
               </dt>
-              <dd>{trip.customer.phoneNumber}</dd>
+              <dd>
+                +{trip.customer.countryCode} {trip.customer.phoneNumber}
+              </dd>
             </dl>
           </div>
         </div>
@@ -95,7 +121,19 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
 
         {/* buttons */}
         <div className="gap-x-3 flex-between md:justify-end">
-          <div className="w-8 h-8 rounded-full bg-slate-300 md:hidden"></div>
+          <div className="w-16 h-10 rounded-xl overflow-hidden bg-slate-300 md:hidden">
+            {trip.vehicle.vehiclePhoto ? (
+              <img
+                src={trip.vehicle.vehiclePhoto}
+                className="object-cover w-full h-full"
+                alt={trip.vehicle.vehicleBrand.brandName + "image"}
+              />
+            ) : (
+              <span className="flex-center h-full text-xs italic  text-slate-500">
+                No Image
+              </span>
+            )}
+          </div>
 
           <div className="flex gap-x-2 items-center">
             <button

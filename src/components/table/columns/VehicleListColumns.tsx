@@ -26,10 +26,13 @@ export const VehicleListColumns: ColumnDef<any>[] = [
             src={vehiclePhoto}
             alt="Vehicle"
             className="object-cover w-full h-full"
+            loading="lazy"
           />
         </div>
       ) : (
-        "No Image"
+        <div className="w-16 h-16 overflow-hidden rounded-md flex-center text-[0.6rem] text-gray-600 bg-slate-300">
+          No Image
+        </div>
       );
     },
   },

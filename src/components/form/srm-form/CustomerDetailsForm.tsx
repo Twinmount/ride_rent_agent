@@ -38,14 +38,12 @@ type SRMCustomerDetailsFormProps = {
   type: "Add" | "Update";
   formData?: SRMCustomerDetailsFormType | null;
   onNextTab?: () => void;
-  initialCountryCode?: string;
 };
 
 export default function SRMCustomerDetailsForm({
   type,
   onNextTab,
   formData,
-  initialCountryCode,
 }: SRMCustomerDetailsFormProps) {
   const [countryCode, setCountryCode] = useState<string>("");
   const [isFileUploading, setIsFileUploading] = useState(false);

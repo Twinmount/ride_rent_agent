@@ -5,6 +5,32 @@ export const CustomerListColumns = (
   handleViewDetails: (userId: string) => void
 ): ColumnDef<any>[] => [
   {
+    accessorKey: "customerProfilePic",
+    header: "Photo",
+    cell: ({ row }) => {
+      const customerProfilePic = row.original.customerProfilePic;
+
+      return customerProfilePic ? (
+        <div className="w-12 h-12 overflow-hidden rounded-md bg-slate-300">
+          <img
+            src={customerProfilePic}
+            alt={"customer profile"}
+            className="object-cover w-full h-full"
+            loading="lazy"
+          />
+        </div>
+      ) : (
+        <div className="w-12 h-12 overflow-hidden rounded-md bg-slate-300">
+          <img
+            src={"/assets/img/user-profile.webp"}
+            alt={"customer profile"}
+            className="object-cover w-full h-full"
+          />
+        </div>
+      );
+    },
+  },
+  {
     accessorKey: "customerName",
     header: "Customer Name",
     cell: ({ row }) => {
@@ -21,11 +47,7 @@ export const CustomerListColumns = (
       );
     },
   },
-  {
-    accessorKey: "nationality",
-    header: "Nationality",
-    cell: ({ row }) => <span>{row.original.nationality}</span>,
-  },
+
   {
     accessorKey: "phoneNumber",
     header: "Phone Number",
@@ -45,7 +67,11 @@ export const CustomerListColumns = (
     header: "Driving License Number",
     cell: ({ row }) => <span>{row.original.drivingLicenseNumber}</span>,
   },
-
+  {
+    accessorKey: "nationality",
+    header: "Nationality",
+    cell: ({ row }) => <span>{row.original.nationality}</span>,
+  },
   {
     accessorKey: "id",
     header: "Customer ID",
