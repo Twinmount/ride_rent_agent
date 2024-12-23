@@ -6,6 +6,7 @@ import {
   AddVehicleFormResponse,
   SearchCustomerResponse,
   CreateCustomerBookingResponse,
+  SearchVehicleResponse,
 } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
@@ -76,6 +77,59 @@ export const createCustomerBooking = async (
     throw error;
   }
 };
+export const updateBookingDataForVehicle = async (
+  bookingId: string,
+  vehicleId: string
+): Promise<CreateCustomerBookingResponse> => {
+  try {
+    // Prepare the request body for the API
+    const requestBody = {
+      bookingId,
+      vehicleId,
+    };
+
+    // Sending the request as a JSON object
+    const data = await API.put<CreateCustomerBookingResponse>({
+      slug: Slug.PUT_SRM_BOOKING_VEHICLE,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to update vehicle");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on updating vehicle", error);
+    throw error;
+  }
+};
+export const updateBookingDataForPayment = async (values: {
+  bookingId: string;
+  paymentId: string;
+  bookingStartDate: string;
+  bookingEndDate: string;
+}): Promise<CreateCustomerBookingResponse> => {
+  try {
+    // Prepare the request body for the API
+    const requestBody = values;
+
+    // Sending the request as a JSON object
+    const data = await API.put<CreateCustomerBookingResponse>({
+      slug: Slug.PUT_SRM_BOOKING_PAYMENT,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to update Payment");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on updating payment data", error);
+    throw error;
+  }
+};
 
 export const updateCustomerDetailsForm = async (
   values: SRMCustomerDetailsFormType,
@@ -125,7 +179,7 @@ export const addVehicleDetailsForm = async (
       vehicleCategoryId: values.vehicleCategoryId,
       vehicleBrandId: values.vehicleBrandId,
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
-      rentalDetails: JSON.stringify(values.rentalDetails),
+      rentalDetails: values.rentalDetails,
       vehiclePhoto: values.vehiclePhoto,
     };
 
@@ -192,18 +246,13 @@ export const addPaymentDetailsForm = async (
       currency: values.currency,
       advanceAmount: values.advanceAmount,
       remainingAmount: values.remainingAmount,
+      securityDeposit: values.securityDeposit,
     };
 
     // Sending the request as a JSON object
     const data = await API.post<AddPaymentFormResponse>({
       slug: Slug.POST_SRM_PAYMENT_FORM,
       body: requestBody,
-      axiosConfig: {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        timeout: 30000,
-      },
     });
 
     if (!data) {
@@ -278,6 +327,37 @@ export const searchCustomer = async (
     return data;
   } catch (error) {
     console.error("Error getting customer list", error);
+    throw error;
+  }
+};
+
+// search vehicle api based on search term
+export const searchVehicle = async (
+  searchTerm: string
+): Promise<SearchVehicleResponse> => {
+  try {
+    // generating query params
+    const queryParams = new URLSearchParams({
+      page: "1",
+      limit: "7",
+      sortOrder: "ASC",
+      search: searchTerm,
+      isFileUrlNeeded: "true",
+    }).toString();
+
+    const slugWithParams = `${Slug.GET_SRM_VEHICLE_LIST}?${queryParams}`;
+
+    const data = await API.get<SearchVehicleResponse>({
+      slug: slugWithParams,
+    });
+
+    if (!data) {
+      throw new Error("Failed to get vehicle list");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error getting vehicle list", error);
     throw error;
   }
 };

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 function Search({
   search,
   setSearch,
-  placeholder = "Search vehicles...",
+  placeholder = "Search ...",
   description,
 }: {
   search: string;

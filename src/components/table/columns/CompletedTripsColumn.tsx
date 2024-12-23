@@ -6,28 +6,89 @@ export const CompletedTripsColumns = (
   handleDownloadModal: (tripId: string) => void
 ): ColumnDef<any>[] => [
   {
-    accessorKey: "brandName",
-    header: "Brand Name",
+    accessorKey: "vehicle.vehicleBrand.brandName",
+    header: "Brand",
+    cell: ({ row }) => (
+      <span>{row.original.vehicle.vehicleBrand?.brandName || "N/A"}</span>
+    ),
   },
   {
-    accessorKey: "customerName",
-    header: "Customer Name",
+    accessorKey: "vehicle.vehiclePhoto",
+    header: "Image",
+    cell: ({ row }) => {
+      const vehiclePhoto = row.original.vehicle.vehiclePhoto;
+      return vehiclePhoto ? (
+        <img
+          src={vehiclePhoto}
+          alt="Vehicle"
+          className="w-16 h-16 object-cover rounded-md"
+        />
+      ) : (
+        "No Image"
+      );
+    },
   },
   {
-    accessorKey: "tripStarted",
+    accessorKey: "customer.customerName",
+    header: "Customer",
+    cell: ({ row }) => (
+      <span>{row.original.customer?.customerName || "N/A"}</span>
+    ),
+  },
+  {
+    accessorKey: "customerPhone",
+    header: "Contact Number",
+    cell: ({ row }) => {
+      const { countryCode, phoneNumber } = row.original.customer || {};
+      return (
+        <span>
+          {countryCode && phoneNumber
+            ? `+${countryCode} ${phoneNumber}`
+            : "N/A"}
+        </span>
+      );
+    },
+  },
+  {
+    accessorKey: "customer.nationality",
+    header: "Nationality",
+    cell: ({ row }) => (
+      <span>{row.original.customer?.nationality || "N/A"}</span>
+    ),
+  },
+  {
+    accessorKey: "customer.drivingLicenseNumber",
+    header: "Driving License",
+    cell: ({ row }) => (
+      <span>{row.original.customer?.drivingLicenseNumber || "N/A"}</span>
+    ),
+  },
+  {
+    accessorKey: "bookingStartDate",
     header: "Trip Started",
+    cell: ({ row }) => {
+      const startDate = row.original.bookingStartDate;
+      return (
+        <span>{startDate ? new Date(startDate).toLocaleString() : "N/A"}</span>
+      );
+    },
   },
   {
-    accessorKey: "tripEnded",
+    accessorKey: "bookingEndDate",
     header: "Trip Ended",
+    cell: ({ row }) => {
+      const endDate = row.original.bookingEndDate;
+      return (
+        <span>{endDate ? new Date(endDate).toLocaleString() : "N/A"}</span>
+      );
+    },
   },
   {
-    accessorKey: "amountCollected",
-    header: "Amount Collected",
-  },
-  {
-    accessorKey: "amountPending",
-    header: "Amount Pending",
+    accessorKey: "customerBookingRemark",
+    header: "Remark",
+    cell: ({ row }) => (
+      <span>{row.original.customerBookingRemark || "No Remark"}</span>
+    ),
   },
   {
     header: "Actions",

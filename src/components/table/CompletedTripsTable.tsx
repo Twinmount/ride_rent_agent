@@ -17,6 +17,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
+import { Trip } from "@/types/srm-types";
 
 export function CompletedTripsTable({
   columns,
@@ -24,7 +25,7 @@ export function CompletedTripsTable({
   loading,
 }: {
   columns: ColumnDef<any>[];
-  data: any[];
+  data: Trip[];
   loading: boolean;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);

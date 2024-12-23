@@ -91,6 +91,6 @@ export enum Slug {
   PUT_SRM_BOOKING_PAYMENT = "/srm-bookings/payment",
 
   // SRM TRIPS
-  GET_SRM_ACTIVE_TRIPS = "/trips/active",
+  GET_SRM_TRIPS = "/srm-bookings/list",
   PUT_SRM_END_ACTIVE_TRIP = "/trips/end",
 }

@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronsUpDown } from "lucide-react";
 import { debounce } from "@/helpers";
 import { searchCustomer } from "@/api/srm";
-import { CustomerListItem } from "@/types/srm-api-types";
+import { CustomerType } from "@/types/srm-types";
 
 type CustomerSearchProps = {
   value?: string;
@@ -105,7 +105,7 @@ const CustomerSearch = ({
                     </div>
                   </CommandItem>
                 )}
-                {customerData.map((customer: CustomerListItem) => (
+                {customerData.map((customer: CustomerType) => (
                   <CommandItem
                     key={customer.id}
                     onSelect={() =>

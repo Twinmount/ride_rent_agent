@@ -54,15 +54,22 @@ const Dashboard = lazy(() => import("./pages/dashboard/Dashboard"));
 const ListingsPage = lazy(() => import("./pages/listings/ListingsPage"));
 const ProfilePage = lazy(() => import("./pages/profile/ProfilePage"));
 
-// yet to lazy load
-import SRMDashboard from "./pages/srm/SRMDashboard";
-import SRMDataAddPage from "./pages/srm/SRMFormAddPage";
-import OngoingTripsPage from "./pages/srm/trip-data/OngoingTripsPage";
-import CompletedTripsPage from "./pages/srm/trip-data/CompletedTripsPage";
-import VehicleListPage from "./pages/srm/trip-data/VehicleListPage";
-import CustomerListPage from "./pages/srm/trip-data/CustomerListPage";
-import TripEndForm from "./components/form/srm/TripEndForm";
-import EndTripsPage from "./pages/srm/EndTripsPage";
+// lazy loading above static imports
+const SRMDashboard = lazy(() => import("./pages/srm/SRMDashboard"));
+const SRMDataAddPage = lazy(() => import("./pages/srm/SRMFormAddPage"));
+const OngoingTripsPage = lazy(
+  () => import("./pages/srm/trip-data/OngoingTripsPage")
+);
+const CompletedTripsPage = lazy(
+  () => import("./pages/srm/trip-data/CompletedTripsPage")
+);
+const VehicleListPage = lazy(
+  () => import("./pages/srm/trip-data/VehicleListPage")
+);
+const CustomerListPage = lazy(
+  () => import("./pages/srm/trip-data/CustomerListPage")
+);
+const EndTripsPage = lazy(() => import("./pages/srm/EndTripsPage"));
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 

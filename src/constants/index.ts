@@ -165,7 +165,7 @@ export const SRMPaymentDetailsFormDefaultValues: SRMPaymentDetailsFormType = {
   },
   bookingStartDate: undefined,
   bookingEndDate: undefined,
-  currency: "",
+  currency: "AED",
 };
 
 // trip end form default values

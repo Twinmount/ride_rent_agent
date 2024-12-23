@@ -33,9 +33,11 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
       <div className="flex flex-col gap-x-2 w-full">
         <div className="flex flex-col">
           <div className="flex mb-2 border-b flex-between">
-            <h3 className="text-lg font-bold">{trip.brandName}</h3>
+            <h3 className="text-lg font-bold">
+              {trip.vehicle.vehicleBrand.brandName}
+            </h3>
             <p className="text-sm text-gray-600">
-              {trip.vehicleRegistrationNumber}
+              {trip.vehicle.vehicleRegistrationNumber}
             </p>
           </div>
 
@@ -44,25 +46,25 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
               <dt>
                 <CircleUserRound />
               </dt>
-              <dd>{trip.customerName}</dd>
+              <dd>{trip.customer.customerName}</dd>
             </dl>
             <dl className="flex gap-x-2 items-center text-sm">
               <dt>
                 <Plane />
               </dt>
-              <dd>{trip.passportNumber}</dd>
+              <dd>{trip.customer.passportNumber}</dd>
             </dl>
             <dl className="flex gap-x-2 items-center text-sm">
               <dt>
                 <MapPinned />
               </dt>
-              <dd>{trip.nationality}</dd>
+              <dd>{trip.customer.nationality}</dd>
             </dl>
             <dl className="flex gap-x-2 items-center text-sm">
               <dt>
                 <Phone />
               </dt>
-              <dd>{trip.mobileNumber}</dd>
+              <dd>{trip.customer.phoneNumber}</dd>
             </dl>
           </div>
         </div>
@@ -86,7 +88,7 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
               :
             </dt>
             <dd className="ml-2">
-              {new Date(trip.BookingEndDate).toLocaleDateString()}
+              {new Date(trip.bookingEndDate).toLocaleDateString()}
             </dd>
           </dl>
         </div>

@@ -169,7 +169,7 @@ export const SRMVehicleDetailsFormSchema = z.object({
   }),
 });
 
-// SRM : User Details Form Schema
+// SRM : Payment Details Form Schema
 export const SRMPaymentDetailsFormSchema = z.object({
   currency: z.string().min(1, "Currency is required"),
   advanceAmount: z.string().min(1, "Advance amount is required"),

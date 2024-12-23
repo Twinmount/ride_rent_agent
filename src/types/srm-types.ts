@@ -59,48 +59,118 @@ export enum CustomerStatus {
   VEHICLE_LOST = "Vehicle Lost",
 }
 
-export interface Trip {
-  id: string;
-  brandName: string;
-  vehicleRegistrationNumber: string;
-  passportNumber: string;
-  customerName: string;
-  bookingStartDate: Date;
-  BookingEndDate: Date;
-  nationality: string;
-  mobileNumber: string;
-  advancePaid: number;
-  amountRemaining: number;
+// SRM Booking Status
+export enum BookingStatus {
+  COMPLETED = "COMPLETED",
+  ONGOING = "ONGOING",
+  CANCELLED = "CANCELLED",
 }
 
-// Additional charge type
-export type AdditionalChargeType = {
+// vehicle types
+export interface RentalDetails {
+  day: {
+    enabled: boolean;
+    rentInAED: string;
+    mileageLimit: string;
+  };
+  week: {
+    enabled: boolean;
+    rentInAED: string;
+    mileageLimit: string;
+  };
+  month: {
+    enabled: boolean;
+    rentInAED: string;
+    mileageLimit: string;
+  };
+  hour: {
+    enabled: boolean;
+    rentInAED: string;
+    mileageLimit: string;
+    minBookingHours: string;
+  };
+}
+
+export interface VehicleType {
+  id: string;
+  vehicleCategory: {
+    categoryId: string;
+    name: string;
+    value: string;
+  };
+  vehicleBrand: {
+    id: string;
+    vehicleCategoryId: string;
+    brandName: string;
+    brandValue: string;
+    brandLogo: string;
+  };
+  vehicleRegistrationNumber: string;
+  vehiclePhoto: string;
+  rentalDetails: RentalDetails;
+  createdBy: string;
+}
+
+// individual customer
+export interface CustomerType {
+  id: string;
+  customerId: string;
+  customerName: string;
+  nationality: string;
+  passportNumber: string;
+  drivingLicenseNumber: string;
+  phoneNumber: string;
+  customerProfilePic?: string;
+  countryCode: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+// Payment type
+export interface PaymentType {
+  id: string;
+  paymentId: string;
+  advanceAmount: string;
+  remainingAmount: string;
+  securityDeposits: {
+    enabled: boolean;
+    amountInAED: string;
+  };
+  currency: string;
+}
+
+export interface Trip {
+  id: string;
+  bookingId: string;
+  levelsFilled: number;
+  vehicle: VehicleType;
+  customer: CustomerType;
+  payment: PaymentType;
+  bookingStatus: string;
+  bookingStartDate: string; // ISO date string
+  bookingEndDate: string; // ISO date string
+  createdBy: string;
+  updatedBy: string;
+  createdDate: string; // ISO date string
+  updatedDate: string; // ISO date string
+  customerBookingRemark: string;
+}
+
+// Base type for charges
+export type ChargeType = {
   amount: string;
-  description?: string;
+  description: string; // General description field
   paymentDate: Date;
 };
 
-// Traffic fine type
-export type TrafficFineType = {
-  amount: string;
-  description: string; // Internal description
-  paymentDate: Date;
-};
-
-// Salik type
-export type SalikType = {
-  amount: string;
-  description: string; // "SALIK" set internally
-  paymentDate: Date;
-};
-
+// Trip End Form Type
 export type TripEndFormType = {
   brandName: string;
   customerName: string;
   customerStatus: CustomerStatus;
-  finesCollected: TrafficFineType[];
-  salikCollected: SalikType[];
-  additionalCharges: AdditionalChargeType[];
+  finesCollected: ChargeType[];
+  salikCollected: ChargeType[];
+  additionalCharges: ChargeType[];
   discounts?: string;
   totalAmountCollected: string;
 };

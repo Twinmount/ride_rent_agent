@@ -11,17 +11,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SRMVehicleDetailsFormDefaultValues } from "@/constants";
 import { SRMVehicleDetailsFormSchema } from "@/lib/validator";
-import { SRMVehicleDetailsFormType } from "@/types/srm-types";
+import { SRMVehicleDetailsFormType, VehicleType } from "@/types/srm-types";
 import CategoryDropdown from "../dropdowns/CategoryDropdown";
 import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
 import { useParams } from "react-router-dom";
 import {
   addVehicleDetailsForm,
+  updateBookingDataForVehicle,
   updateVehicleDetailsForm,
 } from "@/api/srm/srmFormApi";
 import BrandsDropdown from "../dropdowns/BrandsDropdown";
@@ -29,13 +29,12 @@ import RentalDetailsFormField from "../RentalDetailsFormField";
 import { deleteMultipleFiles, validateSRMRentalDetails } from "@/helpers/form";
 import SingleFileUpload from "../file-uploads/SingleFileUpload";
 import { GcsFilePaths } from "@/constants/enum";
+import VehicleSearch from "../dropdowns/VehicleSearchAndAutoFill";
 
 type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";
   formData?: SRMVehicleDetailsFormType | null;
   onNextTab?: () => void;
-  initialCountryCode?: string;
-  isAddOrIncomplete: boolean;
 };
 
 export default function SRMVehicleDetailsForm({
@@ -46,15 +45,19 @@ export default function SRMVehicleDetailsForm({
   const {} = useParams<{}>();
   const [isFileUploading, setIsFileUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
-
-  // Call the useLoadingMessages hook to manage loading messages
+  const [currentVehiclePhoto, setCurrentVehiclePhoto] = useState<string | null>(
+    formData?.vehiclePhoto || null
+  );
+  const [existingVehicleId, setExistingVehicleId] = useState<string | null>(
+    null
+  );
 
   const initialValues =
     formData && type === "Update"
       ? formData
       : SRMVehicleDetailsFormDefaultValues;
 
-  // Define your form.
+  // Define your form
   const form = useForm<z.infer<typeof SRMVehicleDetailsFormSchema>>({
     resolver: zodResolver(SRMVehicleDetailsFormSchema),
     defaultValues: initialValues as SRMVehicleDetailsFormType,
@@ -85,15 +88,37 @@ export default function SRMVehicleDetailsForm({
       return;
     }
 
+    const bookingId = sessionStorage.getItem("bookingId"); // Retrieve bookingId
+
+    if (!bookingId) {
+      toast({
+        variant: "destructive",
+        title: "Booking ID Missing",
+        description: "Please complete the Customer Details Form first.",
+      });
+      return;
+    }
+
     // form submission
     try {
       let data;
       if (type === "Add") {
-        data = await addVehicleDetailsForm(values as SRMVehicleDetailsFormType);
+        if (!!existingVehicleId) {
+          console.log("existing vehicle id", existingVehicleId);
+          await updateBookingDataForVehicle(bookingId, existingVehicleId);
+        } else {
+          console.log("new vehicle");
+          data = await addVehicleDetailsForm(
+            values as SRMVehicleDetailsFormType
+          );
+          const vehicleId = data.result.id;
+
+          await updateBookingDataForVehicle(bookingId, vehicleId);
+        }
       } else if (type === "Update") {
-        data = await updateVehicleDetailsForm(
-          values as SRMVehicleDetailsFormType
-        );
+        // data = await updateVehicleDetailsForm(
+        //   values as SRMVehicleDetailsFormType
+        // );
       }
 
       if (data) {
@@ -102,7 +127,7 @@ export default function SRMVehicleDetailsForm({
 
       if (data) {
         toast({
-          title: `Vehicle ${type.toLowerCase()}ed successfully`,
+          title: `Vehicle ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
         });
 
@@ -134,6 +159,94 @@ export default function SRMVehicleDetailsForm({
     }
   }, [form.formState.errors]);
 
+  // Handle selecting a customer from the results// Handle selecting a vehicle from the results
+  const handleVehicleSelect = (
+    vehicleRegistrationNumber: string,
+    vehicleData: VehicleType | null
+  ) => {
+    form.setValue("vehicleRegistrationNumber", vehicleRegistrationNumber);
+
+    if (vehicleData) {
+      setExistingVehicleId(vehicleData?.id);
+
+      // Set form values based on the selected vehicle
+      form.setValue(
+        "vehicleCategoryId",
+        vehicleData.vehicleCategory?.categoryId || ""
+      );
+      form.setValue("vehicleBrandId", vehicleData.vehicleBrand?.id || "");
+      form.setValue("vehiclePhoto", vehicleData.vehiclePhoto || "");
+
+      form.setValue(
+        "rentalDetails.day.enabled",
+        vehicleData.rentalDetails.day.enabled || false
+      );
+      form.setValue(
+        "rentalDetails.day.rentInAED",
+        vehicleData.rentalDetails.day.rentInAED || ""
+      );
+      form.setValue(
+        "rentalDetails.day.mileageLimit",
+        vehicleData.rentalDetails.day.mileageLimit || ""
+      );
+
+      form.setValue(
+        "rentalDetails.week.enabled",
+        vehicleData.rentalDetails.week.enabled || false
+      );
+      form.setValue(
+        "rentalDetails.week.rentInAED",
+        vehicleData.rentalDetails.week.rentInAED || ""
+      );
+      form.setValue(
+        "rentalDetails.week.mileageLimit",
+        vehicleData.rentalDetails.week.mileageLimit || ""
+      );
+
+      form.setValue(
+        "rentalDetails.month.enabled",
+        vehicleData.rentalDetails.month.enabled || false
+      );
+      form.setValue(
+        "rentalDetails.month.rentInAED",
+        vehicleData.rentalDetails.month.rentInAED || ""
+      );
+      form.setValue(
+        "rentalDetails.month.mileageLimit",
+        vehicleData.rentalDetails.month.mileageLimit || ""
+      );
+
+      form.setValue(
+        "rentalDetails.hour.enabled",
+        vehicleData.rentalDetails.hour.enabled || false
+      );
+      form.setValue(
+        "rentalDetails.hour.minBookingHours",
+        vehicleData.rentalDetails.hour.minBookingHours || ""
+      );
+
+      form.setValue(
+        "rentalDetails.hour.rentInAED",
+        vehicleData.rentalDetails.hour.rentInAED || ""
+      );
+      form.setValue(
+        "rentalDetails.hour.mileageLimit",
+        vehicleData.rentalDetails.hour.mileageLimit || ""
+      );
+
+      setCurrentVehiclePhoto(vehicleData.vehiclePhoto || "");
+    } else {
+      // Reset fields if no vehicle data is selected
+      setExistingVehicleId(null);
+      setCurrentVehiclePhoto(null);
+
+      form.resetField("vehicleCategoryId");
+      form.resetField("vehicleBrandId");
+      form.resetField("vehiclePhoto");
+      form.resetField("rentalDetails");
+    }
+  };
+
   return (
     <Form {...form}>
       <form
@@ -151,41 +264,22 @@ export default function SRMVehicleDetailsForm({
             name="vehicleRegistrationNumber"
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
+                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
                   Registration Number{" "}
                   <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
-                    <Input
-                      placeholder="eg: ABC12345"
-                      {...field}
-                      className={`input-field`}
-                      type="text"
-                      onKeyDown={(e) => {
-                        // Allow only alphanumeric characters and control keys like Backspace, Delete, and Arrow keys
-                        if (
-                          !/[a-zA-Z0-9]/.test(e.key) &&
-                          ![
-                            "Backspace",
-                            "Delete",
-                            "ArrowLeft",
-                            "ArrowRight",
-                            "Tab", // To allow tabbing between fields
-                          ].includes(e.key)
-                        ) {
-                          e.preventDefault();
-                        }
-                      }}
+                    <VehicleSearch
+                      value={field.value} // Pass current field value
+                      onChangeHandler={handleVehicleSelect}
+                      placeholder="Enter / Search Registration Number"
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    Enter your vehicle registration number (e.g., ABC12345). The
-                    number should be a combination of letters and numbers,
-                    without any spaces or special characters, up to 15
-                    characters.
+                    Add or Search Vehicle Registration Number.
                   </FormDescription>
-                  <FormMessage className="ml-2" />
+                  <FormMessage />
                 </div>
               </FormItem>
             )}
@@ -208,7 +302,7 @@ export default function SRMVehicleDetailsForm({
 
                         form.setValue("vehicleBrandId", "");
                       }}
-                      value={initialValues.vehicleCategoryId}
+                      value={initialValues.vehicleCategoryId || field.value}
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
@@ -256,7 +350,7 @@ export default function SRMVehicleDetailsForm({
                 name={field.name}
                 label="Vehicle Photo (optional)"
                 description="Vehicle Photo can have a maximum size of 5MB."
-                existingFile={formData?.vehiclePhoto}
+                existingFile={currentVehiclePhoto}
                 maxSizeMB={5}
                 setIsFileUploading={setIsFileUploading}
                 bucketFilePath={GcsFilePaths.LOGOS}

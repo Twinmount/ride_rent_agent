@@ -7,42 +7,29 @@ import { CompletedTripsTable } from "@/components/table/CompletedTripsTable";
 import { CompletedTripsColumns } from "@/components/table/columns/CompletedTripsColumn";
 import CompletedTripsInvoiceDownloadModal from "@/components/modal/srm-modal/CompletedTripsInvoiceDownloadModal";
 import { fetchCompletedTrips } from "@/api/srm/trips";
-
-const mockData = [
-  {
-    id: "1",
-    brandName: "Toyota",
-    customerName: "John Doe",
-    tripStarted: "2023-12-01",
-    tripEnded: "2023-12-10",
-    amountCollected: 5000,
-    amountPending: 0,
-  },
-  {
-    id: "2",
-    brandName: "BMW",
-    customerName: "Jane Smith",
-    tripStarted: "2023-11-20",
-    tripEnded: "2023-11-30",
-    amountCollected: 7000,
-    amountPending: 200,
-  },
-];
+import DownloadExcelModal from "@/components/srm/DownloadSRMExcelData";
+import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
+import Search from "@/components/Search";
+import { BookingStatus } from "@/types/srm-types";
 
 export default function CompletedTripsPage() {
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState<10 | 15 | 20 | 30>(10);
+  const [limit] = useState<10 | 15 | 20 | 30>(10);
+  const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
   const [downloadTripId, setDownloadTripId] = useState<string | null>(null);
 
   const { data, isLoading } = useQuery({
-    queryKey: ["completedTrips", page, limit],
+    queryKey: ["completedTrips", page, limit, search, sortOrder],
     queryFn: () =>
       fetchCompletedTrips({
         page,
         limit,
         sortOrder,
-      }), // Use mockData instead of API call for now
+        search,
+        bookingStatus: BookingStatus.COMPLETED,
+      }),
     staleTime: 0,
   });
 
@@ -54,27 +41,54 @@ export default function CompletedTripsPage() {
     setDownloadTripId(null);
   };
 
+  const tripData = data?.result?.list || [];
+
+  const totalNumberOfPages = data?.result?.totalNumberOfPages || 0;
+
   return (
     <section className="container py-5 mx-auto min-h-screen md:py-7">
       <h1 className="text-center h3-bold max-sm:text-xl sm:text-left">
         Completed Trips
       </h1>
-      <div className="flex gap-x-2 justify-end mb-4 w-full max-sm:mt-3">
+      <div className="flex flex-wrap gap-x-2 justify-start items-start mt-3 mb-4 w-full max-sm:mt-3">
+        {/* search vehicle */}
+        <Search
+          search={search}
+          setSearch={setSearch}
+          placeholder="Search Trip..."
+          description={
+            <p className=" italic text-gray-600">
+              You can search with{" "}
+              <b>brand, registration number, customer name</b>
+            </p>
+          }
+        />
+
+        <Link
+          to="/srm/trips/new"
+          className="group px-3 h-10 bg-white flex gap-x-2 items-center rounded-lg shadow-lg transition-colors duration-300 ease-in-out flex-center text-yellow hover:bg-yellow hover:text-white"
+          aria-label="add new record"
+        >
+          <span className="text-gray-800 transition-colors group-hover:text-white">
+            New Trip
+          </span>{" "}
+          <Plus />
+        </Link>
+        <DownloadExcelModal
+          title="Excel Data Download"
+          onDownload={async () => {}}
+          additionalClasses=""
+        />
         <SortDropdown
           sortOrder={sortOrder}
           setSortOrder={setSortOrder}
-          isLoading={isLoading}
-        />
-        <LimitDropdown
-          limit={limit}
-          setLimit={setLimit}
           isLoading={isLoading}
         />
       </div>
 
       <CompletedTripsTable
         columns={CompletedTripsColumns(handleDownloadModal)}
-        data={data?.result?.list || mockData}
+        data={tripData}
         loading={isLoading}
       />
 
@@ -88,11 +102,11 @@ export default function CompletedTripsPage() {
         />
       )}
 
-      {data?.result && data?.result.totalNumberOfPages > 0 && (
+      {totalNumberOfPages > 0 && (
         <Pagination
           page={page}
           setPage={setPage}
-          totalPages={data?.result.totalNumberOfPages}
+          totalPages={totalNumberOfPages}
         />
       )}
     </section>

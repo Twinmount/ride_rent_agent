@@ -381,7 +381,7 @@ export const validateSRMTabAccess = ({
   tab,
   levelsFilled,
 }: SRMTabValidationProps): { canAccess: boolean; message: string } => {
-  if (tab === "user" && levelsFilled > 0) {
+  if (tab === "customer" && levelsFilled > 0) {
     return {
       canAccess: false,
       message: "The User Details form is already completed.",

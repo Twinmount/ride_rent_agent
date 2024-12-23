@@ -8,57 +8,30 @@ import { endTrip, fetchOngoingTrips } from "@/api/srm/trips";
 import DownloadExcelModal from "@/components/srm/DownloadSRMExcelData";
 import { Link } from "react-router-dom";
 import Search from "@/components/Search";
-import OngoingTripsCard from "@/components/srm/OngoingTripsCard";
-
 import { Plus } from "lucide-react";
-import { Trip } from "@/types/srm-types";
+import OngoingTrips from "@/components/srm/OngoingTrips";
+import { BookingStatus } from "@/types/srm-types";
 
 // Sample data
-const mockData: Trip[] = [
-  {
-    id: "1",
-    brandName: "Toyota",
-    vehicleRegistrationNumber: "KL02ME0001",
-    passportNumber: "M1234567",
-    customerName: "John Doe",
-    bookingStartDate: new Date(), // This will use the current date and time
-    BookingEndDate: new Date(), // This will use the current date and time
-    nationality: "Indian",
-    mobileNumber: "+1234567890",
-    advancePaid: 1000, // Added example advance paid
-    amountRemaining: 2000, // Added example remaining amount
-  },
-  {
-    id: "2",
-    brandName: "BMW",
-    vehicleRegistrationNumber: "KA05ME7890",
-    passportNumber: "P8901234",
-    customerName: "Jane Smith",
-    bookingStartDate: new Date("2024-02-01"), // Example future date
-    BookingEndDate: new Date("2024-02-15"), // Example future date
-    nationality: "American",
-    mobileNumber: "+9876543210",
-    advancePaid: 500, // Added example advance paid
-    amountRemaining: 1500, // Added example remaining amount
-  },
-];
 
 export default function OngoingTripsPage() {
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState<10 | 15 | 20 | 30>(10);
+  const [limit] = useState<10 | 15 | 20 | 30>(10);
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
   const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
 
   const queryClient = useQueryClient();
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["activeTrips", page, limit],
+  const { data, isLoading, isFetching } = useQuery({
+    queryKey: ["activeTrips", page, limit, search, sortOrder],
     queryFn: () =>
       fetchOngoingTrips({
         page,
         limit,
         sortOrder,
+        search,
+        bookingStatus: BookingStatus.ONGOING,
       }),
     staleTime: 0,
   });
@@ -96,6 +69,10 @@ export default function OngoingTripsPage() {
       });
     }
   };
+
+  const ongoingTrips = data?.result.list || [];
+
+  const totalNumberOfPages = data?.result.totalNumberOfPages || 0;
 
   return (
     <section className="container py-5 !pb-28 mx-auto min-h-screen md:py-7">
@@ -138,28 +115,18 @@ export default function OngoingTripsPage() {
         />
       </div>
 
-      <div className="">
-        {mockData.length > 0 ? (
-          <div className="flex flex-col gap-y-4 items-center">
-            {mockData.map((trip) => (
-              <OngoingTripsCard
-                key={trip.id}
-                trip={trip}
-                onOpenModal={handleOpenModal}
-                onEndTrip={handleEndTrip}
-              />
-            ))}
-          </div>
-        ) : (
-          "no active trips"
-        )}
-      </div>
+      <OngoingTrips
+        data={ongoingTrips}
+        handleOpenModal={handleOpenModal}
+        handleEndTrip={handleEndTrip}
+        isLoading={isLoading || isFetching}
+      />
 
-      {data?.result && data?.result.totalNumberOfPages > 0 && (
+      {totalNumberOfPages > 0 && (
         <Pagination
           page={page}
           setPage={setPage}
-          totalPages={data?.result.totalNumberOfPages}
+          totalPages={totalNumberOfPages}
         />
       )}
 

@@ -20,9 +20,10 @@ import "react-international-phone/style.css";
 
 import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   addPaymentDetailsForm,
+  updateBookingDataForPayment,
   updatePaymentDetailsForm,
 } from "@/api/srm/srmFormApi";
 import CurrencyDropdown from "../dropdowns/CurrencyDropdown";
@@ -30,24 +31,22 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import SecurityDepositField from "../SecurityDepositField";
 import { validateSecurityDeposit } from "@/helpers/form";
+import { CalendarDays } from "lucide-react";
 
 type SRMPaymentDetailsFormProps = {
   type: "Add" | "Update";
   formData?: SRMPaymentDetailsFormType | null;
-  onNextTab?: () => void;
-  initialCountryCode?: string;
-  isAddOrIncomplete: boolean;
 };
 
 export default function SRMPaymentDetailsForm({
   type,
-  onNextTab,
   formData,
 }: SRMPaymentDetailsFormProps) {
   const {} = useParams<{}>();
 
-  // Call the useLoadingMessages hook to manage loading messages
+  const navigate = useNavigate();
 
+  // Call the useLoadingMessages hook to manage loading messages
   const initialValues =
     formData && type === "Update"
       ? formData
@@ -61,6 +60,17 @@ export default function SRMPaymentDetailsForm({
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof SRMPaymentDetailsFormSchema>) {
+    const bookingId = sessionStorage.getItem("bookingId"); // Retrieve bookingId
+
+    if (!bookingId) {
+      toast({
+        variant: "destructive",
+        title: "Booking ID Missing",
+        description: "Please complete the Customer Details Form first.",
+      });
+      return;
+    }
+
     const securityDepositError = validateSecurityDeposit(
       values.securityDeposit
     );
@@ -79,8 +89,19 @@ export default function SRMPaymentDetailsForm({
       let data;
       if (type === "Add") {
         data = await addPaymentDetailsForm(values);
+        const paymentId = data.result.id;
+
+        const bookingStartDate = values.bookingStartDate;
+        const bookingEndDate = values.bookingEndDate;
+
+        await updateBookingDataForPayment({
+          paymentId,
+          bookingId,
+          bookingStartDate: bookingStartDate.toISOString(),
+          bookingEndDate: bookingEndDate.toISOString(),
+        });
       } else if (type === "Update") {
-        data = await updatePaymentDetailsForm(values);
+        // data = await updatePaymentDetailsForm(values);
       }
 
       if (data) {
@@ -89,9 +110,9 @@ export default function SRMPaymentDetailsForm({
           className: "bg-yellow text-white",
         });
 
-        if (type === "Add") {
-          if (onNextTab) onNextTab();
-        }
+        // Safely clear the sessionStorage after successful form submission
+        sessionStorage.removeItem("bookingId");
+        navigate("/");
       }
     } catch (error) {
       toast({
@@ -116,9 +137,6 @@ export default function SRMPaymentDetailsForm({
     }
   }, [form.formState.errors]);
 
-  const minAllowedDate = new Date("2023-12-01"); // Replace with your desired start date
-  const maxAllowedDate = new Date("2023-12-31");
-
   return (
     <Form {...form}>
       <form
@@ -133,7 +151,7 @@ export default function SRMPaymentDetailsForm({
           <div className="flex mb-2 w-full max-sm:flex-col">
             <label
               htmlFor="bookingStartDate"
-              className="flex justify-between mt-4 ml-2 w-52 text-base font-medium max-sm:mb-2 min-w-48 lg:min-w-52 max-sm:w-fit lg:text-lg"
+              className="flex justify-between mt-4 ml-2 w-52 text-base font-medium max-sm:mb-2 min-w-48 lg:min-w-52 max-sm:w-fit lg:text-lg h-fit "
             >
               Booking Period<span className="mr-5 max-sm:hidden">:</span>
             </label>
@@ -145,15 +163,9 @@ export default function SRMPaymentDetailsForm({
                   <FormItem className="w-full">
                     <FormControl>
                       <div className="flex-center h-[54px] w-full overflow-hidden rounded-full bg-grey-50 px-4 gap-x-1 py-2">
-                        <img
-                          src="/assets/icons/calendar.svg"
-                          alt="calendar"
-                          width={24}
-                          height={24}
-                          className="filter-yellow-orange"
-                        />
+                        <CalendarDays className="text-orange" strokeWidth={3} />
                         <label
-                          htmlFor="bookingEndDate"
+                          htmlFor="bookingStartDate"
                           className="flex justify-between items-center mr-1 w-14 whitespace-nowrap text-grey-600"
                         >
                           Start <span>:</span>
@@ -167,15 +179,17 @@ export default function SRMPaymentDetailsForm({
                           wrapperClassName="datePicker text-base w-full"
                           placeholderText="DD/MM/YYYY"
                           id="bookingStartDate"
-                          minDate={minAllowedDate}
-                          maxDate={maxAllowedDate}
                         />
                       </div>
                     </FormControl>
+                    <FormDescription className="ml-2">
+                      Enter the booking start date for this model.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="bookingEndDate"
@@ -183,16 +197,17 @@ export default function SRMPaymentDetailsForm({
                   <FormItem className="w-full">
                     <FormControl>
                       <div className="flex-center h-[54px] w-full overflow-hidden rounded-full bg-grey-50 px-4 py-2 gap-x-1">
-                        <img
-                          src="/assets/icons/calendar.svg"
-                          alt="calendar"
-                          width={24}
-                          height={24}
-                          className="filter-yellow-orange"
+                        <CalendarDays
+                          className={`text-orange ${
+                            !form.watch("bookingStartDate") ? "opacity-50" : ""
+                          }`}
+                          strokeWidth={3}
                         />
                         <label
                           htmlFor="bookingEndDate"
-                          className="flex justify-between items-center mr-1 w-14 whitespace-nowrap text-grey-600"
+                          className={`flex justify-between items-center mr-1 w-14 whitespace-nowrap   text-grey-600 ${
+                            !form.watch("bookingStartDate") ? "opacity-50" : ""
+                          }`}
                         >
                           End <span>:</span>
                         </label>
@@ -202,12 +217,17 @@ export default function SRMPaymentDetailsForm({
                           showTimeSelect
                           timeInputLabel="Time:"
                           dateFormat="dd/MM/yyyy h:mm aa"
-                          wrapperClassName="datePicker text-base"
+                          wrapperClassName="datePicker text-base "
                           placeholderText="DD/MM/YYYY"
                           id="bookingEndDate"
+                          minDate={form.watch("bookingStartDate")}
+                          disabled={!form.watch("bookingStartDate")}
                         />
                       </div>
                     </FormControl>
+                    <FormDescription className="ml-2">
+                      Enter the booking end date for this model.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

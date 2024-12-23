@@ -6,6 +6,7 @@ import {
   FetchCustomerListResponse,
   FetchVehicleListResponse,
 } from "@/types/srm-api-types";
+import { BookingStatus } from "@/types/srm-types";
 
 export interface CompletedTripDetails {
   tripId: string;
@@ -24,6 +25,7 @@ export const fetchOngoingTrips = async (urlParams: {
   limit: number;
   sortOrder: string;
   search?: string;
+  bookingStatus: BookingStatus;
 }): Promise<FetchOngoingTripsResponse> => {
   try {
     // generating query params
@@ -31,13 +33,14 @@ export const fetchOngoingTrips = async (urlParams: {
       page: urlParams.page.toString(),
       limit: urlParams.limit.toString(),
       sortOrder: urlParams.sortOrder,
+      bookingStatus: urlParams.bookingStatus,
     });
 
     if (urlParams.search) {
       queryParams.append("search", urlParams.search);
     }
 
-    const slugWithParams = `${Slug.GET_SRM_ACTIVE_TRIPS}?${queryParams}`;
+    const slugWithParams = `${Slug.GET_SRM_TRIPS}?${queryParams}`;
 
     const data = await API.get<FetchOngoingTripsResponse>({
       slug: slugWithParams,
@@ -73,14 +76,21 @@ export const fetchCompletedTrips = async (urlParams: {
   page: number;
   limit: number;
   sortOrder: string;
+  search?: string;
+  bookingStatus: BookingStatus;
 }): Promise<FetchCompletedTripsResponse> => {
   const queryParams = new URLSearchParams({
     page: urlParams.page.toString(),
     limit: urlParams.limit.toString(),
     sortOrder: urlParams.sortOrder,
+    bookingStatus: urlParams.bookingStatus,
   });
 
-  const slugWithParams = `/completedTrips?${queryParams}`;
+  if (urlParams.search) {
+    queryParams.append("search", urlParams.search);
+  }
+
+  const slugWithParams = `${Slug.GET_SRM_TRIPS}?${queryParams}`;
 
   const data = await API.get<FetchCompletedTripsResponse>({
     slug: slugWithParams,
@@ -108,15 +118,21 @@ export const fetchVehicleList = async (urlParams: {
   page: number;
   limit: number;
   sortOrder: string;
+  search?: string;
 }): Promise<FetchVehicleListResponse> => {
   try {
     const queryParams = new URLSearchParams({
       page: urlParams.page.toString(),
       limit: urlParams.limit.toString(),
       sortOrder: urlParams.sortOrder,
+      isFileUrlNeeded: "true",
     });
 
-    const slugWithParams = `/vehicleList?${queryParams}`;
+    if (urlParams.search) {
+      queryParams.append("search", urlParams.search);
+    }
+
+    const slugWithParams = `${Slug.GET_SRM_VEHICLE_LIST}?${queryParams}`;
 
     const data = await API.get<FetchVehicleListResponse>({
       slug: slugWithParams,
@@ -135,6 +151,7 @@ export const fetchCustomerList = async (urlParams: {
   page: number;
   limit: number;
   sortOrder: string;
+  search?: string;
 }): Promise<FetchCustomerListResponse> => {
   try {
     const queryParams = new URLSearchParams({
@@ -143,7 +160,11 @@ export const fetchCustomerList = async (urlParams: {
       sortOrder: urlParams.sortOrder,
     });
 
-    const slugWithParams = `/customerList?${queryParams}`;
+    if (urlParams.search) {
+      queryParams.append("search", urlParams.search);
+    }
+
+    const slugWithParams = `${Slug.GET_SRM_CUSTOMER_LIST}?${queryParams}`;
 
     const data = await API.get<FetchCustomerListResponse>({
       slug: slugWithParams,

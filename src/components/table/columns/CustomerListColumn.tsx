@@ -7,9 +7,8 @@ export const CustomerListColumns = (
   {
     accessorKey: "customerName",
     header: "Customer Name",
-
     cell: ({ row }) => {
-      const userId = row.original.id; // Assuming `id` is the unique user identifier
+      const userId = row.original.id; // Unique user identifier
       const customerName = row.original.customerName;
 
       return (
@@ -23,34 +22,36 @@ export const CustomerListColumns = (
     },
   },
   {
-    accessorKey: "email",
-    header: "Email",
-  },
-  {
-    accessorKey: "passportNumber",
-    header: "Passport Number",
-  },
-  {
-    accessorKey: "drivingLicenseNumber",
-    header: "Driving License Number",
+    accessorKey: "nationality",
+    header: "Nationality",
+    cell: ({ row }) => <span>{row.original.nationality}</span>,
   },
   {
     accessorKey: "phoneNumber",
     header: "Phone Number",
+    cell: ({ row }) => {
+      const phoneNumber = row.original.phoneNumber;
+      const countryCode = row.original.countryCode;
+      return <span>{`+${countryCode} ${phoneNumber}`}</span>;
+    },
   },
   {
-    header: "View Details",
+    accessorKey: "passportNumber",
+    header: "Passport Number",
+    cell: ({ row }) => <span>{row.original.passportNumber}</span>,
+  },
+  {
+    accessorKey: "drivingLicenseNumber",
+    header: "Driving License Number",
+    cell: ({ row }) => <span>{row.original.drivingLicenseNumber}</span>,
+  },
+
+  {
+    accessorKey: "id",
+    header: "Customer ID",
     cell: ({ row }) => {
       const userId = row.original.id;
-
-      return (
-        <button
-          onClick={() => handleViewDetails(userId)}
-          className="text-blue-500 underline hover:text-blue-700"
-        >
-          View Details
-        </button>
-      );
+      return <span>{userId}</span>;
     },
   },
 ];

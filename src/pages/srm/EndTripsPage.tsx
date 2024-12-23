@@ -1,4 +1,4 @@
-import TripEndForm from "@/components/form/srm/TripEndForm";
+import TripEndForm from "@/components/form/srm-form/TripEndForm";
 import { CircleArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 

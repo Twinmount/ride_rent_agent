@@ -1,7 +1,7 @@
 import { CircleArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
 import { validateSRMTabAccess } from "@/helpers/form";
 import { SRMTabsTypes } from "@/types/types";
@@ -9,13 +9,13 @@ import { toast } from "@/components/ui/use-toast";
 
 // Lazy-loaded form components
 const SRMCustomerDetailsForm = lazy(
-  () => import("@/components/form/srm/CustomerDetailsForm")
+  () => import("@/components/form/srm-form/CustomerDetailsForm")
 );
 const SRMVehicleDetailsForm = lazy(
-  () => import("@/components/form/srm/VehicleDetailsForm")
+  () => import("@/components/form/srm-form/VehicleDetailsForm")
 );
 const SRMPaymentDetailsForm = lazy(
-  () => import("@/components/form/srm/PaymentDetailsForm")
+  () => import("@/components/form/srm-form/PaymentDetailsForm")
 );
 
 export default function SRMDataAddPage() {
@@ -28,7 +28,7 @@ export default function SRMDataAddPage() {
     const tab = value as SRMTabsTypes;
     const { canAccess, message } = validateSRMTabAccess({ tab, levelsFilled });
 
-    if (true) {
+    if (canAccess) {
       setActiveTab(tab);
     } else {
       toast({
@@ -50,6 +50,16 @@ export default function SRMDataAddPage() {
       setLevelsFilled(2);
     }
   };
+
+  // clear session storage bookingId
+  useEffect(() => {
+    sessionStorage.removeItem("bookingId");
+
+    // Cleanup: Clear bookingId again when the component unmounts
+    return () => {
+      sessionStorage.removeItem("bookingId");
+    };
+  }, []);
 
   return (
     <section className="container py-10 pb-44 h-auto min-h-screen bg-white">
@@ -111,14 +121,13 @@ export default function SRMDataAddPage() {
               <SRMVehicleDetailsForm
                 type={"Add"}
                 onNextTab={() => handleNextTab("payment")}
-                isAddOrIncomplete={true}
               />
             </Suspense>
           </TabsContent>
 
           <TabsContent value="payment" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              <SRMPaymentDetailsForm type={"Add"} isAddOrIncomplete={true} />
+              <SRMPaymentDetailsForm type={"Add"} />
             </Suspense>
           </TabsContent>
         </Tabs>

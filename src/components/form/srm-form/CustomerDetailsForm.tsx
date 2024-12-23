@@ -17,7 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SRMCustomerDetailsFormDefaultValues } from "@/constants";
 import { SRMCustomerDetailsFormSchema } from "@/lib/validator";
-import { SRMCustomerDetailsFormType } from "@/types/srm-types";
+import { CustomerType, SRMCustomerDetailsFormType } from "@/types/srm-types";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { deleteMultipleFiles } from "@/helpers/form";
@@ -32,8 +32,7 @@ import {
   updateCustomerDetailsForm,
 } from "@/api/srm/srmFormApi";
 import NationalityDropdown from "../dropdowns/NationalityDropdown";
-import CustomerSearch from "../dropdowns/CustomerSearch";
-import { CustomerListItem } from "@/types/srm-api-types";
+import CustomerSearch from "../dropdowns/CustomerSearchAndAutoFill";
 
 type SRMCustomerDetailsFormProps = {
   type: "Add" | "Update";
@@ -94,7 +93,11 @@ export default function SRMCustomerDetailsForm({
         if (!!existingCustomerId) {
           console.log("existing customer", existingCustomerId);
           // Call only createCustomerBooking if the customer exists
-          await createCustomerBooking(existingCustomerId as string);
+          const bookingResponse = await createCustomerBooking(
+            existingCustomerId as string
+          );
+          const bookingId = bookingResponse.result.bookingId;
+          sessionStorage.setItem("bookingId", bookingId);
         } else {
           console.log("new customer");
           // Add customer details and create a booking if the customer is new
@@ -104,13 +107,21 @@ export default function SRMCustomerDetailsForm({
           );
 
           const customerId = data.result.customerId;
-          await createCustomerBooking(customerId);
+          const bookingResponse = await createCustomerBooking(customerId);
+
+          console.log("bookingResponse", bookingResponse);
+
+          //  storing in session storage
+          if (bookingResponse) {
+            const bookingId = bookingResponse.result.bookingId;
+            sessionStorage.setItem("bookingId", bookingId);
+          }
         }
       } else if (type === "Update") {
-        data = await updateCustomerDetailsForm(
-          values as SRMCustomerDetailsFormType,
-          initialCountryCode as string
-        );
+        // data = await updateCustomerDetailsForm(
+        //   values as SRMCustomerDetailsFormType,
+        //   initialCountryCode as string
+        // );
       }
 
       if (data) {
@@ -150,10 +161,10 @@ export default function SRMCustomerDetailsForm({
     }
   }, [form.formState.errors]);
 
-  // Handle selecting a customer from the results
+  // Handle selecting an existing customer from the results
   const handleCustomerSelect = (
     customerName: string,
-    customerData: CustomerListItem | null
+    customerData: CustomerType | null
   ) => {
     form.setValue("customerName", customerName);
 

@@ -74,8 +74,8 @@ const CategoryDropdown = ({
 
   return (
     <Select
+      value={value}
       onValueChange={handleChange}
-      defaultValue={value}
       disabled={isDisabled || isLoading}
     >
       <SelectTrigger className="ring-0 select-field focus:ring-0 input-fields">
