@@ -5,6 +5,7 @@ import {
   FetchCompletedTripsResponse,
   FetchCustomerListResponse,
   FetchVehicleListResponse,
+  FetchEndTripResponse,
 } from "@/types/srm-api-types";
 import { BookingStatus } from "@/types/srm-types";
 
@@ -174,6 +175,26 @@ export const fetchCustomerList = async (urlParams: {
     return data;
   } catch (error) {
     console.error("Error fetching customer list:", error);
+    throw error;
+  }
+};
+
+// fetch End Trip Data
+export const getEndTripData = async (
+  tripId: string
+): Promise<FetchEndTripResponse> => {
+  try {
+    const data = await API.get<FetchEndTripResponse>({
+      slug: `${Slug.GET_END_TRIP}?tripId=${tripId}`,
+    });
+
+    if (!data) {
+      throw new Error("Failed to fetch end trip data");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching end trip data:", error);
     throw error;
   }
 };

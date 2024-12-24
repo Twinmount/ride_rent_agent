@@ -1,9 +1,22 @@
+import { getEndTripData } from "@/api/srm/trips";
 import TripEndForm from "@/components/form/srm-form/TripEndForm";
+import FormSkelton from "@/components/loading-skelton/FormSkelton";
+import { useQuery } from "@tanstack/react-query";
 import { CircleArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 export default function EndTripsPage() {
   const navigate = useNavigate();
+
+  const { tripId } = useParams<{
+    tripId: string;
+  }>();
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["end-trip", tripId],
+    queryFn: () => getEndTripData(tripId as string),
+    staleTime: 60000,
+  });
 
   return (
     <section className="container py-6 pb-10 h-auto min-h-screen bg-slate-50">
@@ -16,8 +29,7 @@ export default function EndTripsPage() {
         </button>
         <h1 className="text-center h3-bold sm:text-left">End Trip</h1>
       </div>
-
-      <TripEndForm type="Add" />
+      {isLoading ? <FormSkelton /> : <TripEndForm type="Add" />}
     </section>
   );
 }

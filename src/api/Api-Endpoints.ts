@@ -93,4 +93,5 @@ export enum Slug {
   // SRM TRIPS
   GET_SRM_TRIPS = "/srm-bookings/list",
   PUT_SRM_END_ACTIVE_TRIP = "/trips/end",
+  GET_END_TRIP = "/trips/end-trip",
 }

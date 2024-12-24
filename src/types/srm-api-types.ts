@@ -188,3 +188,11 @@ export interface SearchVehicleResponse {
   status: string;
   statusCode: number;
 }
+
+export interface FetchEndTripResponse {
+  result: {
+    advanceAmount: string;
+  };
+  status: string;
+  statusCode: number;
+}
