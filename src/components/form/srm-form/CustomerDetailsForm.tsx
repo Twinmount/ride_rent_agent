@@ -17,11 +17,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SRMCustomerDetailsFormDefaultValues } from "@/constants";
 import { SRMCustomerDetailsFormSchema } from "@/lib/validator";
-import {
-  BannedCustomerType,
-  CustomerType,
-  SRMCustomerDetailsFormType,
-} from "@/types/srm-types";
+import { CustomerType, SRMCustomerDetailsFormType } from "@/types/srm-types";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import { deleteMultipleFiles } from "@/helpers/form";
@@ -32,11 +28,10 @@ import SingleFileUpload from "../file-uploads/SingleFileUpload";
 import {
   addCustomerDetails,
   createCustomerBooking,
-  isCustomerSpam,
 } from "@/api/srm/srmFormApi";
 import NationalityDropdown from "../dropdowns/NationalityDropdown";
 import CustomerSearch from "../dropdowns/CustomerSearchAndAutoFill";
-import BannedUserPopup from "@/components/modal/srm-modal/BannedUserPopup";
+
 import { useValidationToast } from "@/hooks/useValidationToast";
 import { handleCustomerSelect } from "@/helpers";
 
@@ -60,10 +55,6 @@ export default function SRMCustomerDetailsForm({
   const [existingCustomerId, setExistingCustomerId] = useState<string | null>(
     null
   );
-  const [isSpamDialogOpen, setIsSpamDialogOpen] = useState(false);
-  const [spamDetails, setSpamDetails] = useState<BannedCustomerType | null>(
-    null
-  );
 
   //  initial default values for the form
   const initialValues =
@@ -77,34 +68,8 @@ export default function SRMCustomerDetailsForm({
     defaultValues: initialValues as SRMCustomerDetailsFormType,
   });
 
-  // Check if the customer is spam
-  const checkCustomerSpam = async (customerId: string) => {
-    try {
-      const spamResponse = await isCustomerSpam(customerId);
-      const { isSpammed } = spamResponse.result;
-
-      if (isSpammed) {
-        setSpamDetails(spamResponse.result);
-        setIsSpamDialogOpen(true);
-        return true; // Indicate spam
-      }
-      return false; // Not spam
-    } catch (error) {
-      console.error("Error while checking customer spam:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to check customer spam status.",
-      });
-      throw error; // Stop further execution
-    }
-  };
-
   // Handle existing customer booking
   const handleExistingCustomerBooking = async (customerId: string) => {
-    const isSpam = await checkCustomerSpam(customerId);
-    if (isSpam) return; // Stop further execution if spam
-
     const bookingResponse = await createCustomerBooking(customerId);
     const bookingId = bookingResponse.result.bookingId;
     sessionStorage.setItem("bookingId", bookingId);
@@ -123,15 +88,6 @@ export default function SRMCustomerDetailsForm({
     sessionStorage.setItem("bookingId", bookingId);
 
     return customerData;
-  };
-
-  // Handle continue after spam warning
-  const handleContinue = async () => {
-    // Continue with existing customer booking after spam warning
-    if (spamDetails?.customerId) {
-      await handleExistingCustomerBooking(spamDetails.customerId);
-      setIsSpamDialogOpen(false); // Close the dialog
-    }
   };
 
   // Define a submit handler.
@@ -204,13 +160,6 @@ export default function SRMCustomerDetailsForm({
 
   return (
     <>
-      {/* Banned user popup */}
-      <BannedUserPopup
-        isSpamDialogOpen={isSpamDialogOpen}
-        setIsSpamDialogOpen={setIsSpamDialogOpen}
-        spamDetails={spamDetails!} // Ensure this is non-null
-        onContinue={handleContinue}
-      />
       {/* Form container */}
       <Form {...form}>
         <form

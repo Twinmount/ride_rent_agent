@@ -12,7 +12,7 @@ interface BannedUserPopupProps {
   isSpamDialogOpen: boolean;
   setIsSpamDialogOpen: (val: boolean) => void;
   spamDetails: BannedCustomerType;
-  onContinue: () => void; // Add a callback for the "Continue" action
+  onContinue: () => void;
 }
 
 export default function BannedUserPopup({
@@ -25,38 +25,33 @@ export default function BannedUserPopup({
     <Dialog open={isSpamDialogOpen} onOpenChange={setIsSpamDialogOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Customer Flagged as Spam</DialogTitle>
+          <DialogTitle className="text-red-600">
+            Customer Flagged as Spam
+          </DialogTitle>
           <DialogDescription>
-            The customer is flagged as spam.
-            {spamDetails?.reason && (
-              <span className="text-red-600">Reason: {spamDetails.reason}</span>
-            )}
-            {spamDetails?.vehicleRegistrationNumber && (
+            {spamDetails?.companyName && (
               <span>
-                Associated Vehicle: {spamDetails.vehicleRegistrationNumber}
+                By Company: <strong>{spamDetails.companyName}</strong>
               </span>
             )}
-            {spamDetails?.companyName && (
-              <span>Company: {spamDetails.companyName}</span>
+            {spamDetails?.reason && (
+              <span className="text-red-500">Reason: {spamDetails.reason}</span>
             )}
           </DialogDescription>
         </DialogHeader>
         <div className="flex justify-end gap-4">
           <Button
             variant="secondary"
-            onClick={() => {
-              setIsSpamDialogOpen(false);
-            }}
+            className="bg-gray-200 text-gray-800 hover:bg-gray-300"
+            onClick={() => setIsSpamDialogOpen(false)}
           >
             Cancel
           </Button>
           <Button
-            onClick={() => {
-              setIsSpamDialogOpen(false); // Close the dialog
-              onContinue(); // Invoke the callback
-            }}
+            className="bg-red-600 text-white hover:bg-red-700"
+            onClick={onContinue}
           >
-            Continue
+            Continue Trip
           </Button>
         </div>
       </DialogContent>

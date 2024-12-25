@@ -14,9 +14,10 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { ChevronsUpDown } from "lucide-react";
-import { debounce } from "@/helpers";
-import { searchCustomer } from "@/api/srm";
-import { CustomerType } from "@/types/srm-types";
+import { debounce } from "@/lib/utils";
+import { isCustomerSpam, searchCustomer } from "@/api/srm";
+import { BannedCustomerType, CustomerType } from "@/types/srm-types";
+import BannedUserPopup from "@/components/modal/srm-modal/BannedUserPopup";
 
 type CustomerSearchProps = {
   value?: string;
@@ -31,6 +32,10 @@ const CustomerSearch = ({
 }: CustomerSearchProps) => {
   const [searchTerm, setSearchTerm] = useState(""); // Default to an empty string
   const [open, setOpen] = useState(false);
+  const [isSpamDialogOpen, setIsSpamDialogOpen] = useState(false);
+  const [spamDetails, setSpamDetails] = useState<BannedCustomerType | null>(
+    null
+  );
 
   // Fetch customer data based on the search term
   const { data, isFetching, refetch } = useQuery({
@@ -58,100 +63,129 @@ const CustomerSearch = ({
   }, [searchTerm, debouncedSearch]);
 
   // Handle selecting a customer from the dropdown
-  const handleSelectCustomer = (customerName: string, customerData?: any) => {
-    setSearchTerm(customerName); // Set the selected name in the field
+  const handleSelectCustomer = async (
+    customerName: string,
+    customerData?: any
+  ) => {
+    if (customerData?.id) {
+      try {
+        const spamResponse = await isCustomerSpam(customerData.id);
+        const { isSpammed } = spamResponse.result;
+
+        if (isSpammed) {
+          setSpamDetails(spamResponse.result);
+          setIsSpamDialogOpen(true);
+          return;
+        }
+      } catch (error) {
+        console.error("Error checking customer spam status:", error);
+      }
+    }
+
+    setSearchTerm(customerName);
     setOpen(false);
-    onChangeHandler(customerName, customerData); // Pass the selected customer data
+    onChangeHandler(customerName, customerData);
   };
 
   const customerData = data?.result.list;
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-full justify-between"
-        >
-          {value || placeholder}
-          <ChevronsUpDown className="opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-96 max-w-full">
-        <Command>
-          <input
-            value={searchTerm}
-            placeholder={placeholder}
-            onChange={(e) => {
-              setSearchTerm(e.target.value);
-            }}
-            className="w-full border-b outline-none focus:ring-0 h-10 text-sm"
-          />
-          <CommandList>
-            {isFetching ? (
-              <CommandEmpty>Loading...</CommandEmpty>
-            ) : customerData?.length ? (
-              <CommandGroup>
-                {searchTerm && (
-                  <CommandItem
-                    key="manual-entry"
-                    onSelect={() => handleSelectCustomer(searchTerm, {})}
-                    className="border mb-1"
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium ">"{searchTerm}"</span>
-                    </div>
-                  </CommandItem>
-                )}
-                {customerData.map((customer: CustomerType) => (
-                  <CommandItem
-                    key={customer.id}
-                    onSelect={() =>
-                      handleSelectCustomer(customer.customerName, customer)
-                    }
-                    className="border mb-1"
-                  >
-                    <div className="flex flex-col ">
-                      <span className="font-medium">
-                        {customer.customerName}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        Passport: {customer.passportNumber || "N/A"}
-                      </span>
-                      <span className="text-sm text-gray-500">
-                        License: {customer.drivingLicenseNumber || "N/A"}
-                      </span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            ) : (
-              <>
-                <CommandEmpty>
-                  {searchTerm.length > 0
-                    ? "No customers found"
-                    : "Search customer name..."}
-                </CommandEmpty>
-                {searchTerm && (
-                  <CommandGroup>
+    <>
+      {/* Banned User Popup */}
+      <BannedUserPopup
+        isSpamDialogOpen={isSpamDialogOpen}
+        setIsSpamDialogOpen={setIsSpamDialogOpen}
+        spamDetails={spamDetails!}
+        onContinue={() => setIsSpamDialogOpen(false)}
+      />
+
+      {/* Dropdown */}
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between"
+          >
+            {value || placeholder}
+            <ChevronsUpDown className="opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-96 max-w-full">
+          <Command>
+            <input
+              value={searchTerm}
+              placeholder={placeholder}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+              }}
+              className="w-full border-b outline-none focus:ring-0 h-10 text-sm"
+            />
+            <CommandList>
+              {isFetching ? (
+                <CommandEmpty>Loading...</CommandEmpty>
+              ) : customerData?.length ? (
+                <CommandGroup>
+                  {searchTerm && (
                     <CommandItem
                       key="manual-entry"
                       onSelect={() => handleSelectCustomer(searchTerm, {})}
+                      className="border mb-1"
                     >
                       <div className="flex flex-col">
-                        <span className="font-medium">"{searchTerm}"</span>
+                        <span className="font-medium ">"{searchTerm}"</span>
                       </div>
                     </CommandItem>
-                  </CommandGroup>
-                )}
-              </>
-            )}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
+                  )}
+                  {customerData.map((customer: CustomerType) => (
+                    <CommandItem
+                      key={customer.id}
+                      onSelect={() =>
+                        handleSelectCustomer(customer.customerName, customer)
+                      }
+                      className="border mb-1"
+                    >
+                      <div className="flex flex-col ">
+                        <span className="font-medium">
+                          {customer.customerName}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          Passport: {customer.passportNumber || "N/A"}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          License: {customer.drivingLicenseNumber || "N/A"}
+                        </span>
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              ) : (
+                <>
+                  <CommandEmpty>
+                    {searchTerm.length > 0
+                      ? "No customers found"
+                      : "Search customer name..."}
+                  </CommandEmpty>
+                  {searchTerm && (
+                    <CommandGroup>
+                      <CommandItem
+                        key="manual-entry"
+                        onSelect={() => handleSelectCustomer(searchTerm, {})}
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-medium">"{searchTerm}"</span>
+                        </div>
+                      </CommandItem>
+                    </CommandGroup>
+                  )}
+                </>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </>
   );
 };
 

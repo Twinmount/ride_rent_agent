@@ -384,7 +384,7 @@ export const validateSRMTabAccess = ({
   if (tab === "customer" && levelsFilled > 0) {
     return {
       canAccess: false,
-      message: "The User Details form is already completed.",
+      message: "The Customer Details form is already completed.",
     };
   }
 
@@ -397,12 +397,12 @@ export const validateSRMTabAccess = ({
     } else if (levelsFilled >= 2) {
       return {
         canAccess: false,
-        message: "The Vehicle Details form is already completed.",
+        message: "The Vehicle Details  is already completed.",
       };
     } else {
       return {
         canAccess: false,
-        message: "Please complete the User Details form to proceed.",
+        message: "Please complete the Customer Details  to proceed.",
       };
     }
   }
@@ -416,12 +416,12 @@ export const validateSRMTabAccess = ({
     } else if (levelsFilled === 3) {
       return {
         canAccess: false,
-        message: "The Payment details form is already completed.",
+        message: "The Payment details  is already completed.",
       };
     } else {
       return {
         canAccess: false,
-        message: "Please complete the Vehicle Details form to proceed.",
+        message: "Please complete the Vehicle Details to proceed.",
       };
     }
   }

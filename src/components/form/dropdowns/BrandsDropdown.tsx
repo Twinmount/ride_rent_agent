@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Check, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, debounce } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -17,7 +17,6 @@ import {
 } from "@/components/ui/popover";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAllBrands, fetchBrandById } from "@/api/brands";
-import { debounce } from "@/helpers";
 
 type BrandsDropdownProps = {
   value?: string;
