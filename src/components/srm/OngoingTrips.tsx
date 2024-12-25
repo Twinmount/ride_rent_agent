@@ -4,14 +4,12 @@ import OngoingTripsCard from "./OngoingTripsCard";
 type OngoingTripsProps = {
   data: Trip[];
   handleOpenModal: (id: string) => void;
-  handleEndTrip: (id: string) => void;
   isLoading: boolean;
 };
 
 export default function OngoingTrips({
   data,
   handleOpenModal,
-  handleEndTrip,
   isLoading,
 }: OngoingTripsProps) {
   if (isLoading) {
@@ -30,7 +28,6 @@ export default function OngoingTrips({
               key={trip.id}
               trip={trip}
               onOpenModal={handleOpenModal}
-              onEndTrip={handleEndTrip}
             />
           ))}
         </div>

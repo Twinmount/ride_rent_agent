@@ -1,5 +1,5 @@
 import { useFormContext, Controller } from "react-hook-form";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { FormMessage } from "@/components/ui/form";
@@ -19,6 +19,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Label } from "../ui/label";
+import { debounce } from "@/helpers";
 
 const ADDITIONAL_CHARGES_OPTIONS = [
   "Fuel Charges",
@@ -41,13 +42,69 @@ const ADDITIONAL_CHARGES_OPTIONS = [
   "Service Charge",
 ];
 
-const AdditionalChargesField = () => {
+type AdditionalChargesFieldProps = {
+  setAdditionalChargesTotal: React.Dispatch<React.SetStateAction<number>>;
+};
+
+const AdditionalChargesField = ({
+  setAdditionalChargesTotal,
+}: AdditionalChargesFieldProps) => {
   const { control, watch, setValue } = useFormContext();
   const [isEnabled, setIsEnabled] = useState(false);
   const [selectedCharges, setSelectedCharges] = useState<string[]>([]);
 
   const additionalCharges = watch("additionalCharges") || [];
 
+  /**
+   * Debounced function to calculate and update the total of all additional charges.
+   * This function is debounced to prevent multiple recalculations from rapid input changes.
+   */
+  const updateTotal = useMemo(
+    () =>
+      debounce((updatedCharges: typeof additionalCharges) => {
+        const total = updatedCharges.reduce(
+          (sum, charge) => sum + parseFloat(charge.amount || "0"),
+          0
+        );
+        console.log("Debounced Updated Total:", total);
+        setAdditionalChargesTotal(total);
+      }, 1000),
+    [setAdditionalChargesTotal]
+  );
+
+  /**
+   * Handles changes to the "amount" input field for a specific charge.
+   * Updates the corresponding charge in the form state and triggers the debounced total calculation.
+   *
+   * @param {string} value - The new value of the input field.
+   * @param {number} index - The index of the charge being updated in the additionalCharges array.
+   */
+  const handleInputChange = useCallback(
+    (value: string, index: number) => {
+      const updatedCharges = [...additionalCharges];
+      updatedCharges[index] = {
+        ...updatedCharges[index],
+        amount: value,
+      };
+      setValue("additionalCharges", updatedCharges); // Update form field value
+      updateTotal(updatedCharges); // Trigger debounced total update
+    },
+    [additionalCharges, setValue, updateTotal]
+  );
+
+  /**
+   * Ensures that the total is calculated and updated when the component first renders
+   * or whenever the additionalCharges array changes.
+   */
+  useEffect(() => {
+    updateTotal(additionalCharges);
+  }, [additionalCharges, updateTotal]);
+
+  /**
+   * Handles the change in the additional charges checkbox.
+   * If the checkbox is checked, it enables the additional charges field.
+   * If the checkbox is unchecked, it clears the selected charges and resets the form field.
+   */
   const handleCheckboxChange = () => {
     setIsEnabled((prev) => !prev);
     if (!isEnabled) {
@@ -56,6 +113,11 @@ const AdditionalChargesField = () => {
     }
   };
 
+  /**
+   * Handles the selection of additional charges.
+   * If the charge is already selected, it removes it from the list.
+   * If the charge is not selected, it adds it to the list.
+   */
   const handleChargeSelection = (charge: string) => {
     let updatedCharges: string[];
     if (selectedCharges.includes(charge)) {
@@ -69,7 +131,7 @@ const AdditionalChargesField = () => {
       const newCharge = {
         amount: "",
         description: charge,
-        paymentDate: new Date(),
+        paymentDate: undefined,
       };
       setValue("additionalCharges", [...additionalCharges, newCharge]);
     }
@@ -115,7 +177,10 @@ const AdditionalChargesField = () => {
       {isEnabled && (
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full">
+            <Button
+              variant="outline"
+              className="w-full bg-slate-800 text-white hover:bg-slate-700 hover:text-white"
+            >
               {selectedCharges.length > 0
                 ? `${selectedCharges.length} selected`
                 : "Select Additional Charges"}
@@ -126,6 +191,7 @@ const AdditionalChargesField = () => {
             <Command>
               <CommandList>
                 <CommandGroup>
+                  {/* Loop over Additional Charges Options */}
                   {ADDITIONAL_CHARGES_OPTIONS.map((charge) => (
                     <CommandItem
                       key={charge}
@@ -154,7 +220,7 @@ const AdditionalChargesField = () => {
             key={index}
             className="p-2 mt-4 bg-white rounded-lg border shadow"
           >
-            <p className="mb-2 font-medium">{charge.description}</p>
+            <p className="mb-2 font-semibold">{charge.description}</p>
 
             {/* Amount Input */}
             <Controller
@@ -175,18 +241,10 @@ const AdditionalChargesField = () => {
                     placeholder="Enter amount"
                     className="input-field"
                     inputMode="numeric"
-                    onKeyDown={(e) => {
-                      if (
-                        !/^\d*$/.test(e.key) &&
-                        ![
-                          "Backspace",
-                          "Delete",
-                          "ArrowLeft",
-                          "ArrowRight",
-                        ].includes(e.key)
-                      ) {
-                        e.preventDefault();
-                      }
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/[^\d.]/g, ""); // Allow only numeric input
+                      field.onChange(value); // Update form state
+                      handleInputChange(value, index); // Trigger calculation
                     }}
                   />
                   {fieldState.error && (

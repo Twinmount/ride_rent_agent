@@ -170,12 +170,12 @@ const TrafficFineField = () => {
               append({
                 amount: "",
                 description: `TRAFFIC FINE - ${fields.length + 1}`,
-                paymentDate: new Date(),
+                paymentDate: undefined,
               })
             }
-            className="mt-4  text-white"
+            className="mt-4 text-white bg-slate-800 hover:bg-slate-700 hover:text-white"
           >
-            Add More
+            Add More +
           </Button>
         </div>
       )}

@@ -179,3 +179,24 @@ export const TripEndFormDefaultValues: TripEndFormType = {
   discounts: "", // Optional
   totalAmountCollected: "",
 };
+
+export const ADDITIONAL_CHARGES_OPTIONS = [
+  "Fuel Charges",
+  "Excess Mileage Charges",
+  "Cleaning Charges",
+  "Late Return Fee",
+  "Insurance Excess/Deductible",
+  "Replacement/Repair of Lost/Damaged Accessories",
+  "Additional Driver Fee",
+  "Child Seat",
+  "GPS/Navigation System",
+  "Wi-Fi Hotspot Device",
+  "Roadside Assistance",
+  "Cross-Border Fee",
+  "Smoking Penalty",
+  "Lost Registration Card (Mulkia)",
+  "Replacement Car Delivery Fee",
+  "Car Delivery Fee",
+  "Car Return Fee",
+  "Service Charge",
+];

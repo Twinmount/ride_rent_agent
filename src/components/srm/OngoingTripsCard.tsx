@@ -1,25 +1,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-  CircleUserRound,
-  MapPinned,
-  Phone,
-  Plane,
-  Calendar,
-} from "lucide-react";
+import { MapPinned, Phone, Plane, Calendar } from "lucide-react";
 import MotionDiv from "@/components/framer-motion/MotionDiv";
 import { Trip } from "@/types/srm-types";
 
 interface OngoingTripsCardProps {
   trip: Trip;
   onOpenModal: (id: string) => void;
-  onEndTrip: (id: string) => void;
 }
 
 const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
   trip,
   onOpenModal,
-  onEndTrip,
 }) => {
   return (
     <MotionDiv
@@ -143,8 +135,7 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
               Extend Trip
             </button>
             <Link
-              to={`/srm/ongoing-trips/${trip.id}`}
-              onClick={() => onEndTrip(trip.id)}
+              to={`/srm/end-trip/${trip.bookingId}`}
               className="px-3 py-1 text-white bg-red-500 rounded-md"
             >
               End Trip

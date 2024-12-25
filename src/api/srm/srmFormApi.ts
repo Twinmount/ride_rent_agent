@@ -7,11 +7,13 @@ import {
   SearchCustomerResponse,
   CreateCustomerBookingResponse,
   SearchVehicleResponse,
+  FetchTripEndResponse,
 } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
   SRMCustomerDetailsFormType,
   SRMVehicleDetailsFormType,
+  TripEndFormType,
 } from "@/types/srm-types";
 
 export const addCustomerDetailsForm = async (
@@ -104,6 +106,7 @@ export const updateBookingDataForVehicle = async (
     throw error;
   }
 };
+
 export const updateBookingDataForPayment = async (values: {
   bookingId: string;
   paymentId: string;
@@ -358,6 +361,42 @@ export const searchVehicle = async (
     return data;
   } catch (error) {
     console.error("Error getting vehicle list", error);
+    throw error;
+  }
+};
+
+// type for end trip arguments
+type EndTripArgs = {
+  values: TripEndFormType;
+  bookingId: string;
+  companyId: string;
+};
+
+export const endTrip = async ({
+  values,
+  bookingId,
+  companyId,
+}: EndTripArgs): Promise<FetchTripEndResponse> => {
+  try {
+    // combining bookingId and companyId with values to generate a single object as requestBody
+    const requestBody = {
+      ...values,
+      bookingId,
+      companyId,
+    };
+
+    const data = await API.post<FetchTripEndResponse>({
+      slug: Slug.POST_SRM_END_TRIP, // Replace with the actual endpoint
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to end trip. No response received.");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error in endTrip API:", error);
     throw error;
   }
 };

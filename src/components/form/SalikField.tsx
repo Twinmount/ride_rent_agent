@@ -168,12 +168,12 @@ const SalikField = () => {
               append({
                 amount: "",
                 description: "SALIK", // Internally set description
-                paymentDate: new Date(),
+                paymentDate: undefined,
               })
             }
-            className="mt-4 text-white"
+            className="mt-4 text-white bg-slate-800 hover:bg-slate-700 hover:text-white"
           >
-            Add More
+            Add More +
           </Button>
         </div>
       )}

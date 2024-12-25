@@ -146,7 +146,7 @@ const router = createBrowserRouter([
                 element: <OngoingTripsPage />,
               },
               {
-                path: "/srm/ongoing-trips/:tripId",
+                path: "/srm/end-trip/:bookingId",
                 element: <EndTripsPage />,
               },
               {

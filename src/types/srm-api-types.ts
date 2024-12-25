@@ -110,6 +110,9 @@ export interface IndividualTrip {
   createdDate: string; // ISO date string
   updatedDate: string; // ISO date string
   customerBookingRemark: string;
+  maxBookingDate: string;
+  discounts: string;
+  totalAmountCollected: string;
 }
 
 export interface CreateCustomerBookingResponse {
@@ -131,6 +134,18 @@ export interface FetchOngoingTripsResponse {
 }
 
 export interface FetchCompletedTripsResponse {
+  result: {
+    list: IndividualTrip[];
+    page: number;
+    limit: number;
+    total: number;
+    totalNumberOfPages: number;
+  };
+  status: string;
+  statusCode: number;
+}
+
+export interface FetchTripEndResponse {
   result: {
     list: IndividualTrip[];
     page: number;
@@ -191,7 +206,7 @@ export interface SearchVehicleResponse {
 
 export interface FetchEndTripResponse {
   result: {
-    advanceAmount: string;
+    advanceCollected: number;
   };
   status: string;
   statusCode: number;

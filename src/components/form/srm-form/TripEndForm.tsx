@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/use-toast";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import {
   Select,
@@ -32,15 +32,45 @@ import AdditionalChargesField from "../SRMAdditionalChargesField";
 import { CustomerStatus, TripEndFormType } from "@/types/srm-types";
 import { TripEndFormSchema } from "@/lib/validator";
 import { TripEndFormDefaultValues } from "@/constants";
+import { endTrip } from "@/api/srm";
+import { calculateFinalAmount, calculateRentalAmount } from "@/helpers";
 
 type TripEndFormProps = {
   type: "Add" | "Update";
   formData?: TripEndFormType | null;
+  advanceCollected?: number;
+  companyId: string;
 };
 
-export default function TripEndForm({ type, formData }: TripEndFormProps) {
-  const {} = useParams<{}>();
+// mock data
+const mockRentalDetails = {
+  day: { enabled: true, rentInAED: "234", mileageLimit: "2342" },
+  week: { enabled: true, rentInAED: "554", mileageLimit: "554" },
+  month: { enabled: true, rentInAED: "123", mileageLimit: "553" },
+  hour: {
+    enabled: true,
+    rentInAED: "12",
+    mileageLimit: "1234",
+    minBookingHours: "2",
+  },
+};
 
+const mockBookingStartDate = "2023-12-18T18:00:00.000Z";
+const mockBookingEndDate = "2024-12-26T17:30:00.000Z";
+
+export default function TripEndForm({
+  type,
+  formData,
+  companyId,
+}: TripEndFormProps) {
+  const { bookingId } = useParams<{ bookingId: string }>();
+  const [totalAmountCollected, setTotalAmountCollected] = useState<number>(0);
+  const [additionalChargesTotal, setAdditionalChargesTotal] =
+    useState<number>(0);
+
+  const navigate = useNavigate();
+
+  // form initial values
   const initialValues =
     formData && type === "Update" ? formData : TripEndFormDefaultValues;
 
@@ -52,7 +82,23 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof TripEndFormSchema>) {
-    console.log(values);
+    console.log("Form Submitted", values);
+    return;
+    try {
+      let data;
+
+      if (type === "Add") {
+        data = await endTrip({
+          values: values as TripEndFormType,
+          bookingId: bookingId as string,
+          companyId: companyId as string,
+        });
+      }
+
+      if (data) {
+        navigate("srm/completed-trips");
+      }
+    } catch (error) {}
   }
 
   useEffect(() => {
@@ -66,6 +112,29 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
       window.scrollTo({ top: 65, behavior: "smooth" }); // Scroll to the top of the page
     }
   }, [form.formState.errors]);
+
+  const discount = form.watch("discounts") || "";
+
+  // totalAmountCollected calculation
+  useEffect(() => {
+    const baseRentalAmount = calculateRentalAmount(
+      mockRentalDetails,
+      mockBookingStartDate,
+      mockBookingEndDate
+    );
+
+    // Use the already calculated additionalChargesTotal
+    const finalAmount = calculateFinalAmount(
+      baseRentalAmount,
+      additionalChargesTotal,
+      discount
+    );
+
+    setTotalAmountCollected(finalAmount);
+
+    // Update the form value (read-only field)
+    form.setValue("totalAmountCollected", finalAmount.toFixed(2));
+  }, [additionalChargesTotal, discount]);
 
   return (
     <section className="container py-5 mx-auto min-h-screen rounded-lg md:py-7">
@@ -224,7 +293,9 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
                   </FormLabel>
                   <div className="flex-col items-start w-full">
                     <FormControl>
-                      <AdditionalChargesField />
+                      <AdditionalChargesField
+                        setAdditionalChargesTotal={setAdditionalChargesTotal}
+                      />
                     </FormControl>
                     <FormDescription>
                       Specify if a security deposit is required and provide the
@@ -243,20 +314,25 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
               render={({ field }) => (
                 <FormItem className="flex mb-2 w-full max-sm:flex-col">
                   <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                    Discounts / Adjustments{" "}
+                    Discounts / Adjustments &#40;AED&#41;{" "}
                     <span className="mr-5 max-sm:hidden">:</span>
                   </FormLabel>
                   <div className="flex-col items-start w-full">
                     <FormControl>
                       <Input
-                        placeholder="eg: ABC12345"
                         {...field}
-                        className={`input-field`}
+                        placeholder="Enter discount amount"
                         type="text"
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/[^\d.]/g, ""); // Allow only numeric input
+                          field.onChange(value);
+                        }}
+                        className="input-field"
                       />
                     </FormControl>
                     <FormDescription className="ml-2">
-                      &#40;optional&#41; provide value if any.
+                      &#40;optional&#41; provide discount in AED if any. Default
+                      to 0.
                     </FormDescription>
                     <FormMessage className="ml-2" />
                   </div>
@@ -271,36 +347,25 @@ export default function TripEndForm({ type, formData }: TripEndFormProps) {
               render={({ field }) => (
                 <FormItem className="flex mb-2 w-full max-sm:flex-col">
                   <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                    Total Amount to be Collected{" "}
+                    Total Amount to be Collected &#40;AED&#41;{" "}
                     <span className="mr-5 max-sm:hidden">:</span>
                   </FormLabel>
                   <div className="flex-col items-start w-full">
                     <FormControl>
                       <Input
-                        id="trafficFineAmount"
                         {...field}
-                        placeholder="Total Amount"
-                        className="input-field"
-                        type="text"
-                        inputMode="numeric"
-                        onChange={(e) => field.onChange(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (
-                            !/^\d*$/.test(e.key) &&
-                            ![
-                              "Backspace",
-                              "Delete",
-                              "ArrowLeft",
-                              "ArrowRight",
-                            ].includes(e.key)
-                          ) {
-                            e.preventDefault();
-                          }
-                        }}
+                        value={totalAmountCollected.toFixed(2)}
+                        readOnly
+                        className="input-field !text-lg !font-semibold !cursor-default"
                       />
                     </FormControl>
                     <FormDescription className="ml-2">
-                      Enter the total amount to be collected.
+                      Total amount to be collected in AED. Will be automatically
+                      calculated based on the <strong>booking period</strong> ,{" "}
+                      <strong>rental details</strong> of the vehicle,{" "}
+                      <strong>discount</strong> provided, and the{" "}
+                      <strong>additional charges</strong>. &#40;
+                      <strong>5% tax included</strong>&#41;
                     </FormDescription>
                     <FormMessage className="ml-2" />
                   </div>

@@ -1,10 +1,9 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
-import { toast } from "@/components/ui/use-toast";
 import { SortDropdown } from "@/components/SortDropdown";
 import ExtendTripModal from "@/components/modal/srm-modal/ExtendTripModal";
-import { endTrip, fetchOngoingTrips } from "@/api/srm/trips";
+import { fetchOngoingTrips } from "@/api/srm/trips";
 import DownloadExcelModal from "@/components/srm/DownloadSRMExcelData";
 import { Link } from "react-router-dom";
 import Search from "@/components/Search";
@@ -42,32 +41,6 @@ export default function OngoingTripsPage() {
 
   const handleCloseModal = () => {
     setSelectedTripId(null);
-  };
-
-  const handleEndTrip = async (tripId: string) => {
-    try {
-      // Call the API with necessary details
-      await endTrip({ tripId });
-
-      // Invalidate the query to refresh the list of active trips
-      queryClient.invalidateQueries({ queryKey: ["activeTrips"] });
-
-      // Display a success toast notification
-      toast({
-        title: "Trip ended successfully",
-        className: "bg-green-500 text-white",
-      });
-
-      // Optionally reset the selected trip ID if needed
-      setSelectedTripId(null);
-    } catch (error) {
-      console.error("Failed to end trip:", error);
-      toast({
-        variant: "destructive",
-        title: "Failed to end trip",
-        description: "Something went wrong while ending the trip.",
-      });
-    }
   };
 
   const ongoingTrips = data?.result.list || [];
@@ -118,7 +91,6 @@ export default function OngoingTripsPage() {
       <OngoingTrips
         data={ongoingTrips}
         handleOpenModal={handleOpenModal}
-        handleEndTrip={handleEndTrip}
         isLoading={isLoading || isFetching}
       />
 

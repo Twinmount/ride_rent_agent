@@ -1,4 +1,5 @@
 import { SingleVehicleType } from "@/types/API-types";
+import { differenceInHours } from "date-fns";
 
 type ApprovalStatusType = "APPROVED" | "UNDER_REVIEW" | "REJECTED" | "PENDING";
 
@@ -50,4 +51,90 @@ export const debounce = <T extends any[]>(
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => callback(...args), delay);
   };
+};
+
+interface RentalDetails {
+  day: {
+    enabled: boolean;
+    rentInAED: string;
+    mileageLimit: string;
+  };
+  week: {
+    enabled: boolean;
+    rentInAED: string;
+    mileageLimit: string;
+  };
+  month: {
+    enabled: boolean;
+    rentInAED: string;
+    mileageLimit: string;
+  };
+  hour: {
+    enabled: boolean;
+    rentInAED: string;
+    mileageLimit: string;
+    minBookingHours: string;
+  };
+}
+
+export const calculateRentalAmount = (
+  rentalDetails: RentalDetails,
+  bookingStartDate: string,
+  bookingEndDate: string
+): number => {
+  const startDate = new Date(bookingStartDate);
+  const endDate = new Date(bookingEndDate);
+
+  let remainingHours = differenceInHours(endDate, startDate);
+  let totalAmount = 0;
+
+  // Calculate months
+  if (rentalDetails.month.enabled && remainingHours >= 24 * 30) {
+    const months = Math.floor(remainingHours / (24 * 30));
+    totalAmount += months * parseFloat(rentalDetails.month.rentInAED);
+    remainingHours -= months * 24 * 30;
+  }
+
+  // Calculate weeks
+  if (rentalDetails.week.enabled && remainingHours >= 24 * 7) {
+    const weeks = Math.floor(remainingHours / (24 * 7));
+    totalAmount += weeks * parseFloat(rentalDetails.week.rentInAED);
+    remainingHours -= weeks * 24 * 7;
+  }
+
+  // Calculate days
+  if (rentalDetails.day.enabled && remainingHours >= 24) {
+    const days = Math.floor(remainingHours / 24);
+    totalAmount += days * parseFloat(rentalDetails.day.rentInAED);
+    remainingHours -= days * 24;
+  }
+
+  // Calculate hours
+  if (rentalDetails.hour.enabled && remainingHours > 0) {
+    const minBookingHours = parseInt(
+      rentalDetails.hour.minBookingHours || "1",
+      10
+    );
+    if (remainingHours >= minBookingHours) {
+      totalAmount += remainingHours * parseFloat(rentalDetails.hour.rentInAED);
+    }
+  }
+
+  return totalAmount;
+};
+
+export const calculateFinalAmount = (
+  baseAmount: number,
+  additionalChargesTotal: number,
+  discount: string
+): number => {
+  const discountAmount = parseFloat(discount || "0");
+
+  // Add base rental, additional charges total, subtract discount, and add 5% tax
+  let finalAmount = baseAmount + additionalChargesTotal - discountAmount;
+
+  // Add 5% tax
+  finalAmount += finalAmount * 0.05;
+
+  return finalAmount;
 };

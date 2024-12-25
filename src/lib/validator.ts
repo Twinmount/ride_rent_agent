@@ -206,12 +206,12 @@ const AdditionalChargesSchema = z.array(
 );
 // Trip End Form Schema
 export const TripEndFormSchema = z.object({
-  brandName: z.string().min(1, "Brand name is required"), // Example for brand name
+  brandName: z.string().min(1, "Brand name is required"),
   customerName: z.string().min(1, "Customer name is required"),
   customerStatus: z.nativeEnum(CustomerStatus),
-  finesCollected: z.array(TrafficFineSchema).optional(), // Using the traffic fine schema
-  salikCollected: z.array(SalikSchema).optional(), // Using the salikCollected schema
-  additionalCharges: AdditionalChargesSchema.optional(), // Optional field for additional charges
-  discounts: z.string().optional(), // Example field for discounts
+  finesCollected: z.array(TrafficFineSchema).optional(),
+  salikCollected: z.array(SalikSchema).optional(),
+  additionalCharges: AdditionalChargesSchema.optional(),
+  discounts: z.string().optional(),
   totalAmountCollected: z.string().min(1, "Total amount is required"),
 });

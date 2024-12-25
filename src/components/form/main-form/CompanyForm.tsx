@@ -27,9 +27,6 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "../../ui/use-toast";
 import { addCompany, sendOtp, updateCompany, verifyOtp } from "@/api/company";
 import Spinner from "../../general/Spinner";
-import { load, StorageKeys } from "@/utils/storage";
-import { jwtDecode } from "jwt-decode";
-import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
 import { useMutation } from "@tanstack/react-query";
 
 import {
@@ -40,6 +37,7 @@ import {
 import { GcsFilePaths } from "@/constants/enum";
 import { deleteMultipleFiles } from "@/helpers/form";
 import SingleFileUpload from "../file-uploads/SingleFileUpload";
+import useUserId from "@/hooks/useUserId";
 
 type CompanyRegistrationFormProps = {
   type: "Add" | "Update";
@@ -63,15 +61,11 @@ export default function CompanyRegistrationForm({
   const [timer, setTimer] = useState(60);
   const navigate = useNavigate();
 
+  // accessing userId from useUserId hook
+  const { userId } = useUserId();
+
   const initialValues =
     formData && type === "Update" ? formData : CompanyFormDefaultValues;
-
-  // accessing refresh token to get the userId
-  const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
-  const decodedRefreshToken = jwtDecode<DecodedRefreshToken>(
-    refreshToken as string
-  );
-  const { userId } = decodedRefreshToken;
 
   useEffect(() => {
     const isVerified = sessionStorage.getItem("isOtpVerified");
@@ -198,9 +192,9 @@ export default function CompanyRegistrationForm({
     try {
       let data;
       if (type === "Add") {
-        data = await addCompany(values, userId);
+        data = await addCompany(values, userId as string);
       } else if (type === "Update") {
-        data = await updateCompany(values, userId);
+        data = await updateCompany(values, userId as string);
       }
 
       if (data) {

@@ -57,22 +57,6 @@ export const fetchOngoingTrips = async (urlParams: {
   }
 };
 
-export const endTrip = async ({ tripId }: { tripId: string }) => {
-  try {
-    const data = await API.put({
-      slug: Slug.PUT_SRM_END_ACTIVE_TRIP,
-      body: {
-        tripId,
-      },
-    });
-
-    return data;
-  } catch (error) {
-    console.error("Error ending trip", error);
-    throw error;
-  }
-};
-
 export const fetchCompletedTrips = async (urlParams: {
   page: number;
   limit: number;
@@ -179,13 +163,13 @@ export const fetchCustomerList = async (urlParams: {
   }
 };
 
-// fetch End Trip Data
+// fetch End Trip Data for calculating advanceCollected
 export const getEndTripData = async (
-  tripId: string
+  bookingId: string
 ): Promise<FetchEndTripResponse> => {
   try {
     const data = await API.get<FetchEndTripResponse>({
-      slug: `${Slug.GET_END_TRIP}?tripId=${tripId}`,
+      slug: `${Slug.GET_SRM_END_TRIP}?bookingId=${bookingId}`,
     });
 
     if (!data) {
