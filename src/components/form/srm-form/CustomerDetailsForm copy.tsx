@@ -27,6 +27,7 @@ import "react-international-phone/style.css";
 import { deleteMultipleFiles } from "@/helpers/form";
 import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
+import { useParams } from "react-router-dom";
 import { GcsFilePaths } from "@/constants/enum";
 import SingleFileUpload from "../file-uploads/SingleFileUpload";
 import {
@@ -37,8 +38,6 @@ import {
 import NationalityDropdown from "../dropdowns/NationalityDropdown";
 import CustomerSearch from "../dropdowns/CustomerSearchAndAutoFill";
 import BannedUserPopup from "@/components/modal/srm-modal/BannedUserPopup";
-import { useValidationToast } from "@/hooks/useValidationToast";
-import { handleCustomerSelect } from "@/helpers";
 
 type SRMCustomerDetailsFormProps = {
   type: "Add" | "Update";
@@ -65,7 +64,8 @@ export default function SRMCustomerDetailsForm({
     null
   );
 
-  //  initial default values for the form
+  const {} = useParams<{}>();
+
   const initialValues =
     formData && type === "Update"
       ? formData
@@ -77,61 +77,14 @@ export default function SRMCustomerDetailsForm({
     defaultValues: initialValues as SRMCustomerDetailsFormType,
   });
 
-  // Check if the customer is spam
-  const checkCustomerSpam = async (customerId: string) => {
-    try {
-      const spamResponse = await isCustomerSpam(customerId);
-      const { isSpammed } = spamResponse.result;
-
-      if (isSpammed) {
-        setSpamDetails(spamResponse.result);
-        setIsSpamDialogOpen(true);
-        return true; // Indicate spam
-      }
-      return false; // Not spam
-    } catch (error) {
-      console.error("Error while checking customer spam:", error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to check customer spam status.",
-      });
-      throw error; // Stop further execution
-    }
-  };
-
-  // Handle existing customer booking
-  const handleExistingCustomerBooking = async (customerId: string) => {
-    const isSpam = await checkCustomerSpam(customerId);
-    if (isSpam) return; // Stop further execution if spam
-
-    const bookingResponse = await createCustomerBooking(customerId);
-    const bookingId = bookingResponse.result.bookingId;
-    sessionStorage.setItem("bookingId", bookingId);
-  };
-
-  // Handle new customer creation and booking
-  const handleNewCustomerBooking = async (
-    values: SRMCustomerDetailsFormType,
-    countryCode: string
-  ) => {
-    const customerData = await addCustomerDetails(values, countryCode);
-    const customerId = customerData.result.customerId;
-
-    const bookingResponse = await createCustomerBooking(customerId);
-    const bookingId = bookingResponse.result.bookingId;
-    sessionStorage.setItem("bookingId", bookingId);
-
-    return customerData;
-  };
-
-  // Handle continue after spam warning
   const handleContinue = async () => {
-    // Continue with existing customer booking after spam warning
-    if (spamDetails?.customerId) {
-      await handleExistingCustomerBooking(spamDetails.customerId);
-      setIsSpamDialogOpen(false); // Close the dialog
-    }
+    // Proceed with the createCustomerBooking API call
+    const bookingResponse = await createCustomerBooking(
+      existingCustomerId as string
+    );
+    const bookingId = bookingResponse.result.bookingId;
+    sessionStorage.setItem("bookingId", bookingId);
+    console.log("Customer booking continued after spam warning.");
   };
 
   // Define a submit handler.
@@ -149,16 +102,55 @@ export default function SRMCustomerDetailsForm({
       return;
     }
 
+    // Append other form data
     try {
       let data;
-
       if (type === "Add") {
-        if (existingCustomerId) {
-          // Handle existing customer booking
-          await handleExistingCustomerBooking(existingCustomerId);
+        // creating the customer in the db
+        // Check for spam before calling the API
+        if (!!existingCustomerId) {
+          try {
+            const spamResponse = await isCustomerSpam(existingCustomerId);
+            const { isSpammed } = spamResponse.result;
+
+            if (true) {
+              setSpamDetails(spamResponse.result);
+              setIsSpamDialogOpen(true);
+              return; // Prevent further execution until the dialog is resolved
+            }
+          } catch (error) {
+            console.error("Error while checking customer spam:", error);
+            toast({
+              variant: "destructive",
+              title: "Error",
+              description: "Failed to check customer spam status.",
+            });
+            return;
+          }
+
+          // If not spammed, proceed with booking
+          const bookingResponse = await createCustomerBooking(
+            existingCustomerId as string
+          );
+          const bookingId = bookingResponse.result.bookingId;
+          sessionStorage.setItem("bookingId", bookingId);
         } else {
-          // Handle new customer booking
-          data = await handleNewCustomerBooking(values, countryCode);
+          // Add customer details and create a booking if the customer is new
+          data = await addCustomerDetails(
+            values as SRMCustomerDetailsFormType,
+            countryCode
+          );
+
+          const customerId = data.result.customerId;
+          const bookingResponse = await createCustomerBooking(customerId);
+
+          console.log("bookingResponse", bookingResponse);
+
+          //  storing in session storage
+          if (bookingResponse) {
+            const bookingId = bookingResponse.result.bookingId;
+            sessionStorage.setItem("bookingId", bookingId);
+          }
         }
       }
 
@@ -179,39 +171,68 @@ export default function SRMCustomerDetailsForm({
         title: `${type} Vehicle failed`,
         description: "Something went wrong",
       });
+
       console.error(error);
     }
   }
 
-  // custom hook to validate form
-  useValidationToast(form);
+  useEffect(() => {
+    // Check for validation errors and scroll to the top if errors are present
+    if (Object.keys(form.formState.errors).length > 0) {
+      toast({
+        variant: "destructive",
+        title: `Validation Error`,
+        description: "Please make sure values are provided",
+      });
+      window.scrollTo({ top: 65, behavior: "smooth" }); // Scroll to the top of the page
+    }
+  }, [form.formState.errors]);
 
   // Handle selecting an existing customer from the results
-  const onCustomerSelect = (
+  const handleCustomerSelect = (
     customerName: string,
     customerData: CustomerType | null
   ) => {
-    // helper function to handle customer selection
-    handleCustomerSelect(
-      form,
-      customerName,
-      customerData,
-      setExistingCustomerId,
-      setCurrentProfilePic,
-      setCountryCode
-    );
+    form.setValue("customerName", customerName);
+
+    if (customerData) {
+      setExistingCustomerId(customerData?.customerId);
+      form.setValue(
+        "customerProfilePic",
+        customerData.customerProfilePic || ""
+      );
+      setCurrentProfilePic(customerData.customerProfilePic || "");
+      form.setValue("nationality", customerData.nationality || "");
+      form.setValue("passportNumber", customerData.passportNumber || "");
+      form.setValue(
+        "drivingLicenseNumber",
+        customerData.drivingLicenseNumber || ""
+      );
+      form.setValue(
+        "phoneNumber",
+        (customerData.countryCode || "971") + customerData.phoneNumber || ""
+      );
+      setCountryCode(customerData.countryCode || "");
+    } else {
+      setExistingCustomerId(null);
+      setCurrentProfilePic(null);
+      form.setValue("customerProfilePic", "");
+      form.resetField("nationality");
+      form.resetField("passportNumber");
+      form.resetField("drivingLicenseNumber");
+      form.resetField("phoneNumber");
+      setCountryCode("");
+    }
   };
 
   return (
     <>
-      {/* Banned user popup */}
       <BannedUserPopup
         isSpamDialogOpen={isSpamDialogOpen}
         setIsSpamDialogOpen={setIsSpamDialogOpen}
         spamDetails={spamDetails!} // Ensure this is non-null
         onContinue={handleContinue}
       />
-      {/* Form container */}
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -235,7 +256,7 @@ export default function SRMCustomerDetailsForm({
                     <FormControl>
                       <CustomerSearch
                         value={field.value} // Pass current field value
-                        onChangeHandler={onCustomerSelect}
+                        onChangeHandler={handleCustomerSelect}
                         placeholder="Enter / Search customer name"
                       />
                     </FormControl>

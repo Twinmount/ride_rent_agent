@@ -1,3 +1,5 @@
+import { RentalDetails } from "./srm-types";
+
 export interface CustomerApiType {
   id: string; // Unique identifier for the user
   customerId: string;
@@ -13,34 +15,25 @@ export interface CustomerApiType {
 }
 export interface AddCustomerFormResponse {
   result: CustomerApiType;
-  status: string; // Status message (e.g., 'success', 'error')
-  statusCode: number; // HTTP status code (e.g., 200, 400)
+  status: string;
+  statusCode: number;
+}
+
+export interface GetIsCustomerSpamResponse {
+  result: {
+    isSpammed: boolean;
+    customerId: string;
+    reason: string | null;
+    vehicleRegistrationNumber: string | null;
+    companyName: string | null;
+    bookingStartDate: string | null;
+    bookingEndDate: string | null;
+  };
+  status: string;
+  statusCode: number;
 }
 
 // vehicle types
-export interface RentalDetails {
-  day: {
-    enabled: boolean;
-    rentInAED: string;
-    mileageLimit: string;
-  };
-  week: {
-    enabled: boolean;
-    rentInAED: string;
-    mileageLimit: string;
-  };
-  month: {
-    enabled: boolean;
-    rentInAED: string;
-    mileageLimit: string;
-  };
-  hour: {
-    enabled: boolean;
-    rentInAED: string;
-    mileageLimit: string;
-    minBookingHours: string;
-  };
-}
 
 export interface VehicleApiType {
   id: string;

@@ -89,6 +89,7 @@ export enum Slug {
   POST_SRM_BOOKING_CUSTOMER = "/srm-bookings/customer",
   PUT_SRM_BOOKING_VEHICLE = "/srm-bookings/vehicle",
   PUT_SRM_BOOKING_PAYMENT = "/srm-bookings/payment",
+  GET_SRM_IS_CUSTOMER_SPAM = "/srm-bookings/customer/is-spammed-customer",
 
   // SRM TRIPS
   GET_SRM_TRIPS = "/srm-bookings/list",

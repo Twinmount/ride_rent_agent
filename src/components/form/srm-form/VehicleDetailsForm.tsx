@@ -22,7 +22,6 @@ import { useParams } from "react-router-dom";
 import {
   addVehicleDetailsForm,
   updateBookingDataForVehicle,
-  updateVehicleDetailsForm,
 } from "@/api/srm/srmFormApi";
 import BrandsDropdown from "../dropdowns/BrandsDropdown";
 import RentalDetailsFormField from "../RentalDetailsFormField";
@@ -30,6 +29,8 @@ import { deleteMultipleFiles, validateSRMRentalDetails } from "@/helpers/form";
 import SingleFileUpload from "../file-uploads/SingleFileUpload";
 import { GcsFilePaths } from "@/constants/enum";
 import VehicleSearch from "../dropdowns/VehicleSearchAndAutoFill";
+import { handleVehicleSelection } from "@/helpers";
+import { useValidationToast } from "@/hooks/useValidationToast";
 
 type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";
@@ -52,6 +53,7 @@ export default function SRMVehicleDetailsForm({
     null
   );
 
+  // initial default values for the form
   const initialValues =
     formData && type === "Update"
       ? formData
@@ -62,6 +64,26 @@ export default function SRMVehicleDetailsForm({
     resolver: zodResolver(SRMVehicleDetailsFormSchema),
     defaultValues: initialValues as SRMVehicleDetailsFormType,
   });
+
+  // Handle logic for adding a new vehicle record
+  const handleAddVehicle = async (
+    values: SRMVehicleDetailsFormType,
+    bookingId: string
+  ) => {
+    let data;
+    if (!!existingVehicleId) {
+      // Handle updating an existing vehicle booking record
+      await updateBookingDataForVehicle(bookingId, existingVehicleId);
+    } else {
+      //   Handle adding a new vehicle
+      data = await addVehicleDetailsForm(values);
+      const vehicleId = data.result.id;
+
+      // Handle updating the vehicle booking record
+      await updateBookingDataForVehicle(bookingId, vehicleId);
+    }
+    return data;
+  };
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof SRMVehicleDetailsFormSchema>) {
@@ -103,36 +125,18 @@ export default function SRMVehicleDetailsForm({
     try {
       let data;
       if (type === "Add") {
-        if (!!existingVehicleId) {
-          console.log("existing vehicle id", existingVehicleId);
-          await updateBookingDataForVehicle(bookingId, existingVehicleId);
-        } else {
-          console.log("new vehicle");
-          data = await addVehicleDetailsForm(
-            values as SRMVehicleDetailsFormType
-          );
-          const vehicleId = data.result.id;
-
-          await updateBookingDataForVehicle(bookingId, vehicleId);
-        }
-      } else if (type === "Update") {
-        // data = await updateVehicleDetailsForm(
-        //   values as SRMVehicleDetailsFormType
-        // );
+        data = await handleAddVehicle(values, bookingId);
       }
 
       if (data) {
         await deleteMultipleFiles(deletedFiles);
-      }
-
-      if (data) {
         toast({
           title: `Vehicle ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
         });
 
-        if (type === "Add") {
-          if (onNextTab) onNextTab();
+        if (type === "Add" && onNextTab) {
+          onNextTab();
         }
       }
     } catch (error) {
@@ -146,105 +150,21 @@ export default function SRMVehicleDetailsForm({
     }
   }
 
-  // form error validation for complex fields
-  useEffect(() => {
-    // Check for validation errors and scroll to the top if errors are present
-    if (Object.keys(form.formState.errors).length > 0) {
-      toast({
-        variant: "destructive",
-        title: `Validation Error`,
-        description: "Please make sure values are provided",
-      });
-      window.scrollTo({ top: 65, behavior: "smooth" }); // Scroll to the top of the page
-    }
-  }, [form.formState.errors]);
+  // custom hook to validate complex form fields
+  useValidationToast(form);
 
-  // Handle selecting a customer from the results// Handle selecting a vehicle from the results
+  // Handle selecting a vehicle from the registration number dropdown results to auto fill the form fields.
   const handleVehicleSelect = (
     vehicleRegistrationNumber: string,
     vehicleData: VehicleType | null
   ) => {
-    form.setValue("vehicleRegistrationNumber", vehicleRegistrationNumber);
-
-    if (vehicleData) {
-      setExistingVehicleId(vehicleData?.id);
-
-      // Set form values based on the selected vehicle
-      form.setValue(
-        "vehicleCategoryId",
-        vehicleData.vehicleCategory?.categoryId || ""
-      );
-      form.setValue("vehicleBrandId", vehicleData.vehicleBrand?.id || "");
-      form.setValue("vehiclePhoto", vehicleData.vehiclePhoto || "");
-
-      form.setValue(
-        "rentalDetails.day.enabled",
-        vehicleData.rentalDetails.day.enabled || false
-      );
-      form.setValue(
-        "rentalDetails.day.rentInAED",
-        vehicleData.rentalDetails.day.rentInAED || ""
-      );
-      form.setValue(
-        "rentalDetails.day.mileageLimit",
-        vehicleData.rentalDetails.day.mileageLimit || ""
-      );
-
-      form.setValue(
-        "rentalDetails.week.enabled",
-        vehicleData.rentalDetails.week.enabled || false
-      );
-      form.setValue(
-        "rentalDetails.week.rentInAED",
-        vehicleData.rentalDetails.week.rentInAED || ""
-      );
-      form.setValue(
-        "rentalDetails.week.mileageLimit",
-        vehicleData.rentalDetails.week.mileageLimit || ""
-      );
-
-      form.setValue(
-        "rentalDetails.month.enabled",
-        vehicleData.rentalDetails.month.enabled || false
-      );
-      form.setValue(
-        "rentalDetails.month.rentInAED",
-        vehicleData.rentalDetails.month.rentInAED || ""
-      );
-      form.setValue(
-        "rentalDetails.month.mileageLimit",
-        vehicleData.rentalDetails.month.mileageLimit || ""
-      );
-
-      form.setValue(
-        "rentalDetails.hour.enabled",
-        vehicleData.rentalDetails.hour.enabled || false
-      );
-      form.setValue(
-        "rentalDetails.hour.minBookingHours",
-        vehicleData.rentalDetails.hour.minBookingHours || ""
-      );
-
-      form.setValue(
-        "rentalDetails.hour.rentInAED",
-        vehicleData.rentalDetails.hour.rentInAED || ""
-      );
-      form.setValue(
-        "rentalDetails.hour.mileageLimit",
-        vehicleData.rentalDetails.hour.mileageLimit || ""
-      );
-
-      setCurrentVehiclePhoto(vehicleData.vehiclePhoto || "");
-    } else {
-      // Reset fields if no vehicle data is selected
-      setExistingVehicleId(null);
-      setCurrentVehiclePhoto(null);
-
-      form.resetField("vehicleCategoryId");
-      form.resetField("vehicleBrandId");
-      form.resetField("vehiclePhoto");
-      form.resetField("rentalDetails");
-    }
+    handleVehicleSelection(
+      vehicleRegistrationNumber,
+      vehicleData,
+      form,
+      setExistingVehicleId,
+      setCurrentVehiclePhoto
+    );
   };
 
   return (

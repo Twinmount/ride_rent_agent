@@ -24,7 +24,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   addPaymentDetailsForm,
   updateBookingDataForPayment,
-  updatePaymentDetailsForm,
 } from "@/api/srm/srmFormApi";
 import CurrencyDropdown from "../dropdowns/CurrencyDropdown";
 import DatePicker from "react-datepicker";
@@ -32,10 +31,24 @@ import "react-datepicker/dist/react-datepicker.css";
 import SecurityDepositField from "../SecurityDepositField";
 import { validateSecurityDeposit } from "@/helpers/form";
 import { CalendarDays } from "lucide-react";
+import { calculateRentalAmount } from "@/helpers";
 
 type SRMPaymentDetailsFormProps = {
   type: "Add" | "Update";
   formData?: SRMPaymentDetailsFormType | null;
+};
+
+// Mock rental details (replace with actual props later if needed)
+const mockRentalDetails = {
+  day: { enabled: true, rentInAED: "234", mileageLimit: "2342" },
+  week: { enabled: true, rentInAED: "554", mileageLimit: "554" },
+  month: { enabled: true, rentInAED: "123", mileageLimit: "553" },
+  hour: {
+    enabled: true,
+    rentInAED: "12",
+    mileageLimit: "1234",
+    minBookingHours: "2",
+  },
 };
 
 export default function SRMPaymentDetailsForm({
@@ -136,6 +149,31 @@ export default function SRMPaymentDetailsForm({
       window.scrollTo({ top: 65, behavior: "smooth" }); // Scroll to the top of the page
     }
   }, [form.formState.errors]);
+
+  // Watch fields to trigger calculations
+  const bookingStartDate = form.watch("bookingStartDate");
+  const bookingEndDate = form.watch("bookingEndDate");
+  const advanceAmount = form.watch("advanceAmount");
+
+  useEffect(() => {
+    // Perform calculation only if both bookingStartDate and bookingEndDate are provided
+    if (bookingStartDate && bookingEndDate) {
+      const baseRentalAmount = calculateRentalAmount(
+        mockRentalDetails,
+        bookingStartDate.toISOString(),
+        bookingEndDate.toISOString()
+      );
+
+      // Calculate remaining amount
+      const remainingAmount =
+        baseRentalAmount - parseFloat(advanceAmount || "0");
+
+      // Update remainingAmount field in the form (read-only)
+      form.setValue("remainingAmount", remainingAmount.toFixed(2), {
+        shouldValidate: true,
+      });
+    }
+  }, [bookingStartDate, bookingEndDate, advanceAmount, form.setValue]);
 
   return (
     <Form {...form}>
@@ -241,7 +279,8 @@ export default function SRMPaymentDetailsForm({
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Advance Paid <span className="mr-5 max-sm:hidden">:</span>
+                  Advance Paid &#40;AED&#41;
+                  <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
@@ -284,7 +323,7 @@ export default function SRMPaymentDetailsForm({
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Balance to be Paid{" "}
+                  Balance to be Paid &#40;AED&#41;{" "}
                   <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
@@ -292,9 +331,10 @@ export default function SRMPaymentDetailsForm({
                     <Input
                       {...field}
                       placeholder="Balance Amount (AED)"
-                      className="input-field"
+                      className="input-field !font-semibold !cursor-default"
                       type="text"
                       inputMode="numeric"
+                      readOnly
                       onKeyDown={(e) => {
                         if (
                           !/^\d*$/.test(e.key) &&
@@ -314,7 +354,11 @@ export default function SRMPaymentDetailsForm({
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    Enter the remaining amount to be paid in AED.
+                    Balance amount to be paid for this model will be
+                    automatically calculated based on{" "}
+                    <strong>rental details</strong> of the vehicle,{" "}
+                    <strong>booking period</strong>, and{" "}
+                    <strong>advance paid</strong>.
                   </FormDescription>
                   <FormMessage className="ml-2" />
                 </div>

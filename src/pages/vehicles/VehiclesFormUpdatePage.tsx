@@ -132,6 +132,7 @@ export default function VehiclesFormUpdatePage() {
                   type="Update"
                   formData={formData}
                   initialCountryCode={countryCode}
+                  levelsFilled={levelsFilled}
                 />
               )}
             </Suspense>

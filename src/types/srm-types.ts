@@ -174,3 +174,13 @@ export type TripEndFormType = {
   discounts?: string;
   totalAmountCollected: string;
 };
+
+export type BannedCustomerType = {
+  isSpammed: boolean;
+  customerId: string;
+  reason: string | null;
+  vehicleRegistrationNumber: string | null;
+  companyName: string | null;
+  bookingStartDate: string | null;
+  bookingEndDate: string | null;
+};

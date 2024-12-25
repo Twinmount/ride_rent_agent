@@ -1,7 +1,7 @@
 import { CircleArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useState } from "react";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
 import { validateSRMTabAccess } from "@/helpers/form";
 import { SRMTabsTypes } from "@/types/types";
@@ -38,7 +38,7 @@ export default function SRMDataAddPage() {
       });
     }
   };
-
+  // 1234561234;
   // Handle moving to the next tab and update levelsFilled state
   const handleNextTab = (nextTab: SRMTabsTypes) => {
     setActiveTab(nextTab);
@@ -50,16 +50,6 @@ export default function SRMDataAddPage() {
       setLevelsFilled(2);
     }
   };
-
-  // clear session storage bookingId
-  useEffect(() => {
-    sessionStorage.removeItem("bookingId");
-
-    // Cleanup: Clear bookingId again when the component unmounts
-    return () => {
-      sessionStorage.removeItem("bookingId");
-    };
-  }, []);
 
   return (
     <section className="container py-10 pb-44 h-auto min-h-screen bg-white">

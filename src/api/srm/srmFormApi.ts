@@ -8,6 +8,7 @@ import {
   CreateCustomerBookingResponse,
   SearchVehicleResponse,
   FetchTripEndResponse,
+  GetIsCustomerSpamResponse,
 } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
@@ -16,7 +17,7 @@ import {
   TripEndFormType,
 } from "@/types/srm-types";
 
-export const addCustomerDetailsForm = async (
+export const addCustomerDetails = async (
   values: SRMCustomerDetailsFormType,
   countryCode: string
 ): Promise<AddCustomerFormResponse> => {
@@ -79,6 +80,30 @@ export const createCustomerBooking = async (
     throw error;
   }
 };
+
+// checks whether the existing customer is red flagged or not
+export const isCustomerSpam = async (
+  customerId: string
+): Promise<GetIsCustomerSpamResponse> => {
+  try {
+    const slugWithParams = `${Slug.GET_SRM_IS_CUSTOMER_SPAM}?customerId=${customerId}`;
+
+    // Sending the request as a JSON object
+    const data = await API.get<GetIsCustomerSpamResponse>({
+      slug: slugWithParams,
+    });
+
+    if (!data) {
+      throw new Error("Failed to get customer spam info");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on getting spam info", error);
+    throw error;
+  }
+};
+
 export const updateBookingDataForVehicle = async (
   bookingId: string,
   vehicleId: string
