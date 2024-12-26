@@ -52,6 +52,12 @@ export default function FeaturesForm({
       isAddOrIncomplete ? "features-form-data" : "features-update-form-data",
       vehicleId,
     ],
+    /**
+     * Function to fetch features form data.
+     * If `isAddOrIncomplete` is true, fetches all features for the given vehicle category.
+     * If `isAddOrIncomplete` is false, fetches existing features for the given vehicle.
+     * @returns {Promise<FeaturesFormResponse>}
+     */
     queryFn: async () => {
       if (isAddOrIncomplete) {
         const data = await getFeaturesFormFieldsData({

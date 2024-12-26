@@ -68,6 +68,19 @@ interface RentalDetails {
   };
 }
 
+/**
+ * Calculates the total rental amount based on the rental details and booking period.
+ *
+ * This function takes into account the enabled rental periods (month, week, day, hour) and their respective rates.
+ * It calculates the total amount by determining how many complete months, weeks, and days fit into the booking period,
+ * and charges the corresponding rates. For hourly rentals, it considers the minimum booking hours.
+ *
+ * @param rentalDetails - An object containing enabled flags, rates (in AED), and mileage limits for each rental period.
+ * @param bookingStartDate - The start date of the booking in string format.
+ * @param bookingEndDate - The end date of the booking in string format.
+ * @returns The total rental amount for the specified booking period.
+ */
+
 export const calculateRentalAmount = (
   rentalDetails: RentalDetails,
   bookingStartDate: string,

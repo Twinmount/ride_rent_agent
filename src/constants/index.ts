@@ -170,8 +170,6 @@ export const SRMPaymentDetailsFormDefaultValues: SRMPaymentDetailsFormType = {
 
 // trip end form default values
 export const TripEndFormDefaultValues: TripEndFormType = {
-  brandName: "",
-  customerName: "",
   customerStatus: CustomerStatus.SUCCESSFUL,
   finesCollected: [],
   salikCollected: [],

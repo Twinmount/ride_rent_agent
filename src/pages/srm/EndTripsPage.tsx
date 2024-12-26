@@ -1,5 +1,7 @@
-import { getEndTripData } from "@/api/srm/trips";
-import TripEndForm from "@/components/form/srm-form/TripEndForm";
+import { fetchTripByBookingId, getEndTripData } from "@/api/srm/trips";
+import TripEndForm, {
+  BookingDataType,
+} from "@/components/form/srm-form/TripEndForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import { useCompany } from "@/hooks/useCompany";
 import { useQuery } from "@tanstack/react-query";
@@ -16,15 +18,33 @@ export default function EndTripsPage() {
   // accessing userId, companyId, and isCompanyLoading from useCompany hook
   const { companyId, isCompanyLoading } = useCompany();
 
-  const { data, isLoading: isBookingDataLoading } = useQuery({
+  const { data, isLoading: isEndTripDataLoading } = useQuery({
     queryKey: ["end-trip", bookingId],
     queryFn: () => getEndTripData(bookingId as string),
     staleTime: 60000,
   });
 
-  const advanceCollected = data?.result.advanceCollected || 0;
+  const { data: bookingData, isLoading: isBookingDataLoading } = useQuery({
+    queryKey: ["booking", bookingId],
+    queryFn: () => fetchTripByBookingId(bookingId as string),
+    staleTime: 60000,
+  });
 
-  const isLoading = isCompanyLoading || isBookingDataLoading;
+  const bookingStartDate = bookingData?.result.bookingStartDate;
+  const bookingEndDate = bookingData?.result.bookingEndDate;
+
+  // data required for the End Trip form for calculating total amount
+  const initialFormData = {
+    advanceCollected: data?.result.advanceCollected,
+    customerName: data?.result.customer.customerName,
+    vehicleBrand: data?.result.vehicle.vehicleBrand.brandName,
+    rentalDetails: data?.result.vehicle.rentalDetails,
+    bookingStartDate,
+    bookingEndDate,
+  };
+
+  const isLoading =
+    isCompanyLoading || isEndTripDataLoading || isBookingDataLoading;
 
   return (
     <section className="container py-6 pb-10 h-auto min-h-screen bg-slate-50">
@@ -42,7 +62,7 @@ export default function EndTripsPage() {
       ) : (
         <TripEndForm
           type="Add"
-          advanceCollected={advanceCollected}
+          bookingData={initialFormData as BookingDataType}
           companyId={companyId as string}
         />
       )}

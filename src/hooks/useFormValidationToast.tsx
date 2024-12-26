@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { UseFormReturn } from "react-hook-form";
 
-export const useValidationToast = (form: UseFormReturn<any, any>) => {
+export const useFormValidationToast = (form: UseFormReturn<any, any>) => {
   const { toast } = useToast();
 
   useEffect(() => {

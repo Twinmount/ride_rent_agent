@@ -32,6 +32,7 @@ import SecurityDepositField from "../SecurityDepositField";
 import { validateSecurityDeposit } from "@/helpers/form";
 import { CalendarDays } from "lucide-react";
 import { calculateRentalAmount } from "@/helpers";
+import { useFormValidationToast } from "@/hooks/useFormValidationToast";
 
 type SRMPaymentDetailsFormProps = {
   type: "Add" | "Update";
@@ -138,17 +139,8 @@ export default function SRMPaymentDetailsForm({
     }
   }
 
-  useEffect(() => {
-    // Check for validation errors and scroll to the top if errors are present
-    if (Object.keys(form.formState.errors).length > 0) {
-      toast({
-        variant: "destructive",
-        title: `Validation Error`,
-        description: "Please make sure values are provided",
-      });
-      window.scrollTo({ top: 65, behavior: "smooth" }); // Scroll to the top of the page
-    }
-  }, [form.formState.errors]);
+  // custom hook to validate form
+  useFormValidationToast(form);
 
   // Watch fields to trigger calculations
   const bookingStartDate = form.watch("bookingStartDate");

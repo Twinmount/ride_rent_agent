@@ -165,8 +165,6 @@ export type ChargeType = {
 
 // Trip End Form Type
 export type TripEndFormType = {
-  brandName: string;
-  customerName: string;
   customerStatus: CustomerStatus;
   finesCollected: ChargeType[];
   salikCollected: ChargeType[];

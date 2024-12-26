@@ -15,52 +15,39 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
 import { useNavigate, useParams } from "react-router-dom";
-
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 import TrafficFineField from "../TrafficFineField";
 import SalikField from "../SalikField";
 import AdditionalChargesField from "../SRMAdditionalChargesField";
-import { CustomerStatus, TripEndFormType } from "@/types/srm-types";
+import { RentalDetails, TripEndFormType } from "@/types/srm-types";
 import { TripEndFormSchema } from "@/lib/validator";
 import { TripEndFormDefaultValues } from "@/constants";
 import { endTrip } from "@/api/srm";
 import { calculateFinalAmount, calculateRentalAmount } from "@/helpers";
+import SRMCustomerStatusDropdown from "../dropdowns/SRMCustomerStatusDropdown";
+import { useFormValidationToast } from "@/hooks/useFormValidationToast";
+
+export type BookingDataType = {
+  advanceCollected: number;
+  customerName: string;
+  vehicleBrand: string;
+  rentalDetails: RentalDetails;
+  bookingStartDate: string;
+  bookingEndDate: string;
+};
 
 type TripEndFormProps = {
   type: "Add" | "Update";
   formData?: TripEndFormType | null;
-  advanceCollected?: number;
+  bookingData?: BookingDataType;
   companyId: string;
 };
-
-// mock data
-const mockRentalDetails = {
-  day: { enabled: true, rentInAED: "234", mileageLimit: "2342" },
-  week: { enabled: true, rentInAED: "554", mileageLimit: "554" },
-  month: { enabled: true, rentInAED: "123", mileageLimit: "553" },
-  hour: {
-    enabled: true,
-    rentInAED: "12",
-    mileageLimit: "1234",
-    minBookingHours: "2",
-  },
-};
-
-const mockBookingStartDate = "2023-12-18T18:00:00.000Z";
-const mockBookingEndDate = "2024-12-26T17:30:00.000Z";
 
 export default function TripEndForm({
   type,
   formData,
+  bookingData,
   companyId,
 }: TripEndFormProps) {
   const { bookingId } = useParams<{ bookingId: string }>();
@@ -101,26 +88,17 @@ export default function TripEndForm({
     } catch (error) {}
   }
 
-  useEffect(() => {
-    // Check for validation errors and scroll to the top if errors are present
-    if (Object.keys(form.formState.errors).length > 0) {
-      toast({
-        variant: "destructive",
-        title: `Validation Error`,
-        description: "Please make sure values are provided",
-      });
-      window.scrollTo({ top: 65, behavior: "smooth" }); // Scroll to the top of the page
-    }
-  }, [form.formState.errors]);
+  // custom hook to validate form
+  useFormValidationToast(form);
 
   const discount = form.watch("discounts") || "";
 
   // totalAmountCollected calculation
   useEffect(() => {
     const baseRentalAmount = calculateRentalAmount(
-      mockRentalDetails,
-      mockBookingStartDate,
-      mockBookingEndDate
+      bookingData?.rentalDetails as RentalDetails,
+      bookingData?.bookingStartDate as string,
+      bookingData?.bookingEndDate as string
     );
 
     // Use the already calculated additionalChargesTotal
@@ -145,93 +123,51 @@ export default function TripEndForm({
         >
           <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto ">
             {/* Brand Name */}
-            <FormField
-              control={form.control}
-              name="brandName"
-              render={({ field }) => (
-                <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                    Brand Name <span className="mr-5 max-sm:hidden">:</span>
-                  </FormLabel>
-                  <div className="flex-col items-start w-full">
-                    <FormControl>
-                      <Input
-                        placeholder="eg: 'Mercedes-Benz'"
-                        {...field}
-                        className={`input-field`}
-                      />
-                    </FormControl>
-                    <FormDescription className="ml-2">
-                      Enter the brand name, e.g., "Mercedes-Benz".
-                    </FormDescription>
-                    <FormMessage className="ml-2" />
-                  </div>
-                </FormItem>
-              )}
-            />
+            <div className="flex mb-2 w-full max-sm:flex-col">
+              <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
+                Brand <span className="mr-5 max-sm:hidden">:</span>
+              </FormLabel>
+              <div className="flex-col items-start w-full">
+                <div>
+                  <Input
+                    placeholder="eg: 'Mercedes-Benz'"
+                    value={bookingData?.vehicleBrand}
+                    className={`input-field !cursor-default !text-gray-700`}
+                    readOnly
+                  />
+                </div>
+                <FormDescription className="ml-2">
+                  Brand of the vehicle of this trip.
+                </FormDescription>
+                <FormMessage className="ml-2" />
+              </div>
+            </div>
 
             {/* Customer Name */}
-            <FormField
-              control={form.control}
-              name="customerName"
-              render={({ field }) => (
-                <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                    Customer Name <span className="mr-5 max-sm:hidden">:</span>
-                  </FormLabel>
-                  <div className="flex-col items-start w-full">
-                    <FormControl>
-                      <Input
-                        placeholder="eg: 'John Doe'"
-                        {...field}
-                        className={`input-field`}
-                      />
-                    </FormControl>
-                    <FormDescription className="ml-2">
-                      Enter the customer's name.
-                    </FormDescription>
-                    <FormMessage className="ml-2" />
-                  </div>
-                </FormItem>
-              )}
-            />
+            <div className="flex mb-2 w-full max-sm:flex-col">
+              <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
+                Customer Name <span className="mr-5 max-sm:hidden">:</span>
+              </FormLabel>
+              <div className="flex-col items-start w-full">
+                <div>
+                  <Input
+                    placeholder="eg: 'Mercedes-Benz'"
+                    value={bookingData?.customerName}
+                    className={`input-field !cursor-default !text-gray-700`}
+                    readOnly
+                  />
+                </div>
+                <FormDescription className="ml-2">
+                  This is the customer's name of this trip.
+                </FormDescription>
+                <FormMessage className="ml-2" />
+              </div>
+            </div>
 
             {/* Customer Remark Dropdown */}
-            <FormField
+            <SRMCustomerStatusDropdown
               control={form.control}
               name="customerStatus"
-              render={({ field }) => (
-                <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                    Customer Remark{" "}
-                    <span className="mr-5 max-sm:hidden">:</span>
-                  </FormLabel>
-                  <div className="flex-col items-start w-full">
-                    <FormControl>
-                      <Select
-                        onValueChange={(value) =>
-                          field.onChange(value as CustomerStatus)
-                        }
-                        value={field.value}
-                      >
-                        <SelectTrigger className="ring-0 select-field focus:ring-0 input-fields">
-                          <SelectValue placeholder="Select a status" />
-                        </SelectTrigger>
-                        <SelectContent className="bg-white">
-                          {Object.entries(CustomerStatus).map(
-                            ([key, value]) => (
-                              <SelectItem key={key} value={value}>
-                                {value}
-                              </SelectItem>
-                            )
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </div>
-                </FormItem>
-              )}
             />
 
             {/* Traffic Fine */}

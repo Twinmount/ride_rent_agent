@@ -6,6 +6,8 @@ import {
   FetchCustomerListResponse,
   FetchVehicleListResponse,
   FetchEndTripResponse,
+  FetchSingleBookingResponse,
+  FetchExtendTripResponse,
 } from "@/types/srm-api-types";
 import { BookingStatus } from "@/types/srm-types";
 
@@ -20,6 +22,26 @@ export interface CompletedTripDetails {
   amountPending: number;
   customerStatus: "Banned" | "Active";
 }
+
+export const fetchTripByBookingId = async (
+  bookingId: string
+): Promise<FetchSingleBookingResponse> => {
+  try {
+    const slugWithParams = `${Slug.GET_SRM_TRIP_BY_BOOKING_ID}?bookingId=${bookingId}`;
+
+    const data = await API.get<FetchSingleBookingResponse>({
+      slug: slugWithParams,
+    });
+
+    if (!data) {
+      throw new Error("Failed to fetch booking data");
+    }
+    return data;
+  } catch (error) {
+    console.error("Error fetching booking:", error);
+    throw error;
+  }
+};
 
 export const fetchOngoingTrips = async (urlParams: {
   page: number;
@@ -48,11 +70,11 @@ export const fetchOngoingTrips = async (urlParams: {
     });
 
     if (!data) {
-      throw new Error("Failed to fetch vehicles data");
+      throw new Error("Failed to fetch bookings data");
     }
     return data;
   } catch (error) {
-    console.error("Error fetching vehicles:", error);
+    console.error("Error fetching bookings:", error);
     throw error;
   }
 };
@@ -131,7 +153,6 @@ export const fetchVehicleList = async (urlParams: {
 };
 
 // customer list api
-
 export const fetchCustomerList = async (urlParams: {
   page: number;
   limit: number;
@@ -159,6 +180,26 @@ export const fetchCustomerList = async (urlParams: {
     return data;
   } catch (error) {
     console.error("Error fetching customer list:", error);
+    throw error;
+  }
+};
+
+// fetch End Trip Data for calculating advanceCollected
+export const fetchExtendTripDetails = async (
+  bookingId: string
+): Promise<FetchExtendTripResponse> => {
+  try {
+    const data = await API.get<FetchExtendTripResponse>({
+      slug: `${Slug.GET_SRM_EXTEND_TRIP}?bookingId=${bookingId}`,
+    });
+
+    if (!data) {
+      throw new Error("Failed to fetch extend trip data");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching extend trip data:", error);
     throw error;
   }
 };

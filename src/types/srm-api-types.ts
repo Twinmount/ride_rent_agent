@@ -114,6 +114,11 @@ export interface CreateCustomerBookingResponse {
   statusCode: number; // HTTP status code (e.g., 200, 400)
 }
 
+export interface FetchSingleBookingResponse {
+  result: IndividualTrip;
+  status: string;
+  statusCode: number;
+}
 export interface FetchOngoingTripsResponse {
   result: {
     list: IndividualTrip[];
@@ -197,9 +202,24 @@ export interface SearchVehicleResponse {
   statusCode: number;
 }
 
+export interface FetchExtendTripResponse {
+  result: {
+    advanceCollected: number;
+    remainingAmount: number;
+    bookingStartDate: string;
+    bookingEndDate: string;
+    nextPossibleMaxBookingEndDate: string;
+    vehicle: VehicleApiType;
+  };
+  status: string;
+  statusCode: number;
+}
+
 export interface FetchEndTripResponse {
   result: {
     advanceCollected: number;
+    vehicle: VehicleApiType;
+    customer: CustomerApiType;
   };
   status: string;
   statusCode: number;

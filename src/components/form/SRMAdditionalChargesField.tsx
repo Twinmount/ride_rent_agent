@@ -19,28 +19,8 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { Label } from "../ui/label";
-import { debounce } from "@/helpers";
-
-const ADDITIONAL_CHARGES_OPTIONS = [
-  "Fuel Charges",
-  "Excess Mileage Charges",
-  "Cleaning Charges",
-  "Late Return Fee",
-  "Insurance Excess/Deductible",
-  "Replacement/Repair of Lost/Damaged Accessories",
-  "Additional Driver Fee",
-  "Child Seat",
-  "GPS/Navigation System",
-  "Wi-Fi Hotspot Device",
-  "Roadside Assistance",
-  "Cross-Border Fee",
-  "Smoking Penalty",
-  "Lost Registration Card (Mulkia)",
-  "Replacement Car Delivery Fee",
-  "Car Delivery Fee",
-  "Car Return Fee",
-  "Service Charge",
-];
+import { debounce } from "@/lib/utils";
+import { ADDITIONAL_CHARGES_OPTIONS } from "@/constants";
 
 type AdditionalChargesFieldProps = {
   setAdditionalChargesTotal: React.Dispatch<React.SetStateAction<number>>;

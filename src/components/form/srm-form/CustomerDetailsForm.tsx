@@ -32,7 +32,7 @@ import {
 import NationalityDropdown from "../dropdowns/NationalityDropdown";
 import CustomerSearch from "../dropdowns/CustomerSearchAndAutoFill";
 
-import { useValidationToast } from "@/hooks/useValidationToast";
+import { useFormValidationToast } from "@/hooks/useFormValidationToast";
 import { handleCustomerSelect } from "@/helpers";
 
 type SRMCustomerDetailsFormProps = {
@@ -140,7 +140,7 @@ export default function SRMCustomerDetailsForm({
   }
 
   // custom hook to validate form
-  useValidationToast(form);
+  useFormValidationToast(form);
 
   // Handle selecting an existing customer from the results
   const onCustomerSelect = (

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -47,6 +47,7 @@ import { GcsFilePaths } from "@/constants/enum";
 import MultipleFileUpload from "../file-uploads/MultipleFileUpload";
 import AdditionalTypesDropdown from "../dropdowns/AdditionalTypesDropdown";
 import SecurityDepositField from "../SecurityDepositField";
+import { useFormValidationToast } from "@/hooks/useFormValidationToast";
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
@@ -74,8 +75,6 @@ export default function PrimaryDetailsForm({
     vehicleId: string;
     userId: string;
   }>();
-
-  // Call the useLoadingMessages hook to manage loading messages
 
   const initialValues =
     formData && type === "Update" ? formData : PrimaryFormDefaultValues;
@@ -144,9 +143,6 @@ export default function PrimaryDetailsForm({
 
       if (data) {
         await deleteMultipleFiles(deletedFiles);
-      }
-
-      if (data) {
         toast({
           title: `Vehicle ${type.toLowerCase()}ed successfully`,
           className: "bg-yellow text-white",
@@ -184,17 +180,8 @@ export default function PrimaryDetailsForm({
     }
   }
 
-  useEffect(() => {
-    // Check for validation errors and scroll to the top if errors are present
-    if (Object.keys(form.formState.errors).length > 0) {
-      toast({
-        variant: "destructive",
-        title: `Validation Error`,
-        description: "Please make sure values are provided",
-      });
-      window.scrollTo({ top: 65, behavior: "smooth" }); // Scroll to the top of the page
-    }
-  }, [form.formState.errors]);
+  // custom hook to validate complex form fields
+  useFormValidationToast(form);
 
   const vehicleCategoryId = form.watch("vehicleCategoryId");
 

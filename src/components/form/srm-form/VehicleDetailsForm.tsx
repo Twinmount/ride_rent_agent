@@ -30,7 +30,7 @@ import SingleFileUpload from "../file-uploads/SingleFileUpload";
 import { GcsFilePaths } from "@/constants/enum";
 import VehicleSearch from "../dropdowns/VehicleSearchAndAutoFill";
 import { handleVehicleSelection } from "@/helpers";
-import { useValidationToast } from "@/hooks/useValidationToast";
+import { useFormValidationToast } from "@/hooks/useFormValidationToast";
 
 type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";
@@ -151,7 +151,7 @@ export default function SRMVehicleDetailsForm({
   }
 
   // custom hook to validate complex form fields
-  useValidationToast(form);
+  useFormValidationToast(form);
 
   // Handle selecting a vehicle from the registration number dropdown results to auto fill the form fields.
   const handleVehicleSelect = (

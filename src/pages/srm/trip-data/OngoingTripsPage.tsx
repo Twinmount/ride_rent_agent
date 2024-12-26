@@ -18,7 +18,9 @@ export default function OngoingTripsPage() {
   const [limit] = useState<10 | 15 | 20 | 30>(10);
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
-  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const [selectedTripBookingId, setSelectedTripBookingId] = useState<
+    string | null
+  >(null);
 
   const queryClient = useQueryClient();
 
@@ -36,11 +38,11 @@ export default function OngoingTripsPage() {
   });
 
   const handleOpenModal = (id: string) => {
-    setSelectedTripId(id);
+    setSelectedTripBookingId(id);
   };
 
   const handleCloseModal = () => {
-    setSelectedTripId(null);
+    setSelectedTripBookingId(null);
   };
 
   const ongoingTrips = data?.result.list || [];
@@ -103,8 +105,11 @@ export default function OngoingTripsPage() {
       )}
 
       {/* ExtendTripModal */}
-      {selectedTripId && (
-        <ExtendTripModal tripId={selectedTripId} onClose={handleCloseModal} />
+      {selectedTripBookingId && (
+        <ExtendTripModal
+          bookingId={selectedTripBookingId}
+          onClose={handleCloseModal}
+        />
       )}
     </section>
   );

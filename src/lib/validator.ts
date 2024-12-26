@@ -182,6 +182,15 @@ export const SRMPaymentDetailsFormSchema = z.object({
   bookingEndDate: z.date(),
 });
 
+// Extend Trip Form Schema
+export const ExtendTripSchema = z.object({
+  newEndDate: z.date(),
+  advanceAmount: z.string().regex(/^\d+$/, "Advance Amount must be numeric"),
+  remainingAmount: z
+    .string()
+    .regex(/^\d+$/, "Remaining Amount must be numeric"),
+});
+
 // traffic fine sub schema
 const TrafficFineSchema = z.object({
   amount: z.string().min(1, "Amount is required"), // Fine amount
@@ -206,12 +215,10 @@ const AdditionalChargesSchema = z.array(
 );
 // Trip End Form Schema
 export const TripEndFormSchema = z.object({
-  brandName: z.string().min(1, "Brand name is required"),
-  customerName: z.string().min(1, "Customer name is required"),
-  customerStatus: z.nativeEnum(CustomerStatus),
+  customerStatus: z.string().min(1, "Customer status is required"),
   finesCollected: z.array(TrafficFineSchema).optional(),
   salikCollected: z.array(SalikSchema).optional(),
   additionalCharges: AdditionalChargesSchema.optional(),
-  discounts: z.string().optional(),
+  discounts: z.string().default("0").optional(),
   totalAmountCollected: z.string().min(1, "Total amount is required"),
 });

@@ -92,7 +92,9 @@ export enum Slug {
   GET_SRM_IS_CUSTOMER_SPAM = "/srm-bookings/customer/is-spammed-customer",
 
   // SRM TRIPS
+  GET_SRM_TRIP_BY_BOOKING_ID = "/srm-bookings",
   GET_SRM_TRIPS = "/srm-bookings/list",
   POST_SRM_END_TRIP = "/srm-bookings/end-trip",
   GET_SRM_END_TRIP = "/srm-bookings/end-trip",
+  GET_SRM_EXTEND_TRIP = "/srm-bookings/extend-trip",
 }

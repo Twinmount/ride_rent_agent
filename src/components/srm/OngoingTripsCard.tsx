@@ -129,7 +129,7 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
 
           <div className="flex gap-x-2 items-center">
             <button
-              onClick={() => onOpenModal(trip.id)}
+              onClick={() => onOpenModal(trip.bookingId)}
               className="px-3 py-1 text-white bg-blue-500 rounded-md"
             >
               Extend Trip
