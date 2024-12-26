@@ -1,4 +1,4 @@
-import { CompanyFormType } from "@/types/types";
+import { CompanyFormType, ProfileUpdateFormType } from "@/types/types";
 import { Slug } from "../Api-Endpoints";
 import { API } from "../ApiService";
 import {
@@ -32,8 +32,8 @@ export const addCompany = async (values: CompanyFormType, userId: string) => {
 };
 
 // update company
-export const updateCompany = async (
-  values: CompanyFormType,
+export const updateCompanyProfile = async (
+  values: ProfileUpdateFormType,
   companyId: string
 ) => {
   try {
@@ -41,10 +41,8 @@ export const updateCompany = async (
       slug: Slug.PUT_COMPANY,
       body: {
         companyId: companyId,
-        companyName: values.companyName,
         expireDate: values.expireDate!.toISOString(),
         regNumber: values.regNumber,
-        companyLogo: values.companyLogo, // Assuming this is a URL or string
         commercialLicense: values.commercialLicense, // Assuming this is a URL or string
         companyAddress: values.companyAddress,
         companyLanguages: values.companyLanguages,

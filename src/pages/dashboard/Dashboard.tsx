@@ -54,7 +54,7 @@ const AgentDashboard: React.FC = () => {
         userId: userId as string,
       }),
     enabled: !!userId,
-    refetchOnWindowFocus: "always",
+    refetchOnWindowFocus: true,
     staleTime: 0,
   }); // Fetch from cached vehicle data
 

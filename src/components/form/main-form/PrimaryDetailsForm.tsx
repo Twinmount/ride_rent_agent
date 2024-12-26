@@ -47,19 +47,20 @@ import { GcsFilePaths } from "@/constants/enum";
 import MultipleFileUpload from "../file-uploads/MultipleFileUpload";
 import AdditionalTypesDropdown from "../dropdowns/AdditionalTypesDropdown";
 import SecurityDepositField from "../SecurityDepositField";
+import { useQueryClient } from "@tanstack/react-query";
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
   formData?: PrimaryFormType | null;
   onNextTab?: () => void;
-  initialCountryCode?: string;
+  levelsFilled?: number;
 };
 
 export default function PrimaryDetailsForm({
   type,
   onNextTab,
   formData,
-  initialCountryCode,
+  levelsFilled,
 }: PrimaryFormProps) {
   const [countryCode, setCountryCode] = useState<string>("");
   const [isPhotosUploading, setIsPhotosUploading] = useState(false);
@@ -67,6 +68,8 @@ export default function PrimaryDetailsForm({
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
   const [isCarsCategory, setIsCarsCategory] = useState(false);
   const [hideCommercialLicenses, setHideCommercialLicenses] = useState(false);
+
+  const queryClient = useQueryClient();
 
   const { vehicleId, userId } = useParams<{
     vehicleId: string;
@@ -132,7 +135,7 @@ export default function PrimaryDetailsForm({
         data = await updatePrimaryDetailsForm(
           vehicleId as string,
           values as PrimaryFormType,
-          initialCountryCode as string,
+          countryCode as string,
           isCarsCategory
         );
       }
@@ -143,7 +146,7 @@ export default function PrimaryDetailsForm({
 
       if (data) {
         toast({
-          title: `Vehicle ${type.toLowerCase()}ed successfully`,
+          title: `Vehicle ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
         });
 
@@ -176,6 +179,12 @@ export default function PrimaryDetailsForm({
         });
       }
       console.error(error);
+    } finally {
+      // invalidating cached data in the listing page
+      queryClient.invalidateQueries({
+        queryKey: ["primary-details-form", vehicleId],
+        exact: true,
+      });
     }
   }
 
@@ -199,6 +208,9 @@ export default function PrimaryDetailsForm({
     "dd7b3369-688c-471a-b2dc-585d60a757f2", // Leisure Boats
     "3f249138-f0ee-48f2-bc70-db5dcf20f0f3", // Charters
   ].includes(vehicleCategoryId);
+
+  // CategoryDropdown disable if the levels filled is 3
+  const isCategoryDisabled = levelsFilled === 3;
 
   return (
     <Form {...form}>
@@ -238,10 +250,13 @@ export default function PrimaryDetailsForm({
                       value={initialValues.vehicleCategoryId}
                       setIsCarsCategory={setIsCarsCategory}
                       setHideCommercialLicenses={setHideCommercialLicenses}
+                      isDisabled={isCategoryDisabled}
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    select vehicle category
+                    {isCategoryDisabled
+                      ? "Cannot change vehicle category for published vehicles"
+                      : " select vehicle category"}
                   </FormDescription>
                   <FormMessage />
                 </div>

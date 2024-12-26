@@ -62,7 +62,6 @@ export default function VehiclesFormUpdatePage() {
   const formData = data
     ? mapGetPrimaryFormToPrimaryFormType(data.result)
     : null;
-  const countryCode = data?.result?.countryCode || "";
   const vehicleCategoryId = data?.result?.vehicleCategoryId;
   const vehicleTypeId = data?.result?.vehicleTypeId;
 
@@ -74,6 +73,7 @@ export default function VehiclesFormUpdatePage() {
     }
   }, [levelsFilled, vehicleCategoryId]);
 
+  // prefetching levels filled
   useEffect(() => {
     queryClient.prefetchQuery({
       queryKey: ["getLevelsFilled", vehicleId],
@@ -131,7 +131,7 @@ export default function VehiclesFormUpdatePage() {
                 <PrimaryDetailsForm
                   type="Update"
                   formData={formData}
-                  initialCountryCode={countryCode}
+                  levelsFilled={levelsFilled}
                 />
               )}
             </Suspense>

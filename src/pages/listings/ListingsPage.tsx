@@ -25,7 +25,7 @@ export default function ListingsPage() {
   const navigate = useNavigate();
 
   let limit: 10 | 15 | 20 | 30 | 50 = 10;
-  let sortOrder: "ASC" | "DESC" = "ASC";
+  let sortOrder: "ASC" | "DESC" = "DESC";
 
   let userId = load<string>(StorageKeys.USER_ID);
 
@@ -80,7 +80,6 @@ export default function ListingsPage() {
           filters.approvalStatus !== "ALL" ? filters.approvalStatus : undefined,
       }),
     enabled: !!userId,
-    refetchOnWindowFocus: "always",
   });
 
   // Redirect to login page if userId or companyId is not available
