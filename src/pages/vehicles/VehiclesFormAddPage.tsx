@@ -3,11 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { lazy, Suspense, useState } from "react";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
-<<<<<<< HEAD
-import { validateTabAccess } from "@/helpers/form";
-import { TabsTypes } from "@/types/types";
-import { toast } from "@/components/ui/use-toast";
-=======
 import {
   mapGetPrimaryFormToPrimaryFormType,
   validateTabAccess,
@@ -21,7 +16,6 @@ import { getCompany } from "@/api/company";
 import { load, StorageKeys } from "@/utils/storage";
 import { jwtDecode } from "jwt-decode";
 import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
->>>>>>> development
 
 // Lazy-loaded components
 const PrimaryDetailsForm = lazy(
@@ -38,8 +32,6 @@ export default function VehiclesFormAddPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabsTypes>("primary");
   const [levelsFilled, setLevelsFilled] = useState<number>(0); // Default starting level
-<<<<<<< HEAD
-=======
 
   let userId = load<string>(StorageKeys.USER_ID);
 
@@ -84,7 +76,6 @@ export default function VehiclesFormAddPage() {
   const formData = data
     ? mapGetPrimaryFormToPrimaryFormType(data.result)
     : null;
->>>>>>> development
 
   // Handle tab change based on levelsFilled state
   const handleTabChange = (value: string) => {
@@ -115,11 +106,11 @@ export default function VehiclesFormAddPage() {
   };
 
   return (
-    <section className="container py-10 h-auto min-h-screen bg-white">
-      <div className="gap-x-4 mb-5 ml-5 flex-center w-fit">
+    <section className="container h-auto min-h-screen py-10 bg-white">
+      <div className="mb-5 ml-5 flex-center w-fit gap-x-4">
         <button
           onClick={() => navigate(-1)}
-          className="border-none transition-colors outline-none w-fit flex-center hover:text-yellow"
+          className="transition-colors border-none outline-none w-fit flex-center hover:text-yellow"
         >
           <CircleArrowLeft />
         </button>
@@ -134,7 +125,7 @@ export default function VehiclesFormAddPage() {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <TabsList className="gap-x-2 w-full bg-white flex-center">
+          <TabsList className="w-full bg-white flex-center gap-x-2">
             <TabsTrigger
               value="primary"
               className="h-9 max-sm:text-sm max-sm:px-2"
@@ -153,12 +144,6 @@ export default function VehiclesFormAddPage() {
 
           <TabsContent value="primary" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-<<<<<<< HEAD
-              <PrimaryDetailsForm
-                type="Add"
-                onNextTab={() => handleNextTab("specifications")}
-              />
-=======
               {isLoading || isCompanyLoading ? (
                 <FormSkelton />
               ) : (
@@ -168,7 +153,6 @@ export default function VehiclesFormAddPage() {
                   onNextTab={() => handleNextTab("specifications")}
                 />
               )}
->>>>>>> development
             </Suspense>
           </TabsContent>
           <TabsContent value="specifications" className="flex-center">
