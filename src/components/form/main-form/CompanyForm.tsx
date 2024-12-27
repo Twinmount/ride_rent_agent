@@ -22,7 +22,6 @@ import { ApiError, CompanyFormType } from "@/types/types";
 import { ShieldCheck } from "lucide-react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-
 import { useNavigate } from "react-router-dom";
 import { toast } from "../../ui/use-toast";
 import { addCompany, sendOtp, updateCompany, verifyOtp } from "@/api/company";
@@ -37,6 +36,8 @@ import {
 import { GcsFilePaths } from "@/constants/enum";
 import { deleteMultipleFiles } from "@/helpers/form";
 import SingleFileUpload from "../file-uploads/SingleFileUpload";
+import CompanyLanguagesDropdown from "../dropdowns/CompanyLanguagesDropdown";
+import { Textarea } from "@/components/ui/textarea";
 import useUserId from "@/hooks/useUserId";
 
 type CompanyRegistrationFormProps = {
@@ -64,8 +65,7 @@ export default function CompanyRegistrationForm({
   // accessing userId from useUserId hook
   const { userId } = useUserId();
 
-  const initialValues =
-    formData && type === "Update" ? formData : CompanyFormDefaultValues;
+  const initialValues = CompanyFormDefaultValues;
 
   useEffect(() => {
     const isVerified = sessionStorage.getItem("isOtpVerified");
@@ -203,7 +203,7 @@ export default function CompanyRegistrationForm({
 
       if (data) {
         toast({
-          title: `Company ${type}ed successfully`,
+          title: `Company Added successfully`,
           className: "bg-yellow text-white",
         });
         navigate("/listings");
@@ -212,7 +212,7 @@ export default function CompanyRegistrationForm({
       console.error(error);
       toast({
         variant: "destructive",
-        title: `${type} Company failed`,
+        title: `Add Company failed`,
         description: "Something went wrong",
       });
     }
@@ -474,7 +474,7 @@ export default function CompanyRegistrationForm({
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
-                  Registration Number{" "}
+                  Registration Number / Trade License Number{" "}
                   <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
@@ -495,6 +495,81 @@ export default function CompanyRegistrationForm({
               </FormItem>
             )}
           />
+
+          <FormField
+            control={form.control}
+            name="companyLanguages"
+            render={({ field }) => (
+              <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
+                  Supported Languages{" "}
+                  <span className="mr-5 max-sm:hidden">:</span>
+                </FormLabel>
+                <div className="flex-col items-start w-full">
+                  <FormControl>
+                    <CompanyLanguagesDropdown
+                      value={field.value}
+                      onChangeHandler={field.onChange}
+                      placeholder="Languages"
+                    />
+                  </FormControl>
+                  <FormDescription className="mt-1 ml-1">
+                    Select all the languages your staff can speak or understand.
+                    These will be displayed on your company's public profile
+                    page, helping customers feel comfortable with communication.
+                  </FormDescription>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="companyAddress"
+            render={({ field }) => {
+              const [charCount, setCharCount] = useState(
+                field.value?.length || 0
+              ); // To track character count
+
+              const handleInputChange = (
+                e: React.ChangeEvent<HTMLTextAreaElement>
+              ) => {
+                const newValue = e.target.value;
+                if (newValue.length <= 150) {
+                  setCharCount(newValue.length);
+                  field.onChange(e);
+                }
+              };
+
+              return (
+                <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                  <FormLabel className="flex justify-between mt-4 ml-2 w-52 text-base h-fit min-w-52 lg:text-lg">
+                    Company Address
+                    <span className="mr-5 max-sm:hidden">:</span>
+                  </FormLabel>
+                  <div className="flex-col items-start w-full">
+                    <FormControl>
+                      <Textarea
+                        placeholder="Company Address"
+                        {...field}
+                        className={`textarea rounded-xl transition-all duration-300 h-28`} // Dynamic height
+                        onChange={handleInputChange} // Handle change to track character count
+                      />
+                    </FormControl>
+                    <FormDescription className="mt-1 ml-2 w-full flex-between">
+                      <span className="w-full max-w-[90%]">
+                        Provide company address. This will be showed in your
+                        public company profile page. 150 characters max.
+                      </span>{" "}
+                      <span className="ml-auto"> {`${charCount}/150`}</span>
+                    </FormDescription>
+                    <FormMessage className="ml-2" />
+                  </div>
+                </FormItem>
+              );
+            }}
+          />
         </div>
 
         {/* submit */}
@@ -504,7 +579,7 @@ export default function CompanyRegistrationForm({
           disabled={form.formState.isSubmitting}
           className="w-full  mx-auto flex-center col-span-2 mt-3 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow"
         >
-          {type === "Add" ? "Add Company" : "Update Company"}
+          {"Add Company"}
           {form.formState.isSubmitting && <Spinner />}
         </Button>
       </form>

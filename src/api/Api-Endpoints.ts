@@ -50,6 +50,7 @@ export enum Slug {
   POST_PRIMARY_FORM = "/vehicle/level-one",
   PUT_PRIMARY_FORM = "/vehicle/level-one",
   GET_PRIMARY_FORM = "/vehicle/level-one",
+  GET_PRIMARY_FORM_DEFAULT = "/vehicle/level-one-default",
 
   // vehicle specification form endPoints
   GET_SPEC_FORM_FIELD_LIST = "/vehicle-spec/list",

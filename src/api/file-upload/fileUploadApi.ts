@@ -27,6 +27,7 @@ export const uploadSingleFile = async (
         headers: {
           "Content-Type": "multipart/form-data",
         },
+
         onUploadProgress,
         timeout: 60000,
       },
@@ -67,8 +68,8 @@ export const uploadMultipleFiles = async (
         headers: {
           "Content-Type": "multipart/form-data",
         },
-        onUploadProgress,
         timeout: 120000,
+        onUploadProgress,
       },
     });
 
@@ -89,6 +90,9 @@ export const getSingleImage = async (
   try {
     const response = await API.get<GetSingleImageResponse>({
       slug: `${Slug.GET_SINGLE_FILE}?path=${path}`,
+      axiosConfig: {
+        timeout: 30000,
+      },
     });
 
     if (!response) {

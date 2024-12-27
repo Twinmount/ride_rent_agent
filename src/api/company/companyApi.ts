@@ -1,3 +1,4 @@
+import { CompanyFormType, ProfileUpdateFormType } from "@/types/types";
 import { Slug } from "../Api-Endpoints";
 import { API } from "../ApiService";
 import {
@@ -14,7 +15,7 @@ export interface CompanyType {
 }
 
 // add company
-export const addCompany = async (values: CompanyType, userId: string) => {
+export const addCompany = async (values: CompanyFormType, userId: string) => {
   try {
     // Send the data as a JSON object
     const data = await API.post({
@@ -25,13 +26,40 @@ export const addCompany = async (values: CompanyType, userId: string) => {
         expireDate: values.expireDate!.toISOString(),
         regNumber: values.regNumber,
         companyLogo: values.companyLogo, // Assuming this is a URL or string
-        commercialLicense: values.commercialLicense, // Assuming this is a URL or string
+        commercialLicense: values.commercialLicense, // Assuming this is a URL or string'
+        companyAddress: values.companyAddress,
+        companyLanguages: values.companyLanguages,
       },
     });
 
     return data;
   } catch (error) {
     console.error("Error adding company:", error);
+    throw error;
+  }
+};
+
+// update company
+export const updateCompanyProfile = async (
+  values: ProfileUpdateFormType,
+  companyId: string
+) => {
+  try {
+    const data = await API.put({
+      slug: Slug.PUT_COMPANY,
+      body: {
+        companyId: companyId,
+        expireDate: values.expireDate!.toISOString(),
+        regNumber: values.regNumber,
+        commercialLicense: values.commercialLicense, // Assuming this is a URL or string
+        companyAddress: values.companyAddress,
+        companyLanguages: values.companyLanguages,
+      },
+    });
+
+    return data;
+  } catch (error) {
+    console.error("Error updating company:", error);
     throw error;
   }
 };

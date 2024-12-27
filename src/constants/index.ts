@@ -5,7 +5,11 @@ import {
   SRMVehicleDetailsFormType,
   TripEndFormType,
 } from "@/types/srm-types";
-import { CompanyFormType, PrimaryFormType } from "@/types/types";
+import {
+  CompanyFormType,
+  PrimaryFormType,
+  ProfileUpdateFormType,
+} from "@/types/types";
 import {
   Box,
   LayoutDashboard,
@@ -37,7 +41,7 @@ export const sidebarContent = [
 // srm introduction features
 export const srmFeatures = [
   {
-    label: "27x7 Customer Data Upload",
+    label: "24x7 Customer Data Upload",
     description:
       "Agents can easily upload essential customer details like passport number, name, photo, and address, all stored securely within the system accessible 24/7.",
     icon: UploadCloud,
@@ -75,6 +79,17 @@ export const CompanyFormDefaultValues: CompanyFormType = {
   commercialLicense: "",
   expireDate: undefined,
   regNumber: "",
+  companyAddress: "", // Default empty value
+  companyLanguages: [],
+};
+
+// Company profile update form default values
+export const ProfileUpdateFormDefaultValues: ProfileUpdateFormType = {
+  commercialLicense: "",
+  expireDate: undefined,
+  regNumber: "",
+  companyAddress: "", // Default empty value
+  companyLanguages: [],
 };
 
 // otp page default value
@@ -91,10 +106,10 @@ export const LoginPageDefaultValues = {
 // primary details form default values
 export const PrimaryFormDefaultValues: PrimaryFormType = {
   vehicleCategoryId: "",
-  vehicleTypeId: "", //'luxury' for example
+  vehicleTypeId: "",
   vehicleBrandId: "",
   vehicleModel: "",
-  vehiclePhotos: [], //upto 8 photos of the vehicle
+  vehiclePhotos: [],
   vehicleRegistrationNumber: "",
   vehicleRegisteredYear: "",
   commercialLicenses: [],
@@ -115,8 +130,8 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
     },
   },
   phoneNumber: "",
-  stateId: "",
-  cityIds: [],
+  stateId: "", //required
+  cityIds: [], //required
   additionalVehicleTypes: [],
   securityDeposit: {
     enabled: false,

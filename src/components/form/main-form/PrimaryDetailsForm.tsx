@@ -47,13 +47,20 @@ import { GcsFilePaths } from "@/constants/enum";
 import MultipleFileUpload from "../file-uploads/MultipleFileUpload";
 import AdditionalTypesDropdown from "../dropdowns/AdditionalTypesDropdown";
 import SecurityDepositField from "../SecurityDepositField";
+<<<<<<< HEAD
 import { useFormValidationToast } from "@/hooks/useFormValidationToast";
+=======
+import { useQueryClient } from "@tanstack/react-query";
+>>>>>>> development
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
   formData?: PrimaryFormType | null;
   onNextTab?: () => void;
+<<<<<<< HEAD
   initialCountryCode?: string;
+=======
+>>>>>>> development
   levelsFilled?: number;
 };
 
@@ -61,7 +68,10 @@ export default function PrimaryDetailsForm({
   type,
   onNextTab,
   formData,
+<<<<<<< HEAD
   initialCountryCode,
+=======
+>>>>>>> development
   levelsFilled,
 }: PrimaryFormProps) {
   const [countryCode, setCountryCode] = useState<string>("");
@@ -71,13 +81,19 @@ export default function PrimaryDetailsForm({
   const [isCarsCategory, setIsCarsCategory] = useState(false);
   const [hideCommercialLicenses, setHideCommercialLicenses] = useState(false);
 
+  const queryClient = useQueryClient();
+
   const { vehicleId, userId } = useParams<{
     vehicleId: string;
     userId: string;
   }>();
 
+<<<<<<< HEAD
   const initialValues =
     formData && type === "Update" ? formData : PrimaryFormDefaultValues;
+=======
+  const initialValues = formData ? formData : PrimaryFormDefaultValues;
+>>>>>>> development
 
   // Define your form.
   const form = useForm<z.infer<typeof PrimaryFormSchema>>({
@@ -136,7 +152,7 @@ export default function PrimaryDetailsForm({
         data = await updatePrimaryDetailsForm(
           vehicleId as string,
           values as PrimaryFormType,
-          initialCountryCode as string,
+          countryCode as string,
           isCarsCategory
         );
       }
@@ -144,7 +160,7 @@ export default function PrimaryDetailsForm({
       if (data) {
         await deleteMultipleFiles(deletedFiles);
         toast({
-          title: `Vehicle ${type.toLowerCase()}ed successfully`,
+          title: `Vehicle ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
         });
 
@@ -177,6 +193,12 @@ export default function PrimaryDetailsForm({
         });
       }
       console.error(error);
+    } finally {
+      // invalidating cached data in the listing page
+      queryClient.invalidateQueries({
+        queryKey: ["primary-details-form", vehicleId],
+        exact: true,
+      });
     }
   }
 

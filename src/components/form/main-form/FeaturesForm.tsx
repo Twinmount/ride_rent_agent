@@ -137,15 +137,13 @@ export default function FeaturesForm({
       }
       if (response) {
         toast({
-          title: `Features ${type.toLowerCase()}ed successfully`,
+          title: `Features ${type.toLowerCase()} successful`,
           description: isAddOrIncomplete
             ? "Vehicle will be live once the admin approves your listing"
             : "Changes will be reflected once the admin approves it",
           className: "bg-yellow text-white",
         });
-        queryClient.invalidateQueries({
-          queryKey: ["features-update-form-data", vehicleId],
-        });
+
         refetchLevels?.();
         navigate("/listings");
       }
@@ -155,6 +153,12 @@ export default function FeaturesForm({
         variant: "destructive",
         title: `${type} Features failed`,
         description: "Something went wrong",
+      });
+    } finally {
+      // invalidating cached data in the listing page
+      queryClient.invalidateQueries({
+        queryKey: ["features-update-form-data", vehicleId],
+        exact: true,
       });
     }
   }

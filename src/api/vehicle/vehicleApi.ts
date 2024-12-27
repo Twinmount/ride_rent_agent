@@ -155,6 +155,28 @@ type GetSpecificationFormDataParams = {
 };
 
 // fetch specification form data
+export const getPrimaryDetailsFormDefaultData = async (
+  companyId: string
+): Promise<GetPrimaryFormResponse> => {
+  try {
+    const url = `${Slug.GET_PRIMARY_FORM_DEFAULT}?companyId=${companyId}`;
+
+    const data = await API.get<GetPrimaryFormResponse>({
+      slug: url,
+    });
+
+    if (!data) {
+      throw new Error("Failed to fetch primary form data");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching primary form data:", error);
+    throw error;
+  }
+};
+
+// fetch specification form data
 export const getPrimaryDetailsFormData = async (
   vehicleId: string
 ): Promise<GetPrimaryFormResponse> => {

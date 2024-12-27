@@ -20,7 +20,6 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { downloadFileFromStream } from "@/helpers/form";
 import ImagePreviewModal from "@/components/modal/ImagePreviewModal";
-import NeedHelpToolTip from "@/components/common/NeedHelpToolTip";
 
 export default function ProfilePage() {
   const [isCopied, setIsCopied] = useState(false);
@@ -106,7 +105,7 @@ export default function ProfilePage() {
             <span className="font-bold">{profileData.agentId}</span>
             <button
               className="px-2 h-6 text-base rounded-lg border-none outline-none flex-center text-yellow"
-              onClick={() => copyToClipboard(userId)}
+              onClick={() => copyToClipboard(profileData.agentId)}
             >
               {isCopied ? <CheckCheck size={18} /> : <Files size={18} />}
             </button>
@@ -153,7 +152,6 @@ export default function ProfilePage() {
           </dt>
           <dd className="flex flex-col gap-x-3 items-start px-2 ml-4 w-full rounded-lg bg-slate-50">
             <span className="line-clamp-1">{profileData.companyName}</span>
-            <NeedHelpToolTip content="Contact Support to Change Company Name" />
           </dd>
         </div>
 
@@ -193,7 +191,6 @@ export default function ProfilePage() {
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
-            <NeedHelpToolTip content="Contact Support to Change Company Registration Card" />
           </dd>
         </div>
 
@@ -216,7 +213,6 @@ export default function ProfilePage() {
             <span className="w-full max-w-full text-base line-clamp-1">
               {userData?.emailId}
             </span>
-            <NeedHelpToolTip content="Contact Support to Change Company Email" />
           </dd>
         </div>
 
@@ -243,6 +239,29 @@ export default function ProfilePage() {
           </dd>
         </div>
 
+        {/* registration number */}
+        <div className="flex gap-y-2 justify-start items-start w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Company Address
+            <span className="font-bold">:</span>
+          </dt>
+          <dd className="flex gap-x-3 items-center px-2 ml-4 w-full text-base rounded-lg bg-slate-50">
+            {profileData.companyAddress || "N/A"}
+          </dd>
+        </div>
+        {/* registration number */}
+        <div className="flex gap-y-2 justify-start items-start w-full">
+          <dt className="flex justify-between items-start w-64 text-gray-800">
+            Languages
+            <span className="font-bold">:</span>
+          </dt>
+          <dd className="flex gap-x-3 items-center px-2 ml-4 w-full text-base rounded-lg bg-slate-50">
+            {profileData.companyLanguages.length === 0
+              ? "N/A"
+              : profileData.companyLanguages.join(", ")}
+          </dd>
+        </div>
+
         {/* password */}
         <div className="flex gap-y-2 justify-start items-start w-full">
           <dt className="flex justify-between items-start w-64 text-gray-800">
@@ -263,7 +282,18 @@ export default function ProfilePage() {
           <div className="gap-x-4 mr-6 flex-center">
             <SupportModal classes="text-blue-500 w-fit flex-center gap-x-2" />
           </div>
+          <Link
+            to={`/profile/edit/${profileData.agentId}`}
+            className="text-blue-500"
+          >
+            Edit Profile?
+          </Link>
         </div>
+
+        <p className="text-center text-xs bg-red-100 py-2 rounded-lg">
+          Note: For updating Company name, company profile, email or phone
+          number, please contact support
+        </p>
       </dl>
 
       {/* Image Preview Modal */}

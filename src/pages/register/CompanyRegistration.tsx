@@ -13,7 +13,7 @@ export default function CompanyRegistration() {
   const { agentId } = data?.result || {};
 
   return (
-    <section className="py-5 pt-10">
+    <section className="py-5 pt-10 pb-24">
       <h1 className="text-3xl font-bold text-center">Company Details</h1>
       <h2 className="my-3 text-base text-center text-gray-500">
         Provide your company details to complete the registration
@@ -26,7 +26,7 @@ export default function CompanyRegistration() {
           failed to fetch your agent id
         </div>
       ) : (
-        <CompanyForm type="Add" agentId={agentId as string} />
+        <CompanyForm agentId={agentId as string} />
       )}
 
       {/* whatsapp floating button */}
