@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -16,8 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PrimaryFormDefaultValues } from "@/constants";
 import { PrimaryFormSchema } from "@/lib/validator";
+import { PrimaryFormDefaultValues } from "@/constants";
 import { PrimaryFormType } from "@/types/types";
 import YearPicker from "../YearPicker";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -47,12 +47,20 @@ import { GcsFilePaths } from "@/constants/enum";
 import MultipleFileUpload from "../file-uploads/MultipleFileUpload";
 import AdditionalTypesDropdown from "../dropdowns/AdditionalTypesDropdown";
 import SecurityDepositField from "../SecurityDepositField";
+<<<<<<< HEAD
+import { useFormValidationToast } from "@/hooks/useFormValidationToast";
+=======
 import { useQueryClient } from "@tanstack/react-query";
+>>>>>>> development
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
   formData?: PrimaryFormType | null;
   onNextTab?: () => void;
+<<<<<<< HEAD
+  initialCountryCode?: string;
+=======
+>>>>>>> development
   levelsFilled?: number;
 };
 
@@ -60,6 +68,10 @@ export default function PrimaryDetailsForm({
   type,
   onNextTab,
   formData,
+<<<<<<< HEAD
+  initialCountryCode,
+=======
+>>>>>>> development
   levelsFilled,
 }: PrimaryFormProps) {
   const [countryCode, setCountryCode] = useState<string>("");
@@ -76,7 +88,12 @@ export default function PrimaryDetailsForm({
     userId: string;
   }>();
 
+<<<<<<< HEAD
+  const initialValues =
+    formData && type === "Update" ? formData : PrimaryFormDefaultValues;
+=======
   const initialValues = formData ? formData : PrimaryFormDefaultValues;
+>>>>>>> development
 
   // Define your form.
   const form = useForm<z.infer<typeof PrimaryFormSchema>>({
@@ -142,9 +159,6 @@ export default function PrimaryDetailsForm({
 
       if (data) {
         await deleteMultipleFiles(deletedFiles);
-      }
-
-      if (data) {
         toast({
           title: `Vehicle ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
@@ -188,17 +202,8 @@ export default function PrimaryDetailsForm({
     }
   }
 
-  useEffect(() => {
-    // Check for validation errors and scroll to the top if errors are present
-    if (Object.keys(form.formState.errors).length > 0) {
-      toast({
-        variant: "destructive",
-        title: `Validation Error`,
-        description: "Please make sure values are provided",
-      });
-      window.scrollTo({ top: 65, behavior: "smooth" }); // Scroll to the top of the page
-    }
-  }, [form.formState.errors]);
+  // custom hook to validate complex form fields
+  useFormValidationToast(form);
 
   const vehicleCategoryId = form.watch("vehicleCategoryId");
 
@@ -585,6 +590,7 @@ export default function PrimaryDetailsForm({
               </FormItem>
             )}
           />
+
           {/* mobile */}
           <FormField
             control={form.control}

@@ -14,6 +14,7 @@ import ProtectedRoute from "./layout/ProtectedRoutes";
 import LazyLoader from "./components/loading-skelton/LazyLoader";
 import { HelmetProvider } from "react-helmet-async";
 import RouteErrorBoundary from "./layout/RouteErrorBoundary";
+import CustomerDetailsPage from "./pages/srm/CustomerDetailsPage";
 
 // dynamic import
 const RegistrationPage = lazy(
@@ -58,6 +59,23 @@ const ProfilePage = lazy(() => import("./pages/profile/ProfilePage"));
 const ProfileUpdatePage = lazy(
   () => import("./pages/profile/ProfileUpdatePage")
 );
+
+// lazy loading above static imports
+const SRMDashboard = lazy(() => import("./pages/srm/SRMDashboard"));
+const SRMDataAddPage = lazy(() => import("./pages/srm/SRMFormAddPage"));
+const OngoingTripsPage = lazy(
+  () => import("./pages/srm/trip-data/OngoingTripsPage")
+);
+const CompletedTripsPage = lazy(
+  () => import("./pages/srm/trip-data/CompletedTripsPage")
+);
+const VehicleListPage = lazy(
+  () => import("./pages/srm/trip-data/VehicleListPage")
+);
+const CustomerListPage = lazy(
+  () => import("./pages/srm/trip-data/CustomerListPage")
+);
+const EndTripsPage = lazy(() => import("./pages/srm/EndTripsPage"));
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 
@@ -121,8 +139,41 @@ const router = createBrowserRouter([
                 element: <VehiclesFormUpdatePage />,
               },
               {
-                path: "/srm",
+                path: "/srm/intro",
                 element: <SRMIntroduction />,
+              },
+              {
+                path: "/srm/dashboard",
+                element: <SRMDashboard />,
+              },
+              {
+                path: "/srm/trips/new",
+                element: <SRMDataAddPage />,
+              },
+
+              {
+                path: "/srm/ongoing-trips",
+                element: <OngoingTripsPage />,
+              },
+              {
+                path: "/srm/end-trip/:bookingId",
+                element: <EndTripsPage />,
+              },
+              {
+                path: "/srm/completed-trips",
+                element: <CompletedTripsPage />,
+              },
+              {
+                path: "/srm/vehicle-list",
+                element: <VehicleListPage />,
+              },
+              {
+                path: "/srm/customer-list",
+                element: <CustomerListPage />,
+              },
+              {
+                path: "/srm/customer-details/:customerId",
+                element: <CustomerDetailsPage />,
               },
             ],
           },

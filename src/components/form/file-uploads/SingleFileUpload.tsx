@@ -45,6 +45,7 @@ type SingleFileUploadProps = {
   bucketFilePath: GcsFilePaths;
   downloadFileName?: string;
   setDeletedImages: (deletedPaths: (prev: string[]) => string[]) => void;
+  additionalClasses?: string;
 };
 
 const SingleFileUpload = ({
@@ -59,6 +60,7 @@ const SingleFileUpload = ({
   bucketFilePath,
   downloadFileName,
   setDeletedImages,
+  additionalClasses,
 }: SingleFileUploadProps) => {
   const { control, setValue, clearErrors } = useFormContext();
   const [isUploading, setIsUploading] = useState(false);
@@ -80,6 +82,11 @@ const SingleFileUpload = ({
     if (existingFile) {
       setImagePath(existingFile);
       setValue(name, existingFile);
+    } else {
+      {
+        setImagePath(null); // Reset the internal state of the imagePath
+        setValue(name, null); // Ensure the form value is cleared
+      }
     }
   }, [existingFile, setValue, name]);
 
@@ -174,7 +181,9 @@ const SingleFileUpload = ({
   return (
     <>
       <FormItem className="flex mb-2 w-full max-sm:flex-col">
-        <FormLabel className="flex justify-between mt-4 ml-2 w-64 text-base max-sm:w-fit lg:text-lg">
+        <FormLabel
+          className={`flex justify-between mt-4 ml-2 w-64 text-base max-sm:w-fit lg:text-lg ${additionalClasses}`}
+        >
           {label} <span className="mr-5 max-sm:hidden">:</span>
         </FormLabel>
         <div className="flex-col items-start w-full">

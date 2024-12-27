@@ -2,16 +2,11 @@ import { useState } from "react";
 import ListedVehicles from "@/components/common/ListedVehicles";
 import { useQuery } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
-import { load, StorageKeys } from "@/utils/storage";
-import { jwtDecode } from "jwt-decode";
-import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
 import { fetchAllVehicles } from "@/api/vehicle";
-import { getCompany } from "@/api/company";
-import { useNavigate } from "react-router-dom";
-import { toast } from "@/components/ui/use-toast";
-import SearchVehicle from "@/components/SearchVehicle";
 import VehicleFilters from "@/components/VehicleFilters";
 import { ApprovalStatusTypes } from "@/types/types";
+import Search from "@/components/Search";
+import { useCompany } from "@/hooks/useCompany";
 
 export default function ListingsPage() {
   const [page, setPage] = useState(1);
@@ -22,6 +17,10 @@ export default function ListingsPage() {
     approvalStatus: "ALL",
   });
 
+<<<<<<< HEAD
+  // accessing userId, companyId, and isCompanyLoading from useCompany hook
+  const { userId, companyId, isCompanyLoading } = useCompany();
+=======
   const navigate = useNavigate();
 
   let limit: 10 | 15 | 20 | 30 | 50 = 10;
@@ -58,39 +57,27 @@ export default function ListingsPage() {
   });
 
   const companyId = companyData?.result?.companyId;
+>>>>>>> development
 
   // Fetch vehicles if userId is present
   const { data, isLoading, isRefetching } = useQuery({
-    queryKey: [
-      "vehicles",
-      page,
-      limit,
-      sortOrder,
-      search,
-      filters.approvalStatus,
-    ],
+    queryKey: ["vehicles", page, search, filters.approvalStatus],
     queryFn: () =>
       fetchAllVehicles({
         page,
-        limit,
-        sortOrder,
+        limit: 10,
+        sortOrder: "DESC",
         userId: userId as string,
         search: search || undefined,
         approvalStatus:
           filters.approvalStatus !== "ALL" ? filters.approvalStatus : undefined,
       }),
+<<<<<<< HEAD
+    enabled: !!companyId && !!userId,
+=======
     enabled: !!userId,
+>>>>>>> development
   });
-
-  // Redirect to login page if userId or companyId is not available
-  if (!userId || !companyId) {
-    toast({
-      variant: "destructive",
-      title: "Unauthorized! Login to continue",
-    });
-    navigate("/login", { replace: true });
-    return null;
-  }
 
   return (
     <section className="p-3 pt-8 h-auto min-h-screen lg:p-6">
@@ -103,7 +90,7 @@ export default function ListingsPage() {
       </div>
 
       {/* search vehicle */}
-      <SearchVehicle
+      <Search
         search={search}
         setSearch={setSearch}
         placeholder="Search model..."
@@ -116,7 +103,7 @@ export default function ListingsPage() {
       <ListedVehicles
         vehicles={data?.result.list || []}
         isLoading={isLoading || isCompanyLoading || isRefetching}
-        userId={userId}
+        userId={userId as string}
         companyId={companyId as string}
         search={search}
         filters={filters}

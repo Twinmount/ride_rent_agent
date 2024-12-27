@@ -6,6 +6,14 @@ import {
   SendOTPResponse,
 } from "@/types/API-types";
 
+export interface CompanyType {
+  companyName: string;
+  companyLogo: string;
+  commercialLicense: string;
+  expireDate: Date;
+  regNumber: string;
+}
+
 // add company
 export const addCompany = async (values: CompanyFormType, userId: string) => {
   try {
@@ -46,6 +54,28 @@ export const updateCompanyProfile = async (
         commercialLicense: values.commercialLicense, // Assuming this is a URL or string
         companyAddress: values.companyAddress,
         companyLanguages: values.companyLanguages,
+      },
+    });
+
+    return data;
+  } catch (error) {
+    console.error("Error updating company:", error);
+    throw error;
+  }
+};
+
+// update company
+export const updateCompany = async (values: CompanyType, companyId: string) => {
+  try {
+    const data = await API.put({
+      slug: Slug.PUT_COMPANY,
+      body: {
+        companyId: companyId,
+        companyName: values.companyName,
+        expireDate: values.expireDate!.toISOString(),
+        regNumber: values.regNumber,
+        companyLogo: values.companyLogo, // Assuming this is a URL or string
+        commercialLicense: values.commercialLicense, // Assuming this is a URL or string
       },
     });
 

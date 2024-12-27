@@ -62,6 +62,10 @@ export default function VehiclesFormUpdatePage() {
   const formData = data
     ? mapGetPrimaryFormToPrimaryFormType(data.result)
     : null;
+<<<<<<< HEAD
+  const countryCode = data?.result?.countryCode || "";
+=======
+>>>>>>> development
   const vehicleCategoryId = data?.result?.vehicleCategoryId;
   const vehicleTypeId = data?.result?.vehicleTypeId;
 
@@ -82,11 +86,11 @@ export default function VehiclesFormUpdatePage() {
   }, [vehicleId]);
 
   return (
-    <section className="container h-auto min-h-screen pb-10 bg-white">
-      <div className="mb-5 ml-5 flex-center w-fit gap-x-4">
+    <section className="container pb-10 h-auto min-h-screen bg-white">
+      <div className="gap-x-4 mb-5 ml-5 flex-center w-fit">
         <button
           onClick={() => navigate(-1)}
-          className="transition-colors border-none outline-none w-fit flex-center hover:text-yellow"
+          className="border-none transition-colors outline-none w-fit flex-center hover:text-yellow"
         >
           <CircleArrowLeft />
         </button>
@@ -99,7 +103,7 @@ export default function VehiclesFormUpdatePage() {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <TabsList className="bg-white flex-center gap-x-2">
+          <TabsList className="gap-x-2 bg-white flex-center">
             <TabsTrigger
               value="primary"
               className="h-9 max-sm:text-sm max-sm:px-2"
@@ -131,6 +135,10 @@ export default function VehiclesFormUpdatePage() {
                 <PrimaryDetailsForm
                   type="Update"
                   formData={formData}
+<<<<<<< HEAD
+                  initialCountryCode={countryCode}
+=======
+>>>>>>> development
                   levelsFilled={levelsFilled}
                 />
               )}
