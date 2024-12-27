@@ -216,6 +216,46 @@ export default function TripEndForm({
               </div>
             </div>
 
+            {/* Base rental amount */}
+            <div className="flex mb-2 w-full max-sm:flex-col">
+              <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
+                Base Rental Amount &#40;AED&#41;{" "}
+                <span className="mr-5 max-sm:hidden">:</span>
+              </FormLabel>
+              <div className="flex-col items-start w-full">
+                <div>
+                  <Input
+                    value={baseRentalAmount}
+                    className={`input-field !cursor-default !text-gray-700 !font-semibold`}
+                    readOnly
+                  />
+                </div>
+                <FormDescription className="ml-2">
+                  Calculated based on the <b>rental details</b> of the vehicle
+                  for the booking period from{" "}
+                  <b>
+                    {bookingData?.bookingStartDate
+                      ? format(
+                          new Date(bookingData.bookingStartDate),
+                          "dd/MM/yyyy h:mm aa"
+                        )
+                      : "N/A"}
+                  </b>{" "}
+                  to{" "}
+                  <b>
+                    {bookingData?.bookingEndDate
+                      ? format(
+                          new Date(bookingData.bookingEndDate),
+                          "dd/MM/yyyy h:mm aa"
+                        )
+                      : "N/A"}
+                  </b>
+                  .
+                </FormDescription>
+                <FormMessage className="ml-2" />
+              </div>
+            </div>
+
             {/* Customer Remark Dropdown */}
             <SRMCustomerStatusDropdown
               control={form.control}
@@ -309,44 +349,38 @@ export default function TripEndForm({
               )}
             />
 
-            {/* Brand Name */}
-            <div className="flex mb-2 w-full max-sm:flex-col">
-              <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                Base Rental Amount <span className="mr-5 max-sm:hidden">:</span>
-              </FormLabel>
-              <div className="flex-col items-start w-full">
-                <div>
-                  <Input
-                    value={baseRentalAmount}
-                    className={`input-field !cursor-default !text-gray-700 !font-semibold`}
-                    readOnly
-                  />
-                </div>
-                <FormDescription className="ml-2">
-                  Calculated based on the <b>rental details</b> of the vehicle
-                  for the booking period from{" "}
-                  <b>
-                    {bookingData?.bookingStartDate
-                      ? format(
-                          new Date(bookingData.bookingStartDate),
-                          "dd/MM/yyyy h:mm aa"
-                        )
-                      : "N/A"}
-                  </b>{" "}
-                  to{" "}
-                  <b>
-                    {bookingData?.bookingEndDate
-                      ? format(
-                          new Date(bookingData.bookingEndDate),
-                          "dd/MM/yyyy h:mm aa"
-                        )
-                      : "N/A"}
-                  </b>
-                  .
-                </FormDescription>
-                <FormMessage className="ml-2" />
-              </div>
-            </div>
+            {/* Total Amount to be Collected */}
+            <FormField
+              control={form.control}
+              name="totalAmountCollected"
+              render={({ field }) => (
+                <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
+                    Total Amount to be Collected &#40;AED&#41;{" "}
+                    <span className="mr-5 max-sm:hidden">:</span>
+                  </FormLabel>
+                  <div className="flex-col items-start w-full">
+                    <FormControl>
+                      <Input
+                        {...field}
+                        value={totalAmountCollected.toFixed(2)}
+                        readOnly
+                        className="input-field !text-lg !font-semibold !cursor-default"
+                      />
+                    </FormControl>
+                    <FormDescription className="ml-2">
+                      Total amount to be collected in AED. Will be automatically
+                      calculated based on the <strong>booking period</strong> ,{" "}
+                      <strong>rental details</strong> of the vehicle,{" "}
+                      <strong>discount</strong> provided, and the{" "}
+                      <strong>additional charges</strong>. &#40;
+                      <strong>5% tax included</strong>&#41;
+                    </FormDescription>
+                    <FormMessage className="ml-2" />
+                  </div>
+                </FormItem>
+              )}
+            />
 
             {/* Discounts / Adjustments */}
             <FormField
@@ -386,39 +420,6 @@ export default function TripEndForm({
                       <b>Maximum allowed value is {baseRentalAmount}</b>, which
                       is the rental amount of the vehicle calculated for the
                       booking period.
-                    </FormDescription>
-                    <FormMessage className="ml-2" />
-                  </div>
-                </FormItem>
-              )}
-            />
-
-            {/* Total Amount to be Collected */}
-            <FormField
-              control={form.control}
-              name="totalAmountCollected"
-              render={({ field }) => (
-                <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                    Total Amount to be Collected &#40;AED&#41;{" "}
-                    <span className="mr-5 max-sm:hidden">:</span>
-                  </FormLabel>
-                  <div className="flex-col items-start w-full">
-                    <FormControl>
-                      <Input
-                        {...field}
-                        value={totalAmountCollected.toFixed(2)}
-                        readOnly
-                        className="input-field !text-lg !font-semibold !cursor-default"
-                      />
-                    </FormControl>
-                    <FormDescription className="ml-2">
-                      Total amount to be collected in AED. Will be automatically
-                      calculated based on the <strong>booking period</strong> ,{" "}
-                      <strong>rental details</strong> of the vehicle,{" "}
-                      <strong>discount</strong> provided, and the{" "}
-                      <strong>additional charges</strong>. &#40;
-                      <strong>5% tax included</strong>&#41;
                     </FormDescription>
                     <FormMessage className="ml-2" />
                   </div>
