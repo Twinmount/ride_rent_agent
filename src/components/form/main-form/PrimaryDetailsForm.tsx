@@ -47,20 +47,14 @@ import { GcsFilePaths } from "@/constants/enum";
 import MultipleFileUpload from "../file-uploads/MultipleFileUpload";
 import AdditionalTypesDropdown from "../dropdowns/AdditionalTypesDropdown";
 import SecurityDepositField from "../SecurityDepositField";
-<<<<<<< HEAD
+
 import { useFormValidationToast } from "@/hooks/useFormValidationToast";
-=======
 import { useQueryClient } from "@tanstack/react-query";
->>>>>>> development
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
   formData?: PrimaryFormType | null;
   onNextTab?: () => void;
-<<<<<<< HEAD
-  initialCountryCode?: string;
-=======
->>>>>>> development
   levelsFilled?: number;
 };
 
@@ -68,10 +62,6 @@ export default function PrimaryDetailsForm({
   type,
   onNextTab,
   formData,
-<<<<<<< HEAD
-  initialCountryCode,
-=======
->>>>>>> development
   levelsFilled,
 }: PrimaryFormProps) {
   const [countryCode, setCountryCode] = useState<string>("");
@@ -88,12 +78,7 @@ export default function PrimaryDetailsForm({
     userId: string;
   }>();
 
-<<<<<<< HEAD
-  const initialValues =
-    formData && type === "Update" ? formData : PrimaryFormDefaultValues;
-=======
   const initialValues = formData ? formData : PrimaryFormDefaultValues;
->>>>>>> development
 
   // Define your form.
   const form = useForm<z.infer<typeof PrimaryFormSchema>>({

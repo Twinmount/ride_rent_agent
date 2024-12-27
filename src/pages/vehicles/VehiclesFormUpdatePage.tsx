@@ -62,10 +62,7 @@ export default function VehiclesFormUpdatePage() {
   const formData = data
     ? mapGetPrimaryFormToPrimaryFormType(data.result)
     : null;
-<<<<<<< HEAD
-  const countryCode = data?.result?.countryCode || "";
-=======
->>>>>>> development
+
   const vehicleCategoryId = data?.result?.vehicleCategoryId;
   const vehicleTypeId = data?.result?.vehicleTypeId;
 
@@ -135,10 +132,6 @@ export default function VehiclesFormUpdatePage() {
                 <PrimaryDetailsForm
                   type="Update"
                   formData={formData}
-<<<<<<< HEAD
-                  initialCountryCode={countryCode}
-=======
->>>>>>> development
                   levelsFilled={levelsFilled}
                 />
               )}

@@ -17,47 +17,8 @@ export default function ListingsPage() {
     approvalStatus: "ALL",
   });
 
-<<<<<<< HEAD
   // accessing userId, companyId, and isCompanyLoading from useCompany hook
   const { userId, companyId, isCompanyLoading } = useCompany();
-=======
-  const navigate = useNavigate();
-
-  let limit: 10 | 15 | 20 | 30 | 50 = 10;
-  let sortOrder: "ASC" | "DESC" = "DESC";
-
-  let userId = load<string>(StorageKeys.USER_ID);
-
-  // If not found, decode from refresh token
-  if (!userId) {
-    const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
-    if (refreshToken) {
-      try {
-        const decodedRefreshToken = jwtDecode<DecodedRefreshToken>(
-          refreshToken as string
-        );
-        userId = decodedRefreshToken?.userId;
-      } catch (error) {
-        console.error("Error decoding the refresh token", error);
-        toast({
-          variant: "destructive",
-          title: "Invalid token! Login to continue",
-        });
-        navigate("/login", { replace: true });
-        return null;
-      }
-    }
-  }
-
-  // Fetch company data based on userId
-  const { data: companyData, isLoading: isCompanyLoading } = useQuery({
-    queryKey: ["company"],
-    queryFn: () => getCompany(userId as string),
-    enabled: !!userId,
-  });
-
-  const companyId = companyData?.result?.companyId;
->>>>>>> development
 
   // Fetch vehicles if userId is present
   const { data, isLoading, isRefetching } = useQuery({
@@ -72,11 +33,8 @@ export default function ListingsPage() {
         approvalStatus:
           filters.approvalStatus !== "ALL" ? filters.approvalStatus : undefined,
       }),
-<<<<<<< HEAD
+
     enabled: !!companyId && !!userId,
-=======
-    enabled: !!userId,
->>>>>>> development
   });
 
   return (
