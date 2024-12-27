@@ -2,10 +2,9 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
 import { CustomerListTable } from "@/components/table/CustomerListTable";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { fetchCustomerList } from "@/api/srm/trips";
 import { CustomerListColumns } from "@/components/table/columns/CustomerListColumn";
-import BannedUserPopup from "@/components/modal/srm-modal/BannedUserPopup";
 import { SortDropdown } from "@/components/SortDropdown";
 import { Plus } from "lucide-react";
 import Search from "@/components/Search";
@@ -15,8 +14,6 @@ export default function CustomerListPage() {
   const [limit] = useState<10 | 15 | 20 | 30>(10);
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("ASC");
-
-  const navigate = useNavigate();
 
   const { data, isLoading } = useQuery({
     queryKey: ["customerList", page, limit, search, sortOrder],
@@ -30,10 +27,6 @@ export default function CustomerListPage() {
     staleTime: 0,
   });
 
-  const handleViewDetails = (userId: string) => {
-    navigate(`/customerDetails/${userId}`);
-  };
-
   const customerData = data?.result?.list || [];
 
   const totalNumberOfPages = data?.result?.totalNumberOfPages || 0;
@@ -41,7 +34,7 @@ export default function CustomerListPage() {
   return (
     <section className="container py-5 mx-auto min-h-screen md:py-7">
       <h1 className="text-center h3-bold max-sm:text-xl sm:text-left">
-        Customer List
+        Customers List
       </h1>
 
       <div className="flex flex-wrap gap-x-2 justify-start items-start mt-3 mb-4 w-full max-sm:mt-3">
@@ -53,7 +46,7 @@ export default function CustomerListPage() {
           description={
             <p className=" italic text-gray-600">
               You can search with{" "}
-              <b>brand, registration number, customer name</b>
+              <b>customer name, phone, passport and driving license</b>
             </p>
           }
         />
@@ -76,18 +69,8 @@ export default function CustomerListPage() {
         />
       </div>
 
-      <BannedUserPopup
-        isOpen={false}
-        onClose={() => {}}
-        customerName="John Doe"
-        passportNumber="A12345678"
-        drivingLicenseNumber="DL987654321"
-        phoneNumber="+1234567890"
-        customerStatus="Blacklisted"
-      />
-
       <CustomerListTable
-        columns={CustomerListColumns(handleViewDetails)}
+        columns={CustomerListColumns()}
         data={customerData}
         loading={isLoading}
       />

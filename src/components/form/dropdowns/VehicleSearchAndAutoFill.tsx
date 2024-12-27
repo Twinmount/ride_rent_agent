@@ -65,6 +65,15 @@ const VehicleSearch = ({
     setSearchTerm(vehicleRegistrationNumber); // Set the selected name in the field
     setOpen(false);
     onChangeHandler(vehicleRegistrationNumber, vehicleData); // Pass the selected vehicle data
+    // scroll to bottom after 500 ms
+    if (vehicleData?.id) {
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 500);
+    }
   };
 
   const vehicleData = data?.result.list;

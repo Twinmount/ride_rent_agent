@@ -9,6 +9,7 @@ import {
   SearchVehicleResponse,
   FetchTripEndResponse,
   GetIsCustomerSpamResponse,
+  FetchUpcomingBookingDatesResponse,
 } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
@@ -155,6 +156,26 @@ export const updateBookingDataForPayment = async (values: {
     return data;
   } catch (error) {
     console.error("Error on updating payment data", error);
+    throw error;
+  }
+};
+
+export const fetchUpcomingBookingDates = async (
+  vehicleId: string
+): Promise<FetchUpcomingBookingDatesResponse> => {
+  try {
+    // Sending the request as a JSON object
+    const data = await API.get<FetchUpcomingBookingDatesResponse>({
+      slug: `${Slug.GET_SRM_UPCOMING_BOOKINGS}?vehicleId=${vehicleId}`,
+    });
+
+    if (!data) {
+      throw new Error("Failed to fetch upcoming booking dates");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on fetching upcoming booking dates", error);
     throw error;
   }
 };

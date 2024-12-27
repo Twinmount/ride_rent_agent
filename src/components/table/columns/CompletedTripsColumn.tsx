@@ -1,10 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 
-export const CompletedTripsColumns = (
-  handleDownloadModal: (tripId: string) => void
-): ColumnDef<any>[] => [
+export const CompletedTripsColumns = (): ColumnDef<any>[] => [
   {
     accessorKey: "vehicle.vehicleBrand.brandName",
     header: "Brand",
@@ -18,13 +14,17 @@ export const CompletedTripsColumns = (
     cell: ({ row }) => {
       const vehiclePhoto = row.original.vehicle.vehiclePhoto;
       return vehiclePhoto ? (
-        <img
-          src={vehiclePhoto}
-          alt="Vehicle"
-          className="w-16 h-16 object-cover rounded-md"
-        />
+        <div className="w-16 h-16 overflow-hidden rounded-xl bg-slate-300">
+          <img
+            src={vehiclePhoto}
+            alt="Vehicle"
+            className="w-full h-full object-cover rounded-md"
+          />
+        </div>
       ) : (
-        "No Image"
+        <div className="w-16 h-16 overflow-hidden rounded-xl flex-center bg-slate-300">
+          No Image
+        </div>
       );
     },
   },
@@ -90,30 +90,30 @@ export const CompletedTripsColumns = (
       <span>{row.original.customerBookingRemark || "No Remark"}</span>
     ),
   },
-  {
-    header: "Actions",
-    cell: ({ row }) => {
-      const trip = row.original;
+  // {
+  //   header: "Actions",
+  //   cell: ({ row }) => {
+  //     const trip = row.original;
 
-      return (
-        <div className="flex space-x-2">
-          {/* View as Link */}
-          <Link
-            to={`/completed-trips/${trip.id}`}
-            className="text-blue-500 underline hover:text-blue-700"
-          >
-            View
-          </Link>
+  //     return (
+  //       <div className="flex space-x-2">
+  //         {/* View as Link */}
+  //         <Link
+  //           to={`/completed-trips/${trip.id}`}
+  //           className="text-blue-500 underline hover:text-blue-700"
+  //         >
+  //           View
+  //         </Link>
 
-          {/* Download Button */}
-          <Button
-            onClick={() => handleDownloadModal(trip.id)}
-            className="text-white bg-green-500 hover:bg-green-600"
-          >
-            Download
-          </Button>
-        </div>
-      );
-    },
-  },
+  //         {/* Download Button */}
+  //         <Button
+  //           onClick={() => handleDownloadModal(trip.id)}
+  //           className="text-white bg-green-500 hover:bg-green-600"
+  //         >
+  //           Download
+  //         </Button>
+  //       </div>
+  //     );
+  //   },
+  // },
 ];

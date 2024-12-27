@@ -4,13 +4,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { FormDescription } from "../ui/form";
 import HourlyRentalDetailFormField from "./HourlyRentalDetailsFormField";
 
+type RentalDetailsFieldProps = {
+  period: "day" | "week" | "month";
+  description: string;
+  isDisabled?: boolean;
+};
+
 const RentalDetailField = ({
   period,
   description,
-}: {
-  period: "day" | "week" | "month";
-  description: string;
-}) => {
+  isDisabled = false,
+}: RentalDetailsFieldProps) => {
   const { control, watch, clearErrors } = useFormContext();
   const isEnabled = watch(`rentalDetails.${period}.enabled`);
 
@@ -31,6 +35,7 @@ const RentalDetailField = ({
               }}
               className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
               id={`rentalDetails-${period}-enabled`}
+              disabled={isDisabled}
             />
             <label
               htmlFor={`rentalDetails-${period}-enabled`}
@@ -82,6 +87,7 @@ const RentalDetailField = ({
                       field.onChange(e);
                       clearErrors(`rentalDetails`);
                     }}
+                    readOnly={isDisabled}
                   />
                   <FormDescription>
                     {`Rent of the Vehicle in AED per ${period} `}
@@ -126,6 +132,7 @@ const RentalDetailField = ({
                       field.onChange(e);
                       clearErrors(`rentalDetails`);
                     }}
+                    readOnly={isDisabled}
                   />
                   <FormDescription>
                     {`Mileage of the vehicle per ${period} (KM)`}
@@ -140,22 +147,29 @@ const RentalDetailField = ({
   );
 };
 
-const RentalDetailsFormField = () => {
+const RentalDetailsFormField = ({
+  isDisabled = false,
+}: {
+  isDisabled?: boolean;
+}) => {
   return (
     <div className="flex flex-col">
       <RentalDetailField
         period="day"
         description="(Select to set daily rental rates)"
+        isDisabled={isDisabled}
       />
       <RentalDetailField
         period="week"
         description="(Select to set weekly rental rates)"
+        isDisabled={isDisabled}
       />
       <RentalDetailField
         period="month"
         description="(Select to set monthly rental rates)"
+        isDisabled={isDisabled}
       />
-      <HourlyRentalDetailFormField />
+      <HourlyRentalDetailFormField isDisabled={isDisabled} />
     </div>
   );
 };

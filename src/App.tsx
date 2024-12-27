@@ -14,6 +14,7 @@ import ProtectedRoute from "./layout/ProtectedRoutes";
 import LazyLoader from "./components/loading-skelton/LazyLoader";
 import { HelmetProvider } from "react-helmet-async";
 import RouteErrorBoundary from "./layout/RouteErrorBoundary";
+import CustomerDetailsPage from "./pages/srm/CustomerDetailsPage";
 
 // dynamic import
 const RegistrationPage = lazy(
@@ -160,6 +161,10 @@ const router = createBrowserRouter([
               {
                 path: "/srm/customer-list",
                 element: <CustomerListPage />,
+              },
+              {
+                path: "/srm/customer-details/:customerId",
+                element: <CustomerDetailsPage />,
               },
             ],
           },

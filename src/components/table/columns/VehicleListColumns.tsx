@@ -26,7 +26,6 @@ export const VehicleListColumns: ColumnDef<any>[] = [
             src={vehiclePhoto}
             alt="Vehicle"
             className="object-cover w-full h-full"
-            loading="lazy"
           />
         </div>
       ) : (
@@ -37,39 +36,42 @@ export const VehicleListColumns: ColumnDef<any>[] = [
     },
   },
   {
-    accessorKey: "rentalDetails.day.rentInAED",
-    header: "Daily Rent",
+    accessorKey: "vehicleRegistrationNumber",
+    header: "Registration No.",
     cell: ({ row }) => (
-      <span>
-        {row.original.rentalDetails?.day?.rentInAED + " AED" || "N/A"}
-      </span>
+      <span>{row.original.vehicleRegistrationNumber || "N/A"}</span>
     ),
   },
   {
-    accessorKey: "rentalDetails.week.rentInAED",
-    header: "Weekly Rent",
+    accessorKey: "rentalDetails",
+    header: "Rental Details",
     cell: ({ row }) => (
-      <span>
-        {row.original.rentalDetails?.week?.rentInAED + " AED" || "N/A"}
-      </span>
-    ),
-  },
-  {
-    accessorKey: "rentalDetails.month.rentInAED",
-    header: "Monthly Rent",
-    cell: ({ row }) => (
-      <span>
-        {row.original.rentalDetails?.month?.rentInAED + " AED" || "N/A"}{" "}
-      </span>
-    ),
-  },
-  {
-    accessorKey: "rentalDetails.hour.rentInAED",
-    header: "Hourly Rent",
-    cell: ({ row }) => (
-      <span>
-        {row.original.rentalDetails?.hour?.rentInAED + " AED" || "N/A"}{" "}
-      </span>
+      <div className="flex flex-col justify-center gap-y-1">
+        <span>
+          Day :{" "}
+          <span className="font-semibold">
+            {row.original.rentalDetails?.day?.rentInAED + " AED" || "N/A"}
+          </span>
+        </span>
+        <span>
+          Week :{" "}
+          <span className="font-semibold">
+            {row.original.rentalDetails?.week?.rentInAED + " AED" || "N/A"}
+          </span>
+        </span>
+        <span>
+          Month :
+          <span className="font-semibold">
+            {row.original.rentalDetails?.month?.rentInAED + " AED" || "N/A"}
+          </span>
+        </span>
+        <span>
+          Hour :{" "}
+          <span className="font-semibold">
+            {row.original.rentalDetails?.hour?.rentInAED + " AED" || "N/A"}
+          </span>
+        </span>
+      </div>
     ),
   },
 ];

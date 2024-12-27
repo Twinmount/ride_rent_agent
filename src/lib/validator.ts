@@ -1,4 +1,3 @@
-import { CustomerStatus } from "@/types/srm-types";
 import * as z from "zod";
 
 // company registration form schema
@@ -185,40 +184,16 @@ export const SRMPaymentDetailsFormSchema = z.object({
 // Extend Trip Form Schema
 export const ExtendTripSchema = z.object({
   newEndDate: z.date(),
-  advanceAmount: z.string().regex(/^\d+$/, "Advance Amount must be numeric"),
-  remainingAmount: z
-    .string()
-    .regex(/^\d+$/, "Remaining Amount must be numeric"),
+  advanceAmount: z.string().min(1, "Advance amount is required"),
+  remainingAmount: z.string().min(1, "Remaining amount is required"),
 });
 
-// traffic fine sub schema
-const TrafficFineSchema = z.object({
-  amount: z.string().min(1, "Amount is required"), // Fine amount
-  description: z.string().default("TRAFFIC FINE"), // Description (handled internally)
-  paymentDate: z.date(), // Date of the fine
-});
-
-// salikCollected field sub schema
-const SalikSchema = z.object({
-  amount: z.string().min(1, "Amount is required"), // Salik amount (AED)
-  description: z.string().default("SALIK"), // Internally set description (default "SALIK")
-  paymentDate: z.date(), // Date when Salik was collected
-});
-
-// additional charges sub schema
-const AdditionalChargesSchema = z.array(
-  z.object({
-    amount: z.string().min(1, "Amount is required"),
-    description: z.string().optional(),
-    paymentDate: z.date(),
-  })
-);
 // Trip End Form Schema
 export const TripEndFormSchema = z.object({
   customerStatus: z.string().min(1, "Customer status is required"),
-  finesCollected: z.array(TrafficFineSchema).optional(),
-  salikCollected: z.array(SalikSchema).optional(),
-  additionalCharges: AdditionalChargesSchema.optional(),
+  finesCollected: z.any().optional(),
+  salikCollected: z.any().optional(),
+  additionalCharges: z.any().optional(),
   discounts: z.string().default("0").optional(),
   totalAmountCollected: z.string().min(1, "Total amount is required"),
 });

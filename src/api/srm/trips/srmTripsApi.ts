@@ -1,13 +1,16 @@
 import { Slug } from "@/api/Api-Endpoints";
 import { API } from "@/api/ApiService";
+import { ExtendTripFormType } from "@/components/modal/srm-modal/ExtendTripModal";
 import {
-  FetchOngoingTripsResponse,
-  FetchCompletedTripsResponse,
+  FetchBookingsResponse,
   FetchCustomerListResponse,
   FetchVehicleListResponse,
   FetchEndTripResponse,
   FetchSingleBookingResponse,
   FetchExtendTripResponse,
+  FetchCustomerDetailsByIdResponse,
+  FetchPaymentFormRequiredDataResponse,
+  ExtendTripResponse,
 } from "@/types/srm-api-types";
 import { BookingStatus } from "@/types/srm-types";
 
@@ -43,13 +46,14 @@ export const fetchTripByBookingId = async (
   }
 };
 
-export const fetchOngoingTrips = async (urlParams: {
+export const fetchSRMBookings = async (urlParams: {
   page: number;
   limit: number;
   sortOrder: string;
   search?: string;
   bookingStatus: BookingStatus;
-}): Promise<FetchOngoingTripsResponse> => {
+  companyId?: string;
+}): Promise<FetchBookingsResponse> => {
   try {
     // generating query params
     const queryParams = new URLSearchParams({
@@ -63,9 +67,13 @@ export const fetchOngoingTrips = async (urlParams: {
       queryParams.append("search", urlParams.search);
     }
 
+    if (urlParams.companyId) {
+      queryParams.append("companyId", urlParams.companyId);
+    }
+
     const slugWithParams = `${Slug.GET_SRM_TRIPS}?${queryParams}`;
 
-    const data = await API.get<FetchOngoingTripsResponse>({
+    const data = await API.get<FetchBookingsResponse>({
       slug: slugWithParams,
     });
 
@@ -77,40 +85,6 @@ export const fetchOngoingTrips = async (urlParams: {
     console.error("Error fetching bookings:", error);
     throw error;
   }
-};
-
-export const fetchCompletedTrips = async (urlParams: {
-  page: number;
-  limit: number;
-  sortOrder: string;
-  search?: string;
-  bookingStatus: BookingStatus;
-}): Promise<FetchCompletedTripsResponse> => {
-  const queryParams = new URLSearchParams({
-    page: urlParams.page.toString(),
-    limit: urlParams.limit.toString(),
-    sortOrder: urlParams.sortOrder,
-    bookingStatus: urlParams.bookingStatus,
-  });
-
-  if (urlParams.search) {
-    queryParams.append("search", urlParams.search);
-  }
-
-  const slugWithParams = `${Slug.GET_SRM_TRIPS}?${queryParams}`;
-
-  const data = await API.get<FetchCompletedTripsResponse>({
-    slug: slugWithParams,
-  });
-  if (!data) throw new Error("Failed to fetch completed trips");
-  return data;
-};
-
-export const updateCompletedTrip = async (
-  tripDetails: CompletedTripDetails
-) => {
-  const slug = `/completedTrips/${tripDetails.tripId}`;
-  await API.put({ slug, body: tripDetails });
 };
 
 export const downloadCompletedTrip = async ({ tripId }: { tripId: string }) => {
@@ -184,6 +158,24 @@ export const fetchCustomerList = async (urlParams: {
   }
 };
 
+// customer list api
+export const fetchCustomerDetails = async (
+  customerId: string
+): Promise<FetchCustomerDetailsByIdResponse> => {
+  try {
+    const slugWithParams = `${Slug.GET_SRM_CUSTOMER_FORM_BY_ID}?customerId=${customerId}`;
+
+    const data = await API.get<FetchCustomerDetailsByIdResponse>({
+      slug: slugWithParams,
+    });
+    if (!data) throw new Error("Failed to fetch customer details");
+    return data;
+  } catch (error) {
+    console.error("Error fetching customer details:", error);
+    throw error;
+  }
+};
+
 // fetch End Trip Data for calculating advanceCollected
 export const fetchExtendTripDetails = async (
   bookingId: string
@@ -204,12 +196,60 @@ export const fetchExtendTripDetails = async (
   }
 };
 
+export const extendTrip = async (
+  bookingId: string,
+  values: ExtendTripFormType
+): Promise<ExtendTripResponse> => {
+  try {
+    const requestBody = {
+      bookingId,
+      newEndDate: values.newEndDate,
+      advanceAmount: values.advanceAmount,
+      remainingAmount: values.remainingAmount,
+    };
+
+    const data = await API.post<ExtendTripResponse>({
+      slug: `${Slug.POST_EXTEND_TRIP}`,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to  extend trip ");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error updating extend trip :", error);
+    throw error;
+  }
+};
+
 // fetch End Trip Data for calculating advanceCollected
 export const getEndTripData = async (
   bookingId: string
 ): Promise<FetchEndTripResponse> => {
   try {
     const data = await API.get<FetchEndTripResponse>({
+      slug: `${Slug.GET_SRM_END_TRIP}?bookingId=${bookingId}`,
+    });
+
+    if (!data) {
+      throw new Error("Failed to fetch end trip data");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching end trip data:", error);
+    throw error;
+  }
+};
+
+// fetch End Trip Data for calculating advanceCollected
+export const getPaymentFormRequiredData = async (
+  bookingId: string
+): Promise<FetchPaymentFormRequiredDataResponse> => {
+  try {
+    const data = await API.get<FetchPaymentFormRequiredDataResponse>({
       slug: `${Slug.GET_SRM_END_TRIP}?bookingId=${bookingId}`,
     });
 

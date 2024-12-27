@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -66,21 +66,21 @@ export default function SRMVehicleDetailsForm({
   });
 
   // Handle logic for adding a new vehicle record
-  const handleAddVehicle = async (
+  const handleAddVehicleBooking = async (
     values: SRMVehicleDetailsFormType,
     bookingId: string
   ) => {
     let data;
     if (!!existingVehicleId) {
       // Handle updating an existing vehicle booking record
-      await updateBookingDataForVehicle(bookingId, existingVehicleId);
+      data = await updateBookingDataForVehicle(bookingId, existingVehicleId);
     } else {
       //   Handle adding a new vehicle
-      data = await addVehicleDetailsForm(values);
-      const vehicleId = data.result.id;
+      const vehicleData = await addVehicleDetailsForm(values);
+      const vehicleId = vehicleData.result.id;
 
       // Handle updating the vehicle booking record
-      await updateBookingDataForVehicle(bookingId, vehicleId);
+      data = await updateBookingDataForVehicle(bookingId, vehicleId);
     }
     return data;
   };
@@ -125,11 +125,16 @@ export default function SRMVehicleDetailsForm({
     try {
       let data;
       if (type === "Add") {
-        data = await handleAddVehicle(values, bookingId);
+        data = await handleAddVehicleBooking(values, bookingId);
       }
 
       if (data) {
         await deleteMultipleFiles(deletedFiles);
+        sessionStorage.setItem(
+          "rentalDetails",
+          JSON.stringify(values.rentalDetails)
+        );
+
         toast({
           title: `Vehicle ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
@@ -137,6 +142,8 @@ export default function SRMVehicleDetailsForm({
 
         if (type === "Add" && onNextTab) {
           onNextTab();
+
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }
       }
     } catch (error) {
@@ -223,6 +230,7 @@ export default function SRMVehicleDetailsForm({
                         form.setValue("vehicleBrandId", "");
                       }}
                       value={initialValues.vehicleCategoryId || field.value}
+                      isDisabled={!!existingVehicleId}
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
@@ -249,7 +257,9 @@ export default function SRMVehicleDetailsForm({
                       vehicleCategoryId={form.watch("vehicleCategoryId")}
                       value={field.value}
                       onChangeHandler={field.onChange}
-                      isDisabled={!form.watch("vehicleCategoryId")}
+                      isDisabled={
+                        !form.watch("vehicleCategoryId") || !!existingVehicleId
+                      }
                     />
                   </FormControl>
                   <FormDescription className="ml-2">
@@ -268,7 +278,7 @@ export default function SRMVehicleDetailsForm({
             render={({ field }) => (
               <SingleFileUpload
                 name={field.name}
-                label="Vehicle Photo (optional)"
+                label="Vehicle Photo"
                 description="Vehicle Photo can have a maximum size of 5MB."
                 existingFile={currentVehiclePhoto}
                 maxSizeMB={5}
@@ -278,6 +288,7 @@ export default function SRMVehicleDetailsForm({
                 downloadFileName={"vehicle-photo"}
                 setDeletedImages={setDeletedFiles}
                 additionalClasses="w-[18rem]"
+                isDisabled={!!existingVehicleId}
               />
             )}
           />
@@ -294,7 +305,9 @@ export default function SRMVehicleDetailsForm({
                   </FormLabel>
                   <div className="flex-col items-start w-full">
                     <FormControl>
-                      <RentalDetailsFormField />
+                      <RentalDetailsFormField
+                        isDisabled={!!existingVehicleId}
+                      />
                     </FormControl>
                     <FormDescription className="ml-2">
                       Provide rent details. All Value Should be provided for

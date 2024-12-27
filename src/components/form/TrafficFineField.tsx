@@ -1,15 +1,23 @@
 import { useFormContext, Controller, useFieldArray } from "react-hook-form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { FormDescription, FormMessage } from "@/components/ui/form";
+import { FormDescription } from "@/components/ui/form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Label } from "../ui/label";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
-const TrafficFineField = () => {
-  const { control, setValue } = useFormContext();
+type TrafficFineFieldProps = {
+  control: any;
+  bookingStartDate: string;
+};
+
+const TrafficFineField = ({
+  control,
+  bookingStartDate,
+}: TrafficFineFieldProps) => {
+  const { setValue, clearErrors } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "finesCollected", // The field name for the array
@@ -26,6 +34,7 @@ const TrafficFineField = () => {
     } else {
       setValue("finesCollected", []); // Reset the traffic fine array
     }
+    clearErrors(`finesCollected`);
   };
 
   return (
@@ -54,9 +63,9 @@ const TrafficFineField = () => {
         <div className="flex items-center space-x-2">
           <Checkbox
             checked={fields.length === 0}
-            onCheckedChange={(checked) =>
-              handleCheckboxChange(checked === false)
-            }
+            onCheckedChange={(checked) => {
+              handleCheckboxChange(checked === false);
+            }}
             className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
             id="trafficFineNo"
           />
@@ -81,7 +90,7 @@ const TrafficFineField = () => {
               <Controller
                 name={`finesCollected.${index}.amount`}
                 control={control}
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                   <div className="flex items-center">
                     <Label
                       htmlFor={`finesCollected.${index}.amount`}
@@ -110,10 +119,12 @@ const TrafficFineField = () => {
                             e.preventDefault();
                           }
                         }}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          clearErrors(`finesCollected`);
+                        }}
                       />
-                      {fieldState.error && (
-                        <FormMessage>{fieldState.error.message}</FormMessage>
-                      )}
+
                       <FormDescription>
                         Enter the fine amount in AED.
                       </FormDescription>
@@ -126,7 +137,7 @@ const TrafficFineField = () => {
               <Controller
                 name={`finesCollected.${index}.paymentDate`}
                 control={control}
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                   <div className="flex items-center">
                     <Label
                       htmlFor={`finesCollected.${index}.paymentDate`}
@@ -137,14 +148,16 @@ const TrafficFineField = () => {
                     <div className="w-full h-fit">
                       <DatePicker
                         selected={field.value}
-                        onChange={(date: Date | null) => field.onChange(date)}
+                        onChange={(date: Date | null) => {
+                          field.onChange(date);
+                          clearErrors(`finesCollected`);
+                        }}
                         dateFormat="dd/MM/yyyy"
                         wrapperClassName="datePicker text-base"
                         placeholderText="DD/MM/YYYY"
+                        minDate={new Date(bookingStartDate)}
                       />
-                      {fieldState.error && (
-                        <FormMessage>{fieldState.error.message}</FormMessage>
-                      )}
+
                       <FormDescription>
                         Select the date when the fine was issued.
                       </FormDescription>

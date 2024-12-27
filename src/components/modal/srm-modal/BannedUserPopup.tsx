@@ -19,7 +19,6 @@ export default function BannedUserPopup({
   isSpamDialogOpen,
   setIsSpamDialogOpen,
   spamDetails,
-  onContinue,
 }: BannedUserPopupProps) {
   return (
     <Dialog open={isSpamDialogOpen} onOpenChange={setIsSpamDialogOpen}>
@@ -45,14 +44,14 @@ export default function BannedUserPopup({
             className="bg-gray-200 text-gray-800 hover:bg-gray-300"
             onClick={() => setIsSpamDialogOpen(false)}
           >
-            Cancel
+            Close
           </Button>
-          <Button
+          {/* <Button
             className="bg-red-600 text-white hover:bg-red-700"
             onClick={onContinue}
           >
             Continue Trip
-          </Button>
+          </Button> */}
         </div>
       </DialogContent>
     </Dialog>

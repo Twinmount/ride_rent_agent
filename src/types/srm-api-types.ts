@@ -119,19 +119,8 @@ export interface FetchSingleBookingResponse {
   status: string;
   statusCode: number;
 }
-export interface FetchOngoingTripsResponse {
-  result: {
-    list: IndividualTrip[];
-    page: number;
-    limit: number;
-    total: number;
-    totalNumberOfPages: number;
-  };
-  status: string;
-  statusCode: number;
-}
 
-export interface FetchCompletedTripsResponse {
+export interface FetchBookingsResponse {
   result: {
     list: IndividualTrip[];
     page: number;
@@ -178,6 +167,19 @@ export interface FetchCustomerListResponse {
   status: string;
   statusCode: number;
 }
+
+export interface FetchCustomerDetailsByIdResponse {
+  result: CustomerApiType;
+  status: string;
+  statusCode: number;
+}
+
+export interface FetchUpcomingBookingDatesResponse {
+  result: { bookingStartDate: string; bookingEndDate: string }[];
+  status: string;
+  statusCode: number;
+}
+
 export interface SearchCustomerResponse {
   result: {
     list: CustomerApiType[];
@@ -214,12 +216,26 @@ export interface FetchExtendTripResponse {
   status: string;
   statusCode: number;
 }
+export interface ExtendTripResponse {
+  result: IndividualTrip;
+  status: string;
+  statusCode: number;
+}
 
 export interface FetchEndTripResponse {
   result: {
     advanceCollected: number;
     vehicle: VehicleApiType;
     customer: CustomerApiType;
+  };
+  status: string;
+  statusCode: number;
+}
+
+export interface FetchPaymentFormRequiredDataResponse {
+  result: {
+    bookingId: string;
+    vehicle: VehicleApiType;
   };
   status: string;
   statusCode: number;

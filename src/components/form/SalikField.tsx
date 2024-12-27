@@ -1,15 +1,20 @@
 import { useFormContext, Controller, useFieldArray } from "react-hook-form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { FormDescription, FormMessage } from "@/components/ui/form";
+import { FormDescription } from "@/components/ui/form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Label } from "../ui/label";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
-const SalikField = () => {
-  const { control, setValue } = useFormContext();
+type SalikFieldProps = {
+  control: any;
+  bookingStartDate: string;
+};
+
+const SalikField = ({ control, bookingStartDate }: SalikFieldProps) => {
+  const { setValue, clearErrors } = useFormContext();
   const { fields, append, remove } = useFieldArray({
     control,
     name: "salikCollected", // The field name for the array
@@ -26,6 +31,7 @@ const SalikField = () => {
     } else {
       setValue("salikCollected", []); // Reset the salikCollected array
     }
+    clearErrors("salikCollected");
   };
 
   return (
@@ -36,9 +42,10 @@ const SalikField = () => {
         <div className="flex items-center space-x-2">
           <Checkbox
             checked={fields.length > 0}
-            onCheckedChange={(checked) =>
-              handleCheckboxChange(checked === true)
-            }
+            onCheckedChange={(checked) => {
+              handleCheckboxChange(checked === true);
+              clearErrors("salikCollected");
+            }}
             className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
             id="salikYes"
           />
@@ -78,7 +85,7 @@ const SalikField = () => {
               <Controller
                 name={`salikCollected.${index}.amount`}
                 control={control}
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                   <div className="flex items-center">
                     <Label
                       htmlFor={`salikCollected.${index}.amount`}
@@ -94,7 +101,10 @@ const SalikField = () => {
                         className="input-field"
                         type="text"
                         inputMode="numeric"
-                        onChange={(e) => field.onChange(e.target.value)}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          clearErrors("salikCollected");
+                        }}
                         onKeyDown={(e) => {
                           if (
                             !/^\d*$/.test(e.key) &&
@@ -109,9 +119,7 @@ const SalikField = () => {
                           }
                         }}
                       />
-                      {fieldState.error && (
-                        <FormMessage>{fieldState.error.message}</FormMessage>
-                      )}
+
                       <FormDescription>
                         Enter the collected Salik amount in AED.
                       </FormDescription>
@@ -124,7 +132,7 @@ const SalikField = () => {
               <Controller
                 name={`salikCollected.${index}.paymentDate`}
                 control={control}
-                render={({ field, fieldState }) => (
+                render={({ field }) => (
                   <div className="flex items-center">
                     <Label
                       htmlFor={`salikCollected.${index}.paymentDate`}
@@ -135,14 +143,16 @@ const SalikField = () => {
                     <div className="w-full h-fit">
                       <DatePicker
                         selected={field.value}
-                        onChange={(date: Date | null) => field.onChange(date)}
+                        onChange={(date: Date | null) => {
+                          field.onChange(date);
+                          clearErrors("salikCollected");
+                        }}
                         dateFormat="dd/MM/yyyy"
                         wrapperClassName="datePicker text-base"
                         placeholderText="DD/MM/YYYY"
+                        minDate={new Date(bookingStartDate)}
                       />
-                      {fieldState.error && (
-                        <FormMessage>{fieldState.error.message}</FormMessage>
-                      )}
+
                       <FormDescription>
                         Select the date when the Salik was collected.
                       </FormDescription>

@@ -2,7 +2,7 @@ import { useFormContext, Controller } from "react-hook-form";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
-import { FormMessage } from "@/components/ui/form";
+import { FormDescription } from "@/components/ui/form";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {
@@ -24,12 +24,16 @@ import { ADDITIONAL_CHARGES_OPTIONS } from "@/constants";
 
 type AdditionalChargesFieldProps = {
   setAdditionalChargesTotal: React.Dispatch<React.SetStateAction<number>>;
+  control: any;
+  bookingStartDate: string;
 };
 
 const AdditionalChargesField = ({
   setAdditionalChargesTotal,
+  control,
+  bookingStartDate,
 }: AdditionalChargesFieldProps) => {
-  const { control, watch, setValue } = useFormContext();
+  const { watch, setValue, clearErrors } = useFormContext();
   const [isEnabled, setIsEnabled] = useState(false);
   const [selectedCharges, setSelectedCharges] = useState<string[]>([]);
 
@@ -46,7 +50,6 @@ const AdditionalChargesField = ({
           (sum, charge) => sum + parseFloat(charge.amount || "0"),
           0
         );
-        console.log("Debounced Updated Total:", total);
         setAdditionalChargesTotal(total);
       }, 1000),
     [setAdditionalChargesTotal]
@@ -91,6 +94,7 @@ const AdditionalChargesField = ({
       setSelectedCharges([]); // Clear selections if disabled
       setValue("additionalCharges", []);
     }
+    clearErrors("additionalCharges");
   };
 
   /**
@@ -116,6 +120,7 @@ const AdditionalChargesField = ({
       setValue("additionalCharges", [...additionalCharges, newCharge]);
     }
     setSelectedCharges(updatedCharges);
+    clearErrors("additionalCharges");
   };
 
   return (
@@ -207,7 +212,7 @@ const AdditionalChargesField = ({
               name={`additionalCharges.${index}.amount`}
               control={control}
               defaultValue={charge.amount}
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <div className="flex items-center space-x-4">
                   <label
                     htmlFor={`additionalCharges-${charge.description}-amount`}
@@ -215,21 +220,24 @@ const AdditionalChargesField = ({
                   >
                     Amount (AED)
                   </label>
-                  <Input
-                    id={`additionalCharges-${charge.description}-amount`}
-                    {...field}
-                    placeholder="Enter amount"
-                    className="input-field"
-                    inputMode="numeric"
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/[^\d.]/g, ""); // Allow only numeric input
-                      field.onChange(value); // Update form state
-                      handleInputChange(value, index); // Trigger calculation
-                    }}
-                  />
-                  {fieldState.error && (
-                    <FormMessage>{fieldState.error.message}</FormMessage>
-                  )}
+                  <div className="flex flex-col">
+                    <Input
+                      id={`additionalCharges-${charge.description}-amount`}
+                      {...field}
+                      placeholder="Enter amount"
+                      className="input-field"
+                      inputMode="numeric"
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/[^\d.]/g, ""); // Allow only numeric input
+                        field.onChange(value); // Update form state
+                        handleInputChange(value, index); // Trigger calculation
+                        clearErrors("additionalCharges");
+                      }}
+                    />
+                    <FormDescription className="ml-2 text-xs">
+                      Fine Amount in AED.
+                    </FormDescription>
+                  </div>
                 </div>
               )}
             />
@@ -239,7 +247,7 @@ const AdditionalChargesField = ({
               name={`additionalCharges.${index}.paymentDate`}
               control={control}
               defaultValue={charge.paymentDate}
-              render={({ field, fieldState }) => (
+              render={({ field }) => (
                 <div className="flex items-center mt-4 space-x-4">
                   <label
                     htmlFor={`additionalCharges-${charge.description}-date`}
@@ -247,16 +255,22 @@ const AdditionalChargesField = ({
                   >
                     Date
                   </label>
-                  <DatePicker
-                    selected={field.value}
-                    onChange={(date: Date | null) => field.onChange(date)}
-                    dateFormat="dd/MM/yyyy"
-                    placeholderText="DD/MM/YYYY"
-                    wrapperClassName="datePicker text-base"
-                  />
-                  {fieldState.error && (
-                    <FormMessage>{fieldState.error.message}</FormMessage>
-                  )}
+                  <div className="flex flex-col">
+                    <DatePicker
+                      selected={field.value}
+                      onChange={(date: Date | null) => {
+                        field.onChange(date);
+                        clearErrors("additionalCharges");
+                      }}
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="DD/MM/YYYY"
+                      wrapperClassName="datePicker text-base"
+                      minDate={new Date(bookingStartDate)}
+                    />
+                    <FormDescription className="ml-2 text-xs">
+                      Date of the fine.
+                    </FormDescription>
+                  </div>
                 </div>
               )}
             />

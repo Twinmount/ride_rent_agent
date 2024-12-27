@@ -68,8 +68,8 @@ export default function SRMCustomerStatusDropdown({
             </FormControl>
             <FormDescription>
               Choose the status of the customer based on the trip. Any status
-              other than "Successfully Completed Trip" will be used later to
-              flag the customer for future trips.
+              other than <b>"Successfully Completed Trip"</b> will be used later
+              to <b>flag the customer</b> for future trips.
             </FormDescription>
             <FormMessage />
           </div>

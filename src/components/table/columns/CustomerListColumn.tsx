@@ -1,9 +1,6 @@
 import { ColumnDef } from "@tanstack/react-table";
-import { Link } from "react-router-dom";
 
-export const CustomerListColumns = (
-  handleViewDetails: (userId: string) => void
-): ColumnDef<any>[] => [
+export const CustomerListColumns = (): ColumnDef<any>[] => [
   {
     accessorKey: "customerProfilePic",
     header: "Photo",
@@ -16,7 +13,7 @@ export const CustomerListColumns = (
             src={customerProfilePic}
             alt={"customer profile"}
             className="object-cover w-full h-full"
-            loading="lazy"
+            
           />
         </div>
       ) : (
@@ -30,21 +27,31 @@ export const CustomerListColumns = (
       );
     },
   },
+  // {
+  //   accessorKey: "customerName",
+  //   header: "Customer Name",
+  //   cell: ({ row }) => {
+  //     const customerId = row.original.customerId; // Unique user identifier
+  //     const customerName = row.original.customerName;
+
+  //     return (
+  //       <Link
+  //         to={`/srm/customer-details/${customerId}`} // Link to customer details
+  //         className="text-blue-500 underline hover:text-blue-700"
+  //       >
+  //         {customerName}
+  //       </Link>
+  //     );
+  //   },
+  // },
   {
     accessorKey: "customerName",
     header: "Customer Name",
     cell: ({ row }) => {
-      const userId = row.original.id; // Unique user identifier
+      // Unique user identifier
       const customerName = row.original.customerName;
 
-      return (
-        <Link
-          to={`/customerDetails/${userId}`} // Link to customer details
-          className="text-blue-500 underline hover:text-blue-700"
-        >
-          {customerName}
-        </Link>
-      );
+      return <span className="font-semibold">{customerName}</span>;
     },
   },
 

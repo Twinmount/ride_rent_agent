@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { format } from "date-fns";
 
 import {
   Form,
@@ -27,6 +28,9 @@ import { endTrip } from "@/api/srm";
 import { calculateFinalAmount, calculateRentalAmount } from "@/helpers";
 import SRMCustomerStatusDropdown from "../dropdowns/SRMCustomerStatusDropdown";
 import { useFormValidationToast } from "@/hooks/useFormValidationToast";
+import { toast } from "@/components/ui/use-toast";
+import Spinner from "@/components/general/Spinner";
+import { validateFieldArray } from "@/helpers/srm-form";
 
 export type BookingDataType = {
   advanceCollected: number;
@@ -51,6 +55,7 @@ export default function TripEndForm({
   companyId,
 }: TripEndFormProps) {
   const { bookingId } = useParams<{ bookingId: string }>();
+  const [baseRentalAmount, setBaseRentalAmount] = useState<number>(0);
   const [totalAmountCollected, setTotalAmountCollected] = useState<number>(0);
   const [additionalChargesTotal, setAdditionalChargesTotal] =
     useState<number>(0);
@@ -69,8 +74,43 @@ export default function TripEndForm({
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof TripEndFormSchema>) {
-    console.log("Form Submitted", values);
-    return;
+    const trafficFineError = validateFieldArray(
+      values.finesCollected,
+      "Traffic Fine"
+    );
+
+    if (trafficFineError) {
+      form.setError("finesCollected", {
+        type: "manual",
+        message: trafficFineError,
+      });
+      form.setFocus("finesCollected");
+      return;
+    }
+
+    const salikError = validateFieldArray(values.salikCollected, "Salik");
+    if (salikError) {
+      form.setError("salikCollected", {
+        type: "manual",
+        message: salikError,
+      });
+      form.setFocus("salikCollected");
+      return;
+    }
+
+    const additionalChargesError = validateFieldArray(
+      values.additionalCharges,
+      "Additional Charges"
+    );
+    if (additionalChargesError) {
+      form.setError("additionalCharges", {
+        type: "manual",
+        message: additionalChargesError,
+      });
+      form.setFocus("additionalCharges");
+      return;
+    }
+
     try {
       let data;
 
@@ -83,9 +123,16 @@ export default function TripEndForm({
       }
 
       if (data) {
-        navigate("srm/completed-trips");
+        navigate("/srm/completed-trips");
       }
-    } catch (error) {}
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: `Trip End Failed`,
+        description: "Something went wrong",
+      });
+      console.error("Error in onSubmit:", error);
+    }
   }
 
   // custom hook to validate form
@@ -93,15 +140,20 @@ export default function TripEndForm({
 
   const discount = form.watch("discounts") || "";
 
-  // totalAmountCollected calculation
+  // Calculate baseRentalAmount on component mount or when bookingData changes
   useEffect(() => {
-    const baseRentalAmount = calculateRentalAmount(
-      bookingData?.rentalDetails as RentalDetails,
-      bookingData?.bookingStartDate as string,
-      bookingData?.bookingEndDate as string
-    );
+    if (bookingData) {
+      const calculatedBaseRentalAmount = calculateRentalAmount(
+        bookingData.rentalDetails,
+        bookingData.bookingStartDate,
+        bookingData.bookingEndDate
+      );
+      setBaseRentalAmount(calculatedBaseRentalAmount); // Set the fixed base rental amount
+    }
+  }, [bookingData]);
 
-    // Use the already calculated additionalChargesTotal
+  // Calculate totalAmountCollected dynamically
+  useEffect(() => {
     const finalAmount = calculateFinalAmount(
       baseRentalAmount,
       additionalChargesTotal,
@@ -110,9 +162,9 @@ export default function TripEndForm({
 
     setTotalAmountCollected(finalAmount);
 
-    // Update the form value (read-only field)
+    // Synchronize with the form value (read-only field)
     form.setValue("totalAmountCollected", finalAmount.toFixed(2));
-  }, [additionalChargesTotal, discount]);
+  }, [baseRentalAmount, additionalChargesTotal, discount]);
 
   return (
     <section className="container py-5 mx-auto min-h-screen rounded-lg md:py-7">
@@ -181,7 +233,12 @@ export default function TripEndForm({
                   </FormLabel>
                   <div className="flex-col items-start w-full">
                     <FormControl>
-                      <TrafficFineField />
+                      <TrafficFineField
+                        control={form.control}
+                        bookingStartDate={
+                          bookingData?.bookingStartDate as string
+                        }
+                      />
                     </FormControl>
                     <FormDescription>
                       Specify if a security deposit is required and provide the
@@ -205,7 +262,12 @@ export default function TripEndForm({
                   </FormLabel>
                   <div className="flex-col items-start w-full">
                     <FormControl>
-                      <SalikField />
+                      <SalikField
+                        control={form.control}
+                        bookingStartDate={
+                          bookingData?.bookingStartDate as string
+                        }
+                      />
                     </FormControl>
                     <FormDescription>
                       Specify if a security deposit is required and provide the
@@ -231,6 +293,10 @@ export default function TripEndForm({
                     <FormControl>
                       <AdditionalChargesField
                         setAdditionalChargesTotal={setAdditionalChargesTotal}
+                        control={form.control}
+                        bookingStartDate={
+                          bookingData?.bookingStartDate as string
+                        }
                       />
                     </FormControl>
                     <FormDescription>
@@ -242,6 +308,45 @@ export default function TripEndForm({
                 </FormItem>
               )}
             />
+
+            {/* Brand Name */}
+            <div className="flex mb-2 w-full max-sm:flex-col">
+              <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
+                Base Rental Amount <span className="mr-5 max-sm:hidden">:</span>
+              </FormLabel>
+              <div className="flex-col items-start w-full">
+                <div>
+                  <Input
+                    value={baseRentalAmount}
+                    className={`input-field !cursor-default !text-gray-700 !font-semibold`}
+                    readOnly
+                  />
+                </div>
+                <FormDescription className="ml-2">
+                  Calculated based on the <b>rental details</b> of the vehicle
+                  for the booking period from{" "}
+                  <b>
+                    {bookingData?.bookingStartDate
+                      ? format(
+                          new Date(bookingData.bookingStartDate),
+                          "dd/MM/yyyy h:mm aa"
+                        )
+                      : "N/A"}
+                  </b>{" "}
+                  to{" "}
+                  <b>
+                    {bookingData?.bookingEndDate
+                      ? format(
+                          new Date(bookingData.bookingEndDate),
+                          "dd/MM/yyyy h:mm aa"
+                        )
+                      : "N/A"}
+                  </b>
+                  .
+                </FormDescription>
+                <FormMessage className="ml-2" />
+              </div>
+            </div>
 
             {/* Discounts / Adjustments */}
             <FormField
@@ -260,15 +365,27 @@ export default function TripEndForm({
                         placeholder="Enter discount amount"
                         type="text"
                         onChange={(e) => {
-                          const value = e.target.value.replace(/[^\d.]/g, ""); // Allow only numeric input
-                          field.onChange(value);
+                          let value = e.target.value.replace(/[^\d.]/g, ""); // Allow only numeric input
+                          if (parseFloat(value) > baseRentalAmount) {
+                            value = baseRentalAmount.toFixed(2); // Restrict to max
+                          }
+                          field.onChange(value); // Update the field value
+                        }}
+                        onBlur={() => {
+                          // Ensure the value is within the valid range
+                          const value = parseFloat(field.value || "0");
+                          if (value > baseRentalAmount) {
+                            field.onChange(baseRentalAmount.toFixed(2));
+                          }
                         }}
                         className="input-field"
                       />
                     </FormControl>
                     <FormDescription className="ml-2">
-                      &#40;optional&#41; provide discount in AED if any. Default
-                      to 0.
+                      &#40;optional&#41; Provide discount in AED if any.{" "}
+                      <b>Maximum allowed value is {baseRentalAmount}</b>, which
+                      is the rental amount of the vehicle calculated for the
+                      booking period.
                     </FormDescription>
                     <FormMessage className="ml-2" />
                   </div>
@@ -313,8 +430,9 @@ export default function TripEndForm({
             <Button
               type="submit"
               className="w-full rounded-xl text-red-500 font-semibold transition-colors"
+              disabled={form.formState.isSubmitting}
             >
-              End Trip
+              End Trip {form.formState.isSubmitting && <Spinner />}
             </Button>
           </div>
         </form>

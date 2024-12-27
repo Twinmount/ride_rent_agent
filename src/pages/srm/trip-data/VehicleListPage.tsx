@@ -44,8 +44,7 @@ export default function VehicleListPage() {
           placeholder="Search Trip..."
           description={
             <p className=" italic text-gray-600">
-              You can search with{" "}
-              <b>brand, registration number, customer name</b>
+              You can search with <b>brand and registration number</b>
             </p>
           }
         />

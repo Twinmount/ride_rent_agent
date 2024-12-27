@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
 import { SortDropdown } from "@/components/SortDropdown";
 import ExtendTripModal from "@/components/modal/srm-modal/ExtendTripModal";
-import { fetchOngoingTrips } from "@/api/srm/trips";
+import { fetchSRMBookings } from "@/api/srm/trips";
 import DownloadExcelModal from "@/components/srm/DownloadSRMExcelData";
 import { Link } from "react-router-dom";
 import Search from "@/components/Search";
 import { Plus } from "lucide-react";
 import OngoingTrips from "@/components/srm/OngoingTrips";
 import { BookingStatus } from "@/types/srm-types";
+import { useCompany } from "@/hooks/useCompany";
 
 // Sample data
 
@@ -22,19 +23,21 @@ export default function OngoingTripsPage() {
     string | null
   >(null);
 
-  const queryClient = useQueryClient();
+  const { companyId, isCompanyLoading } = useCompany();
 
   const { data, isLoading, isFetching } = useQuery({
     queryKey: ["activeTrips", page, limit, search, sortOrder],
     queryFn: () =>
-      fetchOngoingTrips({
+      fetchSRMBookings({
         page,
         limit,
         sortOrder,
         search,
         bookingStatus: BookingStatus.ONGOING,
+        companyId,
       }),
     staleTime: 0,
+    enabled: !!companyId && !isCompanyLoading,
   });
 
   const handleOpenModal = (id: string) => {
@@ -63,7 +66,10 @@ export default function OngoingTripsPage() {
           description={
             <p className=" italic text-gray-600">
               You can search with{" "}
-              <b>brand, registration number, customer name</b>
+              <b>
+                brand, registration number, customer name, license,passport and
+                phone number.
+              </b>
             </p>
           }
         />

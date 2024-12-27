@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -30,7 +30,7 @@ import {
   createCustomerBooking,
 } from "@/api/srm/srmFormApi";
 import NationalityDropdown from "../dropdowns/NationalityDropdown";
-import CustomerSearch from "../dropdowns/CustomerSearchAndAutoFill";
+import CustomerSearchAndAutoFill from "../dropdowns/CustomerSearchAndAutoFill";
 
 import { useFormValidationToast } from "@/hooks/useFormValidationToast";
 import { handleCustomerSelect } from "@/helpers";
@@ -73,6 +73,7 @@ export default function SRMCustomerDetailsForm({
     const bookingResponse = await createCustomerBooking(customerId);
     const bookingId = bookingResponse.result.bookingId;
     sessionStorage.setItem("bookingId", bookingId);
+    return bookingResponse;
   };
 
   // Handle new customer creation and booking
@@ -87,7 +88,7 @@ export default function SRMCustomerDetailsForm({
     const bookingId = bookingResponse.result.bookingId;
     sessionStorage.setItem("bookingId", bookingId);
 
-    return customerData;
+    return bookingResponse;
   };
 
   // Define a submit handler.
@@ -111,7 +112,7 @@ export default function SRMCustomerDetailsForm({
       if (type === "Add") {
         if (existingCustomerId) {
           // Handle existing customer booking
-          await handleExistingCustomerBooking(existingCustomerId);
+          data = await handleExistingCustomerBooking(existingCustomerId);
         } else {
           // Handle new customer booking
           data = await handleNewCustomerBooking(values, countryCode);
@@ -121,18 +122,19 @@ export default function SRMCustomerDetailsForm({
       if (data) {
         await deleteMultipleFiles(deletedFiles);
         toast({
-          title: `Vehicle ${type.toLowerCase()}ed successfully`,
+          title: `Customer ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
         });
 
         if (type === "Add" && onNextTab) {
           onNextTab();
+          window.scrollTo({ top: 0, behavior: "smooth" });
         }
       }
     } catch (error) {
       toast({
         variant: "destructive",
-        title: `${type} Vehicle failed`,
+        title: `${type} Customer failed`,
         description: "Something went wrong",
       });
       console.error(error);
@@ -182,7 +184,7 @@ export default function SRMCustomerDetailsForm({
                   </FormLabel>
                   <div className="flex-col items-start w-full">
                     <FormControl>
-                      <CustomerSearch
+                      <CustomerSearchAndAutoFill
                         value={field.value} // Pass current field value
                         onChangeHandler={onCustomerSelect}
                         placeholder="Enter / Search customer name"
@@ -205,7 +207,7 @@ export default function SRMCustomerDetailsForm({
               render={({ field }) => (
                 <SingleFileUpload
                   name={field.name}
-                  label="Customer Profile (optional)"
+                  label="Customer Profile "
                   description="Customer profile can have a maximum size of 5MB."
                   existingFile={currentProfilePic}
                   maxSizeMB={5}
@@ -215,6 +217,7 @@ export default function SRMCustomerDetailsForm({
                   downloadFileName={"user profile"}
                   setDeletedImages={setDeletedFiles}
                   additionalClasses="w-[18rem]"
+                  isDisabled={!!existingCustomerId}
                 />
               )}
             />
@@ -233,6 +236,7 @@ export default function SRMCustomerDetailsForm({
                       <NationalityDropdown
                         value={field.value} // Pass the form's field value
                         onChangeHandler={field.onChange} // Bind to form control's onChange
+                        isDisabled={!!existingCustomerId}
                       />
                     </FormControl>
                     <FormDescription className="ml-2">
@@ -260,6 +264,7 @@ export default function SRMCustomerDetailsForm({
                         placeholder="Enter passport number"
                         {...field}
                         className="input-field"
+                        readOnly={!!existingCustomerId}
                       />
                     </FormControl>
                     <FormDescription className="ml-2">
@@ -287,6 +292,7 @@ export default function SRMCustomerDetailsForm({
                         placeholder="Enter driving license number"
                         {...field}
                         className="input-field"
+                        readOnly={!!existingCustomerId}
                       />
                     </FormControl>
                     <FormDescription className="ml-2">
@@ -327,6 +333,7 @@ export default function SRMCustomerDetailsForm({
                           buttonClassName:
                             "!border-none outline-none !h-[52px] !w-[50px] !rounded-xl !bg-gray-100",
                         }}
+                        disabled={!!existingCustomerId}
                       />
                     </FormControl>
                     <FormDescription className="ml-2">
@@ -350,7 +357,6 @@ export default function SRMCustomerDetailsForm({
           </Button>
         </form>
       </Form>
-      ;
     </>
   );
 }

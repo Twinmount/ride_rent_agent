@@ -26,9 +26,9 @@ export default function SRMDataAddPage() {
   // Handle tab change based on levelsFilled state
   const handleTabChange = (value: string) => {
     const tab = value as SRMTabsTypes;
-    const { canAccess, message } = validateSRMTabAccess({ tab, levelsFilled });
+    const { message } = validateSRMTabAccess({ tab, levelsFilled });
 
-    if (canAccess) {
+    if (true) {
       setActiveTab(tab);
     } else {
       toast({

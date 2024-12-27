@@ -22,15 +22,18 @@ import { Input } from "@/components/ui/input";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useQuery } from "@tanstack/react-query";
-import { fetchExtendTripDetails } from "@/api/srm/trips";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { extendTrip, fetchExtendTripDetails } from "@/api/srm/trips";
 import { ExtendTripSchema } from "@/lib/validator";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { calculateRentalAmount } from "@/helpers";
+import { toast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
+import Spinner from "@/components/general/Spinner";
 
 // Validation schema
 
-type ExtendTripFormType = z.infer<typeof ExtendTripSchema>;
+export type ExtendTripFormType = z.infer<typeof ExtendTripSchema>;
 
 interface ExtendTripModalProps {
   bookingId: string;
@@ -47,7 +50,8 @@ export default function ExtendTripModal({
     enabled: !!bookingId,
   });
 
-  const [remainingAmount, setRemainingAmount] = useState<number>(0);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const form = useForm<ExtendTripFormType>({
     resolver: zodResolver(ExtendTripSchema),
@@ -69,33 +73,23 @@ export default function ExtendTripModal({
     }
   }, [data]);
 
-  const onSubmit = (values: ExtendTripFormType) => {
-    console.log("Form Submitted", values);
-    onClose();
-  };
+  const onSubmit = async (values: ExtendTripFormType) => {
+    try {
+      let data;
 
-  const handleNewEndDateChange = (date: Date | null) => {
-    if (data?.result) {
-      const { bookingEndDate, remainingAmount: initialRemainingAmount } =
-        data.result;
-      const { rentalDetails } = data.result.vehicle;
-
-      if (date) {
-        // Calculate the rental amount for the extended period
-        const extendedPeriodAmount = calculateRentalAmount(
-          rentalDetails,
-          bookingEndDate,
-          date.toISOString()
-        );
-
-        // Add the new extended rental amount to the initial remaining amount
-        const totalRemainingAmount =
-          initialRemainingAmount + extendedPeriodAmount;
-
-        // Update the remaining amount
-        setRemainingAmount(totalRemainingAmount);
-        form.setValue("remainingAmount", totalRemainingAmount.toString());
+      data = await extendTrip(bookingId, values);
+      if (data) {
+        navigate("/srm/ongoing-trips");
+        queryClient.invalidateQueries({ queryKey: ["activeTrips"] });
+        onClose();
       }
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: `Trip End Failed`,
+        description: "Something went wrong",
+      });
+      console.error("Error in onSubmit:", error);
     }
   };
 
@@ -112,23 +106,46 @@ export default function ExtendTripModal({
     throw new Error("Failed to fetch extend trip data");
   }
 
-  const { bookingStartDate, bookingEndDate, nextPossibleMaxBookingEndDate } =
-    data.result;
+  const {
+    bookingStartDate,
+    bookingEndDate,
+    remainingAmount: initialRemainingAmount,
+    nextPossibleMaxBookingEndDate,
+  } = data.result;
+
+  const { rentalDetails } = data.result.vehicle;
+
+  const handleNewEndDateChange = (date: Date | null) => {
+    if (date) {
+      // Calculate the rental amount for the extended period
+      const extendedPeriodAmount = calculateRentalAmount(
+        rentalDetails,
+        bookingEndDate,
+        date.toISOString()
+      );
+
+      // Add the new extended rental amount to the initial remaining amount
+      const totalRemainingAmount =
+        initialRemainingAmount + extendedPeriodAmount;
+
+      form.setValue("remainingAmount", totalRemainingAmount.toFixed(2)); // Format as string for form
+    }
+  };
 
   return (
     <Dialog open={!!bookingId} onOpenChange={onClose}>
       <DialogContent className="max-h-[90vh] overflow-hidden">
-        <DialogHeader className="">
-          <DialogTitle>Extend Trip</DialogTitle>
-          <DialogDescription>
-            Update the trip details below to extend the booking period.
+        <DialogHeader className="border-b pb-2">
+          <DialogTitle className="text-center text-lg">Extend Trip</DialogTitle>
+          <DialogDescription className="text-center">
+            Choose a new end date for the trip
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="h-[75vh]">
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="flex flex-col gap-5 p-4 pb-10 mx-auto w-full max-w-xl"
+              className="flex flex-col gap-5 p-4 pb-10 mx-auto w-full max-w-xl bg-white"
             >
               {/* Booking Period */}
               <div className="flex flex-col mb-2 w-full">
@@ -151,7 +168,7 @@ export default function ExtendTripModal({
                         />
                         <label
                           htmlFor="bookingEndDate"
-                          className="flex justify-between items-center mr-1 w-14 whitespace-nowrap text-grey-600"
+                          className="flex justify-between items-center mr-1 w-14 text-gray-600 whitespace-nowrap text-grey-600"
                         >
                           Start <span>:</span>
                         </label>
@@ -160,7 +177,7 @@ export default function ExtendTripModal({
                           showTimeSelect
                           timeInputLabel="Time:"
                           dateFormat="dd/MM/yyyy h:mm aa"
-                          wrapperClassName="datePicker text-base w-full"
+                          wrapperClassName="datePicker text-base text-gray-500 w-full"
                           placeholderText="DD/MM/YYYY"
                           id="bookingStartDate"
                           minDate={new Date(bookingStartDate)}
@@ -169,6 +186,9 @@ export default function ExtendTripModal({
                         />
                       </div>
                     </FormControl>
+                    <FormDescription className="ml-24">
+                      Booking start date. Cannot modify.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
 
@@ -213,6 +233,9 @@ export default function ExtendTripModal({
                             />
                           </div>
                         </FormControl>
+                        <FormDescription className="ml-24">
+                          Choose a new end date, if required.
+                        </FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -233,7 +256,7 @@ export default function ExtendTripModal({
                         <Input
                           {...field}
                           placeholder="Advance Paid (AED)"
-                          className="input-field !cursor-default !text-gray-800"
+                          className="input-field !cursor-default !text-gray-600"
                           type="text"
                           inputMode="numeric"
                           onKeyDown={(e) => {
@@ -256,7 +279,7 @@ export default function ExtendTripModal({
                         />
                       </FormControl>
                       <FormDescription className="ml-2">
-                        Enter the advance received for this model in AED.
+                        Advance received for this model in AED.
                       </FormDescription>
                       <FormMessage className="ml-2" />
                     </div>
@@ -277,7 +300,7 @@ export default function ExtendTripModal({
                         <Input
                           {...field}
                           placeholder="Balance Amount (AED)"
-                          className="input-field !cursor-default !text-gray-800"
+                          className="input-field !cursor-default !text-gray-500 !font-semibold"
                           type="text"
                           inputMode="numeric"
                           onKeyDown={(e) => {
@@ -300,7 +323,9 @@ export default function ExtendTripModal({
                         />
                       </FormControl>
                       <FormDescription className="ml-2">
-                        Enter the remaining amount to be paid in AED.
+                        Balance amount wil be automatically calculated based on
+                        the <strong>rental details</strong> of the vehicle,and
+                        the new <strong>end date</strong> provided.
                       </FormDescription>
                       <FormMessage className="ml-2" />
                     </div>
@@ -312,8 +337,9 @@ export default function ExtendTripModal({
               <Button
                 type="submit"
                 className="mt-4 text-white bg-slate-800 hover:bg-slate-700"
+                disabled={form.formState.isSubmitting}
               >
-                Submit
+                Extend Trip {form.formState.isSubmitting && <Spinner />}
               </Button>
             </form>
           </Form>

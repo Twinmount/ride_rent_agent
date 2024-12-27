@@ -36,6 +36,11 @@ const CustomerSearch = ({
   const [spamDetails, setSpamDetails] = useState<BannedCustomerType | null>(
     null
   );
+  // Store customer data for spam dialog interaction
+  const [selectedCustomerData, setSelectedCustomerData] = useState<{
+    customerName: string;
+    customerData: any;
+  } | null>(null);
 
   // Fetch customer data based on the search term
   const { data, isFetching, refetch } = useQuery({
@@ -75,11 +80,22 @@ const CustomerSearch = ({
         if (isSpammed) {
           setSpamDetails(spamResponse.result);
           setIsSpamDialogOpen(true);
+
+          // Save customer data for "Continue Trip" use
+          setSelectedCustomerData({ customerName, customerData });
           return;
         }
       } catch (error) {
         console.error("Error checking customer spam status:", error);
       }
+
+      // scroll to bottom
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 500);
     }
 
     setSearchTerm(customerName);
@@ -96,7 +112,15 @@ const CustomerSearch = ({
         isSpamDialogOpen={isSpamDialogOpen}
         setIsSpamDialogOpen={setIsSpamDialogOpen}
         spamDetails={spamDetails!}
-        onContinue={() => setIsSpamDialogOpen(false)}
+        onContinue={() => {
+          if (selectedCustomerData) {
+            const { customerName, customerData } = selectedCustomerData;
+            setSearchTerm(customerName);
+            setOpen(false);
+            onChangeHandler(customerName, customerData);
+          }
+          setIsSpamDialogOpen(false);
+        }}
       />
 
       {/* Dropdown */}

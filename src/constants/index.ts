@@ -174,7 +174,7 @@ export const TripEndFormDefaultValues: TripEndFormType = {
   finesCollected: [],
   salikCollected: [],
   additionalCharges: [], // Initially no additional charges
-  discounts: "", // Optional
+  discounts: "0",
   totalAmountCollected: "",
 };
 

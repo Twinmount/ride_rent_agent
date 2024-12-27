@@ -11,7 +11,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const HourlyRentalDetailFormField = () => {
+const HourlyRentalDetailFormField = ({
+  isDisabled = false,
+}: {
+  isDisabled?: boolean;
+}) => {
   const { control, watch, clearErrors } = useFormContext();
   const isEnabled = watch("rentalDetails.hour.enabled");
 
@@ -32,6 +36,7 @@ const HourlyRentalDetailFormField = () => {
               }}
               className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
               id="rentalDetails-hour-enabled"
+              disabled={isDisabled}
             />
             <label
               htmlFor="rentalDetails-hour-enabled"
@@ -64,8 +69,12 @@ const HourlyRentalDetailFormField = () => {
                       clearErrors("rentalDetails");
                     }}
                     value={field.value || ""}
+                    disabled={isDisabled}
                   >
-                    <SelectTrigger className="ring-0 select-field focus:ring-0 input-fields">
+                    <SelectTrigger
+                      disabled={isDisabled}
+                      className="ring-0 select-field focus:ring-0 input-fields"
+                    >
                       <SelectValue
                         className="!font-bold !text-black"
                         placeholder="Select hour"
@@ -121,6 +130,7 @@ const HourlyRentalDetailFormField = () => {
                       field.onChange(e);
                       clearErrors(`rentalDetails`);
                     }}
+                    readOnly={isDisabled}
                   />
                   <FormDescription>
                     Specify the hourly rental price in AED.
@@ -161,6 +171,7 @@ const HourlyRentalDetailFormField = () => {
                       field.onChange(e);
                       clearErrors(`rentalDetails`);
                     }}
+                    readOnly={isDisabled}
                   />
                   <FormDescription>
                     Specify the mileage limit for hourly rentals &#40;in

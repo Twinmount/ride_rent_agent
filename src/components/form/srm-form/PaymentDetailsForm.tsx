@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SRMPaymentDetailsFormDefaultValues } from "@/constants";
 import { SRMPaymentDetailsFormSchema } from "@/lib/validator";
-import { SRMPaymentDetailsFormType } from "@/types/srm-types";
+import { RentalDetails, SRMPaymentDetailsFormType } from "@/types/srm-types";
 import "react-international-phone/style.css";
 
 import { toast } from "@/components/ui/use-toast";
@@ -33,6 +33,7 @@ import { validateSecurityDeposit } from "@/helpers/form";
 import { CalendarDays } from "lucide-react";
 import { calculateRentalAmount } from "@/helpers";
 import { useFormValidationToast } from "@/hooks/useFormValidationToast";
+import { useState } from "react";
 
 type SRMPaymentDetailsFormProps = {
   type: "Add" | "Update";
@@ -40,23 +41,16 @@ type SRMPaymentDetailsFormProps = {
 };
 
 // Mock rental details (replace with actual props later if needed)
-const mockRentalDetails = {
-  day: { enabled: true, rentInAED: "234", mileageLimit: "2342" },
-  week: { enabled: true, rentInAED: "554", mileageLimit: "554" },
-  month: { enabled: true, rentInAED: "123", mileageLimit: "553" },
-  hour: {
-    enabled: true,
-    rentInAED: "12",
-    mileageLimit: "1234",
-    minBookingHours: "2",
-  },
-};
 
 export default function SRMPaymentDetailsForm({
   type,
   formData,
 }: SRMPaymentDetailsFormProps) {
   const {} = useParams<{}>();
+  const bookingId = sessionStorage.getItem("bookingId");
+  const [rentalDetails, setRentalDetails] = useState<RentalDetails | null>(
+    null
+  );
 
   const navigate = useNavigate();
 
@@ -74,8 +68,6 @@ export default function SRMPaymentDetailsForm({
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof SRMPaymentDetailsFormSchema>) {
-    const bookingId = sessionStorage.getItem("bookingId"); // Retrieve bookingId
-
     if (!bookingId) {
       toast({
         variant: "destructive",
@@ -103,7 +95,7 @@ export default function SRMPaymentDetailsForm({
       let data;
       if (type === "Add") {
         data = await addPaymentDetailsForm(values);
-        const paymentId = data.result.id;
+        const paymentId = data?.result?.id;
 
         const bookingStartDate = values.bookingStartDate;
         const bookingEndDate = values.bookingEndDate;
@@ -114,24 +106,26 @@ export default function SRMPaymentDetailsForm({
           bookingStartDate: bookingStartDate.toISOString(),
           bookingEndDate: bookingEndDate.toISOString(),
         });
-      } else if (type === "Update") {
-        // data = await updatePaymentDetailsForm(values);
+
+        // Safely clear the sessionStorage after successful form submission
+        sessionStorage.removeItem("bookingId");
       }
 
       if (data) {
         toast({
-          title: `Vehicle ${type.toLowerCase()}ed successfully`,
+          title: `Trip ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
         });
 
         // Safely clear the sessionStorage after successful form submission
         sessionStorage.removeItem("bookingId");
-        navigate("/");
+        sessionStorage.removeItem("rentalDetails");
+        navigate("/srm/ongoing-trips");
       }
     } catch (error) {
       toast({
         variant: "destructive",
-        title: `${type} Vehicle failed`,
+        title: `Payment ${type} failed`,
         description: "Something went wrong",
       });
 
@@ -148,10 +142,17 @@ export default function SRMPaymentDetailsForm({
   const advanceAmount = form.watch("advanceAmount");
 
   useEffect(() => {
+    const storedRentalDetails = sessionStorage.getItem("rentalDetails");
+    if (storedRentalDetails) {
+      setRentalDetails(JSON.parse(storedRentalDetails));
+    }
+  }, []);
+
+  useEffect(() => {
     // Perform calculation only if both bookingStartDate and bookingEndDate are provided
     if (bookingStartDate && bookingEndDate) {
       const baseRentalAmount = calculateRentalAmount(
-        mockRentalDetails,
+        rentalDetails as RentalDetails,
         bookingStartDate.toISOString(),
         bookingEndDate.toISOString()
       );
@@ -209,6 +210,7 @@ export default function SRMPaymentDetailsForm({
                           wrapperClassName="datePicker text-base w-full"
                           placeholderText="DD/MM/YYYY"
                           id="bookingStartDate"
+                          minDate={new Date()}
                         />
                       </div>
                     </FormControl>

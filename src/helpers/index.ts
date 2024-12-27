@@ -71,16 +71,11 @@ interface RentalDetails {
 /**
  * Calculates the total rental amount based on the rental details and booking period.
  *
- * This function takes into account the enabled rental periods (month, week, day, hour) and their respective rates.
- * It calculates the total amount by determining how many complete months, weeks, and days fit into the booking period,
- * and charges the corresponding rates. For hourly rentals, it considers the minimum booking hours.
- *
- * @param rentalDetails - An object containing enabled flags, rates (in AED), and mileage limits for each rental period.
+ * @param rentalDetails - An object containing rates (in AED) for each rental period.
  * @param bookingStartDate - The start date of the booking in string format.
  * @param bookingEndDate - The end date of the booking in string format.
  * @returns The total rental amount for the specified booking period.
  */
-
 export const calculateRentalAmount = (
   rentalDetails: RentalDetails,
   bookingStartDate: string,
@@ -89,39 +84,42 @@ export const calculateRentalAmount = (
   const startDate = new Date(bookingStartDate);
   const endDate = new Date(bookingEndDate);
 
+  // Calculate total hours between start and end dates
   let remainingHours = differenceInHours(endDate, startDate);
   let totalAmount = 0;
 
-  // Calculate months
-  if (rentalDetails.month.enabled && remainingHours >= 24 * 30) {
-    const months = Math.floor(remainingHours / (24 * 30));
+
+
+  const hoursInMonth = 24 * 30;
+  const hoursInWeek = 24 * 7;
+  const hoursInDay = 24;
+
+  // Calculate rental for months
+  const months = Math.floor(remainingHours / hoursInMonth);
+  if (months > 0) {
     totalAmount += months * parseFloat(rentalDetails.month.rentInAED);
-    remainingHours -= months * 24 * 30;
+    remainingHours -= months * hoursInMonth;
+
   }
 
-  // Calculate weeks
-  if (rentalDetails.week.enabled && remainingHours >= 24 * 7) {
-    const weeks = Math.floor(remainingHours / (24 * 7));
+  // Calculate rental for weeks
+  const weeks = Math.floor(remainingHours / hoursInWeek);
+  if (weeks > 0) {
     totalAmount += weeks * parseFloat(rentalDetails.week.rentInAED);
-    remainingHours -= weeks * 24 * 7;
+    remainingHours -= weeks * hoursInWeek;
+    
   }
 
-  // Calculate days
-  if (rentalDetails.day.enabled && remainingHours >= 24) {
-    const days = Math.floor(remainingHours / 24);
+  // Calculate rental for days
+  const days = Math.floor(remainingHours / hoursInDay);
+  if (days > 0) {
     totalAmount += days * parseFloat(rentalDetails.day.rentInAED);
-    remainingHours -= days * 24;
+    remainingHours -= days * hoursInDay;
   }
 
-  // Calculate hours
-  if (rentalDetails.hour.enabled && remainingHours > 0) {
-    const minBookingHours = parseInt(
-      rentalDetails.hour.minBookingHours || "1",
-      10
-    );
-    if (remainingHours >= minBookingHours) {
-      totalAmount += remainingHours * parseFloat(rentalDetails.hour.rentInAED);
-    }
+  // Calculate rental for remaining hours
+  if (remainingHours > 0) {
+    totalAmount += remainingHours * parseFloat(rentalDetails.hour.rentInAED);
   }
 
   return totalAmount;
@@ -136,6 +134,8 @@ export const calculateFinalAmount = (
 
   // Add base rental, additional charges total, subtract discount, and add 5% tax
   let finalAmount = baseAmount + additionalChargesTotal - discountAmount;
+
+ 
 
   // Add 5% tax
   finalAmount += finalAmount * 0.05;

@@ -1,7 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { load, StorageKeys } from "@/utils/storage";
-import { jwtDecode } from "jwt-decode";
-import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
 import { getCompany } from "@/api/company";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";

@@ -2,16 +2,16 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
 import { SortDropdown } from "@/components/SortDropdown";
-import { LimitDropdown } from "@/components/LimitDropdown";
 import { CompletedTripsTable } from "@/components/table/CompletedTripsTable";
 import { CompletedTripsColumns } from "@/components/table/columns/CompletedTripsColumn";
 import CompletedTripsInvoiceDownloadModal from "@/components/modal/srm-modal/CompletedTripsInvoiceDownloadModal";
-import { fetchCompletedTrips } from "@/api/srm/trips";
+import { fetchSRMBookings } from "@/api/srm/trips";
 import DownloadExcelModal from "@/components/srm/DownloadSRMExcelData";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import Search from "@/components/Search";
 import { BookingStatus } from "@/types/srm-types";
+import { useCompany } from "@/hooks/useCompany";
 
 export default function CompletedTripsPage() {
   const [page, setPage] = useState(1);
@@ -20,22 +20,26 @@ export default function CompletedTripsPage() {
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
   const [downloadTripId, setDownloadTripId] = useState<string | null>(null);
 
+  const { companyId, isCompanyLoading } = useCompany();
+
   const { data, isLoading } = useQuery({
     queryKey: ["completedTrips", page, limit, search, sortOrder],
     queryFn: () =>
-      fetchCompletedTrips({
+      fetchSRMBookings({
         page,
         limit,
         sortOrder,
         search,
         bookingStatus: BookingStatus.COMPLETED,
+        companyId,
       }),
     staleTime: 0,
+    enabled: !!companyId && !isCompanyLoading,
   });
 
-  const handleDownloadModal = (tripId: string) => {
-    setDownloadTripId(tripId);
-  };
+  // const handleDownloadModal = (tripId: string) => {
+  //   setDownloadTripId(tripId);
+  // };
 
   const handleCloseModal = () => {
     setDownloadTripId(null);
@@ -59,7 +63,10 @@ export default function CompletedTripsPage() {
           description={
             <p className=" italic text-gray-600">
               You can search with{" "}
-              <b>brand, registration number, customer name</b>
+              <b>
+                brand, registration number, customer name, passport, license and
+                phone number
+              </b>
             </p>
           }
         />
@@ -87,7 +94,7 @@ export default function CompletedTripsPage() {
       </div>
 
       <CompletedTripsTable
-        columns={CompletedTripsColumns(handleDownloadModal)}
+        columns={CompletedTripsColumns()}
         data={tripData}
         loading={isLoading}
       />
