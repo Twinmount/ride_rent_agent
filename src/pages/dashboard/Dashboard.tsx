@@ -3,16 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchPortfolioStats, fetchEnquiriesStats } from "@/api/dashboard";
 import { format, startOfMonth, endOfDay } from "date-fns";
 import DashboardSkelton from "@/components/loading-skelton/DashboardSkelton";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { fetchAllVehicles } from "@/api/vehicle";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
-import { load, StorageKeys } from "@/utils/storage";
-import { jwtDecode } from "jwt-decode";
-import { toast } from "@/components/ui/use-toast";
-import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
+import useUserId from "@/hooks/useUserId";
 
 const AgentDashboard: React.FC = () => {
-  const navigate = useNavigate();
   const currentDate = new Date();
   const startOfMonthDate = startOfMonth(currentDate);
   const endOfDayDate = endOfDay(currentDate);
@@ -20,28 +16,7 @@ const AgentDashboard: React.FC = () => {
   const dateStartRange = format(startOfMonthDate, "yyyy-MM-dd");
   const dateEndRange = format(endOfDayDate, "yyyy-MM-dd");
 
-  let userId = load<string>(StorageKeys.USER_ID);
-
-  // If not found, decode from refresh token
-  if (!userId) {
-    const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
-    if (refreshToken) {
-      try {
-        const decodedRefreshToken = jwtDecode<DecodedRefreshToken>(
-          refreshToken as string
-        );
-        userId = decodedRefreshToken?.userId;
-      } catch (error) {
-        console.error("Error decoding the refresh token", error);
-        toast({
-          variant: "destructive",
-          title: "Invalid token! Login to continue",
-        });
-        navigate("/login", { replace: true });
-        return null;
-      }
-    }
-  }
+  const { userId } = useUserId();
 
   // Fetch vehicles if userId is present
   const { data, isLoading } = useQuery({

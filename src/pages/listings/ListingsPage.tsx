@@ -1,12 +1,12 @@
 import { useState } from "react";
-import ListedVehicles from "@/components/common/ListedVehicles";
-import { useQuery } from "@tanstack/react-query";
+import ListedVehicles from "@/components/ListedVehicles";
 import Pagination from "@/components/Pagination";
-import { fetchAllVehicles } from "@/api/vehicle";
 import VehicleFilters from "@/components/VehicleFilters";
 import { ApprovalStatusTypes } from "@/types/types";
 import Search from "@/components/Search";
 import { useCompany } from "@/hooks/useCompany";
+import { useVehicles } from "./ListingPage.hooks";
+import { Link } from "react-router-dom";
 
 export default function ListingsPage() {
   const [page, setPage] = useState(1);
@@ -18,24 +18,19 @@ export default function ListingsPage() {
   });
 
   // accessing userId, companyId, and isCompanyLoading from useCompany hook
-  const { userId, companyId, isCompanyLoading } = useCompany();
+  const { userId, isCompanyLoading } = useCompany();
 
   // Fetch vehicles if userId is present
-  const { data, isLoading, isRefetching } = useQuery({
-    queryKey: ["vehicles", page, search, filters.approvalStatus],
-    queryFn: () =>
-      fetchAllVehicles({
-        page,
-        limit: 10,
-        sortOrder: "DESC",
-        userId: userId as string,
-        search: search || undefined,
-        approvalStatus:
-          filters.approvalStatus !== "ALL" ? filters.approvalStatus : undefined,
-      }),
-
-    enabled: !!companyId && !!userId,
+  const { data, isLoading, isRefetching } = useVehicles({
+    page: 1,
+    filter: filters.approvalStatus,
+    limit: 15,
+    userId,
   });
+
+  const vehicles = data?.result.list || [];
+
+  const totalNumberOfPages = data?.result.totalNumberOfPages || 0;
 
   return (
     <section className="p-3 pt-8 h-auto min-h-screen lg:p-6">
@@ -47,33 +42,46 @@ export default function ListingsPage() {
         </div>
       </div>
 
-      {/* search vehicle */}
-      <Search
-        search={search}
-        setSearch={setSearch}
-        placeholder="Search model..."
-      />
+      <div className="flex justify-between gap-2 items-start ">
+        {/* search vehicle */}
+        <Search
+          search={search}
+          setSearch={setSearch}
+          placeholder="Search model..."
+        />
+        <Link
+          to={`/listings/add/${userId}`}
+          className="max-sm:hidden md:mr-4 lg:mr-8 flex-center bg-yellow text-white py-2 whitespace-nowrap w-32 min-w-32 font-semibold rounded-2xl hover:scale-[1.02] transition-all"
+        >
+          Add Vehicle +
+        </Link>
+      </div>
 
       {/* filters */}
       <VehicleFilters filters={filters} setFilters={setFilters} />
 
       {/* Listed Vehicles */}
       <ListedVehicles
-        vehicles={data?.result.list || []}
+        vehicles={vehicles || []}
         isLoading={isLoading || isCompanyLoading || isRefetching}
-        userId={userId as string}
-        companyId={companyId as string}
         search={search}
-        filters={filters}
       />
 
-      {(data?.result.totalNumberOfPages as number) > 0 && (
+      {totalNumberOfPages > 0 && (
         <Pagination
           page={page}
           setPage={setPage}
-          totalPages={data?.result.totalNumberOfPages as number}
+          totalPages={totalNumberOfPages}
         />
       )}
+
+      {/* mobile floating add vehicle button */}
+      <Link
+        to={`/listings/add/${userId}`}
+        className="sm:hidden fixed bottom-12 right-8 flex-center bg-yellow z-30 text-white py-2 whitespace-nowrap w-32 min-w-32 font-semibold rounded-2xl hover:scale-[1.02] transition-all shadow-lg"
+      >
+        Add Vehicle +
+      </Link>
     </section>
   );
 }

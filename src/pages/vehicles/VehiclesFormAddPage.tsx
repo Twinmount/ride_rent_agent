@@ -13,9 +13,7 @@ import { useQuery } from "@tanstack/react-query";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import { getPrimaryDetailsFormDefaultData } from "@/api/vehicle";
 import { getCompany } from "@/api/company";
-import { load, StorageKeys } from "@/utils/storage";
-import { jwtDecode } from "jwt-decode";
-import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
+import useUserId from "@/hooks/useUserId";
 
 // Lazy-loaded components
 const PrimaryDetailsForm = lazy(
@@ -33,28 +31,7 @@ export default function VehiclesFormAddPage() {
   const [activeTab, setActiveTab] = useState<TabsTypes>("primary");
   const [levelsFilled, setLevelsFilled] = useState<number>(0); // Default starting level
 
-  let userId = load<string>(StorageKeys.USER_ID);
-
-  // If not found, decode from refresh token
-  if (!userId) {
-    const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
-    if (refreshToken) {
-      try {
-        const decodedRefreshToken = jwtDecode<DecodedRefreshToken>(
-          refreshToken as string
-        );
-        userId = decodedRefreshToken?.userId;
-      } catch (error) {
-        console.error("Error decoding the refresh token", error);
-        toast({
-          variant: "destructive",
-          title: "Invalid token! Login to continue",
-        });
-        navigate("/login", { replace: true });
-        return null;
-      }
-    }
-  }
+  const { userId } = useUserId();
 
   // Fetch company data based on userId
   const { data: companyData, isLoading: isCompanyLoading } = useQuery({

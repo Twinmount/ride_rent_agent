@@ -23,10 +23,10 @@ export default function VehicleFilters({
         <button
           key={option.value}
           onClick={() => setFilters({ approvalStatus: option.value })}
-          className={`px-2 text-sm  rounded-lg outline-none ring-0 ${
+          className={`px-2 text-sm  rounded-lg outline-none ring-0 hover:bg-yellow hover:text-white transition-colors shadow-lg border border-gray-300 ${
             filters.approvalStatus === option.value
-              ? "bg-yellow text-black"
-              : "border border-gray-400 bg-white  text-black"
+              ? "bg-yellow text-white"
+              : " bg-white  text-black"
           }`}
         >
           {option.label}
