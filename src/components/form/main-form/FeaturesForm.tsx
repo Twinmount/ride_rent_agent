@@ -23,6 +23,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { formatFeatures } from "@/helpers/form";
 import { useEffect } from "react";
+import { useFeaturesFormQuery } from "@/hooks/useFormQuery";
 
 type FeaturesFormType = Record<string, string[] | null>;
 
@@ -47,31 +48,10 @@ export default function FeaturesForm({
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const { data, isLoading } = useQuery({
-    queryKey: [
-      isAddOrIncomplete ? "features-form-data" : "features-update-form-data",
-      vehicleId,
-    ],
-    /**
-     * Function to fetch features form data.
-     * If `isAddOrIncomplete` is true, fetches all features for the given vehicle category.
-     * If `isAddOrIncomplete` is false, fetches existing features for the given vehicle.
-     * @returns {Promise<FeaturesFormResponse>}
-     */
-    queryFn: async () => {
-      if (isAddOrIncomplete) {
-        const data = await getFeaturesFormFieldsData({
-          vehicleCategoryId: vehicleCategoryId as string,
-        });
-        return {
-          ...data,
-          result: data.result.list,
-        };
-      } else {
-        return await getFeaturesFormData(vehicleId);
-      }
-    },
-    enabled: !!vehicleId,
+  const { data, isLoading } = useFeaturesFormQuery({
+    vehicleId,
+    vehicleCategoryId,
+    isAddOrIncomplete: !!isAddOrIncomplete,
   });
 
   const form = useForm<FeaturesFormType>({

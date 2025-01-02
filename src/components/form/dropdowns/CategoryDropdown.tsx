@@ -15,7 +15,7 @@ type CategoryDropdownProps = {
   placeholder?: string;
   isDisabled?: boolean;
   setIsCarsCategory?: (isCars: boolean) => void;
-  setHideCommercialLicenses?: (value: boolean) => void;
+  setHideCommercialLicenses: (value: boolean) => void;
 };
 
 type CategoryType = {
@@ -74,8 +74,8 @@ const CategoryDropdown = ({
 
   return (
     <Select
-      value={value}
       onValueChange={handleChange}
+      defaultValue={value}
       disabled={isDisabled || isLoading}
     >
       <SelectTrigger className="ring-0 select-field focus:ring-0 input-fields">

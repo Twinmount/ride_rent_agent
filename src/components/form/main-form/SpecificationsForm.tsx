@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
@@ -11,12 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import SpecificationDropdown from "../dropdowns/SpecificationDropdown";
 import { useVehicleIdentifiers } from "@/hooks/useVehicleIdentifiers";
-import {
-  addSpecifications,
-  getSpecificationFormData,
-  getSpecificationFormFieldData,
-  updateSpecifications,
-} from "@/api/vehicle";
+import { addSpecifications, updateSpecifications } from "@/api/vehicle";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import Spinner from "@/components/general/Spinner";
 import { toast } from "@/components/ui/use-toast";
@@ -24,6 +19,7 @@ import { formatSpecifications, hasSelected } from "@/helpers/form";
 import { SpecificationFormData } from "@/types/API-types";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
+import { useSpecificationFormQuery } from "@/hooks/useFormQuery";
 
 type SpecificationFormType = Record<string, string | null>;
 
@@ -52,28 +48,11 @@ export default function SpecificationsForm({
   }, []);
 
   // useQuery for fetching form data, now relying on levelsFilled
-  const { data, isLoading } = useQuery({
-    queryKey: [
-      isAddOrIncomplete
-        ? "specification-form-data"
-        : "specification-update-form-data",
-      vehicleId,
-    ],
-    queryFn: async () => {
-      if (isAddOrIncomplete) {
-        const data = await getSpecificationFormFieldData({
-          vehicleCategoryId: vehicleCategoryId as string,
-          vehicleTypeId: vehicleTypeId as string,
-        });
-        return {
-          ...data,
-          result: data.result.list,
-        };
-      } else {
-        return await getSpecificationFormData(vehicleId);
-      }
-    },
-    enabled: !!vehicleId,
+  const { data, isLoading } = useSpecificationFormQuery({
+    vehicleId,
+    vehicleCategoryId,
+    vehicleTypeId,
+    isAddOrIncomplete: !!isAddOrIncomplete,
   });
 
   const fields = data?.result || [];

@@ -26,9 +26,7 @@ import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import RentalDetailsFormField from "../RentalDetailsFormField";
 import {
-  deleteMultipleFiles,
-  validateRentalDetails,
-  validateSecurityDeposit,
+  validateRentalDetailsAndSecurityDeposit,
 } from "@/helpers/form";
 import BrandsDropdown from "../dropdowns/BrandsDropdown";
 import DatePicker from "react-datepicker";
@@ -39,7 +37,7 @@ import VehicleTypesDropdown from "../dropdowns/VehicleTypesDropdown";
 import StatesDropdown from "../dropdowns/StatesDropdown";
 import { save, StorageKeys } from "@/utils/storage";
 import { toast } from "@/components/ui/use-toast";
-import { addPrimaryDetailsForm, updatePrimaryDetailsForm } from "@/api/vehicle";
+
 import Spinner from "@/components/general/Spinner";
 import { useParams } from "react-router-dom";
 import { ApiError } from "@/types/types";
@@ -50,6 +48,11 @@ import SecurityDepositField from "../SecurityDepositField";
 
 import { useFormValidationToast } from "@/hooks/useFormValidationToast";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  showFileUploadInProgressToast,
+  showSuccessToast,
+} from "@/utils/toastUtils";
+import { handleLevelOneFormSubmission } from "@/utils/form-utils";
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
@@ -89,65 +92,38 @@ export default function PrimaryDetailsForm({
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof PrimaryFormSchema>) {
-    const rentalError = validateRentalDetails(values.rentalDetails);
-    if (rentalError) {
-      form.setError("rentalDetails", {
-        type: "manual",
-        message: rentalError,
-      });
-      form.setFocus("rentalDetails");
-      return;
-    }
+    const validationError = validateRentalDetailsAndSecurityDeposit(values);
 
-    const securityDepositError = validateSecurityDeposit(
-      values.securityDeposit
-    );
-
-    if (securityDepositError) {
-      form.setError("securityDeposit", {
+    if (validationError) {
+      form.setError(validationError.fieldName, {
         type: "manual",
-        message: securityDepositError,
+        message: validationError.errorMessage,
       });
-      form.setFocus("securityDeposit");
+      form.setFocus(validationError.fieldName);
       return;
     }
 
     if (isPhotosUploading || isLicenseUploading) {
-      toast({
-        title: "File Upload in Progress",
-        description:
-          "Please wait until the file upload completes before submitting the form.",
-        duration: 3000,
-        className: "bg-orange",
-      });
+      showFileUploadInProgressToast();
       return;
     }
 
     // Append other form data
     try {
-      let data;
-      if (type === "Add") {
-        data = await addPrimaryDetailsForm(
-          values as PrimaryFormType,
+      const data = await handleLevelOneFormSubmission(
+        type,
+        values as PrimaryFormType,
+        {
           countryCode,
-          userId as string,
-          isCarsCategory
-        );
-      } else if (type === "Update") {
-        data = await updatePrimaryDetailsForm(
-          vehicleId as string,
-          values as PrimaryFormType,
-          countryCode as string,
-          isCarsCategory
-        );
-      }
+          userId,
+          vehicleId,
+          isCarsCategory,
+          deletedFiles,
+        }
+      );
 
       if (data) {
-        await deleteMultipleFiles(deletedFiles);
-        toast({
-          title: `Vehicle ${type.toLowerCase()} successful`,
-          className: "bg-yellow text-white",
-        });
+        showSuccessToast(type);
 
         if (type === "Add") {
           save(StorageKeys.VEHICLE_ID, data.result.vehicleId);

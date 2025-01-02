@@ -7,6 +7,7 @@ import {
 } from "@/types/API-types";
 import { PrimaryFormType, SRMTabsTypes, TabsTypes } from "@/types/types";
 import { deleteFile } from "@/api/file-upload";
+import { PrimaryFormSchema } from "@/lib/validator";
 
 type SpecificationOption = { label: string; value: string };
 
@@ -510,4 +511,28 @@ export const deleteMultipleFiles = async (
     console.error("Error deleting files:", error);
     throw error; // Optional: re-throw the error if you want to handle it in the form
   }
+};
+
+// helpers/validateFormFields.ts
+type FieldName = keyof z.infer<typeof PrimaryFormSchema>;
+
+interface ValidationError {
+  fieldName: FieldName;
+  errorMessage: string;
+}
+
+export const validateRentalDetailsAndSecurityDeposit = (
+  values: z.infer<typeof PrimaryFormSchema>
+): ValidationError | null => {
+  const rentalError = validateRentalDetails(values.rentalDetails);
+  if (rentalError) {
+    return { fieldName: "rentalDetails", errorMessage: rentalError };
+  }
+
+  const securityDepositError = validateSecurityDeposit(values.securityDeposit);
+  if (securityDepositError) {
+    return { fieldName: "securityDeposit", errorMessage: securityDepositError };
+  }
+
+  return null;
 };
