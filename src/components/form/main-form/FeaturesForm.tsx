@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
@@ -13,8 +13,6 @@ import MultiSelectDropdown from "../dropdowns/MultiSelectDropdown";
 import { useVehicleIdentifiers } from "@/hooks/useVehicleIdentifiers";
 import {
   addFeatures,
-  getFeaturesFormData,
-  getFeaturesFormFieldsData,
   updateFeatures,
 } from "@/api/vehicle";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";

@@ -226,7 +226,6 @@ export default function SRMVehicleDetailsForm({
                     <CategoryDropdown
                       onChangeHandler={(value) => {
                         field.onChange(value);
-
                         form.setValue("vehicleBrandId", "");
                       }}
                       value={initialValues.vehicleCategoryId || field.value}

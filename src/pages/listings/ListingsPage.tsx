@@ -53,7 +53,7 @@ export default function ListingsPage() {
           to={`/listings/add/${userId}`}
           className="max-sm:hidden md:mr-4 lg:mr-8 flex-center bg-yellow text-white py-2 whitespace-nowrap w-32 min-w-32 font-semibold rounded-2xl hover:scale-[1.02] transition-all"
         >
-          Add Vehicle +
+          List Vehicle +
         </Link>
       </div>
 
@@ -80,7 +80,7 @@ export default function ListingsPage() {
         to={`/listings/add/${userId}`}
         className="sm:hidden fixed bottom-12 right-8 flex-center bg-yellow z-30 text-white py-2 whitespace-nowrap w-32 min-w-32 font-semibold rounded-2xl hover:scale-[1.02] transition-all shadow-lg"
       >
-        Add Vehicle +
+        List Vehicle +
       </Link>
     </section>
   );
