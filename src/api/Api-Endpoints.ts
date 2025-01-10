@@ -67,4 +67,38 @@ export enum Slug {
   // dashboard end points
   GET_ENQUIRIES = "/queries",
   GET_PORTFOLIO = "/portfolio",
+
+  // SRM Form endpoints
+  // SRM CUSTOMERS
+  POST_SRM_CUSTOMER_FORM = "/srm-customers",
+  PUT_SRM_CUSTOMER_FORM = "/srm-customers",
+  GET_SRM_CUSTOMER_FORM = "/srm-customers",
+  GET_SRM_CUSTOMER_FORM_BY_ID = "/srm-customers",
+  GET_SRM_CUSTOMER_LIST = "/srm-customers/list",
+
+  // SRM VEHICLES
+  POST_SRM_VEHICLE_FORM = "srm-vehicle",
+  GET_SRM_VEHICLE_FORM = "srm-vehicle",
+  GET_SRM_VEHICLE_LIST = "srm-vehicle/list",
+  PUT_SRM_VEHICLE_FORM = "srm-vehicle",
+
+  // SRM PAYMENTS
+  POST_SRM_PAYMENT_FORM = "/srm-payment",
+  GET_SRM_PAYMENT_FORM = "/srm-payment",
+  PUT_SRM_PAYMENT_FORM = "/srm-payment",
+
+  // SRM BOOKINGS (customer, vehicle and payment)
+  POST_SRM_BOOKING_CUSTOMER = "/srm-bookings/customer",
+  PUT_SRM_BOOKING_VEHICLE = "/srm-bookings/vehicle",
+  PUT_SRM_BOOKING_PAYMENT = "/srm-bookings/payment",
+  GET_SRM_IS_CUSTOMER_SPAM = "/srm-bookings/customer/is-spammed-customer",
+  GET_SRM_UPCOMING_BOOKINGS = "/srm-bookings/vehicle/upcoming-booking-dates",
+
+  // SRM TRIPS
+  GET_SRM_TRIP_BY_BOOKING_ID = "/srm-bookings",
+  GET_SRM_TRIPS = "/srm-bookings/list",
+  POST_SRM_END_TRIP = "/srm-bookings/end-trip",
+  GET_SRM_END_TRIP = "/srm-bookings/end-trip",
+  GET_SRM_EXTEND_TRIP = "/srm-bookings/extend-trip",
+  POST_EXTEND_TRIP = "/srm-bookings/extend-trip",
 }

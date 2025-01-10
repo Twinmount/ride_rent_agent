@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -16,8 +16,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { PrimaryFormDefaultValues } from "@/constants";
 import { PrimaryFormSchema } from "@/lib/validator";
+import { PrimaryFormDefaultValues } from "@/constants";
 import { PrimaryFormType } from "@/types/types";
 import YearPicker from "../YearPicker";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -25,11 +25,7 @@ import { Label } from "@/components/ui/label";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import RentalDetailsFormField from "../RentalDetailsFormField";
-import {
-  deleteMultipleFiles,
-  validateRentalDetails,
-  validateSecurityDeposit,
-} from "@/helpers/form";
+import { validateRentalDetailsAndSecurityDeposit } from "@/helpers/form";
 import BrandsDropdown from "../dropdowns/BrandsDropdown";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -39,7 +35,7 @@ import VehicleTypesDropdown from "../dropdowns/VehicleTypesDropdown";
 import StatesDropdown from "../dropdowns/StatesDropdown";
 import { save, StorageKeys } from "@/utils/storage";
 import { toast } from "@/components/ui/use-toast";
-import { addPrimaryDetailsForm, updatePrimaryDetailsForm } from "@/api/vehicle";
+
 import Spinner from "@/components/general/Spinner";
 import { useParams } from "react-router-dom";
 import { ApiError } from "@/types/types";
@@ -47,13 +43,21 @@ import { GcsFilePaths } from "@/constants/enum";
 import MultipleFileUpload from "../file-uploads/MultipleFileUpload";
 import AdditionalTypesDropdown from "../dropdowns/AdditionalTypesDropdown";
 import SecurityDepositField from "../SecurityDepositField";
+
+import { useFormValidationToast } from "@/hooks/useFormValidationToast";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  showFileUploadInProgressToast,
+  showSuccessToast,
+} from "@/utils/toastUtils";
+import { handleLevelOneFormSubmission } from "@/utils/form-utils";
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
   formData?: PrimaryFormType | null;
   onNextTab?: () => void;
   levelsFilled?: number;
+  initialCountryCode?: string;
 };
 
 export default function PrimaryDetailsForm({
@@ -61,8 +65,11 @@ export default function PrimaryDetailsForm({
   onNextTab,
   formData,
   levelsFilled,
+  initialCountryCode,
 }: PrimaryFormProps) {
-  const [countryCode, setCountryCode] = useState<string>("");
+  const [countryCode, setCountryCode] = useState<string>(
+    initialCountryCode || "+971"
+  );
   const [isPhotosUploading, setIsPhotosUploading] = useState(false);
   const [isLicenseUploading, setIsLicenseUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
@@ -87,68 +94,38 @@ export default function PrimaryDetailsForm({
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof PrimaryFormSchema>) {
-    const rentalError = validateRentalDetails(values.rentalDetails);
-    if (rentalError) {
-      form.setError("rentalDetails", {
-        type: "manual",
-        message: rentalError,
-      });
-      form.setFocus("rentalDetails");
-      return;
-    }
+    const validationError = validateRentalDetailsAndSecurityDeposit(values);
 
-    const securityDepositError = validateSecurityDeposit(
-      values.securityDeposit
-    );
-
-    if (securityDepositError) {
-      form.setError("securityDeposit", {
+    if (validationError) {
+      form.setError(validationError.fieldName, {
         type: "manual",
-        message: securityDepositError,
+        message: validationError.errorMessage,
       });
-      form.setFocus("securityDeposit");
+      form.setFocus(validationError.fieldName);
       return;
     }
 
     if (isPhotosUploading || isLicenseUploading) {
-      toast({
-        title: "File Upload in Progress",
-        description:
-          "Please wait until the file upload completes before submitting the form.",
-        duration: 3000,
-        className: "bg-orange",
-      });
+      showFileUploadInProgressToast();
       return;
     }
 
     // Append other form data
     try {
-      let data;
-      if (type === "Add") {
-        data = await addPrimaryDetailsForm(
-          values as PrimaryFormType,
+      const data = await handleLevelOneFormSubmission(
+        type,
+        values as PrimaryFormType,
+        {
           countryCode,
-          userId as string,
-          isCarsCategory
-        );
-      } else if (type === "Update") {
-        data = await updatePrimaryDetailsForm(
-          vehicleId as string,
-          values as PrimaryFormType,
-          countryCode as string,
-          isCarsCategory
-        );
-      }
+          userId,
+          vehicleId,
+          isCarsCategory,
+          deletedFiles,
+        }
+      );
 
       if (data) {
-        await deleteMultipleFiles(deletedFiles);
-      }
-
-      if (data) {
-        toast({
-          title: `Vehicle ${type.toLowerCase()} successful`,
-          className: "bg-yellow text-white",
-        });
+        showSuccessToast(type);
 
         if (type === "Add") {
           save(StorageKeys.VEHICLE_ID, data.result.vehicleId);
@@ -188,17 +165,8 @@ export default function PrimaryDetailsForm({
     }
   }
 
-  useEffect(() => {
-    // Check for validation errors and scroll to the top if errors are present
-    if (Object.keys(form.formState.errors).length > 0) {
-      toast({
-        variant: "destructive",
-        title: `Validation Error`,
-        description: "Please make sure values are provided",
-      });
-      window.scrollTo({ top: 65, behavior: "smooth" }); // Scroll to the top of the page
-    }
-  }, [form.formState.errors]);
+  // custom hook to validate complex form fields
+  useFormValidationToast(form);
 
   const vehicleCategoryId = form.watch("vehicleCategoryId");
 
@@ -585,6 +553,7 @@ export default function PrimaryDetailsForm({
               </FormItem>
             )}
           />
+
           {/* mobile */}
           <FormField
             control={form.control}

@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Check, ChevronDown } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn, debounce } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -75,17 +75,6 @@ const BrandsDropdown = ({
       setSelectedValue(value);
     }
   }, [value]);
-
-  const debounce = <T extends any[]>(
-    callback: (...args: T) => void,
-    delay: number
-  ) => {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: T) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => callback(...args), delay);
-    };
-  };
 
   // Debounced handle search
   const debouncedHandleSearch = React.useCallback(

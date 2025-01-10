@@ -1,0 +1,216 @@
+import { useState, useEffect, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { ChevronsUpDown } from "lucide-react";
+import { debounce } from "@/lib/utils";
+import { isCustomerSpam, searchCustomer } from "@/api/srm";
+import { BannedCustomerType, CustomerType } from "@/types/srm-types";
+import BannedUserPopup from "@/components/modal/srm-modal/BannedUserPopup";
+
+type CustomerSearchProps = {
+  value?: string;
+  onChangeHandler: (value: string, customerData?: any) => void;
+  placeholder?: string;
+};
+
+const CustomerSearch = ({
+  value,
+  onChangeHandler,
+  placeholder = "Search customer name...",
+}: CustomerSearchProps) => {
+  const [searchTerm, setSearchTerm] = useState(""); // Default to an empty string
+  const [open, setOpen] = useState(false);
+  const [isSpamDialogOpen, setIsSpamDialogOpen] = useState(false);
+  const [spamDetails, setSpamDetails] = useState<BannedCustomerType | null>(
+    null
+  );
+  // Store customer data for spam dialog interaction
+  const [selectedCustomerData, setSelectedCustomerData] = useState<{
+    customerName: string;
+    customerData: any;
+  } | null>(null);
+
+  // Fetch customer data based on the search term
+  const { data, isFetching, refetch } = useQuery({
+    queryKey: ["searchCustomer", searchTerm],
+    queryFn: () => searchCustomer(searchTerm),
+    enabled: false, // Do not fetch initially
+    staleTime: 0,
+  });
+
+  // Debounce the search function
+  const debouncedSearch = useCallback(
+    debounce((query: string) => {
+      if (query.trim()) {
+        refetch(); // Trigger the query only if a valid search term exists
+      }
+    }, 500),
+    [refetch]
+  );
+
+  // Handle search term changes
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      debouncedSearch(searchTerm);
+    }
+  }, [searchTerm, debouncedSearch]);
+
+  // Handle selecting a customer from the dropdown
+  const handleSelectCustomer = async (
+    customerName: string,
+    customerData?: any
+  ) => {
+    if (customerData?.id) {
+      try {
+        const spamResponse = await isCustomerSpam(customerData.id);
+        const { isSpammed } = spamResponse.result;
+
+        if (isSpammed) {
+          setSpamDetails(spamResponse.result);
+          setIsSpamDialogOpen(true);
+
+          // Save customer data for "Continue Trip" use
+          setSelectedCustomerData({ customerName, customerData });
+          return;
+        }
+      } catch (error) {
+        console.error("Error checking customer spam status:", error);
+      }
+
+      // scroll to bottom
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.body.scrollHeight,
+          behavior: "smooth",
+        });
+      }, 500);
+    }
+
+    setSearchTerm(customerName);
+    setOpen(false);
+    onChangeHandler(customerName, customerData);
+  };
+
+  const customerData = data?.result.list;
+
+  return (
+    <>
+      {/* Banned User Popup */}
+      <BannedUserPopup
+        isSpamDialogOpen={isSpamDialogOpen}
+        setIsSpamDialogOpen={setIsSpamDialogOpen}
+        spamDetails={spamDetails!}
+        onContinue={() => {
+          if (selectedCustomerData) {
+            const { customerName, customerData } = selectedCustomerData;
+            setSearchTerm(customerName);
+            setOpen(false);
+            onChangeHandler(customerName, customerData);
+          }
+          setIsSpamDialogOpen(false);
+        }}
+      />
+
+      {/* Dropdown */}
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            role="combobox"
+            aria-expanded={open}
+            className="w-full justify-between"
+          >
+            {value || placeholder}
+            <ChevronsUpDown className="opacity-50" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-96 max-w-full">
+          <Command>
+            <input
+              value={searchTerm}
+              placeholder={placeholder}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+              }}
+              className="w-full border-b outline-none focus:ring-0 h-10 text-sm"
+            />
+            <CommandList>
+              {isFetching ? (
+                <CommandEmpty>Loading...</CommandEmpty>
+              ) : customerData?.length ? (
+                <CommandGroup>
+                  {searchTerm && (
+                    <CommandItem
+                      key="manual-entry"
+                      onSelect={() => handleSelectCustomer(searchTerm, {})}
+                      className="border mb-1"
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium ">"{searchTerm}"</span>
+                      </div>
+                    </CommandItem>
+                  )}
+                  {customerData.map((customer: CustomerType) => (
+                    <CommandItem
+                      key={customer.id}
+                      onSelect={() =>
+                        handleSelectCustomer(customer.customerName, customer)
+                      }
+                      className="border mb-1"
+                    >
+                      <div className="flex flex-col ">
+                        <span className="font-medium">
+                          {customer.customerName}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          Passport: {customer.passportNumber || "N/A"}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          License: {customer.drivingLicenseNumber || "N/A"}
+                        </span>
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              ) : (
+                <>
+                  <CommandEmpty>
+                    {searchTerm.length > 0
+                      ? "No customers found"
+                      : "Search customer name..."}
+                  </CommandEmpty>
+                  {searchTerm && (
+                    <CommandGroup>
+                      <CommandItem
+                        key="manual-entry"
+                        onSelect={() => handleSelectCustomer(searchTerm, {})}
+                      >
+                        <div className="flex flex-col">
+                          <span className="font-medium">"{searchTerm}"</span>
+                        </div>
+                      </CommandItem>
+                    </CommandGroup>
+                  )}
+                </>
+              )}
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+    </>
+  );
+};
+
+export default CustomerSearch;

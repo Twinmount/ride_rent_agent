@@ -1,4 +1,5 @@
-import { Skeleton } from '../ui/skeleton'
+import { Skeleton } from "../ui/skeleton";
+
 
 export default function CitiesSkelton({ count = 4 }: { count: number }) {
   return (
@@ -8,11 +9,11 @@ export default function CitiesSkelton({ count = 4 }: { count: number }) {
         .map((_, index) => (
           <div
             key={index}
-            className="w-12 h-6 overflow-hidden bg-white rounded-lg shadow-md"
+            className="overflow-hidden w-12 h-6 bg-white rounded-lg shadow-md"
           >
-            <Skeleton className="w-full h-full bg-gray-200 " />
+            <Skeleton className="w-full h-full bg-gray-200" />
           </div>
         ))}
     </div>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import { Skeleton } from '../ui/skeleton'
+import { Skeleton } from "../ui/skeleton";
 
 export default function AdsSkelton() {
   return Array(4)
@@ -6,9 +6,9 @@ export default function AdsSkelton() {
     .map((_, index) => (
       <div
         key={index}
-        className="relative w-full overflow-hidden rounded-lg h-72 "
+        className="overflow-hidden relative w-full h-72 rounded-lg"
       >
-        <Skeleton className="w-full h-full bg-gray-300 " />
+        <Skeleton className="w-full h-full bg-gray-300" />
       </div>
-    ))
+    ));
 }

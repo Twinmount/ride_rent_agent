@@ -26,7 +26,7 @@ export default function CompanyRegistration() {
           failed to fetch your agent id
         </div>
       ) : (
-        <CompanyForm agentId={agentId as string} />
+        <CompanyForm type="Add" agentId={agentId as string} />
       )}
 
       {/* whatsapp floating button */}

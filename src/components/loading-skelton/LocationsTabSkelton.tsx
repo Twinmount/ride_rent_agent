@@ -1,4 +1,4 @@
-import { Skeleton } from '../ui/skeleton'
+import { Skeleton } from "../ui/skeleton";
 
 export default function LocationsTabSkelton({ count = 4 }: { count: number }) {
   return (
@@ -14,5 +14,5 @@ export default function LocationsTabSkelton({ count = 4 }: { count: number }) {
           </div>
         ))}
     </div>
-  )
+  );
 }

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 
-function SearchVehicle({
+function Search({
   search,
   setSearch,
-  placeholder = "Search vehicles...",
+  placeholder = "Search ...",
+  description,
 }: {
   search: string;
   setSearch: (value: string) => void;
   placeholder?: string;
+  description?: React.ReactNode;
 }) {
   const [inputValue, setInputValue] = useState(search); // Immediate input update
   const [debounceTimeout, setDebounceTimeout] = useState<NodeJS.Timeout | null>(
@@ -48,8 +50,9 @@ function SearchVehicle({
           className="bg-white w-full h-[40px] focus-visible:ring-offset-0 placeholder:text-gray-500 rounded-2xl p-regular-16 px-4 py-3 border focus-visible:ring-transparent"
         />
       </div>
+      {description && <div>{description}</div>}
     </div>
   );
 }
 
-export default SearchVehicle;
+export default Search;

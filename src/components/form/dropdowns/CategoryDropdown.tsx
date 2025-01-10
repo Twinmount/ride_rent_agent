@@ -15,7 +15,7 @@ type CategoryDropdownProps = {
   placeholder?: string;
   isDisabled?: boolean;
   setIsCarsCategory?: (isCars: boolean) => void;
-  setHideCommercialLicenses: (value: boolean) => void;
+  setHideCommercialLicenses?: (value: boolean) => void;
 };
 
 type CategoryType = {

@@ -1,56 +1,56 @@
-import { useState, useEffect } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { fetchAllStates } from '@/api/states'
-import { fetchAllCities } from '@/api/cities'
-import { CityType, StateType } from '@/types/API-types'
-import CitiesSkelton from '../loading-skelton/CitiesSkelton'
+import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchAllStates } from "@/api/states";
+import { fetchAllCities } from "@/api/cities";
+import { CityType, StateType } from "@/types/API-types";
+import CitiesSkelton from "../loading-skelton/CitiesSkelton";
 
 const Locations = () => {
   // State management for selected state and cities
-  const [selectedState, setSelectedState] = useState<StateType | null>(null)
-  const [cities, setCities] = useState<CityType[]>([])
-  const [showAllCities, setShowAllCities] = useState<boolean>(false)
+  const [selectedState, setSelectedState] = useState<StateType | null>(null);
+  const [cities, setCities] = useState<CityType[]>([]);
+  const [showAllCities, setShowAllCities] = useState<boolean>(false);
 
   // Fetch all states
   const { data: statesData, isLoading: isStatesLoading } = useQuery({
-    queryKey: ['states'],
+    queryKey: ["states"],
     queryFn: fetchAllStates,
-  })
+  });
 
   // Fetch cities based on the selected state
   const { data: citiesData, isLoading: isCitiesLoading } = useQuery({
-    queryKey: ['cities', selectedState?.stateId],
+    queryKey: ["cities", selectedState?.stateId],
     queryFn: () => fetchAllCities(selectedState?.stateId as string),
     enabled: !!selectedState?.stateId, // Only run if stateId is available
-  })
+  });
 
   // Set the first state as selected by default when statesData is available
   useEffect(() => {
     if (statesData && statesData.result.length > 0) {
-      setSelectedState(statesData.result[0]) // Set first state as selected by default
+      setSelectedState(statesData.result[0]); // Set first state as selected by default
     }
-  }, [statesData])
+  }, [statesData]);
 
   // Update cities when citiesData changes
   useEffect(() => {
     if (citiesData) {
-      setCities(citiesData.result)
+      setCities(citiesData.result);
     }
-  }, [citiesData])
+  }, [citiesData]);
 
   // Handle state change
   const handleStateChange = (state: StateType) => {
-    setSelectedState(state) // Update the selected state
-    setShowAllCities(false) // Reset to show less cities when state changes
-  }
+    setSelectedState(state); // Update the selected state
+    setShowAllCities(false); // Reset to show less cities when state changes
+  };
 
   // Toggle show all or less cities
   const toggleShowAllCities = () => {
-    setShowAllCities((prev) => !prev)
-  }
+    setShowAllCities((prev) => !prev);
+  };
 
   // Determine which cities to display
-  const citiesToDisplay = showAllCities ? cities : cities.slice(0, 50)
+  const citiesToDisplay = showAllCities ? cities : cities.slice(0, 50);
 
   return (
     <div className="bg-white wrapper">
@@ -59,7 +59,7 @@ const Locations = () => {
         Choose your states/city to rent
       </p>
       {/* State selection buttons */}
-      <div className="flex flex-wrap justify-center gap-2 mb-4 gap-x-4">
+      <div className="flex flex-wrap gap-2 gap-x-4 justify-center mb-4">
         {isStatesLoading ? (
           <CitiesSkelton count={4} />
         ) : (
@@ -69,7 +69,7 @@ const Locations = () => {
               onClick={() => handleStateChange(state)}
               className={`${
                 selectedState?.stateId === state.stateId &&
-                '!bg-black text-white'
+                "!bg-black text-white"
               } bg-slate-200 border-none py-1 px-2 rounded-lg cursor-pointer transition-all font-bold hover:bg-black hover:text-white`}
             >
               {state.stateName}
@@ -80,7 +80,7 @@ const Locations = () => {
       {/* City list */}
       {selectedState?.stateId && (
         <div className="flex flex-col items-center">
-          <div className="flex flex-wrap justify-center w-full max-w-full gap-2 mx-auto gap-x-4 ">
+          <div className="flex flex-wrap gap-2 gap-x-4 justify-center mx-auto w-full max-w-full">
             {isCitiesLoading ? (
               <CitiesSkelton count={8} />
             ) : (
@@ -98,15 +98,15 @@ const Locations = () => {
           {cities.length > 50 && (
             <button
               onClick={toggleShowAllCities}
-              className="relative px-2 py-1 mt-3 text-white bg-black bottom-1 flex-center rounded-xl"
+              className="relative bottom-1 px-2 py-1 mt-3 text-white bg-black rounded-xl flex-center"
             >
-              {showAllCities ? 'Show Less' : 'Show All'}
+              {showAllCities ? "Show Less" : "Show All"}
             </button>
           )}
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Locations
+export default Locations;

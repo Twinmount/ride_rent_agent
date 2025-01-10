@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Form,
   FormControl,
@@ -13,8 +13,6 @@ import MultiSelectDropdown from "../dropdowns/MultiSelectDropdown";
 import { useVehicleIdentifiers } from "@/hooks/useVehicleIdentifiers";
 import {
   addFeatures,
-  getFeaturesFormData,
-  getFeaturesFormFieldsData,
   updateFeatures,
 } from "@/api/vehicle";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
@@ -23,6 +21,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 import { formatFeatures } from "@/helpers/form";
 import { useEffect } from "react";
+import { useFeaturesFormQuery } from "@/hooks/useFormQuery";
 
 type FeaturesFormType = Record<string, string[] | null>;
 
@@ -47,25 +46,10 @@ export default function FeaturesForm({
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const { data, isLoading } = useQuery({
-    queryKey: [
-      isAddOrIncomplete ? "features-form-data" : "features-update-form-data",
-      vehicleId,
-    ],
-    queryFn: async () => {
-      if (isAddOrIncomplete) {
-        const data = await getFeaturesFormFieldsData({
-          vehicleCategoryId: vehicleCategoryId as string,
-        });
-        return {
-          ...data,
-          result: data.result.list,
-        };
-      } else {
-        return await getFeaturesFormData(vehicleId);
-      }
-    },
-    enabled: !!vehicleId,
+  const { data, isLoading } = useFeaturesFormQuery({
+    vehicleId,
+    vehicleCategoryId,
+    isAddOrIncomplete: !!isAddOrIncomplete,
   });
 
   const form = useForm<FeaturesFormType>({

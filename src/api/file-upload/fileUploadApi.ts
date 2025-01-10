@@ -27,8 +27,9 @@ export const uploadSingleFile = async (
         headers: {
           "Content-Type": "multipart/form-data",
         },
-        timeout: 120000,
+
         onUploadProgress,
+        timeout: 60000,
       },
     });
 

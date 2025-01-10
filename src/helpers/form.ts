@@ -5,8 +5,9 @@ import {
   GetPrimaryForm,
   SpecificationFormData,
 } from "@/types/API-types";
-import { PrimaryFormType, TabsTypes } from "@/types/types";
+import { PrimaryFormType, SRMTabsTypes, TabsTypes } from "@/types/types";
 import { deleteFile } from "@/api/file-upload";
+import { PrimaryFormSchema } from "@/lib/validator";
 
 type SpecificationOption = { label: string; value: string };
 
@@ -103,6 +104,43 @@ export const validateRentalDetails = (
     if (!hour.rentInAED || !hour.mileageLimit || !hour.minBookingHours) {
       return "Rent in AED, Mileage Limit, and Minimum Booking Hours are required for hourly rental";
     }
+  }
+
+  return null;
+};
+
+// rental details form field validation helper function
+export const validateSRMRentalDetails = (
+  rentalDetails: RentalDetailsType
+): string | null => {
+  const { day, week, month, hour } = rentalDetails;
+
+  const message =
+    "Rent in AED as well as Mileage Limit must be provided for all rental periods";
+
+  // Check if all rental periods are enabled
+  if (!day.enabled || !week.enabled || !month.enabled || !hour.enabled) {
+    return "All rental periods (day, week, month, and hour) must be enabled";
+  }
+
+  // Validate day
+  if (!day.rentInAED || !day.mileageLimit) {
+    return message;
+  }
+
+  // Validate week
+  if (!week.rentInAED || !week.mileageLimit) {
+    return message;
+  }
+
+  // Validate month
+  if (!month.rentInAED || !month.mileageLimit) {
+    return message;
+  }
+
+  // Validate hour, including minBookingHours
+  if (!hour.rentInAED || !hour.mileageLimit || !hour.minBookingHours) {
+    return "Rent in AED, Mileage Limit, and Minimum Booking Hours are required for hourly rental";
   }
 
   return null;
@@ -336,6 +374,64 @@ export const validateTabAccess = ({
   return { canAccess: true, message: "" }; // Default case
 };
 
+interface SRMTabValidationProps {
+  tab: SRMTabsTypes;
+  levelsFilled: number;
+}
+
+// srm tab validation
+export const validateSRMTabAccess = ({
+  tab,
+  levelsFilled,
+}: SRMTabValidationProps): { canAccess: boolean; message: string } => {
+  if (tab === "customer" && levelsFilled > 0) {
+    return {
+      canAccess: false,
+      message: "The Customer Details form is already completed.",
+    };
+  }
+
+  if (tab === "vehicle") {
+    if (levelsFilled >= 1 && levelsFilled < 2) {
+      return {
+        canAccess: true,
+        message: "",
+      }; // Access allowed
+    } else if (levelsFilled >= 2) {
+      return {
+        canAccess: false,
+        message: "The Vehicle Details  is already completed.",
+      };
+    } else {
+      return {
+        canAccess: false,
+        message: "Please complete the Customer Details  to proceed.",
+      };
+    }
+  }
+
+  if (tab === "payment") {
+    if (levelsFilled >= 2 && levelsFilled < 3) {
+      return {
+        canAccess: true,
+        message: "",
+      }; // Access allowed
+    } else if (levelsFilled === 3) {
+      return {
+        canAccess: false,
+        message: "The Payment details  is already completed.",
+      };
+    } else {
+      return {
+        canAccess: false,
+        message: "Please complete the Vehicle Details to proceed.",
+      };
+    }
+  }
+
+  return { canAccess: true, message: "" }; // Default case
+};
+
 // Type guard to check if a value has the 'selected' property for specification form
 export function hasSelected(
   value:
@@ -415,4 +511,28 @@ export const deleteMultipleFiles = async (
     console.error("Error deleting files:", error);
     throw error; // Optional: re-throw the error if you want to handle it in the form
   }
+};
+
+// helpers/validateFormFields.ts
+type FieldName = keyof z.infer<typeof PrimaryFormSchema>;
+
+interface ValidationError {
+  fieldName: FieldName;
+  errorMessage: string;
+}
+
+export const validateRentalDetailsAndSecurityDeposit = (
+  values: z.infer<typeof PrimaryFormSchema>
+): ValidationError | null => {
+  const rentalError = validateRentalDetails(values.rentalDetails);
+  if (rentalError) {
+    return { fieldName: "rentalDetails", errorMessage: rentalError };
+  }
+
+  const securityDepositError = validateSecurityDeposit(values.securityDeposit);
+  if (securityDepositError) {
+    return { fieldName: "securityDeposit", errorMessage: securityDepositError };
+  }
+
+  return null;
 };

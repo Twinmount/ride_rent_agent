@@ -1,4 +1,11 @@
 import {
+  CustomerStatus,
+  SRMCustomerDetailsFormType,
+  SRMPaymentDetailsFormType,
+  SRMVehicleDetailsFormType,
+  TripEndFormType,
+} from "@/types/srm-types";
+import {
   CompanyFormType,
   PrimaryFormType,
   ProfileUpdateFormType,
@@ -133,3 +140,76 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
   isCreditOrDebitCardsSupported: false,
   isTabbySupported: false,
 };
+
+// srm user details form default values
+export const SRMCustomerDetailsFormDefaultValues: SRMCustomerDetailsFormType = {
+  customerProfilePic: "", // Optional field
+  customerName: "", // Name of the Customer
+  nationality: "", // Nationality of the user
+  passportNumber: "", // Passport number
+  drivingLicenseNumber: "", // Driving license number
+  phoneNumber: "", // Phone number with validation on minimum characters
+};
+
+// srm vehicle details form default values
+export const SRMVehicleDetailsFormDefaultValues: SRMVehicleDetailsFormType = {
+  vehicleCategoryId: "",
+  vehicleBrandId: "",
+  vehicleRegistrationNumber: "",
+  vehiclePhoto: "",
+  rentalDetails: {
+    day: { enabled: false, rentInAED: "", mileageLimit: "" },
+    week: { enabled: false, rentInAED: "", mileageLimit: "" },
+    month: { enabled: false, rentInAED: "", mileageLimit: "" },
+    hour: {
+      enabled: false,
+      minBookingHours: "",
+      rentInAED: "",
+      mileageLimit: "",
+    },
+  },
+};
+
+// SRM payment details form default values
+export const SRMPaymentDetailsFormDefaultValues: SRMPaymentDetailsFormType = {
+  advanceAmount: "",
+  remainingAmount: "",
+  securityDeposit: {
+    enabled: false,
+    amountInAED: "",
+  },
+  bookingStartDate: undefined,
+  bookingEndDate: undefined,
+  currency: "AED",
+};
+
+// trip end form default values
+export const TripEndFormDefaultValues: TripEndFormType = {
+  customerStatus: CustomerStatus.SUCCESSFUL,
+  finesCollected: [],
+  salikCollected: [],
+  additionalCharges: [], // Initially no additional charges
+  discounts: "0",
+  totalAmountCollected: "",
+};
+
+export const ADDITIONAL_CHARGES_OPTIONS = [
+  "Fuel Charges",
+  "Excess Mileage Charges",
+  "Cleaning Charges",
+  "Late Return Fee",
+  "Insurance Excess/Deductible",
+  "Replacement/Repair of Lost/Damaged Accessories",
+  "Additional Driver Fee",
+  "Child Seat",
+  "GPS/Navigation System",
+  "Wi-Fi Hotspot Device",
+  "Roadside Assistance",
+  "Cross-Border Fee",
+  "Smoking Penalty",
+  "Lost Registration Card (Mulkia)",
+  "Replacement Car Delivery Fee",
+  "Car Delivery Fee",
+  "Car Return Fee",
+  "Service Charge",
+];
