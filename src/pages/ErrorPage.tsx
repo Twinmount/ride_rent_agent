@@ -33,8 +33,8 @@ const ErrorPage = () => {
   if (isRouteErrorResponse(error)) {
     if (error.status === 404) {
       return (
-        <div className="flex flex-col justify-center items-center p-6 min-h-screen text-gray-800 bg-gray-100">
-          <h1 className="mb-4 text-4xl font-bold">404</h1>
+        <div className="flex flex-col justify-center items-center text-center p-6 min-h-screen text-gray-800 bg-gray-100">
+          <h1 className="mb-4 text-lg font-bold">404</h1>
           <p className="mb-2 text-lg">This page doesn't exist!</p>
           <button onClick={handleGoBack} className="text-blue-500 underline">
             Go back
@@ -45,8 +45,8 @@ const ErrorPage = () => {
 
     if (error.status === 401) {
       return (
-        <div className="flex flex-col justify-center items-center p-6 min-h-screen text-gray-800 bg-gray-100">
-          <h1 className="mb-4 text-4xl font-bold">401</h1>
+        <div className="flex flex-col justify-center items-center text-center p-6 min-h-screen text-gray-800 bg-gray-100">
+          <h1 className="mb-4 text-lg font-bold">401</h1>
           <p className="mb-2 text-lg">You aren't authorized to see this</p>
           <button onClick={handleGoBack} className="text-blue-500 underline">
             Go back
@@ -57,8 +57,8 @@ const ErrorPage = () => {
 
     if (error.status === 503) {
       return (
-        <div className="flex flex-col justify-center items-center p-6 min-h-screen text-gray-800 bg-gray-100">
-          <h1 className="mb-4 text-4xl font-bold">503</h1>
+        <div className="flex flex-col justify-center items-center text-center p-6 min-h-screen text-gray-800 bg-gray-100">
+          <h1 className="mb-4 text-lg font-bold">503</h1>
           <p className="mb-2 text-lg">Looks like our API is down</p>
           <button onClick={handleGoBack} className="text-blue-500 underline">
             Go back
@@ -69,8 +69,8 @@ const ErrorPage = () => {
 
     if (error.status === 418) {
       return (
-        <div className="flex flex-col justify-center items-center p-6 min-h-screen text-gray-800 bg-gray-100">
-          <h1 className="mb-4 text-4xl font-bold">418</h1>
+        <div className="flex flex-col justify-center items-center text-center p-6 min-h-screen text-gray-800 bg-gray-100">
+          <h1 className="mb-4 text-lg font-bold">418</h1>
           <p className="mb-2 text-lg">🫖</p>
           <button onClick={handleGoBack} className="text-blue-500 underline">
             Go back
@@ -82,9 +82,9 @@ const ErrorPage = () => {
 
   if (error instanceof Error) {
     return (
-      <div className="flex flex-col justify-center items-center p-6 min-h-screen text-gray-800 bg-gray-100">
-        <h1 className="mb-4 text-4xl font-bold">Oops</h1>
-        <p className="mb-2 text-lg">{error.message}</p>
+      <div className="flex flex-col justify-center items-center text-center p-6 min-h-screen text-gray-800 bg-gray-100">
+        <h1 className="mb-4 text-lg font-bold">Oops</h1>
+        <p className="mb-2 text-base">{error.message}</p>
         <button onClick={handleGoBack} className="text-blue-500 underline">
           Go back
         </button>
@@ -93,8 +93,8 @@ const ErrorPage = () => {
   }
 
   return (
-    <div className="flex flex-col justify-center items-center p-6 min-h-screen text-gray-800 bg-gray-100">
-      <h1 className="mb-4 text-4xl font-bold">Something went wrong</h1>
+    <div className="flex flex-col justify-center items-center text-center p-6 min-h-screen text-gray-800 bg-gray-100">
+      <h1 className="mb-4 text-lg font-bold">Something went wrong</h1>
       <button onClick={handleGoBack} className="text-blue-500 underline">
         Go back
       </button>
