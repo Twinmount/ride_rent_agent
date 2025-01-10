@@ -66,6 +66,8 @@ export default function VehiclesFormUpdatePage() {
   const vehicleCategoryId = data?.result?.vehicleCategoryId;
   const vehicleTypeId = data?.result?.vehicleTypeId;
 
+  const initialCountryCode = data?.result?.countryCode;
+
   // Store vehicleCategoryId in localStorage if levelsFilled < 3
   useEffect(() => {
     if (levelsFilled < 3 && vehicleCategoryId && vehicleTypeId) {
@@ -133,6 +135,7 @@ export default function VehiclesFormUpdatePage() {
                   type="Update"
                   formData={formData}
                   levelsFilled={levelsFilled}
+                  initialCountryCode={initialCountryCode}
                 />
               )}
             </Suspense>

@@ -25,9 +25,7 @@ import { Label } from "@/components/ui/label";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
 import RentalDetailsFormField from "../RentalDetailsFormField";
-import {
-  validateRentalDetailsAndSecurityDeposit,
-} from "@/helpers/form";
+import { validateRentalDetailsAndSecurityDeposit } from "@/helpers/form";
 import BrandsDropdown from "../dropdowns/BrandsDropdown";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -59,6 +57,7 @@ type PrimaryFormProps = {
   formData?: PrimaryFormType | null;
   onNextTab?: () => void;
   levelsFilled?: number;
+  initialCountryCode?: string;
 };
 
 export default function PrimaryDetailsForm({
@@ -66,8 +65,11 @@ export default function PrimaryDetailsForm({
   onNextTab,
   formData,
   levelsFilled,
+  initialCountryCode,
 }: PrimaryFormProps) {
-  const [countryCode, setCountryCode] = useState<string>("");
+  const [countryCode, setCountryCode] = useState<string>(
+    initialCountryCode || "+971"
+  );
   const [isPhotosUploading, setIsPhotosUploading] = useState(false);
   const [isLicenseUploading, setIsLicenseUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
