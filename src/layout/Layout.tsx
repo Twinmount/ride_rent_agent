@@ -10,6 +10,7 @@ import { jwtDecode } from "jwt-decode";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
 import ApprovalStatusPage from "@/pages/general/ApprovalStatusPage";
 import ScrollToTop from "@/helpers/ScrollToTop";
+import ProtectedPage from "@/pages/general/ProtectedPage";
 
 export default function Layout() {
   const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
@@ -36,8 +37,7 @@ export default function Layout() {
         {isLoading ? (
           <LazyLoader />
         ) : !data?.result ? (
-          // <ProtectedPage />
-          <Outlet />
+          <ProtectedPage />
         ) : data.result.approvalStatus === "REJECTED" ? (
           <ApprovalStatusPage
             status="REJECTED"
