@@ -11,7 +11,7 @@ import {
   ProfileUpdateFormType,
 } from "@/types/types";
 import {
-  Box,
+  // Box,
   LayoutDashboard,
   List,
   UserRoundPen,
@@ -26,11 +26,11 @@ import {
 export const sidebarContent = [
   { label: "Dashboard", icon: LayoutDashboard, link: "/" },
   { label: "My Listings", icon: List, link: "/listings" },
-  {
-    label: "SRM",
-    icon: Box,
-    link: "/srm",
-  },
+  // {
+  //   label: "SRM",
+  //   icon: Box,
+  //   link: "/srm",
+  // },
   {
     label: "Profile",
     icon: UserRoundPen,
