@@ -20,7 +20,7 @@ type Props = {
  * @param {React.ReactNode} children - The form control to display
  * @returns {JSX.Element} A JSX element containing the form item
  */
-export const FormItemUIWrapper = ({ label, description, children }: Props) => {
+export const FormFieldLayout = ({ label, description, children }: Props) => {
   return (
     <FormItem className="mb-2 flex w-full max-sm:flex-col">
       <FormLabel className="ml-2 mt-4 flex w-72 justify-between text-base font-semibold lg:text-lg">
