@@ -3,6 +3,7 @@ import { Slug } from "../Api-Endpoints";
 import { API } from "../ApiService";
 import {
   FetchSpecificCompanyResponse,
+  FetchIsEmailAlreadyVerifiedResponse,
   SendOTPResponse,
 } from "@/types/API-types";
 
@@ -140,6 +141,28 @@ export const verifyOtp = async (otp: string) => {
     return data;
   } catch (error) {
     console.error("Error verifying OTP:", error);
+    throw error;
+  }
+};
+
+export const fetchIsEmailAlreadyVerified = async (
+  email: string
+): Promise<FetchIsEmailAlreadyVerifiedResponse> => {
+  try {
+    const data = await API.post<FetchIsEmailAlreadyVerifiedResponse>({
+      slug: Slug.POST_IS_EMAIL_VERIFIED,
+      body: {
+        email,
+      },
+    });
+
+    if (!data) {
+      throw new Error("Failed to verify whether email is verified or not");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error verifying email:", error);
     throw error;
   }
 };

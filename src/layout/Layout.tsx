@@ -36,7 +36,7 @@ export default function Layout() {
         <ScrollToTop />
         {isLoading ? (
           <LazyLoader />
-        ) : !data?.result ? (
+        ) : !data?.result || true ? (
           <ProtectedPage />
         ) : data.result.approvalStatus === "REJECTED" ? (
           <ApprovalStatusPage

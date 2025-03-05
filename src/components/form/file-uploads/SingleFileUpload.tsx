@@ -182,7 +182,7 @@ const SingleFileUpload = ({
     <>
       <FormItem className="flex mb-2 w-full max-sm:flex-col">
         <FormLabel
-          className={`flex justify-between mt-4 ml-2 w-64 text-base max-sm:w-fit lg:text-lg ${additionalClasses}`}
+          className={`flex justify-between mt-4 ml-2 w-64 font-semibold text-base max-sm:w-fit lg:text-lg ${additionalClasses}`}
         >
           {label} <span className="mr-5 max-sm:hidden">:</span>
         </FormLabel>

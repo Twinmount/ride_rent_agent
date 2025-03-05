@@ -22,17 +22,17 @@ import { ProfileUpdateFormType } from "@/types/types";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "../../ui/use-toast";
+import { toast } from "../../../ui/use-toast";
 import { updateCompanyProfile } from "@/api/company";
-import Spinner from "../../general/Spinner";
+import Spinner from "../../../general/Spinner";
 import { load, StorageKeys } from "@/utils/storage";
 import { jwtDecode } from "jwt-decode";
 import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
 
 import { GcsFilePaths } from "@/constants/enum";
 import { deleteMultipleFiles } from "@/helpers/form";
-import SingleFileUpload from "../file-uploads/SingleFileUpload";
-import CompanyLanguagesDropdown from "../dropdowns/CompanyLanguagesDropdown";
+import SingleFileUpload from "../../file-uploads/SingleFileUpload";
+import CompanyLanguagesDropdown from "../../dropdowns/CompanyLanguagesDropdown";
 import { Textarea } from "@/components/ui/textarea";
 import { useQueryClient } from "@tanstack/react-query";
 

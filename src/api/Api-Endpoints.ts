@@ -5,6 +5,7 @@ export enum Slug {
   VERIFY_OTP = "/auth/verify-otp",
   REFRESH = "/auth/refresh",
   POST_SEND_OTP = "/auth/generate-email-otp",
+  POST_IS_EMAIL_VERIFIED = "/auth/is-email-verified",
   POST_VERIFY_OTP = "/auth/verify-email-otp",
   POST_RESET_PASSWORD = "/auth/reset-password",
   POST_VERIFY_RESET_PASSWORD = "/auth/verify-reset-password-otp",
