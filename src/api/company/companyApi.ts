@@ -149,11 +149,10 @@ export const fetchIsEmailAlreadyVerified = async (
   email: string
 ): Promise<FetchIsEmailAlreadyVerifiedResponse> => {
   try {
-    const data = await API.post<FetchIsEmailAlreadyVerifiedResponse>({
-      slug: Slug.POST_IS_EMAIL_VERIFIED,
-      body: {
-        email,
-      },
+    const slug = `${Slug.GET_IS_EMAIL_ALREADY_VERIFIED}?email=${email}`;
+
+    const data = await API.get<FetchIsEmailAlreadyVerifiedResponse>({
+      slug: slug,
     });
 
     if (!data) {

@@ -176,6 +176,7 @@ export default function CompanyRegistrationForm({
                   : "company-logo"
               }
               setDeletedImages={setDeletedImages}
+              imageOnly={true}
             />
           )}
         />
@@ -261,7 +262,7 @@ export default function CompanyRegistrationForm({
           name="companyLanguages"
           render={({ field }) => (
             <FormFieldLayout
-              label="Supported Languages{"
+              label="Supported Languages"
               description="Select all the languages your staff can speak or understand.
                     These will be displayed on your company's public profile
                     page, helping customers feel comfortable with communication."

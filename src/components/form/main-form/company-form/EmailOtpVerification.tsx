@@ -75,6 +75,10 @@ const EmailOtpVerification = ({
         title: "Failed to verify OTP",
         description: "Invalid OTP or something went wrong",
       });
+
+      // Clear the OTP field
+      setOtp("");
+      setIsEmailVerifiedUI(false);
     },
   });
 
@@ -112,6 +116,7 @@ const EmailOtpVerification = ({
         description: "Something went wrong",
       });
       setIsEmailSent(false);
+      setIsEmailVerifiedUI(false);
     }
   };
 
@@ -181,7 +186,7 @@ const EmailOtpVerification = ({
               to it.
               <br />
               {isEmailVerifiedUI && (
-                <span className="text-green-600 font-semibold mt-1">
+                <span className="text-green-500 font-semibold mt-1">
                   Your email is verified! You can continue filling out the form.
                 </span>
               )}

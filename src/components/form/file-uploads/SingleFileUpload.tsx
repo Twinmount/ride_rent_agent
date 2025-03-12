@@ -46,6 +46,7 @@ type SingleFileUploadProps = {
   downloadFileName?: string;
   setDeletedImages: (deletedPaths: (prev: string[]) => string[]) => void;
   additionalClasses?: string;
+  imageOnly?: boolean;
 };
 
 const SingleFileUpload = ({
@@ -61,6 +62,7 @@ const SingleFileUpload = ({
   downloadFileName,
   setDeletedImages,
   additionalClasses,
+  imageOnly = false,
 }: SingleFileUploadProps) => {
   const { control, setValue, clearErrors } = useFormContext();
   const [isUploading, setIsUploading] = useState(false);
@@ -195,6 +197,11 @@ const SingleFileUpload = ({
                 <>
                   <Input
                     type="file"
+                    accept={
+                      imageOnly
+                        ? "image/png, image/jpeg, image/jpg, image/webp"
+                        : "*"
+                    }
                     onChange={handleFileChange}
                     className="hidden"
                     id={`file-upload-${name}`}
