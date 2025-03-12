@@ -103,6 +103,14 @@ export interface SendOTPResponse {
   statusCode: number;
 }
 
+export interface FetchIsEmailAlreadyVerifiedResponse {
+  result: {
+    isEmailVerified: boolean;
+  };
+  status: string;
+  statusCode: number;
+}
+
 // category type
 export interface CategoryType {
   categoryId: string;

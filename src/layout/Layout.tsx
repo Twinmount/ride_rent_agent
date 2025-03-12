@@ -16,6 +16,7 @@ export default function Layout() {
   const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
 
   if (!refreshToken) {
+    console.warn("Refresh token not found, redirecting..");
     remove(StorageKeys.ACCESS_TOKEN);
     remove(StorageKeys.REFRESH_TOKEN);
     return <Navigate to={"/login"} replace />;
