@@ -109,12 +109,24 @@ const EmailOtpVerification = ({
 
       await sendOtpMutation.mutateAsync({ email });
       setIsEmailSent(true);
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: "Failed to send OTP",
-        description: "Something went wrong",
-      });
+    } catch (error: any) {
+      const errorMessage =
+        error?.response?.data?.error?.message || "Something went wrong";
+
+      if (errorMessage.includes("Email already taken by another user")) {
+        toast({
+          variant: "destructive",
+          title: "Email is already in use",
+          description:
+            "This email is already associated with another user. Please try a different email.",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Failed to send OTP",
+          description: "Something went wrong",
+        });
+      }
       setIsEmailSent(false);
       setIsEmailVerifiedUI(false);
     }
