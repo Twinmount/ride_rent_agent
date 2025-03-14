@@ -11,7 +11,7 @@ import { toast } from "./components/ui/use-toast";
 import LazyLoader from "./components/loading-skelton/LazyLoader";
 import { HelmetProvider } from "react-helmet-async";
 import RouteErrorBoundary from "./layout/RouteErrorBoundary";
-import { router } from "./routerConfig";
+import { router } from "./routes/routerConfig";
 
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 

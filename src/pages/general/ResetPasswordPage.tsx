@@ -24,7 +24,7 @@ import { Slug } from "@/api/Api-Endpoints";
 import { toast } from "@/components/ui/use-toast";
 import { ResetPasswordResponse } from "@/types/API-types";
 
-const LoginPage = () => {
+const ResetPasswordPage = () => {
   // State to store the country code separately
   const [countryCode, setCountryCode] = useState("");
   const navigate = useNavigate();
@@ -166,4 +166,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default ResetPasswordPage;
