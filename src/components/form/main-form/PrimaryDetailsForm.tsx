@@ -184,7 +184,6 @@ export default function PrimaryDetailsForm({
   return (
     <Form {...form}>
       <FormContainer onSubmit={form.handleSubmit(onSubmit)}>
-        {/* category of the vehicle */}
         {/* Vehicle Category */}
         <FormField
           control={form.control}

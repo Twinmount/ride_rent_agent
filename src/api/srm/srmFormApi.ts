@@ -391,7 +391,7 @@ export const searchVehicle = async (
       limit: "7",
       sortOrder: "ASC",
       search: searchTerm,
-      isFileUrlNeeded: "true",
+      isFileUrlNeeded: "false",
     }).toString();
 
     const slugWithParams = `${Slug.GET_SRM_VEHICLE_LIST}?${queryParams}`;

@@ -11,16 +11,17 @@ import Search from "@/components/Search";
 
 export default function CustomerListPage() {
   const [page, setPage] = useState(1);
-  const [limit] = useState<10 | 15 | 20 | 30>(10);
   const [search, setSearch] = useState("");
-  const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("ASC");
+  const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
+
+  const LIMIT = 8;
 
   const { data, isLoading } = useQuery({
-    queryKey: ["customerList", page, limit, search, sortOrder],
+    queryKey: ["customerList", page, search, sortOrder],
     queryFn: () =>
       fetchCustomerList({
         page,
-        limit,
+        limit: LIMIT,
         sortOrder,
         search,
       }),
@@ -75,13 +76,11 @@ export default function CustomerListPage() {
         loading={isLoading}
       />
 
-      {totalNumberOfPages > 0 && (
-        <Pagination
-          page={page}
-          setPage={setPage}
-          totalPages={totalNumberOfPages}
-        />
-      )}
+      <Pagination
+        page={page}
+        setPage={setPage}
+        totalPages={totalNumberOfPages}
+      />
     </section>
   );
 }

@@ -2,22 +2,12 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Button } from "@/components/ui/button";
+import { Form, FormField } from "@/components/ui/form";
 import { SRMVehicleDetailsFormDefaultValues } from "@/constants";
 import { SRMVehicleDetailsFormSchema } from "@/lib/validator";
 import { SRMVehicleDetailsFormType, VehicleType } from "@/types/srm-types";
 import CategoryDropdown from "../dropdowns/CategoryDropdown";
 import { toast } from "@/components/ui/use-toast";
-import Spinner from "@/components/general/Spinner";
 import { useParams } from "react-router-dom";
 import {
   addVehicleDetailsForm,
@@ -31,6 +21,9 @@ import { GcsFilePaths } from "@/constants/enum";
 import VehicleSearch from "../dropdowns/VehicleSearchAndAutoFill";
 import { handleVehicleSelection } from "@/helpers";
 import { useFormValidationToast } from "@/hooks/useFormValidationToast";
+import { FormContainer } from "../form-ui/FormContainer";
+import { FormSubmitButton } from "../form-ui/FormSubmitButton";
+import { FormFieldLayout } from "../form-ui/FormFieldLayout";
 
 type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";
@@ -165,6 +158,7 @@ export default function SRMVehicleDetailsForm({
     vehicleRegistrationNumber: string,
     vehicleData: VehicleType | null
   ) => {
+    console.log("vehicle data", vehicleData);
     handleVehicleSelection(
       vehicleRegistrationNumber,
       vehicleData,
@@ -176,163 +170,122 @@ export default function SRMVehicleDetailsForm({
 
   return (
     <Form {...form}>
-      <form
+      <FormContainer
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col w-full gap-5  mx-auto bg-white  rounded-3xl p-2 md:p-4 py-8 !pb-8  "
+        description={
+          <p className="text-sm italic text-center text-gray-600">
+            Add vehicle details here. You can choose existing vehicle &#40;if
+            any&#41; by searching registration number
+          </p>
+        }
+        className="mt-2"
       >
-        <p className="-mt-4 text-sm italic text-center text-gray-600">
-          Add vehicle details here. You can choose existing vehicle &#40;if
-          any&#41; by searching registration number
-        </p>
-        <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto ">
-          {/* vehicle registration number */}
-          <FormField
-            control={form.control}
-            name="vehicleRegistrationNumber"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
-                  Registration Number{" "}
-                  <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <VehicleSearch
-                      value={field.value} // Pass current field value
-                      onChangeHandler={handleVehicleSelect}
-                      placeholder="Enter / Search Registration Number"
-                    />
-                  </FormControl>
-                  <FormDescription className="ml-2">
-                    Add or Search Vehicle Registration Number.
-                  </FormDescription>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
+        {/* vehicle registration number */}
+        <FormField
+          control={form.control}
+          name="vehicleRegistrationNumber"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Registration Number"
+              description="Add or Search Vehicle Registration Number."
+            >
+              <VehicleSearch
+                value={field.value}
+                onChangeHandler={handleVehicleSelect}
+                placeholder="Enter / Search Registration Number"
+              />
+            </FormFieldLayout>
+          )}
+        />
 
-          <FormField
-            control={form.control}
-            name="vehicleCategoryId"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
-                  Vehicle Category <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <CategoryDropdown
-                      onChangeHandler={(value) => {
-                        field.onChange(value);
-                        form.setValue("vehicleBrandId", "");
-                      }}
-                      value={initialValues.vehicleCategoryId || field.value}
-                      isDisabled={!!existingVehicleId}
-                    />
-                  </FormControl>
-                  <FormDescription className="ml-2">
-                    select vehicle category
-                  </FormDescription>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* brand name */}
-          <FormField
-            control={form.control}
-            name="vehicleBrandId"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Brand Name <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <BrandsDropdown
-                      vehicleCategoryId={form.watch("vehicleCategoryId")}
-                      value={field.value}
-                      onChangeHandler={field.onChange}
-                      isDisabled={
-                        !form.watch("vehicleCategoryId") || !!existingVehicleId
-                      }
-                    />
-                  </FormControl>
-                  <FormDescription className="ml-2">
-                    Select the vehicle's Brand
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* user profile */}
-          <FormField
-            control={form.control}
-            name="vehiclePhoto"
-            render={({ field }) => (
-              <SingleFileUpload
-                name={field.name}
-                label="Vehicle Photo"
-                description="Vehicle Photo can have a maximum size of 5MB."
-                existingFile={currentVehiclePhoto}
-                maxSizeMB={5}
-                setIsFileUploading={setIsFileUploading}
-                bucketFilePath={GcsFilePaths.LOGOS}
-                isDownloadable={true}
-                downloadFileName={"vehicle-photo"}
-                setDeletedImages={setDeletedFiles}
-                additionalClasses="w-[18rem]"
+        {/* vehicle category */}
+        <FormField
+          control={form.control}
+          name="vehicleCategoryId"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Vehicle Category"
+              description="Select the vehicle's Category"
+            >
+              <CategoryDropdown
+                onChangeHandler={(value) => {
+                  field.onChange(value);
+                  form.setValue("vehicleBrandId", "");
+                }}
+                value={initialValues.vehicleCategoryId || field.value}
                 isDisabled={!!existingVehicleId}
               />
-            )}
-          />
+            </FormFieldLayout>
+          )}
+        />
 
-          {/* rental details */}
-          <FormField
-            control={form.control}
-            name="rentalDetails"
-            render={() => {
-              return (
-                <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                    Rental Details <span className="mr-5 max-sm:hidden">:</span>
-                  </FormLabel>
-                  <div className="flex-col items-start w-full">
-                    <FormControl>
-                      <RentalDetailsFormField
-                        isDisabled={!!existingVehicleId}
-                      />
-                    </FormControl>
-                    <FormDescription className="ml-2">
-                      Provide rent details. All Value Should be provided for
-                      calculating rent effectively.
-                    </FormDescription>
-                    <FormMessage className="ml-2" />
-                  </div>
-                </FormItem>
-              );
-            }}
-          />
-        </div>
+        {/* brand name */}
+        <FormField
+          control={form.control}
+          name="vehicleBrandId"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Brand Name"
+              description="Select the vehicle's Brand"
+            >
+              <BrandsDropdown
+                vehicleCategoryId={form.watch("vehicleCategoryId")}
+                value={field.value}
+                onChangeHandler={field.onChange}
+                isDisabled={
+                  !form.watch("vehicleCategoryId") || !!existingVehicleId
+                }
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* user profile */}
+        <FormField
+          control={form.control}
+          name="vehiclePhoto"
+          render={({ field }) => (
+            <SingleFileUpload
+              name={field.name}
+              label="Vehicle Photo"
+              description="Vehicle Photo can have a maximum size of 5MB."
+              existingFile={currentVehiclePhoto}
+              maxSizeMB={5}
+              setIsFileUploading={setIsFileUploading}
+              bucketFilePath={GcsFilePaths.LOGOS}
+              isDownloadable={true}
+              downloadFileName={"vehicle-photo"}
+              setDeletedImages={setDeletedFiles}
+              additionalClasses="w-[18rem]"
+              isDisabled={!!existingVehicleId}
+            />
+          )}
+        />
+
+        {/* rental details */}
+        <FormField
+          control={form.control}
+          name="rentalDetails"
+          render={() => (
+            <FormFieldLayout
+              label="  Rental Details "
+              description="Provide rent details. All Value Should be provided for calculating rent effectively."
+            >
+              <RentalDetailsFormField isDisabled={!!existingVehicleId} />
+            </FormFieldLayout>
+          )}
+        />
 
         {/* submit  */}
-        <Button
-          type="submit"
-          size="lg"
-          disabled={form.formState.isSubmitting}
-          className="w-full md:w-10/12 lg:w-8/12 mx-auto flex-center col-span-2 mt-3 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow"
-        >
-          {type === "Add"
-            ? "Continue to Payment Details"
-            : "Update Vehicle Details"}
-          {form.formState.isSubmitting && <Spinner />}
-        </Button>
-      </form>
+        <FormSubmitButton
+          text={
+            type === "Add"
+              ? "Continue to Payment Details"
+              : "Update Vehicle Details"
+          }
+          isLoading={form.formState.isSubmitting}
+        />
+      </FormContainer>
     </Form>
   );
 }

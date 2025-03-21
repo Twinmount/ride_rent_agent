@@ -88,8 +88,6 @@ export const calculateRentalAmount = (
   let remainingHours = differenceInHours(endDate, startDate);
   let totalAmount = 0;
 
-
-
   const hoursInMonth = 24 * 30;
   const hoursInWeek = 24 * 7;
   const hoursInDay = 24;
@@ -99,7 +97,6 @@ export const calculateRentalAmount = (
   if (months > 0) {
     totalAmount += months * parseFloat(rentalDetails.month.rentInAED);
     remainingHours -= months * hoursInMonth;
-
   }
 
   // Calculate rental for weeks
@@ -107,7 +104,6 @@ export const calculateRentalAmount = (
   if (weeks > 0) {
     totalAmount += weeks * parseFloat(rentalDetails.week.rentInAED);
     remainingHours -= weeks * hoursInWeek;
-    
   }
 
   // Calculate rental for days
@@ -134,8 +130,6 @@ export const calculateFinalAmount = (
 
   // Add base rental, additional charges total, subtract discount, and add 5% tax
   let finalAmount = baseAmount + additionalChargesTotal - discountAmount;
-
- 
 
   // Add 5% tax
   finalAmount += finalAmount * 0.05;
@@ -181,7 +175,7 @@ export const handleCustomerSelect = (
   }
 };
 
-// Helper function to handle vehicle selection to auto fill the Vehicle form
+// Helper function to handle vehicle selection to auto fill the SRM Vehicle form
 export const handleVehicleSelection = (
   vehicleRegistrationNumber: string,
   vehicleData: VehicleType | null,

@@ -17,10 +17,11 @@ import { ChevronsUpDown } from "lucide-react";
 import { debounce } from "@/lib/utils";
 import { searchVehicle } from "@/api/srm";
 import { VehicleType } from "@/types/srm-types";
+import PreviewImageComponent from "../PreviewImageComponent";
 
 type VehicleSearchProps = {
   value?: string;
-  onChangeHandler: (value: string, customerData?: any) => void;
+  onChangeHandler: (value: string, vehicleData?: any) => void;
   placeholder?: string;
 };
 
@@ -132,10 +133,8 @@ const VehicleSearch = ({
                   >
                     <div className="flex h-12 gap-x-3">
                       <div className="h-12 bg-slate-200 w-12 rounded-xl overflow-hidden">
-                        <img
-                          src={vehicle.vehiclePhoto}
-                          className="object-cover w-full h-full"
-                          alt={"vehicle logo"}
+                        <PreviewImageComponent
+                          imagePath={vehicle.vehiclePhoto}
                         />
                       </div>
                       <div className="flex flex-col justify-center">
