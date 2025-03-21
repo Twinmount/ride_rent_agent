@@ -1,6 +1,6 @@
 import { getCompany } from "@/api/company";
 import FloatingWhatsAppButton from "@/components/FloatingWhatsappIcon";
-import CompanyProfileUpdateForm from "@/components/form/main-form/CompanyProfileUpdateForm";
+import CompanyProfileUpdateForm from "@/components/form/main-form/company-form/CompanyProfileUpdateForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
 import { load, StorageKeys } from "@/utils/storage";

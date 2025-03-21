@@ -1,6 +1,6 @@
 import { getUser } from "@/api/user";
 import FloatingWhatsAppButton from "@/components/FloatingWhatsappIcon";
-import CompanyForm from "@/components/form/main-form/CompanyForm";
+import CompanyForm from "@/components/form/main-form/company-form/CompanyForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import { useQuery } from "@tanstack/react-query";
 

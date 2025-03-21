@@ -46,6 +46,7 @@ type SingleFileUploadProps = {
   downloadFileName?: string;
   setDeletedImages: (deletedPaths: (prev: string[]) => string[]) => void;
   additionalClasses?: string;
+  imageOnly?: boolean;
 };
 
 const SingleFileUpload = ({
@@ -61,6 +62,7 @@ const SingleFileUpload = ({
   downloadFileName,
   setDeletedImages,
   additionalClasses,
+  imageOnly = false,
 }: SingleFileUploadProps) => {
   const { control, setValue, clearErrors } = useFormContext();
   const [isUploading, setIsUploading] = useState(false);
@@ -182,7 +184,7 @@ const SingleFileUpload = ({
     <>
       <FormItem className="flex mb-2 w-full max-sm:flex-col">
         <FormLabel
-          className={`flex justify-between mt-4 ml-2 w-64 text-base max-sm:w-fit lg:text-lg ${additionalClasses}`}
+          className={`flex justify-between mt-4 ml-2 w-64 font-semibold text-base max-sm:w-fit lg:text-lg ${additionalClasses}`}
         >
           {label} <span className="mr-5 max-sm:hidden">:</span>
         </FormLabel>
@@ -195,6 +197,11 @@ const SingleFileUpload = ({
                 <>
                   <Input
                     type="file"
+                    accept={
+                      imageOnly
+                        ? "image/png, image/jpeg, image/jpg, image/webp"
+                        : "*"
+                    }
                     onChange={handleFileChange}
                     className="hidden"
                     id={`file-upload-${name}`}

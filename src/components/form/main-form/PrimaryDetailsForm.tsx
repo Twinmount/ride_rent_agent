@@ -14,13 +14,11 @@ import {
 } from "@/components/ui/form";
 
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { PrimaryFormSchema } from "@/lib/validator";
 import { PrimaryFormDefaultValues } from "@/constants";
 import { PrimaryFormType } from "@/types/types";
 import YearPicker from "../YearPicker";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
@@ -36,7 +34,6 @@ import StatesDropdown from "../dropdowns/StatesDropdown";
 import { save, StorageKeys } from "@/utils/storage";
 import { toast } from "@/components/ui/use-toast";
 
-import Spinner from "@/components/general/Spinner";
 import { useParams } from "react-router-dom";
 import { ApiError } from "@/types/types";
 import { GcsFilePaths } from "@/constants/enum";
@@ -51,6 +48,10 @@ import {
   showSuccessToast,
 } from "@/utils/toastUtils";
 import { handleLevelOneFormSubmission } from "@/utils/form-utils";
+import { FormSubmitButton } from "../form-ui/FormSubmitButton";
+import { FormContainer } from "../form-ui/FormContainer";
+import { FormFieldLayout } from "../form-ui/FormFieldLayout";
+import { FormCheckbox } from "../form-ui/FormCheckbox";
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
@@ -182,715 +183,555 @@ export default function PrimaryDetailsForm({
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col w-full gap-5  mx-auto bg-white  rounded-3xl p-2 md:p-4 py-8 !pb-8  "
-      >
-        <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto ">
-          {/* category of the vehicle */}
+      <FormContainer onSubmit={form.handleSubmit(onSubmit)}>
+        {/* category of the vehicle */}
+        {/* Vehicle Category */}
+        <FormField
+          control={form.control}
+          name="vehicleCategoryId"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Vehicle Category"
+              description={
+                isCategoryDisabled
+                  ? "Cannot change category of published vehicle"
+                  : "Select vehicle category"
+              }
+            >
+              <CategoryDropdown
+                onChangeHandler={(value) => {
+                  field.onChange(value);
+                  form.setValue("vehicleTypeId", "");
+                  form.setValue("vehicleBrandId", "");
+
+                  // Reset `commercialLicenses` if the category is bicycles or buggies
+                  if (
+                    [
+                      "b21e0a75-37bc-430b-be3a-c8c0939ef3ec", //buggies
+                      "0ad5ac71-5f8f-43c3-952f-a325e362ad87", //bicycles
+                    ].includes(value)
+                  ) {
+                    form.setValue("commercialLicenses", []);
+                  }
+                }}
+                value={initialValues.vehicleCategoryId}
+                setIsCarsCategory={setIsCarsCategory}
+                setHideCommercialLicenses={setHideCommercialLicenses}
+                isDisabled={isCategoryDisabled}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* Vehicle Type */}
+        <FormField
+          control={form.control}
+          name="vehicleTypeId"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Vehicle Type"
+              description="Select vehicle type"
+            >
+              <VehicleTypesDropdown
+                vehicleCategoryId={form.watch("vehicleCategoryId")}
+                value={field.value}
+                onChangeHandler={field.onChange}
+                isDisabled={!form.watch("vehicleCategoryId")}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* services dropdown for cars */}
+        {isCarsCategory && (
           <FormField
             control={form.control}
-            name="vehicleCategoryId"
+            name="additionalVehicleTypes"
             render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
-                  Vehicle Category <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <CategoryDropdown
-                      onChangeHandler={(value) => {
-                        field.onChange(value);
-                        form.setValue("vehicleTypeId", "");
-                        form.setValue("vehicleBrandId", "");
-
-                        // Reset `commercialLicenses` if the category is bicycles or buggies
-                        if (
-                          [
-                            "b21e0a75-37bc-430b-be3a-c8c0939ef3ec", //buggies
-                            "0ad5ac71-5f8f-43c3-952f-a325e362ad87", //bicycles
-                          ].includes(value)
-                        ) {
-                          form.setValue("commercialLicenses", []);
-                        }
-                      }}
-                      value={initialValues.vehicleCategoryId}
-                      setIsCarsCategory={setIsCarsCategory}
-                      setHideCommercialLicenses={setHideCommercialLicenses}
-                      isDisabled={isCategoryDisabled}
-                    />
-                  </FormControl>
-                  <FormDescription className="ml-2">
-                    {isCategoryDisabled
-                      ? "Cannot change vehicle category for published vehicles"
-                      : " select vehicle category"}
-                  </FormDescription>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* type of the vehicle */}
-          <FormField
-            control={form.control}
-            name="vehicleTypeId"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Vehicle Type <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <VehicleTypesDropdown
-                      vehicleCategoryId={form.watch("vehicleCategoryId")}
-                      value={field.value}
-                      onChangeHandler={field.onChange}
-                      isDisabled={!form.watch("vehicleCategoryId")}
-                    />
-                  </FormControl>
-                  <FormDescription className="ml-2">
-                    select vehicle type
-                  </FormDescription>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* services dropdown for cars */}
-          {isCarsCategory && (
-            <FormField
-              control={form.control}
-              name="additionalVehicleTypes"
-              render={({ field }) => (
-                <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                    <div>
-                      Services Offered <br />
-                      <span>&#40;optional&#41;</span>
-                    </div>
-
-                    <span className="mr-5 max-sm:hidden">:</span>
-                  </FormLabel>
-                  <div className="flex-col items-start w-full">
-                    <FormControl>
-                      <AdditionalTypesDropdown
-                        value={field.value || []}
-                        onChangeHandler={field.onChange}
-                        vehicleTypeId={form.watch("vehicleTypeId")}
-                        isDisabled={!form.watch("vehicleTypeId")}
-                      />
-                    </FormControl>
-                    <FormDescription className="ml-2">
-                      &#40;optional&#41; Select additional services for this
-                      vehicle if available
-                    </FormDescription>
-                    <FormMessage className="ml-2" />
+              <FormFieldLayout
+                label={
+                  <div>
+                    Services Offered <br />
+                    <span>&#40;optional&#41;</span>
                   </div>
-                </FormItem>
-              )}
+                }
+                description="(optional) Select additional services for this vehicle if available"
+              >
+                <AdditionalTypesDropdown
+                  value={field.value || []}
+                  onChangeHandler={field.onChange}
+                  vehicleTypeId={form.watch("vehicleTypeId")}
+                  isDisabled={!form.watch("vehicleTypeId")}
+                />
+              </FormFieldLayout>
+            )}
+          />
+        )}
+
+        {/* brand name */}
+        {/* Brand Name */}
+        <FormField
+          control={form.control}
+          name="vehicleBrandId"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Brand Name"
+              description="Select your vehicle's brand"
+            >
+              <BrandsDropdown
+                vehicleCategoryId={form.watch("vehicleCategoryId")}
+                value={field.value}
+                onChangeHandler={field.onChange}
+                isDisabled={!form.watch("vehicleCategoryId")}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* Model Name */}
+        <FormField
+          control={form.control}
+          name="vehicleModel"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Model Name"
+              description={
+                <>
+                  Enter the model name, e.g.,{" "}
+                  <strong>"Mercedes-Benz C-Class 2024 Latest Model."</strong>
+                </>
+              }
+            >
+              <Input
+                placeholder="e.g., 'Model'"
+                {...field}
+                className="input-field"
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* vehicle registration number */}
+        <FormField
+          control={form.control}
+          name="vehicleRegistrationNumber"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Registration Number"
+              description={
+                <span>
+                  Enter your vehicle registration number (e.g.,{" "}
+                  <strong>ABC12345</strong>).
+                  <br />
+                  The number should be a combination of letters and numbers,
+                  without spaces or special characters, up to 15 characters.
+                </span>
+              }
+            >
+              <Input
+                placeholder="e.g., ABC12345"
+                {...field}
+                className="input-field"
+                type="text"
+                onKeyDown={(e) => {
+                  // Allow only alphanumeric characters and control keys
+                  if (
+                    !/[a-zA-Z0-9]/.test(e.key) &&
+                    ![
+                      "Backspace",
+                      "Delete",
+                      "ArrowLeft",
+                      "ArrowRight",
+                      "Tab", // To allow tabbing between fields
+                    ].includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* Vehicle Photos */}
+        <FormField
+          control={form.control}
+          name="vehiclePhotos"
+          render={() => (
+            <MultipleFileUpload
+              name="vehiclePhotos"
+              label="Vehicle Photos"
+              existingFiles={initialValues.vehiclePhotos || []}
+              description="Add Vehicle Photos. Up to 8 photos can be added."
+              maxSizeMB={30}
+              setIsFileUploading={setIsPhotosUploading}
+              bucketFilePath={GcsFilePaths.IMAGE_VEHICLES}
+              isFileUploading={isPhotosUploading}
+              downloadFileName={
+                formData?.vehicleModel
+                  ? ` ${formData.vehicleModel}`
+                  : "vehicle-image"
+              }
+              setDeletedFiles={setDeletedFiles}
             />
           )}
+        />
 
-          {/* brand name */}
+        {/* Mulkia */}
+        {!hideCommercialLicenses && (
           <FormField
             control={form.control}
-            name="vehicleBrandId"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Brand Name <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <BrandsDropdown
-                      vehicleCategoryId={form.watch("vehicleCategoryId")}
-                      value={field.value}
-                      onChangeHandler={field.onChange}
-                      isDisabled={!form.watch("vehicleCategoryId")}
-                    />
-                  </FormControl>
-                  <FormDescription className="ml-2">
-                    Select your vehicle's Brand
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
-          {/* model name */}
-          <FormField
-            control={form.control}
-            name="vehicleModel"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Model Name <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <Input
-                      placeholder="eg: 'Model'"
-                      {...field}
-                      className={`input-field`}
-                    />
-                  </FormControl>
-                  <FormDescription className="ml-2">
-                    Enter the model name, e.g., "Mercedes-Benz C-Class 2024
-                    Latest Model.
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* vehicle registration number */}
-          <FormField
-            control={form.control}
-            name="vehicleRegistrationNumber"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Registration Number{" "}
-                  <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <Input
-                      placeholder="eg: ABC12345"
-                      {...field}
-                      className={`input-field`}
-                      type="text"
-                      onKeyDown={(e) => {
-                        // Allow only alphanumeric characters and control keys like Backspace, Delete, and Arrow keys
-                        if (
-                          !/[a-zA-Z0-9]/.test(e.key) &&
-                          ![
-                            "Backspace",
-                            "Delete",
-                            "ArrowLeft",
-                            "ArrowRight",
-                            "Tab", // To allow tabbing between fields
-                          ].includes(e.key)
-                        ) {
-                          e.preventDefault();
-                        }
-                      }}
-                    />
-                  </FormControl>
-                  <FormDescription className="ml-2">
-                    Enter your vehicle registration number (e.g., ABC12345). The
-                    number should be a combination of letters and numbers,
-                    without any spaces or special characters, up to 15
-                    characters.
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Vehicle Photos */}
-          <FormField
-            control={form.control}
-            name="vehiclePhotos"
+            name="commercialLicenses"
             render={() => (
               <MultipleFileUpload
-                name="vehiclePhotos"
-                label="Vehicle Photos"
-                existingFiles={initialValues.vehiclePhotos || []}
-                description="Add Vehicle Photos. Up to 8 photos can be added."
-                maxSizeMB={30}
-                setIsFileUploading={setIsPhotosUploading}
-                bucketFilePath={GcsFilePaths.IMAGE_VEHICLES}
-                isFileUploading={isPhotosUploading}
+                name="commercialLicenses"
+                label={
+                  isCustomCommercialLicenseLabel
+                    ? "Registration Card / Certificate"
+                    : "Registration Card / Mulkia"
+                }
+                existingFiles={initialValues.commercialLicenses || []}
+                description={
+                  <>
+                    Upload <span className="font-bold text-yellow">front</span>{" "}
+                    & <span className="font-bold text-yellow">back</span> images
+                    of the Registration Card /{" "}
+                    {isCustomCommercialLicenseLabel ? "Certificate" : "Mulkia"}
+                  </>
+                }
+                maxSizeMB={15}
+                setIsFileUploading={setIsLicenseUploading}
+                bucketFilePath={GcsFilePaths.COMMERCIAL_LICENSES}
+                isFileUploading={isLicenseUploading}
                 downloadFileName={
                   formData?.vehicleModel
-                    ? ` ${formData.vehicleModel}`
-                    : "vehicle-image"
+                    ? `[commercial-license] - ${formData.vehicleModel}`
+                    : "[commercial-license]"
                 }
                 setDeletedFiles={setDeletedFiles}
               />
             )}
           />
+        )}
 
-          {/* Mulkia */}
-          {!hideCommercialLicenses && (
-            <FormField
-              control={form.control}
-              name="commercialLicenses"
-              render={() => (
-                <MultipleFileUpload
-                  name="commercialLicenses"
-                  label={
-                    isCustomCommercialLicenseLabel
-                      ? "Registration Card / Certificate"
-                      : "Registration Card / Mulkia"
-                  }
-                  existingFiles={initialValues.commercialLicenses || []}
-                  description={
-                    <>
-                      Upload{" "}
-                      <span className="font-bold text-yellow">front</span> &{" "}
-                      <span className="font-bold text-yellow">back</span> images
-                      of the Registration Card /{" "}
-                      {isCustomCommercialLicenseLabel
-                        ? "Certificate"
-                        : "Mulkia"}
-                    </>
-                  }
-                  maxSizeMB={15}
-                  setIsFileUploading={setIsLicenseUploading}
-                  bucketFilePath={GcsFilePaths.COMMERCIAL_LICENSES}
-                  isFileUploading={isLicenseUploading}
-                  downloadFileName={
-                    formData?.vehicleModel
-                      ? `[commercial-license] - ${formData.vehicleModel}`
-                      : "[commercial-license]"
-                  }
-                  setDeletedFiles={setDeletedFiles}
-                />
-              )}
-            />
+        {/* Mulkia Expiry */}
+        <FormField
+          control={form.control}
+          name="commercialLicenseExpireDate"
+          render={({ field }) => (
+            <FormFieldLayout
+              label={
+                <span>
+                  Registration Card / Mulkia Expiry Date <br />
+                  <span className="text-sm text-gray-500">(DD/MM/YYYY)</span>
+                </span>
+              }
+              description="Enter the expiry date for the Registration Card/Mulkia in the format DD/MM/YYYY."
+            >
+              <DatePicker
+                selected={field.value}
+                onChange={(date: Date | null) => field.onChange(date)}
+                dateFormat="dd/MM/yyyy"
+                wrapperClassName="datePicker text-base -ml-4"
+                placeholderText="DD/MM/YYYY"
+              />
+            </FormFieldLayout>
           )}
+        />
 
-          {/* Mulkia Expiry */}
-          <FormField
-            control={form.control}
-            name="commercialLicenseExpireDate"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Registration Card / Mulkia Expiry Date{" "}
-                  <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <DatePicker
-                      selected={field.value}
-                      onChange={(date: Date | null) => field.onChange(date)}
-                      dateFormat="dd/MM/yyyy"
-                      wrapperClassName="datePicker text-base -ml-4 "
-                      placeholderText="DD/MM/YYYY"
-                    />
-                  </FormControl>
-                  <FormDescription className="ml-2">
-                    Enter Registration Card/Mulkia expiry date
-                    &#40;DD/MM/YYYY&#41;.
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
+        {/* registered year */}
+        <FormField
+          control={form.control}
+          name="vehicleRegisteredYear"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Registered Year"
+              description="Enter the year in which the vehicle was registered."
+            >
+              <YearPicker
+                onChangeHandler={field.onChange}
+                value={initialValues.vehicleRegisteredYear}
+                placeholder="year"
+              />
+            </FormFieldLayout>
+          )}
+        />
 
-          {/* registered year */}
-          <FormField
-            control={form.control}
-            name="vehicleRegisteredYear"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Registered Year <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <YearPicker
-                      onChangeHandler={field.onChange}
-                      value={initialValues.vehicleRegisteredYear}
-                      placeholder="year"
-                    />
-                  </FormControl>
-                  <FormDescription className="ml-2">
-                    Enter registered year
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Specification */}
-          <FormField
-            control={form.control}
-            name="specification"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Specification <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl className="mt-2">
-                    <RadioGroup
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      className="flex gap-x-5 items-center"
-                      defaultValue="UAE_SPEC"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="UAE_SPEC" id="UAE_SPEC" />
-                        <Label htmlFor="UAE">UAE</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="USA_SPEC" id="USA_SPEC" />
-                        <Label htmlFor="USA_SPEC">USA</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="OTHERS" id="others" />
-                        <Label htmlFor="others">Others</Label>
-                      </div>
-                    </RadioGroup>
-                  </FormControl>
-                  <FormDescription className="mt-1 ml-2">
-                    Select the regional specification of the vehicle
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* mobile */}
-          <FormField
-            control={form.control}
-            name="phoneNumber"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  WhatsApp/Mobile <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <PhoneInput
-                      defaultCountry="ae"
-                      value={field.value}
-                      onChange={(value, country) => {
-                        field.onChange(value);
-                        setCountryCode(country.country.dialCode);
-                      }}
-                      className="flex items-center"
-                      inputClassName="input-field !w-full !text-base"
-                      countrySelectorStyleProps={{
-                        className:
-                          "bg-white !border-none outline-none !rounded-xl  mr-1",
-                        style: {
-                          border: "none ",
-                        },
-                        buttonClassName:
-                          "!border-none outline-none !h-[52px] !w-[50px] !rounded-xl !bg-gray-100",
-                      }}
-                    />
-                  </FormControl>
-                  <FormDescription className="ml-2">
-                    Enter the{" "}
-                    <span className="font-semibold text-green-400">
-                      WhatsApp
-                    </span>{" "}
-                    mobile number. This number will receive the direct booking
-                    details.
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* rental details */}
-          <FormField
-            control={form.control}
-            name="rentalDetails"
-            render={() => {
-              return (
-                <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                    Rental Details <span className="mr-5 max-sm:hidden">:</span>
-                  </FormLabel>
-                  <div className="flex-col items-start w-full">
-                    <FormControl>
-                      <RentalDetailsFormField />
-                    </FormControl>
-                    <FormDescription className="ml-2">
-                      Provide rent details. At least one of "day," "week," or
-                      "month" must be selected.
-                    </FormDescription>
-                    <FormMessage className="ml-2" />
+        {/* Specification */}
+        <FormField
+          control={form.control}
+          name="specification"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Specification"
+              description="Select the regional specification of the vehicle"
+            >
+              <div className="mt-2">
+                <RadioGroup
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  className="flex gap-x-5 items-center"
+                  defaultValue="UAE_SPEC"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="UAE_SPEC" id="UAE_SPEC" />
+                    <Label htmlFor="UAE">UAE</Label>
                   </div>
-                </FormItem>
-              );
-            }}
-          />
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="USA_SPEC" id="USA_SPEC" />
+                    <Label htmlFor="USA_SPEC">USA</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="OTHERS" id="others" />
+                    <Label htmlFor="others">Others</Label>
+                  </div>
+                </RadioGroup>
+              </div>
+            </FormFieldLayout>
+          )}
+        />
 
-          {/* Location(state) */}
-          <FormField
-            control={form.control}
-            name="stateId"
-            render={({ field }) => (
+        {/* mobile */}
+        <FormField
+          control={form.control}
+          name="phoneNumber"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Whatsapp/Mobile"
+              description={
+                <span>
+                  Enter the{" "}
+                  <span className="font-semibold text-green-400">WhatsApp</span>{" "}
+                  mobile number. This number will receive direct booking
+                  details.
+                </span>
+              }
+            >
+              <PhoneInput
+                defaultCountry="ae"
+                value={field.value}
+                onChange={(value, country) => {
+                  field.onChange(value);
+                  setCountryCode(country.country.dialCode);
+                }}
+                className="flex items-center"
+                inputClassName="input-field !w-full !text-base"
+                countrySelectorStyleProps={{
+                  className:
+                    "bg-white !border-none outline-none !rounded-xl  mr-1",
+                  style: {
+                    border: "none ",
+                  },
+                  buttonClassName:
+                    "!border-none outline-none !h-[52px] !w-[50px] !rounded-xl !bg-gray-100",
+                }}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* rental details */}
+        <FormField
+          control={form.control}
+          name="rentalDetails"
+          render={() => {
+            return (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Location <span className="mr-5 max-sm:hidden">:</span>
+                  Rental Details <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
-                    <StatesDropdown
-                      onChangeHandler={(value) => {
-                        field.onChange(value);
-                        form.setValue("cityIds", []); //
-                      }}
-                      value={initialValues.stateId}
-                      placeholder="location"
-                    />
+                    <RentalDetailsFormField />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    Choose your state/location
+                    Provide rent details. At least one of "day," "week," or
+                    "month" must be selected.
                   </FormDescription>
                   <FormMessage className="ml-2" />
                 </div>
               </FormItem>
-            )}
-          />
-          {/* cities */}
-          <FormField
-            control={form.control}
-            name="cityIds"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-52 text-base min-w-52 lg:text-lg">
-                  Cities / Serving Areas{" "}
-                  <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <CitiesDropdown
-                      stateId={form.watch("stateId")}
-                      value={field.value}
-                      onChangeHandler={field.onChange}
-                      placeholder="cities"
-                    />
-                  </FormControl>
-                  <FormDescription className="ml-2">
-                    Select all the cities of operation/serving areas.
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
+            );
+          }}
+        />
 
-          {/* Lease */}
-          <FormField
-            control={form.control}
-            name="isLease"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Lease? <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <div className="flex items-center mt-3 space-x-2">
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
-                        id="isLease"
-                      />
-                      <label
-                        htmlFor="isLease"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Available for lease?
-                      </label>
-                    </div>
-                  </FormControl>
-                  <FormDescription className="mt-1 ml-6">
-                    Select if this vehicle is available for lease.
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
+        {/* Location(state) */}
+        <FormField
+          control={form.control}
+          name="stateId"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Location"
+              description="Choose your state/location"
+            >
+              <StatesDropdown
+                onChangeHandler={(value) => {
+                  field.onChange(value);
+                  form.setValue("cityIds", []); //
+                }}
+                value={initialValues.stateId}
+                placeholder="location"
+              />
+            </FormFieldLayout>
+          )}
+        />
 
-          {/* security deposit */}
-          <FormField
-            control={form.control}
-            name="securityDeposit"
-            render={() => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Security Deposit <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <SecurityDepositField />
-                  </FormControl>
-                  <FormDescription className="ml-8">
-                    Specify if a security deposit is required and provide the
-                    amount if applicable.
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
+        {/* cities */}
+        <FormField
+          control={form.control}
+          name="cityIds"
+          render={({ field }) => (
+            <FormFieldLayout
+              label={
+                <span>
+                  City / Serving Areas <br />
+                  <span className="text-xs text-gray-500">
+                    (multiple selection allowed)
+                  </span>
+                </span>
+              }
+              description="Select all the cities of operation/serving areas."
+            >
+              <CitiesDropdown
+                stateId={form.watch("stateId")}
+                value={field.value}
+                onChangeHandler={field.onChange}
+                placeholder="cities"
+              />
+            </FormFieldLayout>
+          )}
+        />
 
-          {/* payment details */}
-          <div className="flex mb-2 w-full max-sm:flex-col max-sm:space-y-1">
-            <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-              Payment Info <span className="mr-5 max-sm:hidden">:</span>
-            </FormLabel>
-            <div className="p-2 w-full rounded-lg border-b shadow">
+        {/* Lease */}
+        <FormField
+          control={form.control}
+          name="isLease"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Lease?"
+              description="Select if this vehicle is available for lease."
+            >
+              <FormCheckbox
+                id="isLease"
+                label="Available for lease?"
+                checked={field.value}
+                onChange={field.onChange}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* security deposit */}
+        <FormField
+          control={form.control}
+          name="securityDeposit"
+          render={() => (
+            <FormFieldLayout
+              label="Security Deposit"
+              description="Specify if a security deposit is required and provide the amount if applicable."
+            >
+              <SecurityDepositField />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* Payment Info */}
+        <div className="mb-2 flex w-full max-sm:flex-col max-sm:space-y-1">
+          <FormFieldLayout
+            label="Payment Info"
+            description="Select the payment methods your company supports."
+          >
+            <div className="w-full rounded-lg border-b p-2 shadow">
+              {/* Crypto */}
               <FormField
                 control={form.control}
                 name="isCryptoAccepted"
                 render={({ field }) => (
-                  <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                    <div className="flex-col items-start w-full">
-                      <FormControl>
-                        <div className="flex items-center mt-3 space-x-2">
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
-                            id="isCryptoAccepted"
-                          />
-                          <label
-                            htmlFor="isCryptoAccepted"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            Crypto
-                          </label>
-                        </div>
-                      </FormControl>
-                      <FormDescription className="mt-1 ml-7">
-                        Select if your company accepts payments via
-                        cryptocurrency.
-                      </FormDescription>
-                      <FormMessage className="ml-2" />
-                    </div>
-                  </FormItem>
+                  <div className="mb-2">
+                    <FormCheckbox
+                      id="isCryptoAccepted"
+                      label="Crypto"
+                      checked={field.value}
+                      onChange={field.onChange}
+                    />
+                    <FormDescription className="ml-7 mt-1">
+                      Select if your company accepts payments via
+                      cryptocurrency.
+                    </FormDescription>
+                    <FormMessage className="ml-2" />
+                  </div>
                 )}
               />
 
-              {/* credit/debit details */}
+              {/* Credit/Debit Cards */}
               <FormField
                 control={form.control}
                 name="isCreditOrDebitCardsSupported"
                 render={({ field }) => (
-                  <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                    <div className="flex-col items-start w-full">
-                      <FormControl>
-                        <div className="flex items-center mt-3 space-x-2">
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
-                            id="isCreditDebitCard"
-                          />
-                          <label
-                            htmlFor="isCreditDebitCard"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            Credit / Debit card
-                          </label>
-                        </div>
-                      </FormControl>
-                      <FormDescription className="mt-1 ml-7">
-                        Select if your company accepts payments via credit or
-                        debit card.
-                      </FormDescription>
-                      <FormMessage className="ml-2" />
-                    </div>
-                  </FormItem>
+                  <div className="mb-2">
+                    <FormCheckbox
+                      id="isCreditDebitCard"
+                      label="Credit / Debit Card"
+                      checked={field.value}
+                      onChange={field.onChange}
+                    />
+                    <FormDescription className="ml-7 mt-1">
+                      Select if your company accepts payments via credit or
+                      debit cards.
+                    </FormDescription>
+                    <FormMessage className="ml-2" />
+                  </div>
                 )}
               />
 
-              {/*Tabby */}
+              {/* Tabby */}
               <FormField
                 control={form.control}
                 name="isTabbySupported"
                 render={({ field }) => (
-                  <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                    <div className="flex-col items-start w-full">
-                      <FormControl>
-                        <div className="flex items-center mt-3 space-x-2">
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                            className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
-                            id="isTabby"
-                          />
-                          <label
-                            htmlFor="isTabby"
-                            className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                          >
-                            Tabby
-                          </label>
-                        </div>
-                      </FormControl>
-                      <FormDescription className="mt-1 ml-7">
-                        Select if your company accepts payments via Tabby.
-                      </FormDescription>
-                      <FormMessage className="ml-2" />
-                    </div>
-                  </FormItem>
+                  <div className="mb-2">
+                    <FormCheckbox
+                      id="isTabby"
+                      label="Tabby"
+                      checked={field.value}
+                      onChange={field.onChange}
+                    />
+                    <FormDescription className="ml-7 mt-1">
+                      Select if your company accepts payments via Tabby.
+                    </FormDescription>
+                    <FormMessage className="ml-2" />
+                  </div>
                 )}
               />
             </div>
-          </div>
-
-          {/* spot delivery */}
-          <FormField
-            control={form.control}
-            name="isSpotDeliverySupported"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
-                  Spot delivery? <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <div className="flex items-center mt-3 space-x-2">
-                      <Checkbox
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                        className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
-                        id="isSpotDeliverySupported"
-                      />
-                      <label
-                        htmlFor="isSpotDeliverySupported"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Offer spot delivery service?
-                      </label>
-                    </div>
-                  </FormControl>
-                  <FormDescription className="mt-1 ml-7">
-                    Select this option if your company offers on-the-spot
-                    delivery services.
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
+          </FormFieldLayout>
         </div>
 
+        {/* spot delivery */}
+        <FormField
+          control={form.control}
+          name="isSpotDeliverySupported"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Spot Delivery?"
+              description="Select this option if your company offers on-the-spot delivery services."
+            >
+              <FormCheckbox
+                id="isSpotDeliverySupported"
+                label="Offer spot delivery service?"
+                checked={field.value}
+                onChange={field.onChange}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
         {/* submit  */}
-        <Button
-          type="submit"
-          size="lg"
-          disabled={form.formState.isSubmitting}
-          className="w-full md:w-10/12 lg:w-8/12 mx-auto flex-center col-span-2 mt-3 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow"
-        >
-          {type === "Add" ? "Add Vehicle" : "Update Vehicle"}
-          {form.formState.isSubmitting && <Spinner />}
-        </Button>
-      </form>
+        <FormSubmitButton
+          text={type === "Add" ? "Add Vehicle" : "Update Vehicle"}
+          isLoading={form.formState.isSubmitting}
+        />
+      </FormContainer>
     </Form>
   );
 }

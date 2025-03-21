@@ -1,6 +1,5 @@
-import * as React from "react";
 import { Check, ChevronDown } from "lucide-react";
-import { cn, debounce } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -17,6 +16,7 @@ import {
 } from "@/components/ui/popover";
 import { useQuery } from "@tanstack/react-query";
 import { fetchAllBrands, fetchBrandById } from "@/api/brands";
+import { useEffect, useMemo, useState } from "react";
 
 type BrandsDropdownProps = {
   value?: string;
@@ -33,9 +33,10 @@ const BrandsDropdown = ({
   isDisabled = false,
   vehicleCategoryId,
 }: BrandsDropdownProps) => {
-  const [selectedValue, setSelectedValue] = React.useState<string>(value || "");
-  const [searchTerm, setSearchTerm] = React.useState("");
-  const [open, setOpen] = React.useState(false);
+  const [selectedValue, setSelectedValue] = useState<string>(value || "");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(searchTerm);
+  const [open, setOpen] = useState(false);
   // Fetch brand by ID if value is provided
   const { data: specificBrandData, isLoading: isSpecificBrandLoading } =
     useQuery({
@@ -45,80 +46,66 @@ const BrandsDropdown = ({
     });
 
   // Fetch brands by search term and category id
-  const {
-    data: brandData,
-    isFetching: isBrandsLoading,
-    refetch,
-  } = useQuery({
-    queryKey: ["brands", vehicleCategoryId, searchTerm],
+  const { data: brandData, isFetching: isBrandsLoading } = useQuery({
+    queryKey: ["brands", vehicleCategoryId, debouncedSearchTerm],
     queryFn: () =>
       fetchAllBrands({
         page: 1,
         limit: 20,
         sortOrder: "ASC",
         vehicleCategoryId: vehicleCategoryId as string,
-        search: searchTerm,
+        search: debouncedSearchTerm,
       }),
-    enabled: !!vehicleCategoryId,
+    enabled: !!vehicleCategoryId && debouncedSearchTerm.length > 1,
     staleTime: 0,
   });
 
   // Set the selected value based on the fetched specific brand
-  React.useEffect(() => {
+  useEffect(() => {
     if (specificBrandData && specificBrandData.result) {
       setSelectedValue(specificBrandData.result.id);
     }
   }, [specificBrandData]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (value) {
       setSelectedValue(value);
     }
   }, [value]);
 
   // Debounced handle search
-  const debouncedHandleSearch = React.useCallback(
-    debounce((query: string) => {
-      setSearchTerm(query);
-      refetch(); // Trigger the refetch
-    }, 500), // 300ms delay
-    [refetch]
-  );
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300); // Debounce delay
+
+    return () => {
+      clearTimeout(handler); // Clear timeout if user types again
+    };
+  }, [searchTerm]);
 
   const handleSelect = (currentValue: string) => {
     setSelectedValue(currentValue);
     if (onChangeHandler) onChangeHandler(currentValue);
   };
 
-  const selectedBrandName = React.useMemo(() => {
+  const selectedBrandName = useMemo(() => {
     // Prioritize loading states first
     if (isSpecificBrandLoading || isBrandsLoading) return "Loading...";
 
-    // Try to find the brand in the `brandData` list
-    if (selectedValue && brandData?.result.list) {
-      const brand = brandData.result.list.find(
-        (brand) => brand.id === selectedValue
-      );
-      if (brand) {
-        return brand.brandName;
-      }
-    }
-
-    // If `brandData` doesn't have the brand, fallback to `specificBrandData`
     if (specificBrandData?.result) {
       return specificBrandData.result.brandName;
     }
 
     // Default text if nothing is found or loaded yet
     return `Choose ${placeholder}`;
-  }, [
-    selectedValue,
-    brandData,
-    specificBrandData,
-    isSpecificBrandLoading,
-    isBrandsLoading,
-    placeholder,
-  ]);
+  }, [selectedValue, specificBrandData, isSpecificBrandLoading]);
+
+  const handleSearchTermChange = (value: string) => {
+    if (/^[a-zA-Z\s]*$/.test(value)) {
+      setSearchTerm(value);
+    }
+  };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -132,8 +119,8 @@ const BrandsDropdown = ({
           {!vehicleCategoryId
             ? "Choose a vehicle category first"
             : isBrandsLoading || isSpecificBrandLoading
-            ? "Loading brands..."
-            : selectedBrandName}
+              ? "Loading brands..."
+              : selectedBrandName}
           <ChevronDown className="w-6 h-6 opacity-50" />
         </Button>
       </PopoverTrigger>
@@ -141,7 +128,7 @@ const BrandsDropdown = ({
         <Command shouldFilter={false}>
           <CommandInput
             placeholder={`Search ${placeholder}...`}
-            onValueChange={debouncedHandleSearch}
+            onValueChange={(value) => handleSearchTermChange(value)}
           />
           <CommandList>
             {!searchTerm ? (
