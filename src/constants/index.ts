@@ -19,18 +19,17 @@ import {
   ClipboardList,
   Lock,
   CalendarCheck,
-  Box,
 } from "lucide-react";
 
 // sidebar content
 export const sidebarContent = [
   { label: "Dashboard", icon: LayoutDashboard, link: "/" },
   { label: "My Listings", icon: List, link: "/listings" },
-  {
-    label: "SRM",
-    icon: Box,
-    link: "/srm",
-  },
+  // {
+  //   label: "SRM",
+  //   icon: Box,
+  //   link: "/srm",
+  // },
   {
     label: "Profile",
     icon: UserRoundPen,
