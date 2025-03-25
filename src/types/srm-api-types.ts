@@ -46,7 +46,6 @@ export interface VehicleApiType {
     id: string;
     vehicleCategoryId: string;
     brandName: string;
-    brandValue: string;
     brandLogo: string;
   };
   vehicleRegistrationNumber: string;
@@ -64,7 +63,6 @@ export interface AddVehicleFormResponse {
 // Payment type
 export interface PaymentApiType {
   id: string;
-  paymentId: string;
   advanceAmount: string;
   remainingAmount: string;
   securityDeposits: {
@@ -72,6 +70,8 @@ export interface PaymentApiType {
     amountInAED: string;
   };
   currency: string;
+  bookingStartDate: string;
+  bookingEndDate: string;
 }
 
 export interface AddPaymentFormResponse {
@@ -237,6 +237,31 @@ export interface FetchPaymentFormRequiredDataResponse {
     bookingId: string;
     vehicle: VehicleApiType;
   };
+  status: string;
+  statusCode: number;
+}
+
+export interface GetSRMLevelsFilledResponse {
+  result: {
+    levelsFilled: string;
+  };
+  status: string;
+  statusCode: number;
+}
+
+export interface GetSRMCustomerDetailsResponse {
+  result: CustomerApiType;
+  status: string;
+  statusCode: number;
+}
+
+export interface GetSRMVehicleDetailsResponse {
+  result: VehicleApiType;
+  status: string;
+  statusCode: number;
+}
+export interface GetSRMPaymentDetailsResponse {
+  result: PaymentApiType;
   status: string;
   statusCode: number;
 }

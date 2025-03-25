@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
-import { CustomerListTable } from "@/components/table/CustomerListTable";
 import { Link } from "react-router-dom";
 import { fetchCustomerList } from "@/api/srm/trips";
 import { CustomerListColumns } from "@/components/table/columns/CustomerListColumn";
 import { SortDropdown } from "@/components/SortDropdown";
 import { Plus } from "lucide-react";
 import Search from "@/components/Search";
+import { GenericTable } from "@/components/table/GenericTable";
 
 export default function CustomerListPage() {
   const [page, setPage] = useState(1);
@@ -70,7 +70,7 @@ export default function CustomerListPage() {
         />
       </div>
 
-      <CustomerListTable
+      <GenericTable
         columns={CustomerListColumns()}
         data={customerData}
         loading={isLoading}

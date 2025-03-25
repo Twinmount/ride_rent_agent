@@ -27,14 +27,18 @@ import { FormFieldLayout } from "../form-ui/FormFieldLayout";
 
 type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";
-  formData?: SRMVehicleDetailsFormType | null;
+  formData?: SRMVehicleDetailsFormType | null | undefined;
   onNextTab?: () => void;
+  refetchLevels?: () => void;
+  isAddOrIncomplete?: boolean;
 };
 
 export default function SRMVehicleDetailsForm({
   type,
   onNextTab,
   formData,
+  refetchLevels,
+  isAddOrIncomplete,
 }: SRMVehicleDetailsFormProps) {
   const {} = useParams<{}>();
   const [isFileUploading, setIsFileUploading] = useState(false);
@@ -51,6 +55,8 @@ export default function SRMVehicleDetailsForm({
     formData && type === "Update"
       ? formData
       : SRMVehicleDetailsFormDefaultValues;
+
+  console.log("initial values", initialValues);
 
   // Define your form
   const form = useForm<z.infer<typeof SRMVehicleDetailsFormSchema>>({
@@ -117,7 +123,7 @@ export default function SRMVehicleDetailsForm({
     // form submission
     try {
       let data;
-      if (type === "Add") {
+      if (isAddOrIncomplete) {
         data = await handleAddVehicleBooking(values, bookingId);
       }
 
@@ -133,6 +139,7 @@ export default function SRMVehicleDetailsForm({
           className: "bg-yellow text-white",
         });
 
+        refetchLevels?.();
         if (type === "Add" && onNextTab) {
           onNextTab();
 
@@ -271,7 +278,10 @@ export default function SRMVehicleDetailsForm({
               label="  Rental Details "
               description="Provide rent details. All Value Should be provided for calculating rent effectively."
             >
-              <RentalDetailsFormField isDisabled={!!existingVehicleId} />
+              <RentalDetailsFormField
+                isDisabled={!!existingVehicleId}
+                isSRM={true}
+              />
             </FormFieldLayout>
           )}
         />

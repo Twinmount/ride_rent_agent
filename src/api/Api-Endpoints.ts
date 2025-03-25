@@ -69,7 +69,9 @@ export enum Slug {
   GET_ENQUIRIES = "/queries",
   GET_PORTFOLIO = "/portfolio",
 
-  // SRM Form endpoints
+  // SRM
+  GET_SRM_LEVELS_FILLED = "/srm-bookings/levels-filled",
+
   // SRM CUSTOMERS
   POST_SRM_CUSTOMER_FORM = "/srm-customers",
   PUT_SRM_CUSTOMER_FORM = "/srm-customers",

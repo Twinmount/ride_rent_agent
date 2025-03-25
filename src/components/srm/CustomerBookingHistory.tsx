@@ -4,8 +4,8 @@ import { BookingStatus } from "@/types/srm-types";
 import Pagination from "../Pagination";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { CompletedTripsTable } from "../table/CompletedTripsTable";
 import { CompletedTripsColumns } from "../table/columns/CompletedTripsColumn";
+import { GenericTable } from "../table/GenericTable";
 
 export default function CustomerBookingHistory() {
   const [page, setPage] = useState(1);
@@ -43,7 +43,7 @@ export default function CustomerBookingHistory() {
       <h2 className="text-center font-semibold text-lg mb-4">
         Completed Trips
       </h2>
-      <CompletedTripsTable
+      <GenericTable
         columns={CompletedTripsColumns()}
         data={tripData}
         loading={isLoading}

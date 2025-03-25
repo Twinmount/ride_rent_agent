@@ -38,6 +38,8 @@ import { useState } from "react";
 type SRMPaymentDetailsFormProps = {
   type: "Add" | "Update";
   formData?: SRMPaymentDetailsFormType | null;
+  refetchLevels?: () => void;
+  isAddOrIncomplete?: boolean;
 };
 
 // Mock rental details (replace with actual props later if needed)
@@ -45,6 +47,8 @@ type SRMPaymentDetailsFormProps = {
 export default function SRMPaymentDetailsForm({
   type,
   formData,
+  refetchLevels,
+  isAddOrIncomplete,
 }: SRMPaymentDetailsFormProps) {
   const {} = useParams<{}>();
   const bookingId = sessionStorage.getItem("bookingId");
@@ -93,7 +97,7 @@ export default function SRMPaymentDetailsForm({
     // Append other form data
     try {
       let data;
-      if (type === "Add") {
+      if (isAddOrIncomplete) {
         data = await addPaymentDetailsForm(values);
         const paymentId = data?.result?.id;
 
@@ -112,6 +116,7 @@ export default function SRMPaymentDetailsForm({
       }
 
       if (data) {
+        refetchLevels?.();
         toast({
           title: `Trip ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",

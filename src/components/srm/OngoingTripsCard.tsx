@@ -128,6 +128,13 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
           </div>
 
           <div className="flex gap-x-2 items-center">
+            <Link
+              to={`/srm/trips/edit/${trip.bookingId}?customerId=${trip.customer.customerId}&vehicleId=${trip.vehicle.id}&paymentId=${trip.payment.id}`}
+              className="px-3 py-1 text-white bg-red-500 rounded-md"
+            >
+              View
+            </Link>
+
             <button
               onClick={() => onOpenModal(trip.bookingId)}
               className="px-3 py-1 text-white bg-blue-500 rounded-md"

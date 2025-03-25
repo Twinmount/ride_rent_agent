@@ -18,7 +18,7 @@ const SRMPaymentDetailsForm = lazy(
   () => import("@/components/form/srm-form/PaymentDetailsForm")
 );
 
-export default function SRMDataAddPage() {
+export default function SRMFormAddPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<SRMTabsTypes>("customer");
   const [levelsFilled, setLevelsFilled] = useState<number>(0); // Default starting level

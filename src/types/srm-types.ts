@@ -102,7 +102,6 @@ export interface VehicleType {
     id: string;
     vehicleCategoryId: string;
     brandName: string;
-    brandValue: string;
     brandLogo: string;
   };
   vehicleRegistrationNumber: string;
@@ -129,7 +128,6 @@ export interface CustomerType {
 // Payment type
 export interface PaymentType {
   id: string;
-  paymentId: string;
   advanceAmount: string;
   remainingAmount: string;
   securityDeposits: {

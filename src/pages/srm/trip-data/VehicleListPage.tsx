@@ -3,11 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
 import { SortDropdown } from "@/components/SortDropdown";
 import { fetchVehicleList } from "@/api/srm/trips";
-import { VehicleListTable } from "@/components/table/VehicleListTable";
+
 import { VehicleListColumns } from "@/components/table/columns/VehicleListColumns";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import Search from "@/components/Search";
+import { GenericTable } from "@/components/table/GenericTable";
 
 export default function VehicleListPage() {
   const [page, setPage] = useState(1);
@@ -68,7 +69,7 @@ export default function VehicleListPage() {
         />
       </div>
 
-      <VehicleListTable
+      <GenericTable
         columns={VehicleListColumns}
         data={vehicleData}
         loading={isLoading}
