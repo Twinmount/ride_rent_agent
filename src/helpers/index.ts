@@ -266,3 +266,40 @@ export const handleVehicleSelection = (
     form.resetField("rentalDetails");
   }
 };
+
+// for showing notification like indication in teh ongoing srm trips card
+export function getExpiryNotificationText(bookingEndDate: string): {
+  text: string;
+  className: string;
+} {
+  const today = new Date();
+  const endDate = new Date(bookingEndDate);
+  const diffTime = endDate.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24)); // difference in days
+
+  if (diffDays > 7) {
+    return { text: "", className: "" }; // No notification if more than 7 days
+  }
+
+  if (diffDays > 0) {
+    // For 7 - 3 days
+    return {
+      text: `${diffDays} day${diffDays > 1 ? "s" : ""} to end...`,
+      className: "text-yellow", // Yellow/Orange
+    };
+  }
+
+  if (diffDays > -7) {
+    // For 3 - 1 days
+    return {
+      text: `${-diffDays} day${-diffDays > 1 ? "s" : ""} to end...`,
+      className: "text-orange", // Intense color for 3 - 1 days
+    };
+  }
+
+  // For expired bookings
+  return {
+    text: `Expired on ${endDate.toLocaleDateString()}`,
+    className: "text-red-500", // Red color for expired bookings
+  };
+}

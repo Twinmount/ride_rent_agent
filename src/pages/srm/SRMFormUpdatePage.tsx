@@ -1,9 +1,8 @@
 import { CircleArrowLeft } from "lucide-react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense } from "react";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
-import { validateSRMTabAccess } from "@/helpers/form";
 import { SRMTabsTypes } from "@/types/types";
 import { useSRMUpdateForm } from "@/hooks/useSRMUpdateForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
@@ -22,7 +21,7 @@ const SRMPaymentDetailsForm = lazy(
 export default function SRMFormUpdatePage() {
   const navigate = useNavigate();
 
-  const { bookingId = "RDBI-DKmqxZ5TPi" } = useParams<{
+  const { bookingId } = useParams<{
     bookingId: string;
   }>();
 
@@ -30,8 +29,6 @@ export default function SRMFormUpdatePage() {
   const handleTabChange = (value: string) => {
     setActiveTab(value as SRMTabsTypes);
   };
-
-  // const bookingId = "RDBI-DKmqxZ5TPi";
 
   // Using custom hook
   const {
@@ -43,7 +40,6 @@ export default function SRMFormUpdatePage() {
     isVehicleLoading,
     paymentFormData,
     isPaymentLoading,
-    levelsFilled,
     isLevelsFetching,
     refetchLevels,
     isAddOrIncompleteSRMVehicleForm,
@@ -103,7 +99,7 @@ export default function SRMFormUpdatePage() {
               ) : (
                 <SRMCustomerDetailsForm
                   type={"Update"}
-                  formData={customerFormData}
+                  formData={customerFormData as any}
                 />
               )}
             </Suspense>

@@ -56,8 +56,6 @@ export default function SRMVehicleDetailsForm({
       ? formData
       : SRMVehicleDetailsFormDefaultValues;
 
-  console.log("initial values", initialValues);
-
   // Define your form
   const form = useForm<z.infer<typeof SRMVehicleDetailsFormSchema>>({
     resolver: zodResolver(SRMVehicleDetailsFormSchema),
@@ -165,7 +163,6 @@ export default function SRMVehicleDetailsForm({
     vehicleRegistrationNumber: string,
     vehicleData: VehicleType | null
   ) => {
-    console.log("vehicle data", vehicleData);
     handleVehicleSelection(
       vehicleRegistrationNumber,
       vehicleData,
@@ -174,6 +171,9 @@ export default function SRMVehicleDetailsForm({
       setCurrentVehiclePhoto
     );
   };
+
+  // form fields are disabled if the type is "Update"
+  const isFieldsDisabled = type === "Update";
 
   return (
     <Form {...form}>
@@ -200,6 +200,7 @@ export default function SRMVehicleDetailsForm({
                 value={field.value}
                 onChangeHandler={handleVehicleSelect}
                 placeholder="Enter / Search Registration Number"
+                isDisabled={isFieldsDisabled}
               />
             </FormFieldLayout>
           )}
@@ -220,7 +221,7 @@ export default function SRMVehicleDetailsForm({
                   form.setValue("vehicleBrandId", "");
                 }}
                 value={initialValues.vehicleCategoryId || field.value}
-                isDisabled={!!existingVehicleId}
+                isDisabled={!!existingVehicleId || isFieldsDisabled}
               />
             </FormFieldLayout>
           )}
@@ -240,7 +241,9 @@ export default function SRMVehicleDetailsForm({
                 value={field.value}
                 onChangeHandler={field.onChange}
                 isDisabled={
-                  !form.watch("vehicleCategoryId") || !!existingVehicleId
+                  !form.watch("vehicleCategoryId") ||
+                  !!existingVehicleId ||
+                  isFieldsDisabled
                 }
               />
             </FormFieldLayout>
@@ -264,7 +267,7 @@ export default function SRMVehicleDetailsForm({
               downloadFileName={"vehicle-photo"}
               setDeletedImages={setDeletedFiles}
               additionalClasses="w-[18rem]"
-              isDisabled={!!existingVehicleId}
+              isDisabled={!!existingVehicleId || isFieldsDisabled}
             />
           )}
         />
@@ -275,11 +278,11 @@ export default function SRMVehicleDetailsForm({
           name="rentalDetails"
           render={() => (
             <FormFieldLayout
-              label="  Rental Details "
+              label={<>Rental Details</>}
               description="Provide rent details. All Value Should be provided for calculating rent effectively."
             >
               <RentalDetailsFormField
-                isDisabled={!!existingVehicleId}
+                isDisabled={!!existingVehicleId || isFieldsDisabled}
                 isSRM={true}
               />
             </FormFieldLayout>
@@ -287,14 +290,16 @@ export default function SRMVehicleDetailsForm({
         />
 
         {/* submit  */}
-        <FormSubmitButton
-          text={
-            type === "Add"
-              ? "Continue to Payment Details"
-              : "Update Vehicle Details"
-          }
-          isLoading={form.formState.isSubmitting}
-        />
+        {type === "Add" && (
+          <FormSubmitButton
+            text={
+              type === "Add"
+                ? "Continue to Payment Details"
+                : "Update Vehicle Details"
+            }
+            isLoading={form.formState.isSubmitting}
+          />
+        )}
       </FormContainer>
     </Form>
   );

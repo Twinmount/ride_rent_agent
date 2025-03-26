@@ -20,7 +20,7 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
 
   const customerId = searchParams.get("customerId");
   const vehicleId = searchParams.get("vehicleId");
-  const paymentId = searchParams.get("paymentId");
+  // const paymentId = searchParams.get("paymentId");
 
   // Fetch primary form data
   const { data: customerFormResult, isLoading: isCustomerLoading } = useQuery({
@@ -37,12 +37,13 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
     staleTime: 60000,
     enabled: !!vehicleId && activeTab === "vehicle",
   });
+
   // Fetch primary form data
   const { data: paymentFormResult, isLoading: isPaymentLoading } = useQuery({
-    queryKey: ["srm-payment-details-form", paymentId],
-    queryFn: () => getSRMPaymentFormDetails(paymentId as string),
+    queryKey: ["srm-payment-details-form", bookingId],
+    queryFn: () => getSRMPaymentFormDetails(bookingId as string),
     staleTime: 60000,
-    enabled: !!paymentId && activeTab === "payment",
+    enabled: !!bookingId && activeTab === "payment",
   });
 
   // Fetch levelsFilled
@@ -79,9 +80,24 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
   };
 
   // FORM DATA to be pre filled
-  const customerFormData = customerFormResult?.result;
+  const customerFormData = {
+    ...customerFormResult?.result,
+    customerProfilePic: customerFormResult?.result?.customerProfilePicPath,
+  };
   const vehicleFormData = mapToSRMVehicleForm(vehicleFormResult?.result);
   const paymentFormData = mapToSRMPaymentForm(paymentFormResult?.result);
+
+  const vehicleRentalDetails =
+    paymentFormResult?.result?.vehicle?.rentalDetails;
+
+  // saving to session storage
+  useEffect(() => {
+    if (!vehicleRentalDetails) return;
+    sessionStorage.setItem(
+      "rentalDetails",
+      JSON.stringify(vehicleRentalDetails)
+    );
+  }, [vehicleRentalDetails]);
 
   return {
     activeTab,
@@ -91,7 +107,7 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
     vehicleFormData,
     isVehicleLoading,
     paymentFormData,
-    isPaymentLoading,
+    isPaymentLoading: isPaymentLoading,
     levelsFilled,
     isLevelsFetching,
     refetchLevels,

@@ -34,7 +34,7 @@ export default function OngoingTripsPage() {
         sortOrder,
         search,
         bookingStatus: BookingStatus.ONGOING,
-        companyId: "93eb31e6-0ae0-49c3-9bc1-678c54ddc412",
+        companyId,
       }),
     staleTime: 0,
     enabled: !!companyId && !isCompanyLoading,

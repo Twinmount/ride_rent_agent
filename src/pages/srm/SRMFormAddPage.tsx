@@ -21,14 +21,14 @@ const SRMPaymentDetailsForm = lazy(
 export default function SRMFormAddPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<SRMTabsTypes>("customer");
-  const [levelsFilled, setLevelsFilled] = useState<number>(0); // Default starting level
+  const [levelsFilled, setLevelsFilled] = useState<number>(0);
 
   // Handle tab change based on levelsFilled state
   const handleTabChange = (value: string) => {
     const tab = value as SRMTabsTypes;
-    const { message } = validateSRMTabAccess({ tab, levelsFilled });
+    const { canAccess, message } = validateSRMTabAccess({ tab, levelsFilled });
 
-    if (true) {
+    if (canAccess) {
       setActiveTab(tab);
     } else {
       toast({
@@ -111,13 +111,14 @@ export default function SRMFormAddPage() {
               <SRMVehicleDetailsForm
                 type={"Add"}
                 onNextTab={() => handleNextTab("payment")}
+                isAddOrIncomplete={true}
               />
             </Suspense>
           </TabsContent>
 
           <TabsContent value="payment" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              <SRMPaymentDetailsForm type={"Add"} />
+              <SRMPaymentDetailsForm type={"Add"} isAddOrIncomplete={true} />
             </Suspense>
           </TabsContent>
         </Tabs>

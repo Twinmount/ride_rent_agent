@@ -23,12 +23,14 @@ type VehicleSearchProps = {
   value?: string;
   onChangeHandler: (value: string, vehicleData?: any) => void;
   placeholder?: string;
+  isDisabled?: boolean;
 };
 
 const VehicleSearch = ({
   value,
   onChangeHandler,
   placeholder = "Search vehicle name...",
+  isDisabled = false,
 }: VehicleSearchProps) => {
   const [searchTerm, setSearchTerm] = useState(""); // Default to an empty string
   const [open, setOpen] = useState(false);
@@ -81,7 +83,7 @@ const VehicleSearch = ({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild disabled={isDisabled}>
         <Button
           variant="outline"
           role="combobox"

@@ -330,12 +330,12 @@ export const updateVehicleDetailsForm = async (
 };
 
 export const getSRMPaymentFormDetails = async (
-  paymentId: string
+  bookingId: string
 ): Promise<GetSRMPaymentDetailsResponse> => {
   try {
     // Sending the request as a JSON object
     const data = await API.get<GetSRMPaymentDetailsResponse>({
-      slug: `${Slug.GET_SRM_PAYMENT_FORM}?paymentId=${paymentId}`,
+      slug: `${Slug.GET_SRM_PAYMENT_FORM}?bookingId=${bookingId}`,
     });
 
     if (!data) {

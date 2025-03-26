@@ -124,12 +124,25 @@ export default function SRMCustomerDetailsForm({
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
       }
-    } catch (error) {
-      toast({
-        variant: "destructive",
-        title: `${type} Customer failed`,
-        description: "Something went wrong",
-      });
+    } catch (error: any) {
+      if (
+        error?.response?.status === 400 &&
+        error?.response?.data?.error?.message === "Customer already exists"
+      ) {
+        toast({
+          variant: "destructive",
+          title: "Customer Already Exists",
+          description:
+            "A customer with the same passport / driving license / phone number is already registered.",
+          duration: 5000,
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: `${type} Customer failed`,
+          description: "Something went wrong",
+        });
+      }
       console.error(error);
     }
   }
@@ -152,6 +165,10 @@ export default function SRMCustomerDetailsForm({
       setCountryCode
     );
   };
+
+  // FIELDS DISABLED IF THE TYPE === UPDATE
+
+  const isFieldsDisabled = type === "Update";
 
   return (
     <>
@@ -181,6 +198,7 @@ export default function SRMCustomerDetailsForm({
                   value={field.value}
                   onChangeHandler={onCustomerSelect}
                   placeholder="Enter / Search customer name"
+                  isDisabled={isFieldsDisabled}
                 />
               </FormFieldLayout>
             )}
@@ -203,7 +221,7 @@ export default function SRMCustomerDetailsForm({
                 downloadFileName={"user profile"}
                 setDeletedImages={setDeletedFiles}
                 additionalClasses="w-[18rem]"
-                isDisabled={!!existingCustomerId}
+                isDisabled={!!existingCustomerId || isFieldsDisabled}
               />
             )}
           />
@@ -220,7 +238,7 @@ export default function SRMCustomerDetailsForm({
                 <NationalityDropdown
                   value={field.value}
                   onChangeHandler={field.onChange}
-                  isDisabled={!!existingCustomerId}
+                  isDisabled={!!existingCustomerId || isFieldsDisabled}
                 />
               </FormFieldLayout>
             )}
@@ -239,7 +257,7 @@ export default function SRMCustomerDetailsForm({
                   placeholder="Enter passport number"
                   {...field}
                   className="input-field"
-                  readOnly={!!existingCustomerId}
+                  readOnly={!!existingCustomerId || isFieldsDisabled}
                 />
               </FormFieldLayout>
             )}
@@ -251,14 +269,14 @@ export default function SRMCustomerDetailsForm({
             name="drivingLicenseNumber"
             render={({ field }) => (
               <FormFieldLayout
-                label="Passport Number"
+                label="Driving License Number"
                 description="Enter customers driving license number"
               >
                 <Input
                   placeholder="Enter driving license number"
                   {...field}
                   className="input-field"
-                  readOnly={!!existingCustomerId}
+                  readOnly={!!existingCustomerId || isFieldsDisabled}
                 />
               </FormFieldLayout>
             )}
@@ -291,17 +309,25 @@ export default function SRMCustomerDetailsForm({
                     buttonClassName:
                       "!border-none outline-none !h-[52px] !w-[50px] !rounded-xl !bg-gray-100",
                   }}
-                  disabled={!!existingCustomerId}
+                  disabled={!!existingCustomerId || isFieldsDisabled}
                 />
               </FormFieldLayout>
             )}
           />
 
+          <p className="text-red-500 text-center text-sm -mb-2 font-semibold">
+            Warning: Please double-check the customer information before
+            submitting. This action cannot be undone, and the data you provide
+            will be used for fraud detection. Please ensure the accuracy of the
+            details to avoid potential consequences.
+          </p>
           {/* submit  */}
-          <FormSubmitButton
-            text={type === "Add" ? "Continue to Vehicle" : "Update User"}
-            isLoading={form.formState.isSubmitting}
-          />
+          {type === "Add" && (
+            <FormSubmitButton
+              text={type === "Add" ? "Continue to Vehicle" : "Update User"}
+              isLoading={form.formState.isSubmitting}
+            />
+          )}
         </FormContainer>
       </Form>
     </>

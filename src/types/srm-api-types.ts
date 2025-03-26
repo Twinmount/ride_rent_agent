@@ -9,6 +9,7 @@ export interface CustomerApiType {
   drivingLicenseNumber: string; // User's driving license number
   phoneNumber: string; // User's phone number, possibly formatted
   customerProfilePic?: string; // Optional field for the user's profile image or identifier
+  customerProfilePicPath?: string; // Optional field for the user's profile image or identifier
   countryCode: string; // The country code associated with the user's phone number
   createdAt: string; // Timestamp when the record was created
   updatedAt: string; // Timestamp when the record was last updated
@@ -50,8 +51,34 @@ export interface VehicleApiType {
   };
   vehicleRegistrationNumber: string;
   vehiclePhoto: string;
+  vehiclePhotoPath: string;
   rentalDetails: RentalDetails;
   createdBy: string;
+}
+
+export interface OngoingListVehicleType {
+  _id: string;
+  vehicleRegistrationNumber: string;
+  vehicleCategoryId: string;
+  vehicleBrandId: string;
+  vehiclePhoto: string;
+  rentalDetails: {
+    day: {
+      enabled: boolean;
+      rentInAED: string;
+      mileageLimit: string;
+    };
+    week: {
+      enabled: boolean;
+      rentInAED: string;
+      mileageLimit: string;
+    };
+    month: {
+      enabled: boolean;
+      rentInAED: string;
+      mileageLimit: string;
+    };
+  };
 }
 
 export interface AddVehicleFormResponse {
@@ -62,6 +89,25 @@ export interface AddVehicleFormResponse {
 
 // Payment type
 export interface PaymentApiType {
+  bookingId: string;
+  payment: {
+    id: string;
+    advanceAmount: string;
+    remainingAmount: string;
+    securityDeposits: {
+      enabled: boolean;
+      amountInAED: string;
+    };
+    currency: string;
+  };
+  vehicle: {
+    rentalDetails: RentalDetails;
+  };
+  bookingStartDate: string;
+  bookingEndDate: string;
+}
+
+export interface ListPaymentType {
   id: string;
   advanceAmount: string;
   remainingAmount: string;
@@ -70,8 +116,6 @@ export interface PaymentApiType {
     amountInAED: string;
   };
   currency: string;
-  bookingStartDate: string;
-  bookingEndDate: string;
 }
 
 export interface AddPaymentFormResponse {
@@ -94,7 +138,7 @@ export interface IndividualTrip {
   levelsFilled: number;
   vehicle: VehicleApiType;
   customer: CustomerApiType;
-  payment: PaymentApiType;
+  payment: ListPaymentType;
   bookingStatus: string;
   bookingStartDate: string; // ISO date string
   bookingEndDate: string; // ISO date string

@@ -1,8 +1,4 @@
-import {
-  GetSRMVehicleDetailsResponse,
-  PaymentApiType,
-  VehicleApiType,
-} from "@/types/srm-api-types";
+import { PaymentApiType, VehicleApiType } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
   SRMVehicleDetailsFormType,
@@ -74,7 +70,7 @@ export const mapToSRMVehicleForm = (
     vehicleCategoryId: vehicle.vehicleCategory.categoryId,
     vehicleBrandId: vehicle.vehicleBrand.id,
     vehicleRegistrationNumber: vehicle.vehicleRegistrationNumber,
-    vehiclePhoto: vehicle.vehiclePhoto,
+    vehiclePhoto: vehicle.vehiclePhotoPath,
     rentalDetails: vehicle.rentalDetails,
   };
 };
@@ -98,11 +94,11 @@ export const mapToSRMPaymentForm = (
   }
 
   return {
-    advanceAmount: vehicle.advanceAmount,
-    remainingAmount: vehicle.remainingAmount,
-    securityDeposit: vehicle.securityDeposits,
+    advanceAmount: vehicle.payment.advanceAmount,
+    remainingAmount: vehicle.payment.remainingAmount,
+    securityDeposit: vehicle.payment.securityDeposits,
     bookingStartDate: new Date(vehicle.bookingStartDate),
     bookingEndDate: new Date(vehicle.bookingEndDate),
-    currency: vehicle.currency,
+    currency: vehicle.payment.currency,
   };
 };

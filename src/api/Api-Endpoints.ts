@@ -87,7 +87,7 @@ export enum Slug {
 
   // SRM PAYMENTS
   POST_SRM_PAYMENT_FORM = "/srm-payment",
-  GET_SRM_PAYMENT_FORM = "/srm-payment",
+  GET_SRM_PAYMENT_FORM = "/srm-bookings/payment",
   PUT_SRM_PAYMENT_FORM = "/srm-payment",
 
   // SRM BOOKINGS (customer, vehicle and payment)
