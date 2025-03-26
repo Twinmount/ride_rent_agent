@@ -3,24 +3,26 @@ import { useQuery } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
 import { SortDropdown } from "@/components/SortDropdown";
 import { fetchVehicleList } from "@/api/srm/trips";
-import { VehicleListTable } from "@/components/table/VehicleListTable";
+
 import { VehicleListColumns } from "@/components/table/columns/VehicleListColumns";
 import { Link } from "react-router-dom";
 import { Plus } from "lucide-react";
 import Search from "@/components/Search";
+import { GenericTable } from "@/components/table/GenericTable";
 
 export default function VehicleListPage() {
   const [page, setPage] = useState(1);
-  const [limit] = useState<10 | 15 | 20 | 30>(10);
   const [search, setSearch] = useState("");
-  const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("ASC");
+  const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
+
+  const LIMIT = 8;
 
   const { data, isLoading } = useQuery({
-    queryKey: ["vehicleList", page, limit, search, sortOrder],
+    queryKey: ["vehicleList", page, search, sortOrder],
     queryFn: () =>
       fetchVehicleList({
         page,
-        limit,
+        limit: LIMIT,
         sortOrder,
         search,
       }),
@@ -67,19 +69,17 @@ export default function VehicleListPage() {
         />
       </div>
 
-      <VehicleListTable
+      <GenericTable
         columns={VehicleListColumns}
         data={vehicleData}
         loading={isLoading}
       />
 
-      {totalNumberOfPages > 0 && (
-        <Pagination
-          page={page}
-          setPage={setPage}
-          totalPages={totalNumberOfPages}
-        />
-      )}
+      <Pagination
+        page={page}
+        setPage={setPage}
+        totalPages={totalNumberOfPages}
+      />
     </section>
   );
 }

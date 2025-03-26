@@ -10,6 +10,10 @@ import {
   FetchTripEndResponse,
   GetIsCustomerSpamResponse,
   FetchUpcomingBookingDatesResponse,
+  GetSRMLevelsFilledResponse,
+  GetSRMCustomerDetailsResponse,
+  GetSRMVehicleDetailsResponse,
+  GetSRMPaymentDetailsResponse,
 } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
@@ -43,6 +47,26 @@ export const addCustomerDetails = async (
     const data = await API.post<AddCustomerFormResponse>({
       slug: Slug.POST_SRM_CUSTOMER_FORM,
       body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to post customer registration response");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on customer registration", error);
+    throw error;
+  }
+};
+
+export const getSRMCustomerFormDetails = async (
+  customerId: string
+): Promise<GetSRMCustomerDetailsResponse> => {
+  try {
+    // Sending the request as a JSON object
+    const data = await API.get<GetSRMCustomerDetailsResponse>({
+      slug: `${Slug.GET_SRM_CUSTOMER_FORM}?customerId=${customerId}`,
     });
 
     if (!data) {
@@ -218,6 +242,26 @@ export const updateCustomerDetailsForm = async (
   }
 };
 
+export const getSRMVehicleFormDetails = async (
+  vehicleId: string
+): Promise<GetSRMVehicleDetailsResponse> => {
+  try {
+    // Sending the request as a JSON object
+    const data = await API.get<GetSRMVehicleDetailsResponse>({
+      slug: `${Slug.GET_SRM_VEHICLE_FORM}?vehicleId=${vehicleId}`,
+    });
+
+    if (!data) {
+      throw new Error("Failed to post customer registration response");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on customer registration", error);
+    throw error;
+  }
+};
+
 // Function to add vehicle details
 export const addVehicleDetailsForm = async (
   values: SRMVehicleDetailsFormType
@@ -281,6 +325,26 @@ export const updateVehicleDetailsForm = async (
     return data;
   } catch (error) {
     console.error("Error updating vehicle details", error);
+    throw error;
+  }
+};
+
+export const getSRMPaymentFormDetails = async (
+  bookingId: string
+): Promise<GetSRMPaymentDetailsResponse> => {
+  try {
+    // Sending the request as a JSON object
+    const data = await API.get<GetSRMPaymentDetailsResponse>({
+      slug: `${Slug.GET_SRM_PAYMENT_FORM}?bookingId=${bookingId}`,
+    });
+
+    if (!data) {
+      throw new Error("Failed to post customer registration response");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on customer registration", error);
     throw error;
   }
 };
@@ -391,7 +455,7 @@ export const searchVehicle = async (
       limit: "7",
       sortOrder: "ASC",
       search: searchTerm,
-      isFileUrlNeeded: "true",
+      isFileUrlNeeded: "false",
     }).toString();
 
     const slugWithParams = `${Slug.GET_SRM_VEHICLE_LIST}?${queryParams}`;
@@ -443,6 +507,27 @@ export const endTrip = async ({
     return data;
   } catch (error) {
     console.error("Error in endTrip API:", error);
+    throw error;
+  }
+};
+
+export const getSRMLevelsFilled = async (
+  bookingId: string
+): Promise<GetSRMLevelsFilledResponse> => {
+  try {
+    const url = `${Slug.GET_SRM_LEVELS_FILLED}?bookingId=${bookingId}`;
+
+    const data = await API.get<GetSRMLevelsFilledResponse>({
+      slug: url,
+    });
+
+    if (!data) {
+      throw new Error("Failed to fetch srm levels filled");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching srm levels filled data:", error);
     throw error;
   }
 };

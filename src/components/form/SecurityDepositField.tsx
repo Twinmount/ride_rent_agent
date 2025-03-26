@@ -3,7 +3,11 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormDescription, FormMessage } from "@/components/ui/form";
 
-const SecurityDepositField = () => {
+const SecurityDepositField = ({
+  isDisabled = false,
+}: {
+  isDisabled?: boolean;
+}) => {
   const { control, watch, clearErrors } = useFormContext();
   const isEnabled = watch("securityDeposit.enabled");
 
@@ -20,6 +24,7 @@ const SecurityDepositField = () => {
               onCheckedChange={field.onChange}
               className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
               id="securityDeposit-enabled"
+              disabled={isDisabled}
             />
             <label
               htmlFor="securityDeposit-enabled"
@@ -53,6 +58,7 @@ const SecurityDepositField = () => {
                     className="input-field"
                     type="text"
                     inputMode="numeric"
+                    readOnly={isDisabled}
                     onKeyDown={(e) => {
                       if (
                         !/^\d*$/.test(e.key) &&

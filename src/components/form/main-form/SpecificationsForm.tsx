@@ -92,9 +92,8 @@ export default function SpecificationsForm({
         values[spec.name]?.length === 0 ||
         !validValues.length
       ) {
-        updatedErrors[
-          spec.name
-        ] = `Please select at least one option for ${spec.name}`;
+        updatedErrors[spec.name] =
+          `Please select at least one option for ${spec.name}`;
         isValid = false;
       }
     });

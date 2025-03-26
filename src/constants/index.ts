@@ -19,17 +19,18 @@ import {
   ClipboardList,
   Lock,
   CalendarCheck,
+  Box,
 } from "lucide-react";
 
 // sidebar content
 export const sidebarContent = [
   { label: "Dashboard", icon: LayoutDashboard, link: "/" },
   { label: "My Listings", icon: List, link: "/listings" },
-  // {
-  //   label: "SRM",
-  //   icon: Box,
-  //   link: "/srm",
-  // },
+  {
+    label: "SRM",
+    icon: Box,
+    link: "/srm",
+  },
   {
     label: "Profile",
     icon: UserRoundPen,
@@ -157,11 +158,11 @@ export const SRMVehicleDetailsFormDefaultValues: SRMVehicleDetailsFormType = {
   vehicleRegistrationNumber: "",
   vehiclePhoto: "",
   rentalDetails: {
-    day: { enabled: false, rentInAED: "", mileageLimit: "" },
-    week: { enabled: false, rentInAED: "", mileageLimit: "" },
-    month: { enabled: false, rentInAED: "", mileageLimit: "" },
+    day: { enabled: true, rentInAED: "", mileageLimit: "" },
+    week: { enabled: true, rentInAED: "", mileageLimit: "" },
+    month: { enabled: true, rentInAED: "", mileageLimit: "" },
     hour: {
-      enabled: false,
+      enabled: true,
       minBookingHours: "",
       rentInAED: "",
       mileageLimit: "",

@@ -23,12 +23,14 @@ type CustomerSearchProps = {
   value?: string;
   onChangeHandler: (value: string, customerData?: any) => void;
   placeholder?: string;
+  isDisabled?: boolean;
 };
 
 const CustomerSearch = ({
   value,
   onChangeHandler,
   placeholder = "Search customer name...",
+  isDisabled = false,
 }: CustomerSearchProps) => {
   const [searchTerm, setSearchTerm] = useState(""); // Default to an empty string
   const [open, setOpen] = useState(false);
@@ -125,7 +127,7 @@ const CustomerSearch = ({
 
       {/* Dropdown */}
       <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
+        <PopoverTrigger asChild disabled={isDisabled}>
           <Button
             variant="outline"
             role="combobox"

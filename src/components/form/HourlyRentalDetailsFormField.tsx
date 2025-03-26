@@ -13,8 +13,10 @@ import {
 
 const HourlyRentalDetailFormField = ({
   isDisabled = false,
+  isSRM = false,
 }: {
   isDisabled?: boolean;
+  isSRM?: boolean;
 }) => {
   const { control, watch, clearErrors } = useFormContext();
   const isEnabled = watch("rentalDetails.hour.enabled");
@@ -29,6 +31,8 @@ const HourlyRentalDetailFormField = ({
             <Checkbox
               checked={field.value}
               onCheckedChange={(value) => {
+                if (isSRM && !value) return;
+
                 field.onChange(value);
                 if (!value) {
                   clearErrors([`rentalDetails`]);

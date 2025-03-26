@@ -1,11 +1,11 @@
 import {
   ColumnDef,
+  SortingState,
+  getSortedRowModel,
+  flexRender,
   getCoreRowModel,
   getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
-  SortingState,
-  flexRender,
 } from "@tanstack/react-table";
 
 import {
@@ -18,17 +18,21 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 
-interface VehicleListTableProps {
-  columns: ColumnDef<any>[];
-  data: any[];
+interface GenericTableProps<TData> {
+  columns: ColumnDef<TData>[]; // Generic columns type
+  data: TData[]; // Generic data type
   loading: boolean;
+  loadingText?: string;
+  noDataText?: string;
 }
 
-export function VehicleListTable({
+export function GenericTable<TData>({
   columns,
   data,
   loading,
-}: VehicleListTableProps) {
+  loadingText = "Loading ...",
+  noDataText = "No data found.",
+}: GenericTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({
@@ -45,18 +49,18 @@ export function VehicleListTable({
 
   return (
     <div>
-      <div className="bg-white rounded-md border">
+      <div className="rounded-md border bg-white">
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} className="text-black">
+                  <TableHead key={header.id} className="font-[600] text-black">
                     {header.isPlaceholder
                       ? null
                       : flexRender(
                           header.column.columnDef.header,
-                          header.getContext()
+                          header.getContext(),
                         )}
                   </TableHead>
                 ))}
@@ -70,7 +74,7 @@ export function VehicleListTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Loading ...
+                  {loadingText}
                 </TableCell>
               </TableRow>
             ) : table.getRowModel().rows?.length ? (
@@ -83,7 +87,7 @@ export function VehicleListTable({
                     <TableCell key={cell.id} className="min-w-40 max-w-44">
                       {flexRender(
                         cell.column.columnDef.cell,
-                        cell.getContext()
+                        cell.getContext(),
                       )}
                     </TableCell>
                   ))}
@@ -95,7 +99,7 @@ export function VehicleListTable({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No data found.
+                  {noDataText}
                 </TableCell>
               </TableRow>
             )}

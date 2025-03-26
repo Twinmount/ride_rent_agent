@@ -1,3 +1,9 @@
+import { PaymentApiType, VehicleApiType } from "@/types/srm-api-types";
+import {
+  SRMPaymentDetailsFormType,
+  SRMVehicleDetailsFormType,
+} from "@/types/srm-types";
+
 type FormFieldArrayItem = {
   amount?: string; // Now optional
   paymentDate?: Date | null | undefined; // Now optional
@@ -34,4 +40,65 @@ export const validateFieldArray = (
 
   // All items are valid
   return null;
+};
+
+// map to SRM vehicle form
+export const mapToSRMVehicleForm = (
+  vehicle: VehicleApiType | undefined
+): SRMVehicleDetailsFormType => {
+  if (!vehicle) {
+    return {
+      vehicleCategoryId: "",
+      vehicleBrandId: "",
+      vehicleRegistrationNumber: "",
+      vehiclePhoto: "",
+      rentalDetails: {
+        day: { enabled: false, rentInAED: "", mileageLimit: "" },
+        week: { enabled: false, rentInAED: "", mileageLimit: "" },
+        month: { enabled: false, rentInAED: "", mileageLimit: "" },
+        hour: {
+          enabled: false,
+          minBookingHours: "",
+          rentInAED: "",
+          mileageLimit: "",
+        },
+      },
+    };
+  }
+
+  return {
+    vehicleCategoryId: vehicle.vehicleCategory.categoryId,
+    vehicleBrandId: vehicle.vehicleBrand.id,
+    vehicleRegistrationNumber: vehicle.vehicleRegistrationNumber,
+    vehiclePhoto: vehicle.vehiclePhotoPath,
+    rentalDetails: vehicle.rentalDetails,
+  };
+};
+
+// map to srm payment form
+export const mapToSRMPaymentForm = (
+  vehicle: PaymentApiType | undefined
+): SRMPaymentDetailsFormType => {
+  if (!vehicle) {
+    return {
+      advanceAmount: "",
+      remainingAmount: "",
+      securityDeposit: {
+        enabled: false,
+        amountInAED: "",
+      },
+      currency: "",
+      bookingStartDate: undefined,
+      bookingEndDate: undefined,
+    };
+  }
+
+  return {
+    advanceAmount: vehicle.payment.advanceAmount,
+    remainingAmount: vehicle.payment.remainingAmount,
+    securityDeposit: vehicle.payment.securityDeposits,
+    bookingStartDate: new Date(vehicle.bookingStartDate),
+    bookingEndDate: new Date(vehicle.bookingEndDate),
+    currency: vehicle.payment.currency,
+  };
 };

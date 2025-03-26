@@ -3,16 +3,19 @@ import { Link } from "react-router-dom";
 import { MapPinned, Phone, Plane, Calendar } from "lucide-react";
 import MotionDiv from "@/components/framer-motion/MotionDiv";
 import { Trip } from "@/types/srm-types";
+import { getExpiryNotificationText } from "@/helpers";
 
 interface OngoingTripsCardProps {
   trip: Trip;
   onOpenModal: (id: string) => void;
 }
 
-const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
+export const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
   trip,
   onOpenModal,
 }) => {
+  const { text, className } = getExpiryNotificationText(trip.bookingEndDate);
+
   return (
     <MotionDiv
       key={trip.id}
@@ -88,28 +91,10 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
         </div>
 
         {/* calendar */}
-        <div className="flex flex-col gap-4 items-start px-2 py-1 my-3 bg-gray-800 rounded-lg md:items-center md:justify-between md:flex-row h-fit">
-          <dl className="flex gap-x-2 items-center px-2 h-full text-sm text-gray-200 rounded-lg">
-            <dt className="flex gap-x-1 items-center">
-              <span className="gap-1 w-[4.5rem] flex items-center">
-                <Calendar /> From
-              </span>
-              :
-            </dt>
-            <dd>{new Date(trip.bookingStartDate).toLocaleDateString()}</dd>
-          </dl>
-          <dl className="flex gap-x-4 items-center px-2 h-full text-sm text-gray-200 rounded-lg">
-            <dt className="flex gap-x-1 justify-between items-center w-16">
-              <span className="flex gap-1 items-center max-md:min-w-[4.5rem]  w-[4.5rem]">
-                <Calendar /> To
-              </span>
-              :
-            </dt>
-            <dd className="ml-2">
-              {new Date(trip.bookingEndDate).toLocaleDateString()}
-            </dd>
-          </dl>
-        </div>
+        <BookingPeriod
+          bookingStartDate={trip.bookingStartDate}
+          bookingEndDate={trip.bookingEndDate}
+        />
 
         {/* buttons */}
         <div className="gap-x-3 flex-between md:justify-end">
@@ -127,16 +112,30 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
             )}
           </div>
 
+          {/* notification on expiry */}
+          <p
+            className={`max-md:hidden w-fit p-2 px-4 font-[500] mr-auto text-sm rounded-lg bg-slate-100 ${className}`}
+          >
+            {text}
+          </p>
+
           <div className="flex gap-x-2 items-center">
+            <Link
+              to={`/srm/trips/edit/${trip.bookingId}?customerId=${trip.customer.customerId}&vehicleId=${trip.vehicle.id}&paymentId=${trip.payment.id}`}
+              className="px-3 py-1 text-slate-800 hover:text-white  border-slate-800 border hover:bg-slate-800 rounded-md transition-colors"
+            >
+              View
+            </Link>
+
             <button
               onClick={() => onOpenModal(trip.bookingId)}
-              className="px-3 py-1 text-white bg-blue-500 rounded-md"
+              className="px-3 py-1 text-blue-500 hover:text-white  border-blue-500 border hover:bg-blue-500 rounded-md transition-colors"
             >
               Extend Trip
             </button>
             <Link
               to={`/srm/end-trip/${trip.bookingId}`}
-              className="px-3 py-1 text-white bg-red-500 rounded-md"
+              className="px-3 py-1 text-red-500 hover:text-white  border-red-500 border hover:bg-red-500 rounded-md transition-colors"
             >
               End Trip
             </Link>
@@ -147,4 +146,36 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
   );
 };
 
-export default OngoingTripsCard;
+// Booking period with booking start date and end date
+export const BookingPeriod = ({
+  bookingStartDate,
+  bookingEndDate,
+}: {
+  bookingStartDate: string;
+  bookingEndDate: string;
+}) => {
+  return (
+    <div className="flex flex-col gap-4 items-start px-2 py-1 my-3 bg-gray-800 rounded-lg md:items-center md:justify-between md:flex-row h-fit">
+      <dl className="flex gap-x-2 items-center px-2 h-full text-sm text-gray-200 rounded-lg">
+        <dt className="flex gap-x-1 items-center">
+          <span className="gap-1 w-[4.5rem] flex items-center">
+            <Calendar /> From
+          </span>
+          :
+        </dt>
+        <dd>{new Date(bookingStartDate).toLocaleDateString()}</dd>
+      </dl>
+      <dl className="flex gap-x-4 items-center px-2 h-full text-sm text-gray-200 rounded-lg">
+        <dt className="flex gap-x-1 justify-between items-center w-16">
+          <span className="flex gap-1 items-center max-md:min-w-[4.5rem]  w-[4.5rem]">
+            <Calendar /> To
+          </span>
+          :
+        </dt>
+        <dd className="ml-2">
+          {new Date(bookingEndDate).toLocaleDateString()}
+        </dd>
+      </dl>
+    </div>
+  );
+};

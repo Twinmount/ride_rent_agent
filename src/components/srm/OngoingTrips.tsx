@@ -1,5 +1,5 @@
 import { Trip } from "@/types/srm-types";
-import OngoingTripsCard from "./OngoingTripsCard";
+import { OngoingTripsCard } from "./OngoingTripsCard";
 
 type OngoingTripsProps = {
   data: Trip[];

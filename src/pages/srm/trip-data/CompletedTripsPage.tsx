@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
 import { SortDropdown } from "@/components/SortDropdown";
-import { CompletedTripsTable } from "@/components/table/CompletedTripsTable";
 import { CompletedTripsColumns } from "@/components/table/columns/CompletedTripsColumn";
 import CompletedTripsInvoiceDownloadModal from "@/components/modal/srm-modal/CompletedTripsInvoiceDownloadModal";
 import { fetchSRMBookings } from "@/api/srm/trips";
@@ -12,6 +11,7 @@ import { Plus } from "lucide-react";
 import Search from "@/components/Search";
 import { BookingStatus } from "@/types/srm-types";
 import { useCompany } from "@/hooks/useCompany";
+import { GenericTable } from "@/components/table/GenericTable";
 
 export default function CompletedTripsPage() {
   const [page, setPage] = useState(1);
@@ -31,7 +31,7 @@ export default function CompletedTripsPage() {
         sortOrder,
         search,
         bookingStatus: BookingStatus.COMPLETED,
-        companyId,
+        companyId: "93eb31e6-0ae0-49c3-9bc1-678c54ddc412",
       }),
     staleTime: 0,
     enabled: !!companyId && !isCompanyLoading,
@@ -93,7 +93,7 @@ export default function CompletedTripsPage() {
         />
       </div>
 
-      <CompletedTripsTable
+      <GenericTable
         columns={CompletedTripsColumns()}
         data={tripData}
         loading={isLoading}

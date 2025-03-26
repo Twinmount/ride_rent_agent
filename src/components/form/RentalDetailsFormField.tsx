@@ -8,12 +8,14 @@ type RentalDetailsFieldProps = {
   period: "day" | "week" | "month";
   description: string;
   isDisabled?: boolean;
+  isSRM?: boolean;
 };
 
 const RentalDetailField = ({
   period,
   description,
   isDisabled = false,
+  isSRM = false,
 }: RentalDetailsFieldProps) => {
   const { control, watch, clearErrors } = useFormContext();
   const isEnabled = watch(`rentalDetails.${period}.enabled`);
@@ -28,9 +30,11 @@ const RentalDetailField = ({
             <Checkbox
               checked={field.value}
               onCheckedChange={(value) => {
+                if (isSRM && !value) return;
+
                 field.onChange(value);
                 if (!value) {
-                  clearErrors([`rentalDetails`]); // Clear related errors when checkbox is unchecked
+                  clearErrors([`rentalDetails`]);
                 }
               }}
               className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
@@ -149,8 +153,10 @@ const RentalDetailField = ({
 
 const RentalDetailsFormField = ({
   isDisabled = false,
+  isSRM = false,
 }: {
   isDisabled?: boolean;
+  isSRM?: boolean;
 }) => {
   return (
     <div className="flex flex-col">
@@ -158,18 +164,21 @@ const RentalDetailsFormField = ({
         period="day"
         description="(Select to set daily rental rates)"
         isDisabled={isDisabled}
+        isSRM={isSRM}
       />
       <RentalDetailField
         period="week"
         description="(Select to set weekly rental rates)"
         isDisabled={isDisabled}
+        isSRM={isSRM}
       />
       <RentalDetailField
         period="month"
         description="(Select to set monthly rental rates)"
         isDisabled={isDisabled}
+        isSRM={isSRM}
       />
-      <HourlyRentalDetailFormField isDisabled={isDisabled} />
+      <HourlyRentalDetailFormField isDisabled={isDisabled} isSRM={isSRM} />
     </div>
   );
 };

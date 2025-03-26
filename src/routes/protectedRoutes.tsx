@@ -25,7 +25,8 @@ const ProfileUpdatePage = lazy(
 
 // lazy loading above static imports
 const SRMDashboard = lazy(() => import("../pages/srm/SRMDashboard"));
-const SRMDataAddPage = lazy(() => import("../pages/srm/SRMFormAddPage"));
+const SRMFormAddPage = lazy(() => import("../pages/srm/SRMFormAddPage"));
+const SRMFormUpdatePage = lazy(() => import("../pages/srm/SRMFormUpdatePage"));
 const OngoingTripsPage = lazy(
   () => import("../pages/srm/trip-data/OngoingTripsPage")
 );
@@ -70,7 +71,11 @@ export const protectedRoutes = [
   },
   {
     path: "/srm/trips/new",
-    element: <SRMDataAddPage />,
+    element: <SRMFormAddPage />,
+  },
+  {
+    path: "/srm/trips/edit/:bookingId",
+    element: <SRMFormUpdatePage />,
   },
 
   {

@@ -39,6 +39,8 @@ export const fetchTripByBookingId = async (
     if (!data) {
       throw new Error("Failed to fetch booking data");
     }
+
+
     return data;
   } catch (error) {
     console.error("Error fetching booking:", error);

@@ -1,87 +1,53 @@
 import { CircleArrowLeft } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense } from "react";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { SRMTabsTypes } from "@/types/types";
+import { useSRMUpdateForm } from "@/hooks/useSRMUpdateForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
-import { getLevelsFilled, getPrimaryDetailsFormData } from "@/api/vehicle";
-import { mapGetPrimaryFormToPrimaryFormType } from "@/helpers/form";
-import { save, StorageKeys } from "@/utils/storage";
 
-// Lazy-loaded components
-const PrimaryDetailsForm = lazy(
-  () => import("@/components/form/main-form/PrimaryDetailsForm")
+// Lazy-loaded form components
+const SRMCustomerDetailsForm = lazy(
+  () => import("@/components/form/srm-form/CustomerDetailsForm")
 );
-const SpecificationsForm = lazy(
-  () => import("@/components/form/main-form/SpecificationsForm")
+const SRMVehicleDetailsForm = lazy(
+  () => import("@/components/form/srm-form/VehicleDetailsForm")
 );
-const FeaturesForm = lazy(
-  () => import("@/components/form/main-form/FeaturesForm")
+const SRMPaymentDetailsForm = lazy(
+  () => import("@/components/form/srm-form/PaymentDetailsForm")
 );
 
-type TabsTypes = "primary" | "specifications" | "features";
-
-export default function VehiclesFormUpdatePage() {
+export default function SRMFormUpdatePage() {
   const navigate = useNavigate();
-  const { vehicleId } = useParams<{
-    vehicleId: string;
+
+  const { bookingId } = useParams<{
+    bookingId: string;
   }>();
-  const [activeTab, setActiveTab] = useState<TabsTypes>("primary");
 
-  const queryClient = useQueryClient();
-
+  // Handle tab change based on levelsFilled state
   const handleTabChange = (value: string) => {
-    setActiveTab(value as TabsTypes);
+    setActiveTab(value as SRMTabsTypes);
   };
 
-  const { data, isLoading } = useQuery({
-    queryKey: ["primary-details-form", vehicleId],
-    queryFn: () => getPrimaryDetailsFormData(vehicleId as string),
-    staleTime: 60000,
-  });
-
-  // Fetch levelsFilled only if the type is "Update"
+  // Using custom hook
   const {
-    data: levelsData,
-    refetch: refetchLevels,
-    isFetching: isLevelsFetching,
-  } = useQuery({
-    queryKey: ["getLevelsFilled", vehicleId],
-    queryFn: () => getLevelsFilled(vehicleId as string),
-    enabled: !!vehicleId,
-  });
-
-  const levelsFilled = levelsData
-    ? parseInt(levelsData.result.levelsFilled, 10)
-    : 1;
-
-  const isAddOrIncompleteSpecifications = levelsFilled < 2; // true if only level 1 is filled
-  const isAddOrIncompleteFeatures = levelsFilled < 3;
-
-  const formData = data
-    ? mapGetPrimaryFormToPrimaryFormType(data.result)
-    : null;
-  const vehicleCategoryId = data?.result?.vehicleCategoryId;
-  const vehicleTypeId = data?.result?.vehicleTypeId;
-
-  // Store vehicleCategoryId in localStorage if levelsFilled < 3
-  useEffect(() => {
-    if (levelsFilled < 3 && vehicleCategoryId && vehicleTypeId) {
-      save(StorageKeys.CATEGORY_ID, vehicleCategoryId);
-      save(StorageKeys.VEHICLE_TYPE_ID, vehicleTypeId);
-    }
-  }, [levelsFilled, vehicleCategoryId]);
-
-  useEffect(() => {
-    queryClient.prefetchQuery({
-      queryKey: ["getLevelsFilled", vehicleId],
-      queryFn: () => getLevelsFilled(vehicleId as string),
-    });
-  }, [vehicleId]);
+    activeTab,
+    setActiveTab,
+    customerFormData,
+    isCustomerLoading,
+    vehicleFormData,
+    isVehicleLoading,
+    paymentFormData,
+    isPaymentLoading,
+    isLevelsFetching,
+    refetchLevels,
+    isAddOrIncompleteSRMVehicleForm,
+    isAddOrIncompleteSRMPaymentForm,
+  } = useSRMUpdateForm(bookingId);
 
   return (
-    <section className="container pb-10 h-auto min-h-screen bg-white">
+    <section className="container py-10 pb-44 h-auto min-h-screen bg-white">
       <div className="gap-x-4 mb-5 ml-5 flex-center w-fit">
         <button
           onClick={() => navigate(-1)}
@@ -89,7 +55,9 @@ export default function VehiclesFormUpdatePage() {
         >
           <CircleArrowLeft />
         </button>
-        <h1 className="text-center h3-bold sm:text-left">Vehicle Details</h1>
+        <h1 className="text-center h3-bold max-sm:text-xl sm:text-left">
+          Add New Record
+        </h1>
       </div>
 
       <div>
@@ -98,65 +66,70 @@ export default function VehiclesFormUpdatePage() {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <TabsList className="gap-x-2 bg-white flex-center">
+          <TabsList className="gap-x-2 w-full bg-white flex-center max-sm:gap-x-4">
             <TabsTrigger
-              value="primary"
-              className="h-9 max-sm:text-sm max-sm:px-2"
+              value="customer"
+              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
             >
-              Primary Details
+              Customer
+              <span className="text-xs">details</span>
             </TabsTrigger>
+
             <TabsTrigger
-              disabled={isLoading || isLevelsFetching}
-              value="specifications"
-              className="max-sm:px-2"
+              value="vehicle"
+              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
             >
-              Specifications
+              Vehicle
+              <span className="text-xs">details</span>
             </TabsTrigger>
+
             <TabsTrigger
-              value="features"
-              disabled={
-                isLoading || isLevelsFetching || isAddOrIncompleteSpecifications
-              }
-              className={`max-sm:px-2`}
+              value="payment"
+              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
             >
-              Features
+              Payment
+              <span className="text-xs">details</span>
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="primary" className="flex-center">
+
+          <TabsContent value="customer" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              {isLoading ? (
+              {isCustomerLoading ? (
                 <FormSkelton />
               ) : (
-                <PrimaryDetailsForm
-                  type="Update"
-                  formData={formData}
-                  levelsFilled={levelsFilled}
+                <SRMCustomerDetailsForm
+                  type={"Update"}
+                  formData={customerFormData as any}
                 />
               )}
             </Suspense>
           </TabsContent>
-          <TabsContent value="specifications" className="flex-center">
+
+          <TabsContent value="vehicle" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              {isLevelsFetching ? (
+              {isLevelsFetching || isVehicleLoading ? (
                 <FormSkelton />
               ) : (
-                <SpecificationsForm
-                  type="Update"
+                <SRMVehicleDetailsForm
+                  type={"Update"}
+                  formData={vehicleFormData}
                   refetchLevels={refetchLevels}
-                  isAddOrIncomplete={isAddOrIncompleteSpecifications}
+                  isAddOrIncomplete={isAddOrIncompleteSRMVehicleForm}
                 />
               )}
             </Suspense>
           </TabsContent>
-          <TabsContent value="features" className="flex-center">
+
+          <TabsContent value="payment" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              {isLevelsFetching ? (
+              {isLevelsFetching || isPaymentLoading ? (
                 <FormSkelton />
               ) : (
-                <FeaturesForm
-                  type="Update"
+                <SRMPaymentDetailsForm
+                  type={"Update"}
+                  formData={paymentFormData}
                   refetchLevels={refetchLevels}
-                  isAddOrIncomplete={isAddOrIncompleteFeatures}
+                  isAddOrIncomplete={isAddOrIncompleteSRMPaymentForm}
                 />
               )}
             </Suspense>
