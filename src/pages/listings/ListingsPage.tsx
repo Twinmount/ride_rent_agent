@@ -22,7 +22,7 @@ export default function ListingsPage() {
 
   // Fetch vehicles if userId is present
   const { data, isLoading, isRefetching } = useVehicles({
-    page: 1,
+    page,
     filter: filters.approvalStatus,
     limit: 15,
     userId,

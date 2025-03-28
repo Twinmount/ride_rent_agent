@@ -16,7 +16,7 @@ interface UseVehiclesParams {
 }
 
 export const useVehicles = ({
-  page,
+  page = 1,
   limit = 10,
   search,
   filter,
