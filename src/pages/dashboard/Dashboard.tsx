@@ -1,69 +1,25 @@
 import React from "react";
-import { useQuery } from "@tanstack/react-query";
-import { fetchPortfolioStats, fetchEnquiriesStats } from "@/api/dashboard";
-import { format, startOfMonth, endOfDay } from "date-fns";
 import DashboardSkelton from "@/components/loading-skelton/DashboardSkelton";
 import { Link } from "react-router-dom";
-import { fetchAllVehicles } from "@/api/vehicle";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
-import useUserId from "@/hooks/useUserId";
+import useDashboard from "@/hooks/useDashboard";
 
 const AgentDashboard: React.FC = () => {
-  const currentDate = new Date();
-  const startOfMonthDate = startOfMonth(currentDate);
-  const endOfDayDate = endOfDay(currentDate);
+  const {
+    vehicleCount,
+    totalPortfolioCount,
+    totalEnquiriesCount,
+    monthlyPortfolioCount,
+    monthlyEnquiriesCount,
+    isVehiclesLoading,
+    isPortfolioLoading,
+    isEnquiriesLoading,
+    isMonthlyPortfolioLoading,
+    isMonthlyEnquiriesLoading,
+    userId,
+  } = useDashboard();
 
-  const dateStartRange = format(startOfMonthDate, "yyyy-MM-dd");
-  const dateEndRange = format(endOfDayDate, "yyyy-MM-dd");
-
-  const { userId } = useUserId();
-
-  // Fetch vehicles if userId is present
-  const { data, isLoading } = useQuery({
-    queryKey: ["vehicles", 1, 10, "ASC"],
-    queryFn: () =>
-      fetchAllVehicles({
-        page: 1,
-        limit: 10,
-        sortOrder: "ASC",
-        userId: userId as string,
-      }),
-    enabled: !!userId,
-    refetchOnWindowFocus: true,
-    staleTime: 0,
-  }); // Fetch from cached vehicle data
-
-  const vehiclesListLength = data?.result.list.length || 0;
-
-  // Fetch all-time stats
-  const { data: portfolioData, isLoading: isPortfolioLoading } = useQuery({
-    queryKey: ["portfolioStats"],
-    queryFn: () => fetchPortfolioStats(),
-    staleTime: 0,
-  });
-
-  const { data: enquiriesData, isLoading: isEnquiriesLoading } = useQuery({
-    queryKey: ["enquiriesStats"],
-    queryFn: () => fetchEnquiriesStats(),
-    staleTime: 0,
-  });
-
-  // Fetch current month stats
-  const { data: monthlyPortfolioData, isLoading: isMonthlyPortfolioLoading } =
-    useQuery({
-      queryKey: ["monthlyPortfolioStats", dateStartRange, dateEndRange],
-      queryFn: () => fetchPortfolioStats(dateStartRange, dateEndRange),
-      staleTime: 0,
-    });
-
-  const { data: monthlyEnquiriesData, isLoading: isMonthlyEnquiriesLoading } =
-    useQuery({
-      queryKey: ["monthlyEnquiriesStats", dateStartRange, dateEndRange],
-      queryFn: () => fetchEnquiriesStats(dateStartRange, dateEndRange),
-      staleTime: 0,
-    });
-
-  if (isLoading) {
+  if (isVehiclesLoading) {
     return <LazyLoader />;
   }
 
@@ -83,7 +39,7 @@ const AgentDashboard: React.FC = () => {
               <>
                 <p className="text-lg font-semibold">Total portfolio views</p>
                 <p className="text-4xl font-bold text-[#FFB347] mt-2">
-                  {portfolioData?.result.count}
+                  {totalPortfolioCount}
                 </p>
               </>
             )}
@@ -97,7 +53,7 @@ const AgentDashboard: React.FC = () => {
               <>
                 <p className="text-lg font-semibold">Total enquiries</p>
                 <p className="text-4xl font-bold text-[#FFB347] mt-2">
-                  {enquiriesData?.result.count}
+                  {totalEnquiriesCount}
                 </p>
               </>
             )}
@@ -111,7 +67,7 @@ const AgentDashboard: React.FC = () => {
               <>
                 <p className="text-lg font-semibold">Monthly portfolio views</p>
                 <p className="text-4xl font-bold text-[#FFB347] mt-2">
-                  {monthlyPortfolioData?.result.count}
+                  {monthlyPortfolioCount}
                 </p>
               </>
             )}
@@ -125,7 +81,7 @@ const AgentDashboard: React.FC = () => {
               <>
                 <p className="text-lg font-semibold">Monthly Enquiries</p>
                 <p className="text-4xl font-bold text-[#FFB347] mt-2">
-                  {monthlyEnquiriesData?.result.count}
+                  {monthlyEnquiriesCount}
                 </p>
               </>
             )}
@@ -146,7 +102,7 @@ const AgentDashboard: React.FC = () => {
         </div>
 
         {/* Conditional Overlay */}
-        {vehiclesListLength === 0 && (
+        {vehicleCount === 0 && (
           <div className="flex absolute inset-0 z-20 justify-center pt-0 bg-gray-200 bg-opacity-30 backdrop-blur-md">
             <div className="flex flex-col text-center w-full max-sm:max-w-[90%] max-w-[500px]  mt-52 rounded-lg ">
               <h3 className="mb-4 text-2xl font-extrabold text-gray-800">
