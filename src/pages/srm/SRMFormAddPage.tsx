@@ -6,6 +6,7 @@ import LazyLoader from "@/components/loading-skelton/LazyLoader";
 import { validateSRMTabAccess } from "@/helpers/form";
 import { SRMTabsTypes } from "@/types/types";
 import { toast } from "@/components/ui/use-toast";
+import PageWrapper from "@/components/PageWrapper";
 
 // Lazy-loaded form components
 const SRMCustomerDetailsForm = lazy(
@@ -52,19 +53,7 @@ export default function SRMFormAddPage() {
   };
 
   return (
-    <section className="container py-10 pb-44 h-auto min-h-screen bg-white">
-      <div className="gap-x-4 mb-5 ml-5 flex-center w-fit">
-        <button
-          onClick={() => navigate(-1)}
-          className="border-none transition-colors outline-none w-fit flex-center hover:text-yellow"
-        >
-          <CircleArrowLeft />
-        </button>
-        <h1 className="text-center h3-bold max-sm:text-xl sm:text-left">
-          Add New Record
-        </h1>
-      </div>
-
+    <PageWrapper heading="Add New Record">
       <div>
         <Tabs
           value={activeTab}
@@ -123,6 +112,6 @@ export default function SRMFormAddPage() {
           </TabsContent>
         </Tabs>
       </div>
-    </section>
+    </PageWrapper>
   );
 }

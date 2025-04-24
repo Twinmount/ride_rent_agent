@@ -1,16 +1,15 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
+import { fetchCustomerList } from "@/api/srm/trips";
+import { CustomerListColumns } from "@/components/table/columns/CustomerListColumn";
 import { SortDropdown } from "@/components/SortDropdown";
-import { fetchVehicleList } from "@/api/srm/trips";
-
-import { VehicleListColumns } from "@/components/table/columns/VehicleListColumns";
-import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
 import Search from "@/components/Search";
 import { GenericTable } from "@/components/table/GenericTable";
+import LinkButton from "@/components/common/LinkButton";
+import PageWrapper from "@/components/PageWrapper";
 
-export default function VehicleListPage() {
+export default function ManageSRMCustomersPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
@@ -18,9 +17,9 @@ export default function VehicleListPage() {
   const LIMIT = 8;
 
   const { data, isLoading } = useQuery({
-    queryKey: ["vehicleList", page, search, sortOrder],
+    queryKey: ["customerList", page, search, sortOrder],
     queryFn: () =>
-      fetchVehicleList({
+      fetchCustomerList({
         page,
         limit: LIMIT,
         sortOrder,
@@ -29,15 +28,12 @@ export default function VehicleListPage() {
     staleTime: 0,
   });
 
-  const vehicleData = data?.result?.list || [];
+  const customerData = data?.result?.list || [];
 
   const totalNumberOfPages = data?.result?.totalNumberOfPages || 0;
 
   return (
-    <section className="container py-5 mx-auto min-h-screen md:py-7">
-      <h1 className="text-center h3-bold max-sm:text-xl sm:text-left">
-        Vehicle List
-      </h1>
+    <PageWrapper heading="Customer List">
       <div className="flex flex-wrap gap-x-2 justify-start items-start mt-3 mb-4 w-full max-sm:mt-3">
         {/* search vehicle */}
         <Search
@@ -46,21 +42,13 @@ export default function VehicleListPage() {
           placeholder="Search Trip..."
           description={
             <p className=" italic text-gray-600">
-              You can search with <b>brand and registration number</b>
+              You can search with{" "}
+              <b>customer name, phone, passport and driving license</b>
             </p>
           }
         />
 
-        <Link
-          to="/srm/trips/new"
-          className="group px-3 h-10 bg-white flex gap-x-2 items-center rounded-lg shadow-lg transition-colors duration-300 ease-in-out flex-center text-yellow hover:bg-yellow hover:text-white"
-          aria-label="add new record"
-        >
-          <span className="text-gray-800 transition-colors group-hover:text-white">
-            New Trip
-          </span>{" "}
-          <Plus />
-        </Link>
+        <LinkButton label="New Trip" link="/srm/trips/new" />
 
         <SortDropdown
           sortOrder={sortOrder}
@@ -70,8 +58,8 @@ export default function VehicleListPage() {
       </div>
 
       <GenericTable
-        columns={VehicleListColumns}
-        data={vehicleData}
+        columns={CustomerListColumns()}
+        data={customerData}
         loading={isLoading}
       />
 
@@ -80,6 +68,6 @@ export default function VehicleListPage() {
         setPage={setPage}
         totalPages={totalNumberOfPages}
       />
-    </section>
+    </PageWrapper>
   );
 }

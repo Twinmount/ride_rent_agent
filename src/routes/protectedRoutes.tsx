@@ -33,11 +33,15 @@ const OngoingTripsPage = lazy(
 const CompletedTripsPage = lazy(
   () => import("../pages/srm/trip-data/CompletedTripsPage")
 );
-const VehicleListPage = lazy(
-  () => import("../pages/srm/trip-data/VehicleListPage")
+const ManageVehiclePage = lazy(
+  () => import("../pages/srm/trip-data/ManageVehiclePage")
+);
+const SRMVehicleAddPage = lazy(() => import("../pages/srm/SRMVehicleAddPage"));
+const SRMVehicleUpdatePage = lazy(
+  () => import("../pages/srm/SRMVehicleUpdatePage")
 );
 const CustomerListPage = lazy(
-  () => import("../pages/srm/trip-data/CustomerListPage")
+  () => import("../pages/srm/trip-data/ManageSRMCustomersPage")
 );
 const EndTripsPage = lazy(() => import("../pages/srm/EndTripsPage"));
 
@@ -77,7 +81,6 @@ export const protectedRoutes = [
     path: "/srm/trips/edit/:bookingId",
     element: <SRMFormUpdatePage />,
   },
-
   {
     path: "/srm/ongoing-trips",
     element: <OngoingTripsPage />,
@@ -91,8 +94,16 @@ export const protectedRoutes = [
     element: <CompletedTripsPage />,
   },
   {
-    path: "/srm/vehicle-list",
-    element: <VehicleListPage />,
+    path: "/srm/manage-vehicles",
+    element: <ManageVehiclePage />,
+  },
+  {
+    path: "/srm/manage-vehicles/add",
+    element: <SRMVehicleAddPage />,
+  },
+  {
+    path: "/srm/manage-vehicles/edit/:vehicleId",
+    element: <SRMVehicleUpdatePage />,
   },
   {
     path: "/srm/customer-list",

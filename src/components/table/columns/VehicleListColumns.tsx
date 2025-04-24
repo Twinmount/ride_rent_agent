@@ -1,4 +1,5 @@
 import { ColumnDef } from "@tanstack/react-table";
+import { Link } from "react-router-dom";
 
 export const VehicleListColumns: ColumnDef<any>[] = [
   {
@@ -12,7 +13,12 @@ export const VehicleListColumns: ColumnDef<any>[] = [
     accessorKey: "vehicleBrand.brandName",
     header: "Brand",
     cell: ({ row }) => (
-      <span>{row.original.vehicleBrand?.brandName || "N/A"}</span>
+      <Link
+        to={`/srm/manage-vehicles/edit/${row.original.id}`}
+        className="text-blue-500 hover:underline"
+      >
+        {row.original.vehicleBrand?.brandName || "N/A"}
+      </Link>
     ),
   },
   {
@@ -21,13 +27,15 @@ export const VehicleListColumns: ColumnDef<any>[] = [
     cell: ({ row }) => {
       const vehiclePhoto = row.original.vehiclePhoto;
       return vehiclePhoto ? (
-        <div className="w-16 h-16 overflow-hidden rounded-md bg-slate-300">
-          <img
-            src={vehiclePhoto}
-            alt="Vehicle"
-            className="object-cover w-full h-full"
-          />
-        </div>
+        <Link to={`/srm/manage-vehicles/edit/${row.original.id}`}>
+          <div className="w-24 h-16 overflow-hidden rounded-md border hover:outline-2 hover:outline-blue-400 bg-slate-300">
+            <img
+              src={vehiclePhoto}
+              alt="Vehicle"
+              className="object-cover w-full h-full"
+            />
+          </div>
+        </Link>
       ) : (
         <div className="w-16 h-16 overflow-hidden rounded-md flex-center text-[0.6rem] text-gray-600 bg-slate-300">
           No Image
@@ -39,7 +47,12 @@ export const VehicleListColumns: ColumnDef<any>[] = [
     accessorKey: "vehicleRegistrationNumber",
     header: "Registration No.",
     cell: ({ row }) => (
-      <span>{row.original.vehicleRegistrationNumber || "N/A"}</span>
+      <Link
+        to={`/srm/manage-vehicles/edit/${row.original.id}`}
+        className="text-blue-500 hover:underline"
+      >
+        {row.original.vehicleRegistrationNumber || "N/A"}
+      </Link>
     ),
   },
   {
