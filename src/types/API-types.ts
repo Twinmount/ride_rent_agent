@@ -76,6 +76,7 @@ export interface companyType {
   plan: string;
   companyAddress: string;
   companyLanguages: string[];
+  accountType?: string;
 }
 
 //  interface for the get-all-companies  API response

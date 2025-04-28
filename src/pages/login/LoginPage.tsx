@@ -29,7 +29,7 @@ import { LoginResponse } from "@/types/API-types";
 import Footer from "@/components/footer/Footer";
 import { Eye, EyeOff } from "lucide-react";
 
-const LoginPage = () => {
+const LoginPage = ({ country = "uae" }: { country?: string }) => {
   const [isView, setIsView] = useState(false);
   // State to store the country code separately
   const [countryCode, setCountryCode] = useState("");
@@ -148,7 +148,7 @@ const LoginPage = () => {
                     <div className="flex-col items-start w-full">
                       <FormControl>
                         <PhoneInput
-                          defaultCountry="ae"
+                          defaultCountry={country === "india" ? "in" : "ae"}
                           value={field.value}
                           onChange={(value, country) => {
                             field.onChange(value);
@@ -231,7 +231,10 @@ const LoginPage = () => {
               </Link>
               <div>
                 New to Ride.Rent?{" "}
-                <Link to={"/register"} className="font-semibold text-yellow">
+                <Link
+                  to={`${country === "india" ? "/in" : "/uae"}/register`}
+                  className="font-semibold text-yellow"
+                >
                   Register
                 </Link>
               </div>

@@ -24,9 +24,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { register } from "@/api/auth";
 import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
-import { Eye, EyeOff } from "lucide-react";
+import { ChevronDown, Eye, EyeOff } from "lucide-react";
 
-const RegistrationForm = () => {
+const RegistrationForm = ({ country }: { country: string }) => {
   const navigate = useNavigate();
   const [isView, setIsView] = useState(false);
 
@@ -34,12 +34,14 @@ const RegistrationForm = () => {
   const storedPhoneNumber = sessionStorage.getItem("phoneNumber") || "";
   const storedCountryCode = sessionStorage.getItem("countryCode") || "";
   const storedPassword = sessionStorage.getItem("password") || "";
+  const storedCountry = sessionStorage.getItem("country") || "";
 
   const [countryCode, setCountryCode] = useState(storedCountryCode);
 
   const initialValues = {
     phoneNumber: storedCountryCode + storedPhoneNumber,
     password: storedPassword,
+    country: storedCountry,
   };
 
   // Define your form.
@@ -65,8 +67,9 @@ const RegistrationForm = () => {
         sessionStorage.setItem("phoneNumber", phoneNumber);
         sessionStorage.setItem("countryCode", countryCode);
         sessionStorage.setItem("password", values.password);
+        sessionStorage.setItem("country", values.country);
 
-        navigate("/verify-otp");
+        navigate(`/verify-otp?country=${country}`);
       }
     } catch (error: any) {
       if (error.response && error.response.status === 400) {
@@ -114,7 +117,7 @@ const RegistrationForm = () => {
                 <div className="flex-col items-start w-full">
                   <FormControl>
                     <PhoneInput
-                      defaultCountry="ae"
+                      defaultCountry={country === "india" ? "in" : "ae"}
                       value={field.value}
                       onChange={(value, country) => {
                         field.onChange(value);
@@ -190,6 +193,44 @@ const RegistrationForm = () => {
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem className="flex flex-col mb-2 w-full">
+                <FormLabel className="ml-2 text-base lg:text-lg">
+                  Country
+                </FormLabel>
+                <div className="flex-col items-start w-full">
+                  <FormControl>
+                    <div className="relative custom-select-box-div">
+                      <select
+                        className="input-field w-full focus:outline-none focus:ring-0 focus:border-none pr-8"
+                        {...field}
+                      >
+                        <option>Select a country</option>
+                        <option value="ee8a7c95-303d-4f55-bd6c-85063ff1cf48">
+                          UAE
+                        </option>
+                        <option value="68ea1314-08ed-4bba-a2b1-af549946523d">
+                          India
+                        </option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <ChevronDown className="h-4 w-4 text-gray-600" />
+                      </div>
+                    </div>
+                  </FormControl>
+                  <FormDescription className="mt-1 ml-2 text-gray-500">
+                    Select a country where you would like to create your
+                    listings
+                  </FormDescription>
+                  <FormMessage className="ml-2" />
+                </div>
+              </FormItem>
+            )}
+          />
+
           <div className="text-sm text-center">
             An OTP will be sent to your provided{" "}
             <span className="font-bold">mobile</span> number
@@ -208,7 +249,10 @@ const RegistrationForm = () => {
         <div className="px-2 mt-3 text-center">
           <div>
             Already registered?{" "}
-            <Link to={"/login"} className="font-semibold text-yellow">
+            <Link
+              to={`${country === "india" ? "/in" : "/uae"}/login`}
+              className="font-semibold text-yellow"
+            >
               Login
             </Link>
           </div>

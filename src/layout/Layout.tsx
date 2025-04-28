@@ -38,7 +38,7 @@ export default function Layout() {
         {isLoading ? (
           <LazyLoader />
         ) : !data?.result ? (
-          <ProtectedPage />
+          <ProtectedPage userId={decodedData.userId} />
         ) : data.result.approvalStatus === "REJECTED" ? (
           <ApprovalStatusPage
             status="REJECTED"

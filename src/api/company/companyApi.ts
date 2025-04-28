@@ -30,6 +30,7 @@ export const addCompany = async (values: CompanyFormType, userId: string) => {
         commercialLicense: values.commercialLicense, // Assuming this is a URL or string'
         companyAddress: values.companyAddress,
         companyLanguages: values.companyLanguages,
+        accountType: values.accountType,
       },
     });
 

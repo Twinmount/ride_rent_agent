@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -32,6 +32,9 @@ const OTPPage = () => {
     resolver: zodResolver(OTPFormSchema),
     defaultValues: { otp: "" },
   });
+
+  const [searchParams] = useSearchParams();
+  const country = searchParams.get("country") || "uae";
 
   useEffect(() => {
     const storedTimestamp = sessionStorage.getItem("otpTimestamp");
@@ -106,7 +109,11 @@ const OTPPage = () => {
           title: "Your account is created successfully!. Now you can login",
           className: "bg-yellow text-white",
         });
-        navigate("/login", { replace: true });
+        if (country === "india") {
+          navigate("/in/login", { replace: true });
+        } else {
+          navigate("/uae/login", { replace: true });
+        }
       }
     } catch (error: any) {
       if (error.response && error.response.status === 400) {

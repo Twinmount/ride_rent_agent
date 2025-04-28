@@ -7,8 +7,8 @@ import "react-datepicker/dist/react-datepicker.css";
 import { Form, FormField } from "@/components/ui/form";
 
 import { Input } from "@/components/ui/input";
-import { CompanyFormDefaultValues } from "@/constants";
-import { CompanyFormSchema } from "@/lib/validator";
+import { IndividualFormDefaultValues } from "@/constants";
+import { IndividualFormSchema } from "@/lib/validator";
 import { CompanyFormType } from "@/types/types";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -33,19 +33,19 @@ import { FormSubmitButton } from "../../form-ui/FormSubmitButton";
 import EmailOtpVerification from "./EmailOtpVerification";
 import { FormContainer } from "../../form-ui/FormContainer";
 
-type CompanyRegistrationFormProps = {
+type IndividualRegistrationFormProps = {
   country: string;
   type: "Add" | "Update";
   formData?: CompanyFormType | null;
   agentId: string;
 };
 
-export default function CompanyRegistrationForm({
+export default function IndividualRegistrationForm({
   country = "UAE",
   type,
   formData,
   agentId,
-}: CompanyRegistrationFormProps) {
+}: IndividualRegistrationFormProps) {
   const [email, setEmail] = useState("");
   const [isEmailVerifiedUI, setIsEmailVerifiedUI] = useState(false);
   const [isLogoUploading, setIsLogoUploading] = useState(false);
@@ -56,7 +56,7 @@ export default function CompanyRegistrationForm({
   // accessing userId from useUserId hook
   const { userId } = useUserId();
 
-  const initialValues = CompanyFormDefaultValues;
+  const initialValues = IndividualFormDefaultValues;
 
   const isIndia = country === "India" || country === "india";
 
@@ -67,16 +67,15 @@ export default function CompanyRegistrationForm({
   });
 
   // creating form
-  const form = useForm<z.infer<ReturnType<typeof CompanyFormSchema>>>({
-    resolver: zodResolver(CompanyFormSchema(isIndia)),
+  const form = useForm<z.infer<typeof IndividualFormSchema>>({
+    resolver: zodResolver(IndividualFormSchema),
     defaultValues: initialValues,
   });
 
-  async function onSubmit(
-    values: z.infer<ReturnType<typeof CompanyFormSchema>>
-  ) {
+  async function onSubmit(values: z.infer<typeof IndividualFormSchema>) {
     // Check if OTP is verified before submitting the form
     // 1️⃣ Before submitting, check if email is verified
+
     const { result } = await checkEmailVerification.mutateAsync({ email });
 
     if (!result.isEmailVerified) {
@@ -140,12 +139,9 @@ export default function CompanyRegistrationForm({
           control={form.control}
           name="companyName"
           render={({ field }) => (
-            <FormFieldLayout
-              label="Company Name"
-              description={"Enter your company name"}
-            >
+            <FormFieldLayout label="Name" description={"Enter your name"}>
               <Input
-                placeholder="Company Name"
+                placeholder="Name"
                 {...field}
                 className="input-field"
                 type="text"
@@ -169,8 +165,8 @@ export default function CompanyRegistrationForm({
           render={({ field }) => (
             <SingleFileUpload
               name={field.name}
-              label="Company Logo"
-              description="Company logo can have a maximum size of 5MB."
+              label="Photo"
+              description="Upload a recent photo, selfies not accepted, photo can have a maximum size of 5MB."
               existingFile={formData?.companyLogo}
               maxSizeMB={5}
               setIsFileUploading={setIsLogoUploading}
@@ -194,16 +190,12 @@ export default function CompanyRegistrationForm({
           render={({ field }) => (
             <SingleFileUpload
               name={field.name}
-              label={isIndia ? "Registration Detail" : "Commercial License"}
+              label={"Commercial Registration"}
               description={
                 <>
                   Please upload a <strong>PHOTO</strong> or a{" "}
-                  <strong>SCREENSHOT</strong> of your{" "}
-                  {isIndia
-                    ? `Company Registration / GST Registration / Trade License,`
-                    : `commercial license,
-                  `}{" "}
-                  maximum file size 5MB.
+                  <strong>SCREENSHOT</strong> of your Commercial Registration /
+                  Tourist Permit. Maximum file size 5MB.
                 </>
               }
               existingFile={formData?.commercialLicense}
@@ -249,31 +241,24 @@ export default function CompanyRegistrationForm({
           )}
         />
 
-        {/* registration number */}
+        {/* PAN number */}
         <FormField
           control={form.control}
           name="regNumber"
           render={({ field }) => (
             <FormFieldLayout
-              label={
-                isIndia
-                  ? "GST Number"
-                  : "Registration Number / Trade License Number"
-              }
-              description={
-                isIndia
-                  ? `Enter your company GST number. The number should be a combination of letters and numbers, without any spaces or special characters.`
-                  : `Enter your company registration number. The number should be a combination of letters and numbers, without any spaces or special characters, up to 15 characters.`
-              }
+              label="PAN"
+              description="Enter your company PAN. The number should be a combination of letters and numbers, without any spaces or special characters."
             >
               <Input
-                placeholder={
-                  isIndia
-                    ? "Enter your company GST number"
-                    : "Enter your company registration number"
-                }
+                placeholder={"Enter your PAN number"}
                 {...field}
                 className="input-field"
+                onChange={(e) => {
+                  const upperValue = e.target.value.toUpperCase();
+                  field.onChange(upperValue);
+                }}
+                value={field.value?.toUpperCase() || ""}
               />
             </FormFieldLayout>
           )}
@@ -286,9 +271,7 @@ export default function CompanyRegistrationForm({
           render={({ field }) => (
             <FormFieldLayout
               label="Supported Languages"
-              description="Select all the languages your staff can speak or understand.
-                    These will be displayed on your company's public profile
-                    page, helping customers feel comfortable with communication."
+              description="Select all the languages you can speak or understand. These will be shown on your public profile to help customers communicate comfortably with you."
             >
               <CompanyLanguagesDropdown
                 isIndia={isIndia}
@@ -320,19 +303,19 @@ export default function CompanyRegistrationForm({
 
             return (
               <FormFieldLayout
-                label="Company Address"
+                label="Address"
                 description={
                   <>
                     <span className="w-full max-w-[90%]">
-                      Provide company address. This will be showed in your
-                      public company profile page. 150 characters max.
+                      Provide your address. It will appear on your public
+                      profile and must match your registered details
                     </span>{" "}
                     <span className="ml-auto"> {`${charCount}/150`}</span>
                   </>
                 }
               >
                 <Textarea
-                  placeholder="Company Address"
+                  placeholder="Address"
                   {...field}
                   className={`textarea rounded-xl transition-all duration-300 h-28`} // Dynamic height
                   onChange={handleInputChange} // Handle change to track character count

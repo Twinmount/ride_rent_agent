@@ -17,7 +17,11 @@ import {
 
 import { Link, useLocation } from "react-router-dom";
 
-export default function RegistrationPage() {
+export default function RegistrationPage({
+  country = "uae",
+}: {
+  country?: string;
+}) {
   const location = useLocation();
 
   // Check if the current pathname is "/register"
@@ -79,7 +83,9 @@ export default function RegistrationPage() {
                     className="text-sm font-bold text-gray-300 transition-colors cursor-pointer hover:text-yellow"
                   >
                     <a
-                      href="https://ride.rent"
+                      href={`https://ride.rent/${
+                        country === "india" ? "in" : "uae"
+                      }`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
@@ -107,7 +113,7 @@ export default function RegistrationPage() {
             <SignUpFeatures />
 
             {/* form */}
-            <RegistrationForm />
+            <RegistrationForm country={country} />
           </MotionDiv>
         </div>
 

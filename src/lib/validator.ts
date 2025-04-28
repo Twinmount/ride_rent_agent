@@ -4,25 +4,66 @@ import * as z from "zod";
 export const RegistrationFormSchema = z.object({
   phoneNumber: z.string().min(6, "Provide a valid mobile  number"),
   password: z.string().min(4, "Password must be at least 4 characters"),
+  country: z.string().min(1, "Select a country"),
 });
 
 // Company Form Schema
-export const CompanyFormSchema = z.object({
+export const CompanyFormSchema = (isIndia: boolean) =>
+  z.object({
+    companyName: z
+      .string()
+      .min(1, "Company name is required")
+      .max(50, "Maximum 50 characters allowed"),
+    companyLogo: z.string().min(1, "Company logo is required"),
+    commercialLicense: z.string().min(1, "Commercial License is required"),
+    expireDate: z.date(),
+    regNumber: z
+      .string()
+      .min(1, `${isIndia ? "GST" : "Registration"} number is required`)
+      .refine(
+        (val) => {
+          if (isIndia) {
+            return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/.test(
+              val
+            );
+          }
+          return true; // Skip validation if not India
+        },
+        {
+          message: "Invalid GST number format",
+        }
+      ),
+    companyAddress: z
+      .string()
+      .min(5, "Company address is required")
+      .max(150, "Address can be up to 150 characters"),
+    companyLanguages: z
+      .array(z.string())
+      .min(1, "At least one language must be selected"),
+    accountType: z.enum(["company", "individual"]),
+  });
+
+// individual Form Schema
+export const IndividualFormSchema = z.object({
   companyName: z
     .string()
-    .min(1, "Company name is required")
+    .min(1, "Name is required")
     .max(50, "Maximum 50 characters allowed"),
-  companyLogo: z.string().min(1, "Company logo is required"),
-  commercialLicense: z.string().min(1, "Commercial License is required"),
+  companyLogo: z.string().min(1, "Photo is required"),
+  commercialLicense: z.string().min(1, "Commercial Registration is required"),
   expireDate: z.date(),
-  regNumber: z.string().min(1, "Registration number is required"),
+  regNumber: z
+    .string()
+    .min(1, "PAN number is required")
+    .regex(/^[A-Z]{5}[0-9]{4}[A-Z]$/, "Invalid PAN format"),
   companyAddress: z
     .string()
-    .min(5, "Company address is required")
+    .min(5, "Address is required")
     .max(150, "Address can be up to 150 characters"),
   companyLanguages: z
     .array(z.string())
     .min(1, "At least one language must be selected"),
+  accountType: z.enum(["company", "individual"]),
 });
 
 // Company Form Schema

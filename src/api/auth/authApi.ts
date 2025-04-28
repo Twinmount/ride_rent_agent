@@ -1,21 +1,22 @@
-import { RegisterResponse, VerifyOTPResponse } from '@/types/API-types'
-import { Slug } from '../Api-Endpoints'
-import { API } from '../ApiService'
+import { RegisterResponse, VerifyOTPResponse } from "@/types/API-types";
+import { Slug } from "../Api-Endpoints";
+import { API } from "../ApiService";
 
 type registerArgsType = {
-  phoneNumber: string
-  password: string
-}
+  phoneNumber: string;
+  password: string;
+  country?: string;
+};
 type resendOtpArgsType = {
-  phoneNumber: string
-  password: string
-  countryCode: string
-}
+  phoneNumber: string;
+  password: string;
+  countryCode: string;
+};
 type verifyOtpArgsType = {
-  otpId: string
-  userId: string
-  otp: string
-}
+  otpId: string;
+  userId: string;
+  otp: string;
+};
 
 // register a agent
 export const register = async (
@@ -24,30 +25,33 @@ export const register = async (
 ): Promise<RegisterResponse> => {
   try {
     // extracting phone number and country code
-    const phoneNumber = values.phoneNumber.replace(`+${countryCode}`, '').trim()
+    const phoneNumber = values.phoneNumber
+      .replace(`+${countryCode}`, "")
+      .trim();
 
     const requestBody = {
       countryCode,
       phoneNumber,
       password: values.password,
-    }
+      countryId: values.country,
+    };
 
     // Send the FormData object using the API post method
     const data = await API.post<RegisterResponse>({
       slug: Slug.REGISTER,
       body: requestBody,
-    })
+    });
 
     if (!data) {
-      throw new Error('Failed to get registration response')
+      throw new Error("Failed to get registration response");
     }
 
-    return data
+    return data;
   } catch (error) {
-    console.error('Error on agent registration', error)
-    throw error
+    console.error("Error on agent registration", error);
+    throw error;
   }
-}
+};
 
 // resend OTP
 export const resendOTP = async (
@@ -58,18 +62,18 @@ export const resendOTP = async (
     const data = await API.post<RegisterResponse>({
       slug: Slug.REGISTER,
       body: values,
-    })
+    });
 
     if (!data) {
-      throw new Error('Failed to get resend otp response')
+      throw new Error("Failed to get resend otp response");
     }
 
-    return data
+    return data;
   } catch (error) {
-    console.error('Error on resend OTP', error)
-    throw error
+    console.error("Error on resend OTP", error);
+    throw error;
   }
-}
+};
 
 //verify otp
 export const verifyOTP = async (
@@ -80,15 +84,15 @@ export const verifyOTP = async (
     const data = await API.post<VerifyOTPResponse>({
       slug: Slug.VERIFY_OTP,
       body: values,
-    })
+    });
 
     if (!data) {
-      throw new Error('Failed to verify OTP')
+      throw new Error("Failed to verify OTP");
     }
 
-    return data
+    return data;
   } catch (error) {
-    console.error('Error on OTP verification', error)
-    throw error
+    console.error("Error on OTP verification", error);
+    throw error;
   }
-}
+};

@@ -81,6 +81,19 @@ export const CompanyFormDefaultValues: CompanyFormType = {
   regNumber: "",
   companyAddress: "", // Default empty value
   companyLanguages: [],
+  accountType: "company",
+};
+
+// Individual registration phase 2 form default values
+export const IndividualFormDefaultValues: CompanyFormType = {
+  companyName: "",
+  companyLogo: "",
+  commercialLicense: "",
+  expireDate: undefined,
+  regNumber: "",
+  companyAddress: "", // Default empty value
+  companyLanguages: [],
+  accountType: "individual",
 };
 
 // Company profile update form default values

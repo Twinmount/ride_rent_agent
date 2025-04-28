@@ -1,11 +1,12 @@
+import { fetchComapnyCountry } from "@/api/dashboard";
 import { getUser } from "@/api/user";
 import FloatingWhatsAppButton from "@/components/FloatingWhatsappIcon";
-import CompanyForm from "@/components/form/main-form/company-form/CompanyForm";
+import IndividualForm from "@/components/form/main-form/company-form/IndividualForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import { useCompanyCountry } from "@/hooks/useCompanyCountry";
 import { useQuery } from "@tanstack/react-query";
 
-export default function CompanyRegistration() {
+export default function IndividualRegistration() {
   const { data, isLoading, isError } = useQuery({
     queryKey: ["users"],
     queryFn: getUser,
@@ -19,19 +20,25 @@ export default function CompanyRegistration() {
 
   return (
     <section className="py-5 pt-10 pb-24">
-      <h1 className="text-3xl font-bold text-center">Company Details</h1>
+      <h1 className="text-3xl font-bold text-center">Owner Details</h1>
       <h2 className="my-3 text-base text-center text-gray-500">
-        Provide your company details to complete the registration
+        Provide your details to complete the registration
       </h2>
 
       {isLoading || isLoadingCountry ? (
         <FormSkelton />
-      ) : !data || isError ? (
+      ) : !data || isError || country !== "India" ? (
         <div className="mt-36 text-2xl font-semibold text-center text-red-500">
-          failed to fetch your agent id
+          {country !== "India"
+            ? "Individual register is not activated in you country"
+            : "failed to fetch your agent id"}
         </div>
       ) : (
-        <CompanyForm country={country} type="Add" agentId={agentId as string} />
+        <IndividualForm
+          country={country}
+          type="Add"
+          agentId={agentId as string}
+        />
       )}
 
       {/* whatsapp floating button */}

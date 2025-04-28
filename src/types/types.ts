@@ -18,6 +18,8 @@ export type CompanyFormType = {
   regNumber: string;
   companyAddress: string;
   companyLanguages: string[];
+  accountType?: "company" | "individual";
+  countryId?: string;
 };
 
 export type ProfileUpdateFormType = {
@@ -26,6 +28,7 @@ export type ProfileUpdateFormType = {
   regNumber: string;
   companyAddress: string;
   companyLanguages: string[];
+  accountType?: string;
 };
 
 // Rental detail type for day, week, and month
