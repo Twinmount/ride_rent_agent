@@ -77,6 +77,8 @@ export interface companyType {
   companyAddress: string;
   companyLanguages: string[];
   accountType?: string;
+  countryName?: string;
+  countryId: string;
 }
 
 //  interface for the get-all-companies  API response
@@ -201,6 +203,12 @@ export interface FetchStatesResponse {
   statusCode: number;
 }
 
+export interface FetchParentStatesResponse {
+  result: StateType;
+  status: string;
+  statusCode: number;
+}
+
 export interface CityType {
   stateId: string;
   cityId: string;
@@ -292,7 +300,7 @@ export interface AddPrimaryFormResponse {
     vehicleModel: string;
     registredYear: string; // corrected to match the response field name
     rentalDetails: RentalDetailsType; // Assuming this is a JSON string, as in the response example
-    specification: "USA_SPEC" | "UAE_SPEC" | "OTHERS";
+    specification: "India_SPEC" | "USA_SPEC" | "UAE_SPEC" | "OTHERS";
     countryCode: string;
     phoneNumber: string;
     state: StateType;
@@ -319,7 +327,7 @@ export type GetPrimaryForm = {
   vehicleModel: string;
   countryCode: string;
   phoneNumber: string;
-  specification: "UAE_SPEC" | "USA_SPEC" | "OTHERS";
+  specification: "India_SPEC" | "UAE_SPEC" | "USA_SPEC" | "OTHERS";
   rentalDetails: {
     day: {
       enabled: boolean;
@@ -360,6 +368,7 @@ export type GetPrimaryForm = {
   };
   isCreditOrDebitCardsSupported: boolean;
   isTabbySupported: boolean;
+  isCashSupported: boolean;
 };
 
 // Primary form get all response

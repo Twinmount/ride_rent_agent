@@ -10,6 +10,7 @@ import {
   ReactNode,
   useEffect,
 } from "react";
+import { load, StorageKeys } from "@/utils/storage";
 
 const AgentContext = createContext<AgentContextType | null>(null);
 
@@ -30,9 +31,13 @@ const AgentProvider = ({ children }: AgentProviderProps) => {
 
   const isSmallScreen = useIsSmallScreen(1100);
 
+  const accessToken = load<string>(StorageKeys.ACCESS_TOKEN);
+  const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ["users"],
     queryFn: getUser,
+    enabled: !!accessToken && !!refreshToken,
   });
 
   const { agentId, id } = data?.result || {};

@@ -8,6 +8,8 @@ import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import { getLevelsFilled, getPrimaryDetailsFormData } from "@/api/vehicle";
 import { mapGetPrimaryFormToPrimaryFormType } from "@/helpers/form";
 import { save, StorageKeys } from "@/utils/storage";
+import useUserId from "@/hooks/useUserId";
+import { getCompany } from "@/api/company";
 
 // Lazy-loaded components
 const PrimaryDetailsForm = lazy(
@@ -51,6 +53,17 @@ export default function VehiclesFormUpdatePage() {
     queryFn: () => getLevelsFilled(vehicleId as string),
     enabled: !!vehicleId,
   });
+
+  const { userId } = useUserId();
+
+  const { data: companyData, isLoading: isCompanyLoading } = useQuery({
+    queryKey: ["company", userId],
+    queryFn: () => getCompany(userId as string),
+    enabled: !!userId,
+  });
+
+  const isIndia = companyData?.result?.countryName === "India";
+  const countryId = companyData?.result?.countryId || "";
 
   const levelsFilled = levelsData
     ? parseInt(levelsData.result.levelsFilled, 10)
@@ -110,7 +123,7 @@ export default function VehiclesFormUpdatePage() {
               Primary Details
             </TabsTrigger>
             <TabsTrigger
-              disabled={isLoading || isLevelsFetching}
+              disabled={isLoading || isLevelsFetching || isCompanyLoading}
               value="specifications"
               className="max-sm:px-2"
             >
@@ -128,7 +141,7 @@ export default function VehiclesFormUpdatePage() {
           </TabsList>
           <TabsContent value="primary" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              {isLoading ? (
+              {isLoading || isCompanyLoading ? (
                 <FormSkelton />
               ) : (
                 <PrimaryDetailsForm
@@ -136,6 +149,8 @@ export default function VehiclesFormUpdatePage() {
                   formData={formData}
                   levelsFilled={levelsFilled}
                   initialCountryCode={initialCountryCode}
+                  isIndia={isIndia}
+                  countryId={countryId}
                 />
               )}
             </Suspense>

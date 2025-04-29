@@ -297,7 +297,11 @@ export function mapGetPrimaryFormToPrimaryFormType(
     isLease: data.isLease,
     isCryptoAccepted: data.isCryptoAccepted,
     isSpotDeliverySupported: data.isSpotDeliverySupported,
-    specification: data.specification as "UAE_SPEC" | "USA_SPEC" | "OTHERS",
+    specification: data.specification as
+      | "India_SPEC"
+      | "UAE_SPEC"
+      | "USA_SPEC"
+      | "OTHERS",
     rentalDetails: data.rentalDetails,
     phoneNumber: formattedPhoneNumber, // Set the combined phone number
     stateId: data.stateId,
@@ -306,6 +310,7 @@ export function mapGetPrimaryFormToPrimaryFormType(
     securityDeposit: data.securityDeposit,
     isCreditOrDebitCardsSupported: data.isCreditOrDebitCardsSupported,
     isTabbySupported: data.isTabbySupported,
+    isCashSupported: data.isCashSupported,
   };
 }
 

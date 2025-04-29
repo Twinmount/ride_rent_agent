@@ -49,6 +49,7 @@ export const addPrimaryDetailsForm = async (
       securityDeposit: values.securityDeposit,
       isCreditOrDebitCardsSupported: values.isCreditOrDebitCardsSupported,
       isTabbySupported: values.isTabbySupported,
+      isCashSupported: values.isCashSupported,
     };
 
     // Include additionalVehicleTypes only if isCarsCategory is true
@@ -116,6 +117,7 @@ export const updatePrimaryDetailsForm = async (
       securityDeposit: values.securityDeposit,
       isCreditOrDebitCardsSupported: values.isCreditOrDebitCardsSupported,
       isTabbySupported: values.isTabbySupported,
+      isCashSupported: values.isCashSupported,
     };
 
     // Include additionalVehicleTypes only if isCarsCategory is true

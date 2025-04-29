@@ -117,7 +117,9 @@ export const LoginPageDefaultValues = {
 };
 
 // primary details form default values
-export const PrimaryFormDefaultValues: PrimaryFormType = {
+export const getPrimaryFormDefaultValues = (
+  isIndia: boolean
+): PrimaryFormType => ({
   vehicleCategoryId: "",
   vehicleTypeId: "",
   vehicleBrandId: "",
@@ -130,7 +132,7 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
   isLease: false,
   isCryptoAccepted: false,
   isSpotDeliverySupported: false,
-  specification: "UAE_SPEC",
+  specification: isIndia ? "India_SPEC" : "UAE_SPEC",
   rentalDetails: {
     day: { enabled: false, rentInAED: "", mileageLimit: "" },
     week: { enabled: false, rentInAED: "", mileageLimit: "" },
@@ -152,7 +154,8 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
   },
   isCreditOrDebitCardsSupported: false,
   isTabbySupported: false,
-};
+  isCashSupported: false,
+});
 
 // srm user details form default values
 export const SRMCustomerDetailsFormDefaultValues: SRMCustomerDetailsFormType = {

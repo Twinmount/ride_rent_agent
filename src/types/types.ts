@@ -65,7 +65,7 @@ export type PrimaryFormType = {
   isLease: boolean;
   isCryptoAccepted: boolean;
   isSpotDeliverySupported: boolean;
-  specification: "UAE_SPEC" | "USA_SPEC" | "OTHERS";
+  specification: "India_SPEC" | "UAE_SPEC" | "USA_SPEC" | "OTHERS";
   rentalDetails: {
     day: RentalDetailType;
     week: RentalDetailType;
@@ -83,6 +83,7 @@ export type PrimaryFormType = {
   };
   isCreditOrDebitCardsSupported: boolean;
   isTabbySupported: boolean;
+  isCashSupported: boolean;
 };
 
 export type SpecificationFormData = {
