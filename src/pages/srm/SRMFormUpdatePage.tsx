@@ -1,11 +1,11 @@
-import { CircleArrowLeft } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { lazy, Suspense } from "react";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
 import { SRMTabsTypes } from "@/types/types";
 import { useSRMUpdateForm } from "@/hooks/useSRMUpdateForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
+import PageWrapper from "@/components/PageWrapper";
 
 // Lazy-loaded form components
 const SRMCustomerDetailsForm = lazy(
@@ -19,8 +19,6 @@ const SRMPaymentDetailsForm = lazy(
 );
 
 export default function SRMFormUpdatePage() {
-  const navigate = useNavigate();
-
   const { bookingId } = useParams<{
     bookingId: string;
   }>();
@@ -47,19 +45,7 @@ export default function SRMFormUpdatePage() {
   } = useSRMUpdateForm(bookingId);
 
   return (
-    <section className="container py-10 pb-44 h-auto min-h-screen bg-white">
-      <div className="gap-x-4 mb-5 ml-5 flex-center w-fit">
-        <button
-          onClick={() => navigate(-1)}
-          className="border-none transition-colors outline-none w-fit flex-center hover:text-yellow"
-        >
-          <CircleArrowLeft />
-        </button>
-        <h1 className="text-center h3-bold max-sm:text-xl sm:text-left">
-          Add New Record
-        </h1>
-      </div>
-
+    <PageWrapper heading="Edit Trip Record">
       <div>
         <Tabs
           value={activeTab}
@@ -136,6 +122,6 @@ export default function SRMFormUpdatePage() {
           </TabsContent>
         </Tabs>
       </div>
-    </section>
+    </PageWrapper>
   );
 }

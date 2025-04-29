@@ -3,7 +3,7 @@ import React from "react";
 
 const SRMIntroduction: React.FC = () => {
   return (
-    <section className="flex justify-center items-center py-8">
+    <div className="flex justify-center items-center py-8">
       <div className="p-8 w-full max-w-4xl bg-white rounded-2xl shadow-lg">
         <div className="flex flex-col justify-center items-center">
           {/* Logo */}
@@ -49,7 +49,7 @@ const SRMIntroduction: React.FC = () => {
           </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 };
 

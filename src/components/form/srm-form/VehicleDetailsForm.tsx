@@ -24,6 +24,7 @@ import { useFormValidationToast } from "@/hooks/useFormValidationToast";
 import { FormContainer } from "../form-ui/FormContainer";
 import { FormSubmitButton } from "../form-ui/FormSubmitButton";
 import { FormFieldLayout } from "../form-ui/FormFieldLayout";
+import { Input } from "@/components/ui/input";
 
 type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";
@@ -31,6 +32,8 @@ type SRMVehicleDetailsFormProps = {
   onNextTab?: () => void;
   refetchLevels?: () => void;
   isAddOrIncomplete?: boolean;
+  showDescription?: boolean;
+  isDedicatedAddPage?: boolean;
 };
 
 export default function SRMVehicleDetailsForm({
@@ -39,6 +42,8 @@ export default function SRMVehicleDetailsForm({
   formData,
   refetchLevels,
   isAddOrIncomplete,
+  showDescription = true,
+  isDedicatedAddPage = false,
 }: SRMVehicleDetailsFormProps) {
   const {} = useParams<{}>();
   const [isFileUploading, setIsFileUploading] = useState(false);
@@ -180,10 +185,12 @@ export default function SRMVehicleDetailsForm({
       <FormContainer
         onSubmit={form.handleSubmit(onSubmit)}
         description={
-          <p className="text-sm italic text-center text-gray-600">
-            Add vehicle details here. You can choose existing vehicle &#40;if
-            any&#41; by searching registration number
-          </p>
+          type === "Add" && showDescription ? (
+            <p className="text-sm italic text-center text-gray-600">
+              Add srm vehicle details here. You can choose existing vehicle
+              &#40;if any&#41; by searching registration number
+            </p>
+          ) : null
         }
         className="mt-2"
       >
@@ -196,12 +203,20 @@ export default function SRMVehicleDetailsForm({
               label="Registration Number"
               description="Add or Search Vehicle Registration Number."
             >
-              <VehicleSearch
-                value={field.value}
-                onChangeHandler={handleVehicleSelect}
-                placeholder="Enter / Search Registration Number"
-                isDisabled={isFieldsDisabled}
-              />
+              {isDedicatedAddPage ? (
+                <Input
+                  placeholder="eg: '12341234'"
+                  {...field}
+                  className={`input-field !cursor-default !text-gray-700`}
+                />
+              ) : (
+                <VehicleSearch
+                  value={field.value}
+                  onChangeHandler={handleVehicleSelect}
+                  placeholder="Enter / Search Registration Number"
+                  isDisabled={isFieldsDisabled}
+                />
+              )}
             </FormFieldLayout>
           )}
         />

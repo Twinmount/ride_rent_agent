@@ -23,8 +23,8 @@ const SRMSidebarBox = ({ icon }: SRMSidebarBoxProps) => {
     { label: "SRM Dashboard", link: "/srm/dashboard" },
     { label: "Ongoing Trips", link: "/srm/ongoing-trips" },
     { label: "Completed Trips", link: "/srm/completed-trips" },
-    { label: "Vehicle List", link: "/srm/vehicle-list" },
-    { label: "Customer List", link: "/srm/customer-list" },
+    { label: "SRM Vehicles", link: "/srm/manage-vehicles" },
+    { label: "SRM Customers", link: "/srm/customer-list" },
   ];
 
   const toggleDropdown = () => {

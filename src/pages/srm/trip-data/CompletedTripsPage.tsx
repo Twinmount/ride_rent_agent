@@ -6,12 +6,12 @@ import { CompletedTripsColumns } from "@/components/table/columns/CompletedTrips
 import CompletedTripsInvoiceDownloadModal from "@/components/modal/srm-modal/CompletedTripsInvoiceDownloadModal";
 import { fetchSRMBookings } from "@/api/srm/trips";
 import DownloadExcelModal from "@/components/srm/DownloadSRMExcelData";
-import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
 import Search from "@/components/Search";
 import { BookingStatus } from "@/types/srm-types";
 import { useCompany } from "@/hooks/useCompany";
 import { GenericTable } from "@/components/table/GenericTable";
+import LinkButton from "@/components/common/LinkButton";
+import PageWrapper from "@/components/PageWrapper";
 
 export default function CompletedTripsPage() {
   const [page, setPage] = useState(1);
@@ -50,10 +50,7 @@ export default function CompletedTripsPage() {
   const totalNumberOfPages = data?.result?.totalNumberOfPages || 0;
 
   return (
-    <section className="container py-5 mx-auto min-h-screen md:py-7">
-      <h1 className="text-center h3-bold max-sm:text-xl sm:text-left">
-        Completed Trips
-      </h1>
+    <PageWrapper heading="Completed Trips">
       <div className="flex flex-wrap gap-x-2 justify-start items-start mt-3 mb-4 w-full max-sm:mt-3">
         {/* search vehicle */}
         <Search
@@ -71,16 +68,8 @@ export default function CompletedTripsPage() {
           }
         />
 
-        <Link
-          to="/srm/trips/new"
-          className="group px-3 h-10 bg-white flex gap-x-2 items-center rounded-lg shadow-lg transition-colors duration-300 ease-in-out flex-center text-yellow hover:bg-yellow hover:text-white"
-          aria-label="add new record"
-        >
-          <span className="text-gray-800 transition-colors group-hover:text-white">
-            New Trip
-          </span>{" "}
-          <Plus />
-        </Link>
+        <LinkButton label="New Trip" link="/srm/trips/new" />
+
         <DownloadExcelModal
           title="Excel Data Download"
           onDownload={async () => {}}
@@ -116,6 +105,6 @@ export default function CompletedTripsPage() {
           totalPages={totalNumberOfPages}
         />
       )}
-    </section>
+    </PageWrapper>
   );
 }
