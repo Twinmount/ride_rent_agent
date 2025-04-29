@@ -1,20 +1,13 @@
-import { fetchComapnyCountry } from "@/api/dashboard";
-import { getUser } from "@/api/user";
 import FloatingWhatsAppButton from "@/components/FloatingWhatsappIcon";
 import IndividualForm from "@/components/form/main-form/company-form/IndividualForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
+import { useAgentContext } from "@/context/AgentContext";
 import { useCompanyCountry } from "@/hooks/useCompanyCountry";
-import { useQuery } from "@tanstack/react-query";
-
 export default function IndividualRegistration() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["users"],
-    queryFn: getUser,
-  });
+  const { isLoading, isError, agentId, userId } = useAgentContext();
 
-  const { agentId, id } = data?.result || {};
-
-  const { data: countryData, isLoading: isLoadingCountry } = useCompanyCountry(id)
+  const { data: countryData, isLoading: isLoadingCountry } =
+    useCompanyCountry(userId);
 
   const country = countryData?.result || "UAE";
 
@@ -27,7 +20,7 @@ export default function IndividualRegistration() {
 
       {isLoading || isLoadingCountry ? (
         <FormSkelton />
-      ) : !data || isError || country !== "India" ? (
+      ) : !agentId || isError || country !== "India" ? (
         <div className="mt-36 text-2xl font-semibold text-center text-red-500">
           {country !== "India"
             ? "Individual register is not activated in you country"

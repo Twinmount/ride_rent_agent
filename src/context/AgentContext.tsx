@@ -1,5 +1,7 @@
-import useIsSmallScreen from '@/hooks/useIsSmallScreen'
-import { AgentContextType } from '@/types/types'
+import useIsSmallScreen from "@/hooks/useIsSmallScreen";
+import { AgentContextType } from "@/types/types";
+import { useQuery } from "@tanstack/react-query";
+import { getUser } from "@/api/user";
 
 import {
   createContext,
@@ -7,42 +9,49 @@ import {
   useState,
   ReactNode,
   useEffect,
-} from 'react'
+} from "react";
 
-const AgentContext = createContext<AgentContextType | null>(null)
+const AgentContext = createContext<AgentContextType | null>(null);
 
 const useAgentContext = () => {
-  const context = useContext(AgentContext)
+  const context = useContext(AgentContext);
   if (!context) {
-    throw new Error('useAgentContext must be used within an AppProvider')
+    throw new Error("useAgentContext must be used within an AppProvider");
   }
-  return context
-}
+  return context;
+};
 
 type AgentProviderProps = {
-  children: ReactNode
-}
+  children: ReactNode;
+};
 
 const AgentProvider = ({ children }: AgentProviderProps) => {
-  const [isSidebarOpen, setSidebarOpen] = useState(false)
+  const [isSidebarOpen, setSidebarOpen] = useState(false);
 
-  const isSmallScreen = useIsSmallScreen(1100)
+  const isSmallScreen = useIsSmallScreen(1100);
+
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ["users"],
+    queryFn: getUser,
+  });
+
+  const { agentId, id } = data?.result || {};
 
   const toggleSidebar = () => {
-    setSidebarOpen(!isSidebarOpen)
-  }
+    setSidebarOpen(!isSidebarOpen);
+  };
 
   useEffect(() => {
     const handleResize = () => {
-      setSidebarOpen(false)
-    }
+      setSidebarOpen(false);
+    };
 
-    window.addEventListener('resize', handleResize)
+    window.addEventListener("resize", handleResize);
 
     return () => {
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [])
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
     <AgentContext.Provider
@@ -50,11 +59,15 @@ const AgentProvider = ({ children }: AgentProviderProps) => {
         isSidebarOpen,
         toggleSidebar,
         isSmallScreen,
+        agentId,
+        userId: id,
+        isLoading,
+        isError,
       }}
     >
       {children}
     </AgentContext.Provider>
-  )
-}
+  );
+};
 
-export { useAgentContext, AgentProvider }
+export { useAgentContext, AgentProvider };

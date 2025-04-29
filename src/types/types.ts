@@ -3,6 +3,10 @@ export type AgentContextType = {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
   isSmallScreen: boolean;
+  agentId: string | undefined;
+  userId: string | undefined;
+  isLoading: boolean;
+  isError: boolean;
 };
 
 export type RegistrationType = {

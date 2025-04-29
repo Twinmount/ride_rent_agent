@@ -4,9 +4,6 @@ import { Link } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import { useQuery } from "@tanstack/react-query";
 import { getCompany } from "@/api/company";
-import { load, StorageKeys } from "@/utils/storage";
-import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
-import { jwtDecode } from "jwt-decode";
 import { getUser } from "@/api/user";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
 import SupportModal from "@/components/modal/SupportModal";
@@ -21,6 +18,7 @@ import { toast } from "@/components/ui/use-toast";
 import { downloadFileFromStream } from "@/helpers/form";
 import ImagePreviewModal from "@/components/modal/ImagePreviewModal";
 import { useCompanyCountry } from "@/hooks/useCompanyCountry";
+import { useAgentContext } from "@/context/AgentContext";
 
 export default function ProfilePage() {
   const [isCopied, setIsCopied] = useState(false);
@@ -40,14 +38,12 @@ export default function ProfilePage() {
     );
   };
 
-  const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
-
-  const { userId } = jwtDecode<DecodedRefreshToken>(refreshToken as string);
+  const { userId } = useAgentContext();
 
   // Query to get company data
   const { data: companyData, isLoading: isCompanyLoading } = useQuery({
     queryKey: ["company"],
-    queryFn: () => getCompany(userId),
+    queryFn: () => getCompany(userId as string),
   });
 
   // Query to get user data

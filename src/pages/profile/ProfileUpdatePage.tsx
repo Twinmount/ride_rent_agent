@@ -2,23 +2,20 @@ import { getCompany } from "@/api/company";
 import FloatingWhatsAppButton from "@/components/FloatingWhatsappIcon";
 import CompanyProfileUpdateForm from "@/components/form/main-form/company-form/CompanyProfileUpdateForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
+import { useAgentContext } from "@/context/AgentContext";
 import { useCompanyCountry } from "@/hooks/useCompanyCountry";
-import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
-import { load, StorageKeys } from "@/utils/storage";
 import { useQuery } from "@tanstack/react-query";
-import { jwtDecode } from "jwt-decode";
 import { useParams } from "react-router-dom";
 
 export default function ProfileUpdatePage() {
-  const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
-  const { userId } = jwtDecode<DecodedRefreshToken>(refreshToken as string);
+  const { userId } = useAgentContext();
 
   const { agentId } = useParams<{ agentId: string }>();
 
   // Query to get company data
   const { data, isLoading } = useQuery({
     queryKey: ["company", agentId],
-    queryFn: () => getCompany(userId),
+    queryFn: () => getCompany(userId as string),
   });
 
   const { data: countryData, isLoading: isLoadingCountry } =
