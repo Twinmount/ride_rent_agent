@@ -50,6 +50,7 @@ export const addPrimaryDetailsForm = async (
       isCreditOrDebitCardsSupported: values.isCreditOrDebitCardsSupported,
       isTabbySupported: values.isTabbySupported,
       isCashSupported: values.isCashSupported,
+      tempCitys: values.tempCitys,
     };
 
     // Include additionalVehicleTypes only if isCarsCategory is true
@@ -118,6 +119,7 @@ export const updatePrimaryDetailsForm = async (
       isCreditOrDebitCardsSupported: values.isCreditOrDebitCardsSupported,
       isTabbySupported: values.isTabbySupported,
       isCashSupported: values.isCashSupported,
+      tempCitys: values.tempCitys,
     };
 
     // Include additionalVehicleTypes only if isCarsCategory is true
@@ -192,7 +194,6 @@ export const getPrimaryDetailsFormData = async (
     if (!data) {
       throw new Error("Failed to fetch primary form data");
     }
-
     return data;
   } catch (error) {
     console.error("Error fetching primary form data:", error);

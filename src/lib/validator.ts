@@ -41,6 +41,13 @@ export const CompanyFormSchema = (isIndia: boolean) =>
       .array(z.string())
       .min(1, "At least one language must be selected"),
     accountType: z.enum(["company", "individual"]),
+    location: z
+      .object({
+        lat: z.number(),
+        lng: z.number(),
+        address: z.string(),
+      })
+      .optional(),
   });
 
 // individual Form Schema
@@ -64,6 +71,13 @@ export const IndividualFormSchema = z.object({
     .array(z.string())
     .min(1, "At least one language must be selected"),
   accountType: z.enum(["company", "individual"]),
+  location: z
+    .object({
+      lat: z.number(),
+      lng: z.number(),
+      address: z.string(),
+    })
+    .optional(),
 });
 
 // Company Form Schema
@@ -78,6 +92,13 @@ export const ProfileUpdateFormSchema = z.object({
   companyLanguages: z
     .array(z.string())
     .min(1, "At least one language must be selected"),
+  location: z
+    .object({
+      lat: z.number(),
+      lng: z.number(),
+      address: z.string(),
+    })
+    .optional(),
 });
 
 // otp page form schema
@@ -166,6 +187,16 @@ export const PrimaryFormSchema = z
     isCreditOrDebitCardsSupported: z.boolean().default(false),
     isTabbySupported: z.boolean().default(false),
     isCashSupported: z.boolean().default(false),
+    tempCitys: z
+      .array(
+        z.object({
+          stateId: z.string(),
+          cityId: z.string(),
+          cityName: z.string(),
+          cityValue: z.string(),
+        })
+      )
+      .optional(),
   })
   .refine(
     (data) => {

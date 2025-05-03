@@ -62,6 +62,12 @@ export interface FetchUserResponse {
   statusCode: number;
 }
 
+interface Location {
+  lat: number;
+  lng: number;
+  address?: string;
+}
+
 // company type
 export interface companyType {
   agentId: string;
@@ -79,6 +85,7 @@ export interface companyType {
   accountType?: string;
   countryName?: string;
   countryId: string;
+  location?: Location;
 }
 
 //  interface for the get-all-companies  API response
@@ -369,6 +376,7 @@ export type GetPrimaryForm = {
   isCreditOrDebitCardsSupported: boolean;
   isTabbySupported: boolean;
   isCashSupported: boolean;
+  tempCitys: CityType[];
 };
 
 // Primary form get all response

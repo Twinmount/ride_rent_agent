@@ -35,6 +35,7 @@ import SingleFileUpload from "../../file-uploads/SingleFileUpload";
 import CompanyLanguagesDropdown from "../../dropdowns/CompanyLanguagesDropdown";
 import { Textarea } from "@/components/ui/textarea";
 import { useQueryClient } from "@tanstack/react-query";
+import LocationPicker from "../../LocationPicker";
 
 type CompanyProfileUpdateFormProps = {
   formData?: ProfileUpdateFormType | null;
@@ -165,7 +166,6 @@ export default function CompanyProfileUpdateForm({
               />
             )}
           />
-
           {/* expiry date */}
           <FormField
             control={form.control}
@@ -200,7 +200,6 @@ export default function CompanyProfileUpdateForm({
               </FormItem>
             )}
           />
-
           {/* registration number */}
           <FormField
             control={form.control}
@@ -239,7 +238,6 @@ export default function CompanyProfileUpdateForm({
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="companyLanguages"
@@ -264,6 +262,30 @@ export default function CompanyProfileUpdateForm({
                       : "Select all the languages your staff can speak or understand. These will be displayed on your company's public profile page, helping customers feel comfortable with communication."}
                   </FormDescription>
                   <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+              <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                <FormLabel className="flex justify-between mt-4 ml-2 w-52 text-base max-sm:w-fit lg:text-lg">
+                  GPS Location <span className="mr-5 max-sm:hidden">:</span>
+                </FormLabel>
+                <div className="flex-col items-start w-fit">
+                  <LocationPicker
+                    onChangeHandler={field.onChange}
+                    initialLocation={field.value}
+                    buttonText="Choose Location"
+                    buttonClassName="w-full cursor-pointer bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-900"
+                  />
+                  <FormDescription className="mt-1 ml-1">
+                    Enter the GSP location where the company is registered or
+                    operates.
+                  </FormDescription>
                 </div>
               </FormItem>
             )}

@@ -82,6 +82,7 @@ export const CompanyFormDefaultValues: CompanyFormType = {
   companyAddress: "", // Default empty value
   companyLanguages: [],
   accountType: "company",
+  location: undefined,
 };
 
 // Individual registration phase 2 form default values
@@ -94,6 +95,7 @@ export const IndividualFormDefaultValues: CompanyFormType = {
   companyAddress: "", // Default empty value
   companyLanguages: [],
   accountType: "individual",
+  location: undefined,
 };
 
 // Company profile update form default values
@@ -155,6 +157,7 @@ export const getPrimaryFormDefaultValues = (
   isCreditOrDebitCardsSupported: false,
   isTabbySupported: false,
   isCashSupported: false,
+  tempCitys: [],
 });
 
 // srm user details form default values

@@ -31,7 +31,18 @@ type CitiesDropdownProps = {
   placeholder?: string;
   isDisabled?: boolean;
   stateId: string;
+  isTempEditable?: boolean;
+  isTempCreatable?: boolean;
+  selectedCities: string[];
+  setSelectedCities: React.Dispatch<React.SetStateAction<string[]>>;
+  cities: CityType[];
+  setCities: React.Dispatch<React.SetStateAction<CityType[]>>;
+  setTemoraryCities: React.Dispatch<React.SetStateAction<CityType[]>>;
+  temoraryCities: CityType[];
 };
+
+const generateTempCityId = (name: string) =>
+  `temp-${name.toLowerCase().replace(/\s+/g, "-")}`;
 
 const CitiesDropdown = ({
   value = [],
@@ -39,6 +50,14 @@ const CitiesDropdown = ({
   placeholder = "cities",
   isDisabled = false,
   stateId,
+  isTempEditable = true,
+  isTempCreatable = false,
+  selectedCities = [],
+  setSelectedCities = () => {},
+  cities = [],
+  setCities = () => {},
+  setTemoraryCities = () => {},
+  temoraryCities = [],
 }: CitiesDropdownProps) => {
   const { data, isLoading } = useQuery({
     queryKey: ["cities", stateId],
@@ -46,37 +65,115 @@ const CitiesDropdown = ({
     enabled: !!stateId,
   });
 
-  const [cities, setCities] = useState<CityType[]>([]);
-  const [selectedCities, setSelectedCities] = useState<string[]>(value || []);
   const [searchTerm, setSearchTerm] = useState("");
+  const [editingCityId, setEditingCityId] = useState<string | null>(null);
+  const [editingCityName, setEditingCityName] = useState<string>("");
 
   useEffect(() => {
-    if (data) {
-      setCities(data.result);
+    if (data?.result && Array.isArray(data.result)) {
+      setCities((prevCities) => {
+        const newCities = data.result.filter(
+          (newCity: CityType) =>
+            !prevCities.some((city) => city.cityId === newCity.cityId)
+        );
+        return [...prevCities, ...newCities];
+      });
     }
-  }, [data]);
+  }, [data?.result]);
 
   useEffect(() => {
-    if (value) {
-      setSelectedCities(value);
+    if (temoraryCities.length > 0) {
+      setCities((prev) => {
+        let newCities = temoraryCities.filter(
+          (city) =>
+            city.stateId === stateId &&
+            !prev.some((prevCity) => prevCity.cityId === city.cityId)
+        );
+        return [...prev, ...newCities];
+      });
     }
   }, [value]);
 
-  const handleSelectCity = (cityId: string) => {
-    let updatedSelectedCities: string[];
-
-    if (selectedCities.includes(cityId)) {
-      updatedSelectedCities = selectedCities.filter((id) => id !== cityId);
-    } else {
-      updatedSelectedCities = [...selectedCities, cityId];
+  useEffect(() => {
+    if (value && Array.isArray(value)) {
+      setSelectedCities((prevSelected) => {
+        const newValues = value.filter((val) => !prevSelected.includes(val));
+        return [...prevSelected, ...newValues];
+      });
     }
+  }, []);
 
-    setSelectedCities(updatedSelectedCities);
-    onChangeHandler(updatedSelectedCities);
+  useEffect(() => {
+    if (value) {
+      const tempCitiesToAdd: CityType[] = value
+        .filter(
+          (id) =>
+            id?.startsWith("temp-") &&
+            !cities.some((city) => city?.cityId === id)
+        )
+        .map((id) => {
+          const name = id.replace("temp-", "").replace(/-/g, " ");
+          return {
+            cityId: id,
+            cityName: name.charAt(0).toUpperCase() + name.slice(1),
+            cityValue: name,
+            stateId,
+          };
+        });
+
+      if (tempCitiesToAdd.length > 0) {
+        setCities((prev) => [...prev, ...tempCitiesToAdd]);
+      }
+
+      // setSelectedCities((prev) => [
+      //   ...prev,
+      //   ...value.filter((id) => !prev.includes(id)),
+      // ]);
+    }
+  }, [value, cities, stateId]);
+
+  const handleSelectCity = (cityId: string) => {
+    const updatedSelected = selectedCities.includes(cityId)
+      ? selectedCities.filter((id) => id !== cityId)
+      : [...selectedCities, cityId];
+    setSelectedCities(updatedSelected);
+    onChangeHandler(updatedSelected);
+  };
+
+  const handleCreateCity = (name: string) => {
+    const cityId = generateTempCityId(name);
+    const newCity: CityType = {
+      cityId,
+      cityName: name,
+      cityValue: name,
+      stateId,
+    };
+
+    setCities((prev) => [...prev, newCity]);
+    setTemoraryCities((prev) => [...prev, newCity]);
+    const updatedSelected = [...selectedCities, cityId];
+    setSelectedCities(updatedSelected);
+    onChangeHandler(updatedSelected);
+    setSearchTerm("");
+  };
+
+  const handleDeleteCity = (cityId: string) => {
+    setCities((prev) => prev.filter((c) => c.cityId !== cityId));
+    setTemoraryCities((prev) => prev.filter((c) => c.cityId !== cityId));
+    const updatedSelected = selectedCities.filter((id) => id !== cityId);
+    setSelectedCities(updatedSelected);
+    onChangeHandler(updatedSelected);
+    if (editingCityId === cityId) {
+      setEditingCityId(null);
+    }
   };
 
   const filteredCities = cities.filter((city) =>
     city.cityName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const cityExists = filteredCities.some(
+    (city) => city.cityName.toLowerCase() === searchTerm.toLowerCase()
   );
 
   return (
@@ -102,29 +199,102 @@ const CitiesDropdown = ({
       <PopoverContent className="md:!w-96 p-0">
         <Command shouldFilter={false}>
           <CommandInput
-            placeholder={`Search ${placeholder}...`}
+            value={searchTerm}
+            placeholder={`Type to search or create ${placeholder}...`}
             onValueChange={(query) => setSearchTerm(query)}
           />
           <CommandList>
-            {filteredCities.length === 0 ? (
-              <CommandEmpty>No {placeholder} found.</CommandEmpty>
+            {filteredCities.length === 0 && !cityExists ? (
+              <CommandEmpty>
+                <div className="p-2 text-sm">
+                  No match found.
+                  <br />
+                  {!!searchTerm && !!isTempCreatable && (
+                    <button
+                      className="text-blue-600 underline mt-2"
+                      onClick={() => handleCreateCity(searchTerm)}
+                    >
+                      Create & Select “{searchTerm}”
+                    </button>
+                  )}
+                </div>
+              </CommandEmpty>
             ) : (
               <CommandGroup>
-                {filteredCities.map((city) => (
-                  <CommandItem
-                    key={city.cityId}
-                    value={city.cityId}
-                    onSelect={() => handleSelectCity(city.cityId)}
-                    className="flex items-center mt-1 gap-x-2"
-                  >
-                    <Checkbox
-                      checked={selectedCities.includes(city.cityId)}
-                      onCheckedChange={() => handleSelectCity(city.cityId)}
-                      className="bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none "
-                    />
-                    {city.cityName}
-                  </CommandItem>
-                ))}
+                {filteredCities.map((city) => {
+                  const isTemp = city.cityId.startsWith("temp-");
+                  const isEditable = isTempEditable && isTemp;
+
+                  return (
+                    <CommandItem
+                      key={city.cityId}
+                      value={city.cityId}
+                      onSelect={() => handleSelectCity(city.cityId)}
+                      className="flex items-center justify-between gap-2 mt-1"
+                    >
+                      <div className="flex items-center gap-x-2">
+                        <Checkbox
+                          checked={selectedCities.includes(city.cityId)}
+                          onCheckedChange={() => handleSelectCity(city.cityId)}
+                          className="bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
+                        />
+                        {editingCityId === city.cityId ? (
+                          <input
+                            type="text"
+                            value={editingCityName}
+                            onChange={(e) => setEditingCityName(e.target.value)}
+                            onBlur={() => {
+                              setCities((prev) =>
+                                prev.map((c) =>
+                                  c.cityId === city.cityId
+                                    ? {
+                                        ...c,
+                                        cityName: editingCityName,
+                                        cityValue: editingCityName,
+                                      }
+                                    : c
+                                )
+                              );
+                              setEditingCityId(null);
+                            }}
+                            autoFocus
+                            className="border px-1 py-0.5 text-sm rounded"
+                          />
+                        ) : (
+                          <span>{city.cityName}</span>
+                        )}
+                      </div>
+
+                      {isEditable && (
+                        <div className="flex items-center gap-x-1">
+                          {editingCityId !== city.cityId && (
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditingCityId(city.cityId);
+                                setEditingCityName(city.cityName);
+                              }}
+                              className="text-gray-500 hover:text-black"
+                            >
+                              ✏️
+                            </button>
+                          )}
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDeleteCity(city.cityId);
+                            }}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      )}
+                    </CommandItem>
+                  );
+                })}
               </CommandGroup>
             )}
           </CommandList>

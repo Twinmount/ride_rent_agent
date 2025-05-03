@@ -32,6 +32,7 @@ import { FormFieldLayout } from "../../form-ui/FormFieldLayout";
 import { FormSubmitButton } from "../../form-ui/FormSubmitButton";
 import EmailOtpVerification from "./EmailOtpVerification";
 import { FormContainer } from "../../form-ui/FormContainer";
+import LocationPicker from "../../LocationPicker";
 
 type CompanyRegistrationFormProps = {
   country: string;
@@ -77,6 +78,7 @@ export default function CompanyRegistrationForm({
   ) {
     // Check if OTP is verified before submitting the form
     // 1️⃣ Before submitting, check if email is verified
+
     const { result } = await checkEmailVerification.mutateAsync({ email });
 
     if (!result.isEmailVerified) {
@@ -295,6 +297,29 @@ export default function CompanyRegistrationForm({
                 value={field.value}
                 onChangeHandler={field.onChange}
                 placeholder="Languages"
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="GPS Location"
+              description={
+                <span>
+                  Enter the GSP location where the company is registered or
+                  operates.
+                </span>
+              }
+            >
+              <LocationPicker
+                onChangeHandler={field.onChange}
+                initialLocation={field.value}
+                buttonText="Choose Location"
+                buttonClassName="w-full cursor-pointer bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-900"
               />
             </FormFieldLayout>
           )}

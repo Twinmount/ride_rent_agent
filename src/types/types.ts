@@ -14,6 +14,12 @@ export type RegistrationType = {
   password: string;
 };
 
+export interface Location {
+  lat: number;
+  lng: number;
+  address?: string;
+}
+
 export type CompanyFormType = {
   companyName: string;
   companyLogo: string;
@@ -24,6 +30,7 @@ export type CompanyFormType = {
   companyLanguages: string[];
   accountType?: "company" | "individual";
   countryId?: string;
+  location?: Location;
 };
 
 export type ProfileUpdateFormType = {
@@ -33,6 +40,7 @@ export type ProfileUpdateFormType = {
   companyAddress: string;
   companyLanguages: string[];
   accountType?: string;
+  location?: Location;
 };
 
 // Rental detail type for day, week, and month
@@ -48,6 +56,14 @@ type HourlyRentalDetailType = {
   rentInAED: string;
   mileageLimit: string;
   minBookingHours: string;
+};
+
+type CityType = {
+  _id?: string;
+  stateId: string;
+  cityId: string;
+  cityName: string;
+  cityValue: string;
 };
 
 // primary details form type
@@ -84,6 +100,7 @@ export type PrimaryFormType = {
   isCreditOrDebitCardsSupported: boolean;
   isTabbySupported: boolean;
   isCashSupported: boolean;
+  tempCitys?: CityType[];
 };
 
 export type SpecificationFormData = {
