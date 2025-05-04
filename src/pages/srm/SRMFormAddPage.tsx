@@ -1,5 +1,3 @@
-import { CircleArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { lazy, Suspense, useState } from "react";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
@@ -20,16 +18,15 @@ const SRMPaymentDetailsForm = lazy(
 );
 
 export default function SRMFormAddPage() {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<SRMTabsTypes>("customer");
-  const [levelsFilled, setLevelsFilled] = useState<number>(0);
+  const [levelsFilled, setLevelsFilled] = useState<number>(3);
 
   // Handle tab change based on levelsFilled state
   const handleTabChange = (value: string) => {
     const tab = value as SRMTabsTypes;
     const { canAccess, message } = validateSRMTabAccess({ tab, levelsFilled });
 
-    if (canAccess) {
+    if (true) {
       setActiveTab(tab);
     } else {
       toast({
@@ -53,7 +50,7 @@ export default function SRMFormAddPage() {
   };
 
   return (
-    <PageWrapper heading="Add New Record">
+    <PageWrapper heading="Trip Details">
       <div>
         <Tabs
           value={activeTab}
@@ -84,9 +81,17 @@ export default function SRMFormAddPage() {
               Payment
               <span className="text-xs">details</span>
             </TabsTrigger>
+
+            <TabsTrigger
+              value="vehicle-check-list"
+              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
+            >
+              Vehicle
+              <span className="text-xs">Check List</span>
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="customer" className="flex-center">
+          <TabsContent value="customer" className="flex-center  ">
             <Suspense fallback={<LazyLoader />}>
               <SRMCustomerDetailsForm
                 type="Add"
@@ -108,6 +113,12 @@ export default function SRMFormAddPage() {
           <TabsContent value="payment" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
               <SRMPaymentDetailsForm type={"Add"} isAddOrIncomplete={true} />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="vehicle-check-list" className="flex-center">
+            <Suspense fallback={<LazyLoader />}>
+              <div>New Form will be added here</div>
             </Suspense>
           </TabsContent>
         </Tabs>

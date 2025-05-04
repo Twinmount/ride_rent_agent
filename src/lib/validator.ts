@@ -165,10 +165,22 @@ const SRMHourlyRentalDetailTypeSchema = z.object({
 // SRM : Customer Details Form Schema
 export const SRMCustomerDetailsFormSchema = z.object({
   customerProfilePic: z.string().optional(),
-  customerName: z.string().min(1, "Customer name is required"),
-  nationality: z.string().min(1, "Nationality is required"),
-  passportNumber: z.string().min(1, "Passport number is required"),
-  drivingLicenseNumber: z.string().min(1, "Driving license number is required"),
+  customerName: z
+    .string()
+    .min(1, "Customer name is required")
+    .max(50, "Maximum 50 characters allowed"),
+  nationality: z
+    .string()
+    .min(1, "Nationality is required")
+    .max(30, "Maximum 30 characters allowed"),
+  passportNumber: z
+    .string()
+    .min(1, "Passport number is required")
+    .max(30, "Maximum 30 characters allowed"),
+  drivingLicenseNumber: z
+    .string()
+    .min(1, "Driving license number is required")
+    .max(30, "Maximum 30 characters allowed"),
   phoneNumber: z.string().min(6, "Provide a valid mobile number"),
 });
 

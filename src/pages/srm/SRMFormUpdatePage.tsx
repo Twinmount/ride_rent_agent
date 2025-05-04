@@ -76,6 +76,14 @@ export default function SRMFormUpdatePage() {
               Payment
               <span className="text-xs">details</span>
             </TabsTrigger>
+
+            <TabsTrigger
+              value="payment"
+              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
+            >
+              Vehicle
+              <span className="text-xs">Check List</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="customer" className="flex-center">

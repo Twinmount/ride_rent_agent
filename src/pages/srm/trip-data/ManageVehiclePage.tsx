@@ -40,10 +40,10 @@ export default function ManageVehiclePage() {
         <Search
           search={search}
           setSearch={setSearch}
-          placeholder="Search Trip..."
+          placeholder="Search Vehicle..."
           description={
             <p className=" italic text-gray-600">
-              You can search with <b>brand and registration number</b>
+              You can search with <b>brand, model and registration number</b>
             </p>
           }
         />

@@ -3,6 +3,14 @@ import { differenceInHours } from "date-fns";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerType } from "@/types/srm-types";
 import { SRMVehicleDetailsFormType, VehicleType } from "@/types/srm-types";
+import {
+  format,
+  differenceInCalendarDays,
+  isBefore,
+  isAfter,
+  isSameDay,
+  parseISO,
+} from "date-fns";
 
 type ApprovalStatusType = "APPROVED" | "UNDER_REVIEW" | "REJECTED" | "PENDING";
 
@@ -268,38 +276,57 @@ export const handleVehicleSelection = (
 };
 
 // for showing notification like indication in teh ongoing srm trips card
-export function getExpiryNotificationText(bookingEndDate: string): {
-  text: string;
+export function getExpiryNotificationText(
+  bookingStartDate: string,
+  bookingEndDate: string
+): {
+  reminderMessage: string;
   className: string;
 } {
   const today = new Date();
-  const endDate = new Date(bookingEndDate);
-  const diffTime = endDate.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24)); // difference in days
+  const startDate = parseISO(bookingStartDate);
+  const endDate = parseISO(bookingEndDate);
 
-  if (diffDays > 7) {
-    return { text: "", className: "" }; // No notification if more than 7 days
-  }
+  const daysUntilStart = differenceInCalendarDays(startDate, today);
+  const daysUntilEnd = differenceInCalendarDays(endDate, today);
 
-  if (diffDays > 0) {
-    // For 7 - 3 days
+  // Case 1: Not started yet
+  if (isBefore(today, startDate)) {
     return {
-      text: `${diffDays} day${diffDays > 1 ? "s" : ""} to end...`,
-      className: "text-yellow", // Yellow/Orange
+      reminderMessage: `Starts in ${daysUntilStart} day${
+        daysUntilStart > 1 ? "s" : ""
+      }`,
+      className: "text-blue-500",
     };
   }
 
-  if (diffDays > -7) {
-    // For 3 - 1 days
+  // Case 2: Ongoing
+  if (!isBefore(today, startDate) && !isAfter(today, endDate)) {
+    if (isSameDay(today, endDate)) {
+      return {
+        reminderMessage: "Ends today",
+        className: "text-orange",
+      };
+    }
+
+    if (daysUntilEnd <= 3) {
+      return {
+        reminderMessage: `${daysUntilEnd} day${
+          daysUntilEnd > 1 ? "s" : ""
+        } left`,
+        className: "text-orange",
+      };
+    }
+
     return {
-      text: `${-diffDays} day${-diffDays > 1 ? "s" : ""} to end...`,
-      className: "text-orange", // Intense color for 3 - 1 days
+      reminderMessage: `${daysUntilEnd} day${daysUntilEnd > 1 ? "s" : ""} left`,
+      className: "text-yellow",
     };
   }
 
-  // For expired bookings
+  // Case 3: Expired
   return {
-    text: `Expired on ${endDate.toLocaleDateString()}`,
-    className: "text-red-500", // Red color for expired bookings
+    reminderMessage: `Ended on ${format(endDate, "dd/MM/yyyy")}`,
+    className: "text-red-500",
   };
 }

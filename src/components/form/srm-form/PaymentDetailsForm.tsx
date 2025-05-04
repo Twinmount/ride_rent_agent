@@ -33,7 +33,11 @@ import { useFormValidationToast } from "@/hooks/useFormValidationToast";
 import { useState } from "react";
 import { FormContainer } from "../form-ui/FormContainer";
 import { FormFieldLayout } from "../form-ui/FormFieldLayout";
-import { FormSubmitButton } from "../form-ui/FormSubmitButton";
+import {
+  FormGenericButton,
+  FormSubmitButton,
+} from "../form-ui/FormSubmitButton";
+import RentalDetailsPreview from "../SRMRentalDetailsPreview";
 
 type SRMPaymentDetailsFormProps = {
   type: "Add" | "Update";
@@ -180,7 +184,14 @@ export default function SRMPaymentDetailsForm({
     <Form {...form}>
       <FormContainer
         onSubmit={form.handleSubmit(onSubmit)}
-        description={"Add Payment Details here"}
+        description={
+          type === "Add" ? (
+            <p className="text-sm italic text-center text-gray-600">
+              Add trip payment details here. It will be used to generate
+              invoice.
+            </p>
+          ) : null
+        }
       >
         {/* Booking Period */}
         <div className="flex mb-2 w-full max-sm:flex-col">
@@ -273,6 +284,14 @@ export default function SRMPaymentDetailsForm({
             />
           </div>
         </div>
+
+        {/* rental details preview */}
+        <FormFieldLayout
+          label="Rental Details (Preview)"
+          description="This preview summarizes the rental prices and mileage limits set above."
+        >
+          <RentalDetailsPreview rentalDetails={rentalDetails} />
+        </FormFieldLayout>
 
         <FormField
           control={form.control}
@@ -386,6 +405,12 @@ export default function SRMPaymentDetailsForm({
             </FormFieldLayout>
           )}
         />
+
+        {type === "Add" && (
+          <FormGenericButton type="button">
+            Download Quote/Invoice
+          </FormGenericButton>
+        )}
 
         {/* submit  */}
         {type === "Add" && (

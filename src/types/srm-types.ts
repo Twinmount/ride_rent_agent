@@ -66,7 +66,7 @@ export enum BookingStatus {
   CANCELLED = "CANCELLED",
 }
 
-// vehicle types
+// rental details type of srm
 export interface RentalDetails {
   day: {
     enabled: boolean;

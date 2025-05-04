@@ -14,7 +14,10 @@ export const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
   trip,
   onOpenModal,
 }) => {
-  const { text, className } = getExpiryNotificationText(trip.bookingEndDate);
+  const { reminderMessage, className } = getExpiryNotificationText(
+    trip.bookingStartDate,
+    trip.bookingEndDate
+  );
 
   return (
     <MotionDiv
@@ -113,18 +116,20 @@ export const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
           </div>
 
           {/* notification on expiry */}
-          <p
-            className={`max-md:hidden w-fit p-2 px-4 font-[500] mr-auto text-sm rounded-lg bg-slate-100 ${className}`}
-          >
-            {text}
-          </p>
+          {reminderMessage && (
+            <span
+              className={`max-md:hidden w-fit p-2 px-4 font-[500] mr-auto text-sm rounded-lg bg-slate-100 ${className}`}
+            >
+              {reminderMessage}
+            </span>
+          )}
 
           <div className="flex gap-x-2 items-center">
             <Link
               to={`/srm/trips/edit/${trip.bookingId}?customerId=${trip.customer.customerId}&vehicleId=${trip.vehicle.id}&paymentId=${trip.payment.id}`}
               className="px-3 py-1 text-slate-800 hover:text-white  border-slate-800 border hover:bg-slate-800 rounded-md transition-colors"
             >
-              View
+              View Trip
             </Link>
 
             <button

@@ -27,18 +27,23 @@ import { handleCustomerSelect } from "@/helpers";
 import { FormFieldLayout } from "../form-ui/FormFieldLayout";
 import { FormSubmitButton } from "../form-ui/FormSubmitButton";
 import { FormContainer } from "../form-ui/FormContainer";
+import { useNavigate } from "react-router-dom";
 
 type SRMCustomerDetailsFormProps = {
   type: "Add" | "Update";
   formData?: SRMCustomerDetailsFormType | null;
   onNextTab?: () => void;
+  isPublic?: boolean;
 };
 
 export default function SRMCustomerDetailsForm({
   type,
   onNextTab,
   formData,
+  isPublic = false,
 }: SRMCustomerDetailsFormProps) {
+  const navigate = useNavigate();
+
   const [countryCode, setCountryCode] = useState<string>("");
   const [isFileUploading, setIsFileUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
@@ -106,6 +111,8 @@ export default function SRMCustomerDetailsForm({
         if (existingCustomerId) {
           // Handle existing customer booking
           data = await handleExistingCustomerBooking(existingCustomerId);
+        } else if (isPublic) {
+          console.log("isPublic");
         } else {
           // Handle new customer booking
           data = await handleNewCustomerBooking(values, countryCode);
@@ -119,7 +126,9 @@ export default function SRMCustomerDetailsForm({
           className: "bg-yellow text-white",
         });
 
-        if (type === "Add" && onNextTab) {
+        if (isPublic && type === "Add") {
+          navigate("/srm/customer-details/public/success");
+        } else if (type === "Add" && onNextTab) {
           onNextTab();
           window.scrollTo({ top: 0, behavior: "smooth" });
         }
@@ -167,8 +176,14 @@ export default function SRMCustomerDetailsForm({
   };
 
   // FIELDS DISABLED IF THE TYPE === UPDATE
-
   const isFieldsDisabled = type === "Update";
+
+  // submit button text
+  const submitButtonText = isPublic
+    ? "Submit"
+    : type === "Add"
+    ? "Add Customer"
+    : "Update Customer";
 
   return (
     <>
@@ -178,8 +193,9 @@ export default function SRMCustomerDetailsForm({
           onSubmit={form.handleSubmit(onSubmit)}
           description={
             <p className="text-sm italic text-center text-gray-600">
-              Add customer details here. You can choose existing customer
-              &#40;if any&#41; by searching customer name
+              {isPublic
+                ? "Public form for filling customer details."
+                : "  Add customer details here. You can choose existing customer (if any) by searching customer name"}
             </p>
           }
           className="mt-4"
@@ -191,15 +207,27 @@ export default function SRMCustomerDetailsForm({
             render={({ field }) => (
               <FormFieldLayout
                 label="Customer Name"
-                description="  Provide customer name. You can search existing customer
-                      also."
+                description={
+                  isPublic
+                    ? "Provide customer name."
+                    : "  Provide customer name. You can search existing customer also."
+                }
               >
-                <CustomerSearchAndAutoFill
-                  value={field.value}
-                  onChangeHandler={onCustomerSelect}
-                  placeholder="Enter / Search customer name"
-                  isDisabled={isFieldsDisabled}
-                />
+                {isPublic ? (
+                  <Input
+                    placeholder="Enter customer name"
+                    {...field}
+                    className="input-field"
+                    readOnly={isFieldsDisabled}
+                  />
+                ) : (
+                  <CustomerSearchAndAutoFill
+                    value={field.value}
+                    onChangeHandler={onCustomerSelect}
+                    placeholder="Enter / Search customer name"
+                    isDisabled={isFieldsDisabled}
+                  />
+                )}
               </FormFieldLayout>
             )}
           />
@@ -315,16 +343,17 @@ export default function SRMCustomerDetailsForm({
             )}
           />
 
-          <p className="text-red-500 text-center text-sm -mb-2 font-semibold">
-            Warning: Please double-check the customer information before
-            submitting. This action cannot be undone, and the data you provide
-            will be used for fraud detection. Please ensure the accuracy of the
-            details to avoid potential consequences.
-          </p>
+          {type === "Add" && (
+            <p className="text-red-500 text-center text-sm -mb-2 font-semibold">
+              Warning: Please double check and ensure the accuracy of the
+              details to avoid potential consequences.
+            </p>
+          )}
+
           {/* submit  */}
           {type === "Add" && (
             <FormSubmitButton
-              text={type === "Add" ? "Continue to Vehicle" : "Update User"}
+              text={submitButtonText}
               isLoading={form.formState.isSubmitting}
             />
           )}
