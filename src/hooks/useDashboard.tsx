@@ -64,17 +64,37 @@ export default function useDashboard() {
   const monthlyPortfolioCount = monthlyPortfolioData?.result.count || 0;
   const monthlyEnquiriesCount = monthlyEnquiriesData?.result.count || 0;
 
+  const metricCards: {
+    title: string;
+    value: number | string;
+    isLoading: boolean;
+  }[] = [
+    {
+      title: "Total portfolio views",
+      value: totalPortfolioCount,
+      isLoading: isPortfolioLoading,
+    },
+    {
+      title: "Total enquiries",
+      value: totalEnquiriesCount,
+      isLoading: isEnquiriesLoading,
+    },
+    {
+      title: "Monthly portfolio views",
+      value: monthlyPortfolioCount,
+      isLoading: isMonthlyPortfolioLoading,
+    },
+    {
+      title: "Monthly Enquiries",
+      value: monthlyEnquiriesCount,
+      isLoading: isMonthlyEnquiriesLoading,
+    },
+  ];
+
   return {
     vehicleCount,
-    totalPortfolioCount,
-    totalEnquiriesCount,
-    monthlyPortfolioCount,
-    monthlyEnquiriesCount,
     isVehiclesLoading,
-    isPortfolioLoading,
-    isEnquiriesLoading,
-    isMonthlyPortfolioLoading,
-    isMonthlyEnquiriesLoading,
+    metricCards,
     userId,
   };
 }
