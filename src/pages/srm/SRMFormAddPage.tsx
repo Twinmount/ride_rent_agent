@@ -1,5 +1,3 @@
-import { CircleArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { lazy, Suspense, useState } from "react";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
@@ -20,7 +18,6 @@ const SRMPaymentDetailsForm = lazy(
 );
 
 export default function SRMFormAddPage() {
-  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<SRMTabsTypes>("customer");
   const [levelsFilled, setLevelsFilled] = useState<number>(0);
 
