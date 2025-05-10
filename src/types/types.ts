@@ -1,4 +1,14 @@
 // agent context  type
+
+import React from "react";
+
+type AppState = {
+  accessToken: string;
+  refreshToken: string;
+  userId: string;
+  agentId: string;
+};
+
 export type AgentContextType = {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
@@ -7,6 +17,8 @@ export type AgentContextType = {
   userId: string | undefined;
   isLoading: boolean;
   isError: boolean;
+  appState: AppState;
+  setAppState: React.Dispatch<React.SetStateAction<AppState>>;
 };
 
 export type RegistrationType = {

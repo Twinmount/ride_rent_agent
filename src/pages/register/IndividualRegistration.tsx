@@ -4,7 +4,11 @@ import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import { useAgentContext } from "@/context/AgentContext";
 import { useCompanyCountry } from "@/hooks/useCompanyCountry";
 export default function IndividualRegistration() {
-  const { isLoading, isError, agentId, userId } = useAgentContext();
+  const {
+    isLoading,
+    isError,
+    appState: { agentId, userId },
+  } = useAgentContext();
 
   const { data: countryData, isLoading: isLoadingCountry } =
     useCompanyCountry(userId);

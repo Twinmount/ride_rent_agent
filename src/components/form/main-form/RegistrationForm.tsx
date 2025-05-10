@@ -24,7 +24,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { register } from "@/api/auth";
 import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
-import { ChevronDown, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 
 const RegistrationForm = ({ country }: { country: string }) => {
   const navigate = useNavigate();
@@ -34,14 +34,16 @@ const RegistrationForm = ({ country }: { country: string }) => {
   const storedPhoneNumber = sessionStorage.getItem("phoneNumber") || "";
   const storedCountryCode = sessionStorage.getItem("countryCode") || "";
   const storedPassword = sessionStorage.getItem("password") || "";
-  const storedCountry = sessionStorage.getItem("country") || "";
 
   const [countryCode, setCountryCode] = useState(storedCountryCode);
 
   const initialValues = {
     phoneNumber: storedCountryCode + storedPhoneNumber,
     password: storedPassword,
-    country: storedCountry,
+    country:
+      country === "uae"
+        ? "ee8a7c95-303d-4f55-bd6c-85063ff1cf48"
+        : "68ea1314-08ed-4bba-a2b1-af549946523d",
   };
 
   // Define your form.
@@ -99,6 +101,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
   return (
     <Form {...form}>
       <form
+        id="agent-account-registration-form"
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex-1 bg-white shadow-lg p-4 lg:mt-6 pb-6 rounded-[1rem] border w-full min-w-[350px] max-w-[400px]"
       >
@@ -186,44 +189,6 @@ const RegistrationForm = ({ country }: { country: string }) => {
                   </FormControl>
                   <FormDescription className="mt-1 ml-2">
                     Enter a password of at least 4 characters long
-                  </FormDescription>
-                  <FormMessage className="ml-2" />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="country"
-            render={({ field }) => (
-              <FormItem className="flex flex-col mb-2 w-full">
-                <FormLabel className="ml-2 text-base lg:text-lg">
-                  Country
-                </FormLabel>
-                <div className="flex-col items-start w-full">
-                  <FormControl>
-                    <div className="relative custom-select-box-div">
-                      <select
-                        className="input-field w-full focus:outline-none focus:ring-0 focus:border-none pr-8"
-                        {...field}
-                      >
-                        <option>Select a country</option>
-                        <option value="ee8a7c95-303d-4f55-bd6c-85063ff1cf48">
-                          UAE
-                        </option>
-                        <option value="68ea1314-08ed-4bba-a2b1-af549946523d">
-                          India
-                        </option>
-                      </select>
-                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <ChevronDown className="h-4 w-4 text-gray-600" />
-                      </div>
-                    </div>
-                  </FormControl>
-                  <FormDescription className="mt-1 ml-2 text-gray-500">
-                    Select a country where you would like to create your
-                    listings
                   </FormDescription>
                   <FormMessage className="ml-2" />
                 </div>

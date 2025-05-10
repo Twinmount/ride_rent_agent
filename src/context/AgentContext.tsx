@@ -26,6 +26,13 @@ type AgentProviderProps = {
   children: ReactNode;
 };
 
+type AppState = {
+  accessToken: string;
+  refreshToken: string;
+  userId: string;
+  agentId: string;
+};
+
 const AgentProvider = ({ children }: AgentProviderProps) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
 
@@ -34,13 +41,30 @@ const AgentProvider = ({ children }: AgentProviderProps) => {
   const accessToken = load<string>(StorageKeys.ACCESS_TOKEN);
   const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
 
+  const [appState, setAppState] = useState<AppState>({
+    accessToken: "",
+    refreshToken: "",
+    userId: "",
+    agentId: "",
+  });
+
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["users"],
+    queryKey: ["users", accessToken, refreshToken],
     queryFn: getUser,
     enabled: !!accessToken && !!refreshToken,
   });
 
   const { agentId, id } = data?.result || {};
+
+  useEffect(() => {
+    if (!!agentId && !!id) {
+      setAppState((prev) => ({
+        ...prev,
+        agentId: agentId,
+        userId: id,
+      }));
+    }
+  }, [data?.result]);
 
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
@@ -68,6 +92,8 @@ const AgentProvider = ({ children }: AgentProviderProps) => {
         userId: id,
         isLoading,
         isError,
+        appState,
+        setAppState,
       }}
     >
       {children}

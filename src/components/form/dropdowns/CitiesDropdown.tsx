@@ -17,6 +17,7 @@ import { ChevronDown } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { fetchAllCities } from "@/api/cities";
+import { toast } from "@/components/ui/use-toast";
 
 type CityType = {
   stateId: string;
@@ -133,7 +134,17 @@ const CitiesDropdown = ({
   }, [value, cities, stateId]);
 
   const handleSelectCity = (cityId: string) => {
-    const updatedSelected = selectedCities.includes(cityId)
+    const isAlreadySelected = selectedCities.includes(cityId);
+
+    if (!isAlreadySelected && selectedCities.length >= 10) {
+      return toast({
+        variant: "destructive",
+        title: "Action Failed",
+        description: "You can only select up to 10 serviceable areas.",
+      });
+    }
+
+    const updatedSelected = isAlreadySelected
       ? selectedCities.filter((id) => id !== cityId)
       : [...selectedCities, cityId];
     setSelectedCities(updatedSelected);
@@ -141,6 +152,12 @@ const CitiesDropdown = ({
   };
 
   const handleCreateCity = (name: string) => {
+    if (selectedCities.length >= 10)
+      return toast({
+        variant: "destructive",
+        title: `Action Failed`,
+        description: "You can only select up to 10 serviceable areas.",
+      });
     const cityId = generateTempCityId(name);
     const newCity: CityType = {
       cityId,
@@ -149,9 +166,9 @@ const CitiesDropdown = ({
       stateId,
     };
 
-    setCities((prev) => [...prev, newCity]);
-    setTemoraryCities((prev) => [...prev, newCity]);
-    const updatedSelected = [...selectedCities, cityId];
+    setCities((prev) => [newCity, ...prev]);
+    setTemoraryCities((prev) => [newCity, ...prev]);
+    const updatedSelected = [cityId, ...selectedCities];
     setSelectedCities(updatedSelected);
     onChangeHandler(updatedSelected);
     setSearchTerm("");

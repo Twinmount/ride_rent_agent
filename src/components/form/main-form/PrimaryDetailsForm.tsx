@@ -392,7 +392,7 @@ export default function PrimaryDetailsForm({
               description={
                 <span>
                   Enter your vehicle registration number (e.g.,{" "}
-                  <strong>ABC12345</strong>).
+                  <strong>{isIndia ? "KL02AB1234" : "ABC12345"}</strong>).
                   <br />
                   The number should be a combination of letters and numbers,
                   without spaces or special characters, up to 15 characters.
@@ -400,7 +400,7 @@ export default function PrimaryDetailsForm({
               }
             >
               <Input
-                placeholder="e.g., ABC12345"
+                placeholder={isIndia ? "e.g., KL02AB1234" : "e.g., ABC12345"}
                 {...field}
                 className="input-field"
                 type="text"
@@ -558,7 +558,7 @@ export default function PrimaryDetailsForm({
                   )}
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="UAE_SPEC" id="UAE_SPEC" />
-                    <Label htmlFor="UAE">UAE</Label>
+                    <Label htmlFor="UAE">GCC</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="USA_SPEC" id="USA_SPEC" />
@@ -566,7 +566,7 @@ export default function PrimaryDetailsForm({
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="OTHERS" id="others" />
-                    <Label htmlFor="others">Modified</Label>
+                    <Label htmlFor="others">Other</Label>
                   </div>
                 </RadioGroup>
               </div>
@@ -687,7 +687,7 @@ export default function PrimaryDetailsForm({
               }
               description={
                 isIndia
-                  ? "Select / Create all operation/serving areas."
+                  ? "Select / Create serviceable. You can select up to 10 serviceable areas."
                   : "Select all the cities of operation/serving areas."
               }
             >

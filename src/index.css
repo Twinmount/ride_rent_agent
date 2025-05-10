@@ -136,3 +136,7 @@
   appearance: none;
   background-image: none;
 }
+
+.custom-register-modal-content > button {
+  color: #ffffff !important;
+}

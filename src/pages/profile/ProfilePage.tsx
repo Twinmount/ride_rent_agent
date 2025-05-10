@@ -38,7 +38,9 @@ export default function ProfilePage() {
     );
   };
 
-  const { userId } = useAgentContext();
+  const {
+    appState: { userId },
+  } = useAgentContext();
 
   // Query to get company data
   const { data: companyData, isLoading: isCompanyLoading } = useQuery({

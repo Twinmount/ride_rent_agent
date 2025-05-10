@@ -28,12 +28,15 @@ import { remove, save, StorageKeys } from "@/utils/storage";
 import { LoginResponse } from "@/types/API-types";
 import Footer from "@/components/footer/Footer";
 import { Eye, EyeOff } from "lucide-react";
+import { useAgentContext } from "@/context/AgentContext";
 
 const LoginPage = ({ country = "uae" }: { country?: string }) => {
   const [isView, setIsView] = useState(false);
   // State to store the country code separately
   const [countryCode, setCountryCode] = useState("");
   const navigate = useNavigate();
+
+  const { setAppState } = useAgentContext();
 
   const initialValues = LoginPageDefaultValues;
 
@@ -70,7 +73,12 @@ const LoginPage = ({ country = "uae" }: { country?: string }) => {
         save(StorageKeys.ACCESS_TOKEN, data.result.token);
         save(StorageKeys.REFRESH_TOKEN, data.result.refreshToken);
         save(StorageKeys.USER_ID, data.result.userId);
-
+        setAppState((prev) => ({
+          ...prev,
+          accessToken: data.result.token,
+          refreshToken: data.result.refreshToken,
+          userId: data.result.userId,
+        }));
         navigate("/");
       }
     } catch (error: any) {

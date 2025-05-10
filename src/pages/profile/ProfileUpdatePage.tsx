@@ -8,7 +8,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
 export default function ProfileUpdatePage() {
-  const { userId } = useAgentContext();
+  const {
+    appState: { userId },
+  } = useAgentContext();
 
   const { agentId } = useParams<{ agentId: string }>();
 
