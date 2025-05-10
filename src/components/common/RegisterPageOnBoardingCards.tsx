@@ -17,7 +17,7 @@ export default function RegisterPageOnBoardingCards() {
         {/* Card 1 */}
         <div className="p-6 rounded-2xl hover:shadow-md max-w-md border hover:scale-105 duration-300  transition">
           <div className="p-4 border rounded-lg w-fit mb-4">
-            <UserPlus className="w-10 h-10 " />
+            <UserPlus className="w-10 h-10 text-yellow" />
           </div>
           <h3 className="text-3xl mb-4">Sign up</h3>
           <ul className="space-y-2 text-sm">
@@ -32,7 +32,7 @@ export default function RegisterPageOnBoardingCards() {
         {/* Card 2 */}
         <div className="p-6 rounded-2xl hover:shadow-md max-w-md border hover:scale-105 duration-300  transition">
           <div className="p-4 border rounded-lg w-fit mb-4">
-            <Building2 className="w-10 h-10" />
+            <Building2 className="w-10 h-10 text-yellow" />
           </div>
           <h3 className="text-3xl mb-4">Register Company</h3>
           <ul className="space-y-2 text-sm">
@@ -48,7 +48,7 @@ export default function RegisterPageOnBoardingCards() {
         {/* Card 3 */}
         <div className="p-6 rounded-2xl hover:shadow-md max-w-md border hover:scale-105 duration-300  transition">
           <div className="p-4 border rounded-lg w-fit mb-4">
-            <Car className="w-10 h-10" />
+            <Car className="w-10 h-10 text-yellow" />
           </div>
           <h3 className="text-3xl mb-4">List your Vehicle</h3>
           <ul className="space-y-2 text-sm">

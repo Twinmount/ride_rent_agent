@@ -25,7 +25,7 @@ export default function RegisterPageCards() {
         {/* Card 1 */}
         <div className="p-6 rounded-2xl hover:shadow-md max-w-md border hover:scale-105 duration-300  transition ">
           <div className="p-4 border rounded-lg w-fit mb-4 ">
-            <TrendingUp className="w-10 h-10 " />
+            <TrendingUp className="w-10 h-10 text-yellow" />
           </div>
           <h3 className="text-xl font-bold mb-2">
             More Profits, Zero Commission
@@ -68,7 +68,7 @@ export default function RegisterPageCards() {
         {/* Card 2 */}
         <div className="p-6 rounded-2xl hover:shadow-md max-w-md border hover:scale-105 duration-300  transition">
           <div className="p-4 border rounded-lg w-fit mb-4">
-            <ShieldCheck className="w-10 h-10" />
+            <ShieldCheck className="w-10 h-10 text-yellow" />
           </div>
           <h3 className="text-xl font-bold mb-2">Safe & Secure Rentals</h3>
           <ul className="space-y-2 text-sm">
@@ -105,7 +105,7 @@ export default function RegisterPageCards() {
         {/* Card 3 */}
         <div className="p-6 rounded-2xl hover:shadow-md max-w-md border hover:scale-105 duration-300  transition">
           <div className="p-4 border rounded-lg w-fit mb-4">
-            <FileText className="w-10 h-10" />
+            <FileText className="w-10 h-10 text-yellow" />
           </div>
           <h3 className="text-xl font-bold mb-2">Cloud Contracts & Billing</h3>
           <ul className="space-y-2 text-sm">
