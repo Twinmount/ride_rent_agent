@@ -127,6 +127,7 @@ export const getPrimaryFormDefaultValues = (
   vehicleBrandId: "",
   vehicleModel: "",
   vehiclePhotos: [],
+  vehicleVideos: [],
   vehicleRegistrationNumber: "",
   vehicleRegisteredYear: "",
   commercialLicenses: [],

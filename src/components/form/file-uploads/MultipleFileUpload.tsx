@@ -46,6 +46,8 @@ type MultipleFileUploadProps = {
   bucketFilePath: GcsFilePaths;
   downloadFileName?: string;
   setDeletedFiles: (deletedPaths: (prev: string[]) => string[]) => void;
+  isVideoAccepted?: boolean;
+  isImageAccepted?: boolean;
 };
 
 const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
@@ -60,6 +62,8 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
   bucketFilePath,
   downloadFileName,
   setDeletedFiles,
+  isVideoAccepted = false,
+  isImageAccepted = true,
 }) => {
   const { control, setValue, clearErrors } = useFormContext();
   const [files, setFiles] = useState<string[]>(existingFiles);
@@ -73,6 +77,7 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
   const getMaxCount = () => {
     if (name === "vehiclePhotos") return 8;
     if (name === "commercialLicenses") return 2;
+    if (name === "vehicleVideos") return 1;
     return 0;
   };
 
@@ -100,6 +105,18 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
 
     for (const file of selectedFiles) {
       const isVideo = file.type.startsWith("video/");
+      const isImage = file.type.startsWith("image/");
+
+      // Skip files not matching allowed types
+      if ((isVideo && !isVideoAccepted) || (isImage && !isImageAccepted)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid file type",
+          description: `File ${file.name} is not an accepted type.`,
+        });
+        continue;
+      }
+
       const sizeLimitMB = isVideo ? maxVideoSizeMB : maxSizeMB;
       if (!validateFileSize(file, sizeLimitMB)) {
         toast({
@@ -244,7 +261,9 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
                         isUploading={isFileUploading}
                         uploadingCount={uploadingCount}
                         onFileChange={handleFilesChange}
-                        accept="image/*,video/*"
+                        accept={`${isImageAccepted ? "image/*" : ""}${
+                          isImageAccepted && isVideoAccepted ? "," : ""
+                        }${isVideoAccepted ? "video/*" : ""}`}
                       />
                     )
                   )}
