@@ -158,6 +158,7 @@ export const getPrimaryFormDefaultValues = (
   isTabbySupported: false,
   isCashSupported: false,
   tempCitys: [],
+  isVehicleModified: false,
 });
 
 // srm user details form default values

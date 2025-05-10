@@ -51,6 +51,7 @@ export const addPrimaryDetailsForm = async (
       isTabbySupported: values.isTabbySupported,
       isCashSupported: values.isCashSupported,
       tempCitys: values.tempCitys,
+      isVehicleModified: values.isVehicleModified.toString(),
     };
 
     // Include additionalVehicleTypes only if isCarsCategory is true
@@ -120,6 +121,7 @@ export const updatePrimaryDetailsForm = async (
       isTabbySupported: values.isTabbySupported,
       isCashSupported: values.isCashSupported,
       tempCitys: values.tempCitys,
+      isVehicleModified: values.isVehicleModified.toString(),
     };
 
     // Include additionalVehicleTypes only if isCarsCategory is true

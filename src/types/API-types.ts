@@ -364,6 +364,7 @@ export type GetPrimaryForm = {
   commercialLicenseExpireDate: string;
   isLease: boolean;
   isCryptoAccepted: boolean;
+  isVehicleModified: boolean;
   isSpotDeliverySupported: boolean;
   description: string;
   vehiclePhotos: string[];

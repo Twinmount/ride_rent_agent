@@ -162,6 +162,7 @@ export const PrimaryFormSchema = z
     commercialLicenseExpireDate: z.date(),
     isLease: z.boolean().default(false),
     isCryptoAccepted: z.boolean().default(false),
+    isVehicleModified: z.boolean().default(false),
     isSpotDeliverySupported: z.boolean().default(false),
     specification: z
       .enum(["India_SPEC", "USA_SPEC", "UAE_SPEC", "OTHERS"], {

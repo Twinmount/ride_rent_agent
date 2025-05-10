@@ -311,6 +311,7 @@ export function mapGetPrimaryFormToPrimaryFormType(
     isCreditOrDebitCardsSupported: data.isCreditOrDebitCardsSupported,
     isTabbySupported: data.isTabbySupported,
     isCashSupported: data.isCashSupported,
+    isVehicleModified: data.isVehicleModified,
     tempCitys: data.tempCitys || [],
   };
 }

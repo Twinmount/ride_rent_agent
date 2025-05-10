@@ -113,6 +113,7 @@ export type PrimaryFormType = {
   isTabbySupported: boolean;
   isCashSupported: boolean;
   tempCitys?: CityType[];
+  isVehicleModified: boolean;
 };
 
 export type SpecificationFormData = {
