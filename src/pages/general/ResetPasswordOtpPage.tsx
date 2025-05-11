@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -18,6 +18,7 @@ import {
 import { OTPFormSchema } from "@/lib/validator";
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/general/Spinner";
+import Footer from "@/components/footer/Footer";
 
 const ResetPasswordOTPPage = () => {
   const navigate = useNavigate();
@@ -33,6 +34,7 @@ const ResetPasswordOTPPage = () => {
   }
 
   return (
+    <>
     <section
       className="h-screen bg-gray-100 flex-center"
       style={{
@@ -42,6 +44,16 @@ const ResetPasswordOTPPage = () => {
         backgroundRepeat: "no-repeat", // Prevent the image from repeating
       }}
     >
+       <Link
+          to={"/"}
+          className="absolute left-4 top-6 z-20 w-32 lg:left-20 md:w-40 lg:w-44"
+        >
+          <img
+            src="/assets/logo/header/agent_white_logo.webp"
+            alt="riderent logo"
+            className="object-contain w-full h-full"
+          />
+        </Link>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -99,6 +111,8 @@ const ResetPasswordOTPPage = () => {
         </form>
       </Form>
     </section>
+  <Footer />
+  </>
   );
 };
 
