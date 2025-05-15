@@ -8,7 +8,7 @@ import { SRMVehicleDetailsFormSchema } from "@/lib/validator";
 import { SRMVehicleDetailsFormType, VehicleType } from "@/types/srm-types";
 import CategoryDropdown from "../dropdowns/CategoryDropdown";
 import { toast } from "@/components/ui/use-toast";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   addVehicleDetailsForm,
   updateBookingDataForVehicle,
@@ -25,6 +25,12 @@ import { FormContainer } from "../form-ui/FormContainer";
 import { FormSubmitButton } from "../form-ui/FormSubmitButton";
 import { FormFieldLayout } from "../form-ui/FormFieldLayout";
 import { Input } from "@/components/ui/input";
+import NumberOfPassengersDropdown from "../dropdowns/NumberOfPassengersDropdown";
+import VehicleColorDropdown from "../dropdowns/VehicleColorDropdown";
+import BodyTypeDropdown from "../dropdowns/BodyTypeDropdown";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { useQueryClient } from "@tanstack/react-query";
 
 type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";
@@ -46,6 +52,9 @@ export default function SRMVehicleDetailsForm({
   isDedicatedAddPage = false,
 }: SRMVehicleDetailsFormProps) {
   const {} = useParams<{}>();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const [isFileUploading, setIsFileUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
   const [currentVehiclePhoto, setCurrentVehiclePhoto] = useState<string | null>(
@@ -142,11 +151,18 @@ export default function SRMVehicleDetailsForm({
           className: "bg-yellow text-white",
         });
 
-        refetchLevels?.();
-        if (type === "Add" && onNextTab) {
-          onNextTab();
+        if (isDedicatedAddPage) {
+          queryClient.invalidateQueries({
+            queryKey: ["srm-vehicles"],
+          });
+          navigate("/srm/manage-vehicles");
+        } else {
+          refetchLevels?.();
+          if (type === "Add" && onNextTab) {
+            onNextTab();
 
-          window.scrollTo({ top: 0, behavior: "smooth" });
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }
         }
       }
     } catch (error) {
@@ -287,6 +303,312 @@ export default function SRMVehicleDetailsForm({
           )}
         />
 
+        {/* Number of Passengers */}
+        <FormField
+          control={form.control}
+          name="numberOfPassengers"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Number of Passengers"
+              description="Select the number of passengers this vehicle can accommodate."
+            >
+              <NumberOfPassengersDropdown
+                value={field.value}
+                onChangeHandler={field.onChange}
+                isDisabled={!!existingVehicleId || isFieldsDisabled}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* vehicle color */}
+        <FormField
+          control={form.control}
+          name="vehicleColor"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Vehicle Color"
+              description="Select the color of the vehicle."
+            >
+              <VehicleColorDropdown
+                value={field.value}
+                onChangeHandler={field.onChange}
+                isDisabled={!!existingVehicleId || isFieldsDisabled}
+              />
+            </FormFieldLayout>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="bodyType"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Vehicle Body Type"
+              description="Select the vehicle body type with visual reference."
+            >
+              <BodyTypeDropdown
+                value={field.value}
+                onChangeHandler={field.onChange}
+                isDisabled={!!existingVehicleId || isFieldsDisabled}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* chassis number */}
+        <FormField
+          control={form.control}
+          name="chassisNumber"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Chassis Number"
+              description="Enter the vehicle's chassis number (max 50 characters)."
+            >
+              <Input
+                placeholder="Enter chassis number"
+                maxLength={50}
+                className="input-field"
+                {...field}
+                onChange={(e) => {
+                  field.onChange(e);
+                  form.clearErrors("chassisNumber");
+                }}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* additional milage charge */}
+        <FormField
+          control={form.control}
+          name="additionalMilageChargePerKm"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Additional Mileage Charge per KM"
+              description="Enter the per kilometer extra charge for mileage."
+            >
+              <Input
+                placeholder="Enter charge per KM"
+                className="input-field"
+                type="text"
+                inputMode="numeric"
+                {...field}
+                onKeyDown={(e) => {
+                  if (
+                    !/^\d*$/.test(e.key) &&
+                    ![
+                      "Backspace",
+                      "Delete",
+                      "ArrowLeft",
+                      "ArrowRight",
+                      "Tab",
+                    ].includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                onChange={(e) => {
+                  field.onChange(e);
+                  form.clearErrors("additionalMilageChargePerKm");
+                }}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* registration date */}
+        <FormField
+          control={form.control}
+          name="registrationDate"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Registration Date"
+              description="Select the vehicle's official registration date."
+            >
+              <DatePicker
+                selected={field.value}
+                onChange={(date: Date | null) => field.onChange(date)}
+                dateFormat="dd/MM/yyyy"
+                wrapperClassName="datePicker text-base w-full"
+                placeholderText="DD/MM/YYYY"
+                id="registrationDate"
+                minDate={new Date()}
+                disabled={isFieldsDisabled}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* registration due date */}
+        <FormField
+          control={form.control}
+          name="registrationDueDate"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Registration Due Date"
+              description="Select the date when the registration is due for renewal."
+            >
+              <DatePicker
+                selected={field.value}
+                onChange={(date: Date | null) => field.onChange(date)}
+                dateFormat="dd/MM/yyyy"
+                wrapperClassName="datePicker text-base w-full"
+                placeholderText="DD/MM/YYYY"
+                id="registrationDueDate"
+                minDate={new Date()}
+                disabled={isFieldsDisabled}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* traffic fine id */}
+        <FormField
+          control={form.control}
+          name="trafficFineId"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Traffic Fine ID"
+              description="Enter the associated traffic fine ID (max 50 characters)."
+            >
+              <Input
+                placeholder="Enter Traffic Fine ID"
+                maxLength={50}
+                className="input-field"
+                {...field}
+                onChange={(e) => {
+                  field.onChange(e);
+                  form.clearErrors("trafficFineId");
+                }}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* last service date */}
+        <FormField
+          control={form.control}
+          name="lastServiceDate"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Last Service Date"
+              description="Select the date when the vehicle was last serviced."
+            >
+              <DatePicker
+                selected={field.value}
+                onChange={(date: Date | null) => field.onChange(date)}
+                dateFormat="dd/MM/yyyy"
+                wrapperClassName="datePicker text-base w-full"
+                placeholderText="DD/MM/YYYY"
+                id="lastServiceDate"
+                minDate={new Date()}
+                disabled={isFieldsDisabled}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* current kilometre */}
+        <FormField
+          control={form.control}
+          name="currentKilometre"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Current Kilometre"
+              description="Enter the current odometer reading (in KM)."
+            >
+              <Input
+                placeholder="Enter current KM"
+                className="input-field"
+                type="text"
+                inputMode="numeric"
+                {...field}
+                onKeyDown={(e) => {
+                  if (
+                    !/^\d*$/.test(e.key) &&
+                    ![
+                      "Backspace",
+                      "Delete",
+                      "ArrowLeft",
+                      "ArrowRight",
+                      "Tab",
+                    ].includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                onChange={(e) => {
+                  field.onChange(e);
+                  form.clearErrors("currentKilometre");
+                }}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* service kilometre */}
+        <FormField
+          control={form.control}
+          name="nextServiceKilometre"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Service Kilometre"
+              description="Enter the kilometre value at which the next service is due."
+            >
+              <Input
+                placeholder="Enter service KM"
+                className="input-field"
+                type="text"
+                inputMode="numeric"
+                {...field}
+                onKeyDown={(e) => {
+                  if (
+                    !/^\d*$/.test(e.key) &&
+                    ![
+                      "Backspace",
+                      "Delete",
+                      "ArrowLeft",
+                      "ArrowRight",
+                      "Tab",
+                    ].includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                onChange={(e) => {
+                  field.onChange(e);
+                  form.clearErrors("nextServiceKilometre");
+                }}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* next service date */}
+        <FormField
+          control={form.control}
+          name="nextServiceDate"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Next Service Date"
+              description="Select the scheduled date for the next service."
+            >
+              <DatePicker
+                selected={field.value}
+                onChange={(date: Date | null) => field.onChange(date)}
+                showTimeSelect
+                timeInputLabel="Time:"
+                dateFormat="dd/MM/yyyy h:mm aa"
+                wrapperClassName="datePicker text-base w-full"
+                placeholderText="DD/MM/YYYY"
+                id="nextServiceDate"
+                minDate={new Date()}
+                disabled={isFieldsDisabled}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
         {/* rental details */}
         <FormField
           control={form.control}
@@ -308,11 +630,14 @@ export default function SRMVehicleDetailsForm({
         {type === "Add" && (
           <FormSubmitButton
             text={
-              type === "Add"
+              isDedicatedAddPage
+                ? "Add Vehicle"
+                : type === "Add"
                 ? "Continue to Payment Details"
                 : "Update Vehicle Details"
             }
             isLoading={form.formState.isSubmitting}
+            className="mt-6 "
           />
         )}
       </FormContainer>

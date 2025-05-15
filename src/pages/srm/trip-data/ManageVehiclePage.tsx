@@ -18,7 +18,7 @@ export default function ManageVehiclePage() {
   const LIMIT = 8;
 
   const { data, isLoading } = useQuery({
-    queryKey: ["vehicleList", page, search, sortOrder],
+    queryKey: ["srm-vehicles", page, search, sortOrder],
     queryFn: () =>
       fetchVehicleList({
         page,

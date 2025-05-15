@@ -29,6 +29,19 @@ export type SRMVehicleDetailsFormType = {
   vehicleBrandId: string;
   vehicleRegistrationNumber: string;
   vehiclePhoto: string;
+  numberOfPassengers: string;
+  vehicleColor: string;
+  bodyType: string;
+  chassisNumber: string;
+  additionalMilageChargePerKm: string;
+  registrationDate: Date | undefined;
+  registrationDueDate: Date | undefined;
+  trafficFineId: string;
+  lastServiceDate: Date | undefined;
+  currentKilometre: string;
+  serviceKilometre: string;
+  nextServiceKilometre: string;
+  nextServiceDate: Date | undefined;
   rentalDetails: {
     day: SRMRentalDetailType;
     week: SRMRentalDetailType;

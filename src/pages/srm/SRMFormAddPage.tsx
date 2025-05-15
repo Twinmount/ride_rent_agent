@@ -5,6 +5,7 @@ import { validateSRMTabAccess } from "@/helpers/form";
 import { SRMTabsTypes } from "@/types/types";
 import { toast } from "@/components/ui/use-toast";
 import PageWrapper from "@/components/PageWrapper";
+import SRMCheckListForm from "@/components/form/srm-form/CheckListForm";
 
 // Lazy-loaded form components
 const SRMCustomerDetailsForm = lazy(
@@ -57,7 +58,7 @@ export default function SRMFormAddPage() {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <TabsList className="gap-x-2 w-full bg-white flex-center max-sm:gap-x-4">
+          <TabsList className="gap-x-2 w-full bg-transparent flex-center max-sm:gap-x-4 max-w-full overflow-x-auto px4">
             <TabsTrigger
               value="customer"
               className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
@@ -118,7 +119,7 @@ export default function SRMFormAddPage() {
 
           <TabsContent value="vehicle-check-list" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              <div>New Form will be added here</div>
+              <SRMCheckListForm />
             </Suspense>
           </TabsContent>
         </Tabs>

@@ -193,6 +193,27 @@ export const SRMVehicleDetailsFormSchema = z.object({
     .min(1, "Vehicle registration number is required")
     .max(15, "Vehicle registration number cannot exceed 15 characters"),
   vehiclePhoto: z.string(),
+  numberOfPassengers: z.string().min(1, "Number of passengers is required"),
+  vehicleColor: z.string().min(1, { message: "Please select a vehicle color" }),
+  bodyType: z.string().min(1, { message: "Please select a body type" }),
+  chassisNumber: z
+    .string()
+    .min(1, { message: "Chassis number is required" })
+    .max(50, { message: "Chassis number must be at most 50 characters" }),
+  additionalMilageChargePerKm: z
+    .string()
+    .min(1, "Additional milage charge per km is required"),
+  registrationDate: z.date(),
+  registrationDueDate: z.date(),
+  trafficFineId: z
+    .string()
+    .min(1, { message: "Traffic Fine ID is required" })
+    .max(50, { message: "Traffic Fine ID must be at most 50 characters" }),
+  serviceDueDate: z.date(),
+  lastServiceDate: z.date(),
+  currentKilometre: z.string().min(1, "Current kilometre is required"),
+  nextServiceKilometre: z.string().min(1, "Service kilometre is required"),
+  nextServiceDate: z.date(),
   rentalDetails: z.object({
     day: SRMRentalDetailTypeSchema,
     week: SRMRentalDetailTypeSchema,

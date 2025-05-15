@@ -4,6 +4,7 @@ import Spinner from "@/components/general/Spinner";
 type Props = {
   text: string;
   isLoading: boolean;
+  className?: string;
 };
 
 /**
@@ -11,9 +12,9 @@ type Props = {
  *
  * typical form submit button with loading spinner
  */
-export const FormSubmitButton = ({ text, isLoading }: Props) => {
+export const FormSubmitButton = ({ text, isLoading, className }: Props) => {
   return (
-    <FormGenericButton disabled={isLoading}>
+    <FormGenericButton disabled={isLoading} className={className}>
       {text}
       {isLoading && <Spinner />}
     </FormGenericButton>
