@@ -52,6 +52,20 @@ export interface VehicleApiType {
   vehicleRegistrationNumber: string;
   vehiclePhoto: string;
   vehiclePhotoPath: string;
+  numberOfPassengers: string;
+  vehicleColor: string;
+  bodyType: string;
+  chassisNumber: string;
+  additionalMilageChargePerKm: string;
+
+  registrationDate: string;
+  registrationDueDate: string;
+  trafficFineId: string;
+  lastServiceDate: string;
+  currentKilometre: string;
+  serviceKilometre: string;
+  nextServiceKilometre: string;
+  nextServiceDate: string;
   rentalDetails: RentalDetails;
   createdBy: string;
 }
@@ -301,6 +315,17 @@ export interface GetSRMCustomerDetailsResponse {
 
 export interface GetSRMVehicleDetailsResponse {
   result: VehicleApiType;
+  status: string;
+  statusCode: number;
+}
+
+export interface ChecklistApiType {
+  vehicleId: string;
+  checklistMetadata: string;
+}
+
+export interface GetSRMChecklistResponse {
+  result: ChecklistApiType;
   status: string;
   statusCode: number;
 }

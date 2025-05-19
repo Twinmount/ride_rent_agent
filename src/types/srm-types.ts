@@ -106,20 +106,40 @@ export interface RentalDetails {
 
 export interface VehicleType {
   id: string;
+
   vehicleCategory: {
     categoryId: string;
     name: string;
     value: string;
   };
+
   vehicleBrand: {
     id: string;
     vehicleCategoryId: string;
     brandName: string;
     brandLogo: string;
   };
+
   vehicleRegistrationNumber: string;
   vehiclePhoto: string;
+
+  numberOfPassengers: string;
+  vehicleColor: string;
+  bodyType: string;
+  chassisNumber: string;
+  additionalMilageChargePerKm: string;
+
+  registrationDate: string; // ISO string from API
+  registrationDueDate: string;
+  trafficFineId: string;
+  lastServiceDate: string;
+  currentKilometre: string;
+  serviceKilometre: string;
+  nextServiceKilometre: string;
+  nextServiceDate: string;
+
   rentalDetails: RentalDetails;
+
   createdBy: string;
 }
 

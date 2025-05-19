@@ -5,14 +5,20 @@ import {
 } from "@markerjs/markerjs3";
 import { useEffect, useRef, useState } from "react";
 import TooltipButton from "./TooltipButton";
-import { PlusCircle, Trash2, XCircle } from "lucide-react";
+import { PaintBucket, PlusCircle, Trash2, XCircle } from "lucide-react";
+import { FormGenericButton } from "../form-ui/FormSubmitButton";
 
 type Props = {
   targetImage: string;
   initialAnnotation?: AnnotationState | null;
+  onSave: (data: AnnotationState) => void;
 };
 
-const ImageAnnotationEditor = ({ targetImage, initialAnnotation }: Props) => {
+const ImageAnnotationEditor = ({
+  targetImage,
+  initialAnnotation,
+  onSave,
+}: Props) => {
   const editorContainer = useRef<HTMLDivElement | null>(null);
   const markerAreaRef = useRef<MarkerArea | null>(null);
   const [history, setHistory] = useState<AnnotationState[]>([]);
@@ -36,6 +42,10 @@ const ImageAnnotationEditor = ({ targetImage, initialAnnotation }: Props) => {
         setHasSelection(true);
       });
 
+      markerArea.addEventListener("markerdeselect", () => {
+        setHasSelection(false);
+      });
+
       markerAreaRef.current = markerArea;
 
       editorContainer.current!.innerHTML = "";
@@ -52,7 +62,10 @@ const ImageAnnotationEditor = ({ targetImage, initialAnnotation }: Props) => {
 
   const handleAddCallout = () => {
     if (markerAreaRef.current) {
-      markerAreaRef.current.createMarker(CalloutMarker);
+      const editor = markerAreaRef.current.createMarker(CalloutMarker);
+      if (editor) {
+        editor.strokeColor = "#ffffff"; // Set stroke color
+      }
     }
   };
 
@@ -82,9 +95,16 @@ const ImageAnnotationEditor = ({ targetImage, initialAnnotation }: Props) => {
     setHasSelection(false);
   };
 
+  const handleSave = () => {
+    if (markerAreaRef.current) {
+      const currentState = markerAreaRef.current.getState();
+      onSave(currentState);
+    }
+  };
+
   return (
-    <div className="w-full max-w-full">
-      <div className="flex space-x-4 mb-2">
+    <div className="w-full max-w-full ">
+      <div className="flex space-x-4 mb-6">
         <TooltipButton
           onClick={handleAddCallout}
           ariaLabel="Add Callout"
@@ -119,8 +139,13 @@ const ImageAnnotationEditor = ({ targetImage, initialAnnotation }: Props) => {
 
       <div
         ref={editorContainer}
-        className="w-full h-[700px] relative overflow-hidden flex items-center justify-center border-[3px] border-[#b2b0a8] rounded-[10px] mx-auto max-w-[98%]"
+        className="w-full h-[700px] relative  flex items-center justify-center border-[3px]  shadow rounded-2xl mx-auto max-w-[1200px]"
+        onDragOver={(e) => e.preventDefault()}
       />
+
+      <FormGenericButton className="mt-8" onClick={handleSave}>
+        Add Vehicle Checklist
+      </FormGenericButton>
     </div>
   );
 };

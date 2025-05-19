@@ -184,21 +184,20 @@ export const handleCustomerSelect = (
 };
 
 // Helper function to handle vehicle selection to auto fill the SRM Vehicle form
+// Helper function to handle vehicle selection to auto fill the SRM Vehicle form
 export const handleVehicleSelection = (
   vehicleRegistrationNumber: string,
   vehicleData: VehicleType | null,
-  form: UseFormReturn<SRMVehicleDetailsFormType>,
+  form: any,
   setExistingVehicleId: (id: string | null) => void,
   setCurrentVehiclePhoto: (photo: string | null) => void
 ) => {
-  // Set vehicle registration number in the form
   form.setValue("vehicleRegistrationNumber", vehicleRegistrationNumber);
 
   if (vehicleData) {
-    // Update existing vehicle ID
-    setExistingVehicleId(vehicleData?.id);
+    setExistingVehicleId(vehicleData.id);
+    setCurrentVehiclePhoto(vehicleData.vehiclePhoto || "");
 
-    // Set form values based on selected vehicle data
     form.setValue(
       "vehicleCategoryId",
       vehicleData.vehicleCategory?.categoryId || ""
@@ -206,6 +205,33 @@ export const handleVehicleSelection = (
     form.setValue("vehicleBrandId", vehicleData.vehicleBrand?.id || "");
     form.setValue("vehiclePhoto", vehicleData.vehiclePhoto || "");
 
+    // New Fields
+    form.setValue("numberOfPassengers", vehicleData.numberOfPassengers || "");
+    form.setValue("vehicleColor", vehicleData.vehicleColor || "");
+    form.setValue("bodyType", vehicleData.bodyType || "");
+    form.setValue("chassisNumber", vehicleData.chassisNumber || "");
+    form.setValue(
+      "additionalMilageChargePerKm",
+      vehicleData.additionalMilageChargePerKm || ""
+    );
+    form.setValue("trafficFineId", vehicleData.trafficFineId || "");
+    form.setValue("currentKilometre", vehicleData.currentKilometre || "");
+    form.setValue("serviceKilometre", vehicleData.serviceKilometre || "");
+    form.setValue(
+      "nextServiceKilometre",
+      vehicleData.nextServiceKilometre || ""
+    );
+
+    // Dates - ensure they exist before setting
+    form.setValue("registrationDate", new Date(vehicleData.registrationDate));
+    form.setValue(
+      "registrationDueDate",
+      new Date(vehicleData.registrationDueDate)
+    );
+    form.setValue("lastServiceDate", new Date(vehicleData.lastServiceDate));
+    form.setValue("nextServiceDate", new Date(vehicleData.nextServiceDate));
+
+    // Rental Details
     form.setValue(
       "rentalDetails.day.enabled",
       vehicleData.rentalDetails.day.enabled || false
@@ -261,10 +287,8 @@ export const handleVehicleSelection = (
       "rentalDetails.hour.mileageLimit",
       vehicleData.rentalDetails.hour.mileageLimit || ""
     );
-
-    setCurrentVehiclePhoto(vehicleData.vehiclePhoto || "");
   } else {
-    // Reset fields if no vehicle data is selected
+    // Reset the form if no vehicle is selected
     setExistingVehicleId(null);
     setCurrentVehiclePhoto(null);
 
@@ -272,6 +296,19 @@ export const handleVehicleSelection = (
     form.resetField("vehicleBrandId");
     form.resetField("vehiclePhoto");
     form.resetField("rentalDetails");
+    form.resetField("numberOfPassengers");
+    form.resetField("vehicleColor");
+    form.resetField("bodyType");
+    form.resetField("chassisNumber");
+    form.resetField("additionalMilageChargePerKm");
+    form.resetField("registrationDate");
+    form.resetField("registrationDueDate");
+    form.resetField("trafficFineId");
+    form.resetField("lastServiceDate");
+    form.resetField("currentKilometre");
+    form.resetField("serviceKilometre");
+    form.resetField("nextServiceKilometre");
+    form.resetField("nextServiceDate");
   }
 };
 

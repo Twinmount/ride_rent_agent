@@ -12,6 +12,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   addVehicleDetailsForm,
   updateBookingDataForVehicle,
+  updateVehicleDetailsForm,
 } from "@/api/srm/srmFormApi";
 import BrandsDropdown from "../dropdowns/BrandsDropdown";
 import RentalDetailsFormField from "../RentalDetailsFormField";
@@ -34,12 +35,13 @@ import { useQueryClient } from "@tanstack/react-query";
 
 type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";
-  formData?: SRMVehicleDetailsFormType | null | undefined;
+  formData?: SRMVehicleDetailsFormType | undefined;
   onNextTab?: () => void;
   refetchLevels?: () => void;
   isAddOrIncomplete?: boolean;
   showDescription?: boolean;
   isDedicatedAddPage?: boolean;
+  setCheckListData?: (value: { vehicleId: string; bodyType: string }) => void;
 };
 
 export default function SRMVehicleDetailsForm({
@@ -50,8 +52,9 @@ export default function SRMVehicleDetailsForm({
   isAddOrIncomplete,
   showDescription = true,
   isDedicatedAddPage = false,
+  setCheckListData,
 }: SRMVehicleDetailsFormProps) {
-  const {} = useParams<{}>();
+  const { vehicleId } = useParams<{ vehicleId: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -73,25 +76,44 @@ export default function SRMVehicleDetailsForm({
   // Define your form
   const form = useForm<z.infer<typeof SRMVehicleDetailsFormSchema>>({
     resolver: zodResolver(SRMVehicleDetailsFormSchema),
-    defaultValues: initialValues as SRMVehicleDetailsFormType,
+    defaultValues: initialValues as z.infer<typeof SRMVehicleDetailsFormSchema>,
   });
 
   // Handle logic for adding a new vehicle record
-  const handleAddVehicleBooking = async (
-    values: SRMVehicleDetailsFormType,
-    bookingId: string
-  ) => {
+  const handleVehicleSubmit = async (values: SRMVehicleDetailsFormType) => {
     let data;
-    if (!!existingVehicleId) {
-      // Handle updating an existing vehicle booking record
-      data = await updateBookingDataForVehicle(bookingId, existingVehicleId);
-    } else {
-      //   Handle adding a new vehicle
-      const vehicleData = await addVehicleDetailsForm(values);
-      const vehicleId = vehicleData.result.id;
 
-      // Handle updating the vehicle booking record
-      data = await updateBookingDataForVehicle(bookingId, vehicleId);
+    // if we are in the dedicated SRMVehicleAddPage or SRMVehicleUpdatePage
+    if (isDedicatedAddPage) {
+      if (type === "Add") {
+        data = await addVehicleDetailsForm(values);
+      } else if (type === "Update") {
+        data = await updateVehicleDetailsForm(vehicleId as string, values);
+      }
+    } else {
+      // else we are in the SRMFormAddPage or SRMFormUpdatePage, which means we need to update the booking data for the vehicle. No Vehicle Specific Add or Update occurs here, only the srm booking related logic is updated here.
+      const bookingId = sessionStorage.getItem("bookingId"); // Retrieve bookingId
+
+      if (!bookingId) {
+        toast({
+          variant: "destructive",
+          title: "Booking ID Missing",
+          description: "Please complete the Customer Details Form first.",
+        });
+        return;
+      }
+
+      if (existingVehicleId && bookingId) {
+        data = await updateBookingDataForVehicle(bookingId, existingVehicleId);
+
+        // saving the vehicle id for the vehicle-check-list form
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Error updating vehicle data",
+        });
+      }
     }
     return data;
   };
@@ -121,22 +143,11 @@ export default function SRMVehicleDetailsForm({
       return;
     }
 
-    const bookingId = sessionStorage.getItem("bookingId"); // Retrieve bookingId
-
-    if (!bookingId) {
-      toast({
-        variant: "destructive",
-        title: "Booking ID Missing",
-        description: "Please complete the Customer Details Form first.",
-      });
-      return;
-    }
-
     // form submission
     try {
       let data;
       if (isAddOrIncomplete) {
-        data = await handleAddVehicleBooking(values, bookingId);
+        data = await handleVehicleSubmit(values);
       }
 
       if (data) {
@@ -191,6 +202,11 @@ export default function SRMVehicleDetailsForm({
       setExistingVehicleId,
       setCurrentVehiclePhoto
     );
+
+    setCheckListData?.({
+      vehicleId: vehicleData?.id as string,
+      bodyType: vehicleData?.bodyType as string,
+    });
   };
 
   // form fields are disabled if the type is "Update"
@@ -546,13 +562,50 @@ export default function SRMVehicleDetailsForm({
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="serviceKilometre"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Service Kilometre"
+              description="Enter the service in Kilometre."
+            >
+              <Input
+                placeholder="Enter service KM"
+                className="input-field"
+                type="text"
+                inputMode="numeric"
+                {...field}
+                onKeyDown={(e) => {
+                  if (
+                    !/^\d*$/.test(e.key) &&
+                    ![
+                      "Backspace",
+                      "Delete",
+                      "ArrowLeft",
+                      "ArrowRight",
+                      "Tab",
+                    ].includes(e.key)
+                  ) {
+                    e.preventDefault();
+                  }
+                }}
+                onChange={(e) => {
+                  field.onChange(e);
+                  form.clearErrors("currentKilometre");
+                }}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
         {/* service kilometre */}
         <FormField
           control={form.control}
           name="nextServiceKilometre"
           render={({ field }) => (
             <FormFieldLayout
-              label="Service Kilometre"
+              label="Next Service Kilometre"
               description="Enter the kilometre value at which the next service is due."
             >
               <Input

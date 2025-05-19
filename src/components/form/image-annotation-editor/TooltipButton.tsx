@@ -6,6 +6,7 @@ type TooltipButtonProps = {
   variant?: "add" | "delete" | "clear" | "save";
   label?: string; // new label text
   children: React.ReactNode; // icon element
+  className?: string;
 };
 
 const TooltipButton = ({
@@ -16,6 +17,7 @@ const TooltipButton = ({
   variant = "add",
   label,
   children,
+  className,
 }: TooltipButtonProps) => {
   let baseClasses =
     "inline-flex items-center space-x-2 p-2 rounded-md focus:outline-none focus:ring-2";
@@ -54,11 +56,11 @@ const TooltipButton = ({
       disabled={disabled}
       aria-label={ariaLabel}
       title={title}
-      className={`${baseClasses} ${colorClasses}`}
+      className={`${baseClasses} ${colorClasses} ${className}`}
     >
       {children}
       {label && (
-        <span className="select-none font-medium max-sm:hidden">{label}</span>
+        <span className="select-none font-medium max-sm:text-sm">{label}</span>
       )}
     </button>
   );

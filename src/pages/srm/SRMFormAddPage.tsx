@@ -5,7 +5,6 @@ import { validateSRMTabAccess } from "@/helpers/form";
 import { SRMTabsTypes } from "@/types/types";
 import { toast } from "@/components/ui/use-toast";
 import PageWrapper from "@/components/PageWrapper";
-import SRMCheckListForm from "@/components/form/srm-form/CheckListForm";
 
 // Lazy-loaded form components
 const SRMCustomerDetailsForm = lazy(
@@ -17,14 +16,33 @@ const SRMVehicleDetailsForm = lazy(
 const SRMPaymentDetailsForm = lazy(
   () => import("@/components/form/srm-form/PaymentDetailsForm")
 );
+const SRMCheckListForm = lazy(
+  () => import("@/components/form/srm-form/CheckListForm")
+);
 
 export default function SRMFormAddPage() {
   const [activeTab, setActiveTab] = useState<SRMTabsTypes>("customer");
   const [levelsFilled, setLevelsFilled] = useState<number>(3);
+  const [checkListData, setCheckListData] = useState({
+    vehicleId: "",
+    bodyType: "",
+  });
 
   // Handle tab change based on levelsFilled state
   const handleTabChange = (value: string) => {
     const tab = value as SRMTabsTypes;
+    if (
+      tab === "vehicle-check-list" &&
+      (!checkListData.vehicleId || !checkListData.bodyType)
+    ) {
+      toast({
+        title: "Access Restricted",
+        description: "Please fill in Vehicle Details first.",
+        className: "bg-orange text-white",
+      });
+      return;
+    }
+
     const { canAccess, message } = validateSRMTabAccess({ tab, levelsFilled });
 
     if (true) {
@@ -58,7 +76,7 @@ export default function SRMFormAddPage() {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <TabsList className="gap-x-2 w-full bg-transparent flex-center max-sm:gap-x-4 max-w-full overflow-x-auto px4">
+          <TabsList className="gap-x-2 h-20 w-full bg-transparent flex-center max-sm:gap-x-4 max-w-full overflow-x-auto px-6 pl-20">
             <TabsTrigger
               value="customer"
               className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
@@ -107,6 +125,7 @@ export default function SRMFormAddPage() {
                 type={"Add"}
                 onNextTab={() => handleNextTab("payment")}
                 isAddOrIncomplete={true}
+                setCheckListData={setCheckListData}
               />
             </Suspense>
           </TabsContent>
@@ -119,7 +138,7 @@ export default function SRMFormAddPage() {
 
           <TabsContent value="vehicle-check-list" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              <SRMCheckListForm />
+              <SRMCheckListForm type={"Add"} checkListData={checkListData} />
             </Suspense>
           </TabsContent>
         </Tabs>

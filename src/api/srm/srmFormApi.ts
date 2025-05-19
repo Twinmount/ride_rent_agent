@@ -14,6 +14,7 @@ import {
   GetSRMCustomerDetailsResponse,
   GetSRMVehicleDetailsResponse,
   GetSRMPaymentDetailsResponse,
+  GetSRMChecklistResponse,
 } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
@@ -272,8 +273,21 @@ export const addVehicleDetailsForm = async (
       vehicleCategoryId: values.vehicleCategoryId,
       vehicleBrandId: values.vehicleBrandId,
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
-      rentalDetails: values.rentalDetails,
       vehiclePhoto: values.vehiclePhoto,
+      numberOfPassengers: values.numberOfPassengers,
+      vehicleColor: values.vehicleColor,
+      bodyType: values.bodyType,
+      chassisNumber: values.chassisNumber,
+      additionalMilageChargePerKm: values.additionalMilageChargePerKm,
+      registrationDate: values.registrationDate,
+      registrationDueDate: values.registrationDueDate,
+      trafficFineId: values.trafficFineId,
+      lastServiceDate: values.lastServiceDate,
+      currentKilometre: values.currentKilometre,
+      serviceKilometre: values.serviceKilometre,
+      nextServiceKilometre: values.nextServiceKilometre,
+      nextServiceDate: values.nextServiceDate,
+      rentalDetails: values.rentalDetails,
     };
 
     // Sending the request as a JSON object
@@ -295,14 +309,30 @@ export const addVehicleDetailsForm = async (
 
 // Function to update vehicle details
 export const updateVehicleDetailsForm = async (
+  vehicleId: string,
   values: SRMVehicleDetailsFormType
 ): Promise<AddVehicleFormResponse> => {
   try {
     // Prepare the request body for the API
     const requestBody = {
+      vehicleId,
       vehicleCategoryId: values.vehicleCategoryId,
       vehicleBrandId: values.vehicleBrandId,
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
+      vehiclePhoto: values.vehiclePhoto,
+      numberOfPassengers: values.numberOfPassengers,
+      vehicleColor: values.vehicleColor,
+      bodyType: values.bodyType,
+      chassisNumber: values.chassisNumber,
+      additionalMilageChargePerKm: values.additionalMilageChargePerKm,
+      registrationDate: values.registrationDate,
+      registrationDueDate: values.registrationDueDate,
+      trafficFineId: values.trafficFineId,
+      lastServiceDate: values.lastServiceDate,
+      currentKilometre: values.currentKilometre,
+      serviceKilometre: values.serviceKilometre,
+      nextServiceKilometre: values.nextServiceKilometre,
+      nextServiceDate: values.nextServiceDate,
       rentalDetails: values.rentalDetails,
     };
 
@@ -410,6 +440,77 @@ export const updatePaymentDetailsForm = async (
     return data;
   } catch (error) {
     console.error("Error updating payment details", error);
+    throw error;
+  }
+};
+
+// get srm check list
+export const getSRMCheckListFormData = async (
+  vehicleId: string
+): Promise<GetSRMChecklistResponse> => {
+  try {
+    // Sending the request as a JSON object
+    const data = await API.get<GetSRMChecklistResponse>({
+      slug: `${Slug.GET_SRM_CHECKLIST}?vehicleId=${vehicleId}`,
+    });
+
+    if (!data) {
+      throw new Error("Failed to srm check list response");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on srm check list", error);
+    throw error;
+  }
+};
+
+export const postSRMCheckList = async (values: {
+  vehicleId: string;
+  checklistMetadata: string;
+}): Promise<GetSRMChecklistResponse> => {
+  try {
+    // Prepare the request body for the API
+    const requestBody = values;
+
+    // Sending the request as a JSON object
+    const data = await API.put<GetSRMChecklistResponse>({
+      slug: Slug.POST_SRM_CHECKLIST,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to update check list");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on updating check list data", error);
+    throw error;
+  }
+};
+
+export const putSRMCheckList = async (values: {
+  vehicleId: string;
+  checklistMetadata: string;
+}): Promise<GetSRMChecklistResponse> => {
+  try {
+    // Prepare the request body for the API
+    const requestBody = values;
+
+    // Sending the request as a JSON object
+    const data = await API.put<GetSRMChecklistResponse>({
+      slug: Slug.PUT_SRM_CHECKLIST,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to update check list");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on updating check list data", error);
     throw error;
   }
 };

@@ -209,9 +209,9 @@ export const SRMVehicleDetailsFormSchema = z.object({
     .string()
     .min(1, { message: "Traffic Fine ID is required" })
     .max(50, { message: "Traffic Fine ID must be at most 50 characters" }),
-  serviceDueDate: z.date(),
   lastServiceDate: z.date(),
   currentKilometre: z.string().min(1, "Current kilometre is required"),
+  serviceKilometre: z.string().min(1, "Current kilometre is required"),
   nextServiceKilometre: z.string().min(1, "Service kilometre is required"),
   nextServiceDate: z.date(),
   rentalDetails: z.object({

@@ -85,6 +85,11 @@ export enum Slug {
   GET_SRM_VEHICLE_LIST = "srm-vehicle/list",
   PUT_SRM_VEHICLE_FORM = "srm-vehicle",
 
+  // SRM VEHICLES CHECKLIST
+  GET_SRM_CHECKLIST = "/srm-vehicle/check-list",
+  POST_SRM_CHECKLIST = "/srm-vehicle/check-list",
+  PUT_SRM_CHECKLIST = "/srm-vehicle/check-list",
+
   // SRM PAYMENTS
   POST_SRM_PAYMENT_FORM = "/srm-payment",
   GET_SRM_PAYMENT_FORM = "/srm-bookings/payment",
