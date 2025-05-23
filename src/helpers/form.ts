@@ -455,7 +455,11 @@ export const downloadFileFromStream = async (
   fileName: string
 ) => {
   try {
-    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const appCountry = localStorage.getItem("appCountry") || "uae";
+    const apiBaseUrl =
+      appCountry === "in"
+        ? import.meta.env.VITE_API_URL_INDIA
+        : import.meta.env.VITE_API_URL_UAE;
     const url = `${apiBaseUrl}/file/stream?path=${imagePath}`; // Stream endpoint for download
 
     // Fetch the image stream from the backend API

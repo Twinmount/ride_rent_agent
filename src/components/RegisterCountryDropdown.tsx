@@ -1,3 +1,4 @@
+import { useAgentContext } from "@/context/AgentContext";
 import { useState } from "react";
 
 const countries = {
@@ -6,22 +7,31 @@ const countries = {
     value: "uae",
     imagePath:
       "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f1e6-1f1ea.svg",
-    url: "/uae/register",
+    registerUrl: "/uae/register",
+    loginUrl: "/uae/login",
   },
   India: {
     name: "India",
-    value: "india",
+    value: "in",
     imagePath:
       "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f1ee-1f1f3.svg", // 🇮🇳
-    url: "/in/register",
+    registerUrl: "/in/register",
+    loginUrl: "/in/login",
   },
 };
 
-const RegisterCountryDropdown = ({ country }: { country: string }) => {
+const RegisterCountryDropdown = ({
+  country,
+  type = "register",
+}: {
+  country: string;
+  type?: string;
+}) => {
   const [selectedCountry, setSelectedCountry] = useState(
     country === "uae" ? "UAE" : "India"
   );
   const [open, setOpen] = useState(false);
+  const { updateAppCountry } = useAgentContext();
 
   return (
     <div className="relative inline-block text-left">
@@ -44,9 +54,12 @@ const RegisterCountryDropdown = ({ country }: { country: string }) => {
         <div className="absolute right-0 mt-2 w-32 bg-white border border-gray-200 rounded-md shadow-lg z-10">
           {Object.entries(countries).map(([key, country]) => (
             <a
-              href={country.url}
+              href={
+                type === "register" ? country.registerUrl : country.loginUrl
+              }
               key={key}
               onClick={() => {
+                updateAppCountry(country.value);
                 setSelectedCountry(key);
                 setOpen(false);
               }}

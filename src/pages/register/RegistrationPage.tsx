@@ -17,6 +17,8 @@ import {
 
 import { Link, useLocation } from "react-router-dom";
 import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
+import { useEffect } from "react";
+import { useAgentContext } from "@/context/AgentContext";
 
 export default function RegistrationPage({
   country = "uae",
@@ -24,12 +26,17 @@ export default function RegistrationPage({
   country?: string;
 }) {
   const location = useLocation();
+  const { updateAppCountry } = useAgentContext();
 
   // Check if the current pathname is "/register"
   const isRegisterPage =
     location.pathname === "/register" ||
     location.pathname === "/uae/register" ||
     location.pathname === "/in/register";
+
+  useEffect(() => {
+    updateAppCountry(country === "india" ? "in" : "uae");
+  }, []);
 
   return (
     <>
@@ -114,7 +121,7 @@ export default function RegistrationPage({
             </div>
 
             <div className="flex items-center gap-4">
-              <RegisterCountryDropdown country={country} />
+              <RegisterCountryDropdown country={country} type="register" />
               <h4 className="text-white ms-4 hidden md:block">
                 Already an Agent?
               </h4>

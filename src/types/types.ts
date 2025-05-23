@@ -9,6 +9,13 @@ type AppState = {
   agentId: string;
 };
 
+export type AppSuportedCountries = {
+  id: string;
+  name: string;
+  value: string;
+  icon: string;
+};
+
 export type AgentContextType = {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
@@ -19,6 +26,9 @@ export type AgentContextType = {
   isError: boolean;
   appState: AppState;
   setAppState: React.Dispatch<React.SetStateAction<AppState>>;
+  appCountry: string;
+  updateAppCountry: (country: string) => void;
+  appSuportedCountries: AppSuportedCountries[];
 };
 
 export type RegistrationType = {

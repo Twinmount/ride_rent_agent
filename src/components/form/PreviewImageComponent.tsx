@@ -1,62 +1,66 @@
-import React, { useEffect, useState } from 'react'
-import { Skeleton } from '../ui/skeleton'
-import { toast } from '../ui/use-toast'
+import React, { useEffect, useState } from "react";
+import { Skeleton } from "../ui/skeleton";
+import { toast } from "../ui/use-toast";
 
 type PreviewImageComponentProps = {
-  imagePath: string
-}
+  imagePath: string;
+};
 
 const PreviewImageComponent: React.FC<PreviewImageComponentProps> = ({
   imagePath,
 }) => {
-  const [imageSrc, setImageSrc] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const apiBaseUrl = import.meta.env.VITE_API_URL
+        const appCountry = localStorage.getItem("appCountry") || "uae";
+        const apiBaseUrl =
+          appCountry === "in"
+            ? import.meta.env.VITE_API_URL_INDIA
+            : import.meta.env.VITE_API_URL_UAE;
         // Construct the full URL for the image stream
-        const url = `${apiBaseUrl}/file/stream?path=${imagePath}`
+        const url = `${apiBaseUrl}/file/stream?path=${imagePath}`;
 
         // Fetch the image stream from the backend API
-        const response = await fetch(url)
-        const reader = response.body?.getReader()
+        const response = await fetch(url);
+        const reader = response.body?.getReader();
 
         if (!reader) {
-          throw new Error('Failed to get reader from stream')
+          throw new Error("Failed to get reader from stream");
         }
 
-        let chunks: Uint8Array[] = []
+        let chunks: Uint8Array[] = [];
         const stream = new ReadableStream({
           async start(controller) {
             while (true) {
-              const { done, value } = await reader.read()
+              const { done, value } = await reader.read();
               if (done) {
-                controller.close()
-                break
+                controller.close();
+                break;
               }
-              controller.enqueue(value)
-              chunks.push(value)
+              controller.enqueue(value);
+              chunks.push(value);
             }
           },
-        })
+        });
 
-        const blob = await new Response(stream).blob()
-        const objectURL = URL.createObjectURL(blob)
-        setImageSrc(objectURL)
+        const blob = await new Response(stream).blob();
+        const objectURL = URL.createObjectURL(blob);
+        setImageSrc(objectURL);
       } catch (error) {
-        toast({ variant: 'destructive', title: 'Image load failed' })
-        console.error('Error fetching image:', error)
+        toast({ variant: "destructive", title: "Image load failed" });
+        console.error("Error fetching image:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     if (imagePath) {
-      fetchImage()
+      fetchImage();
     }
-  }, [imagePath])
+  }, [imagePath]);
 
   return (
     <>
@@ -74,7 +78,7 @@ const PreviewImageComponent: React.FC<PreviewImageComponentProps> = ({
         </div>
       ) : null}
     </>
-  )
-}
+  );
+};
 
-export default PreviewImageComponent
+export default PreviewImageComponent;

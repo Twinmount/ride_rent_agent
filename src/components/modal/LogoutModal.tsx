@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -6,26 +6,28 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button' // Assuming you have a Button component
-import { LogOut } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
-import { remove, StorageKeys } from '@/utils/storage'
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button"; // Assuming you have a Button component
+import { LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { remove, StorageKeys } from "@/utils/storage";
+import { useAgentContext } from "@/context/AgentContext";
 
 export default function LogoutModal() {
-  const [open, setOpen] = useState(false)
-  const navigate = useNavigate()
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  const { appCountry } = useAgentContext();
 
   const handleLogout = () => {
-    remove(StorageKeys.ACCESS_TOKEN)
-    remove(StorageKeys.REFRESH_TOKEN)
-    remove(StorageKeys.USER_ID)
-    navigate('/login')
-  }
+    remove(StorageKeys.ACCESS_TOKEN);
+    remove(StorageKeys.REFRESH_TOKEN);
+    remove(StorageKeys.USER_ID);
+    navigate(appCountry === "in" ? "/in/login" : "/uae/login");
+  };
 
   const handleClose = () => {
-    setOpen(false)
-  }
+    setOpen(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -61,5 +63,5 @@ export default function LogoutModal() {
         </DialogHeader>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

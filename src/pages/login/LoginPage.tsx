@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -29,6 +29,7 @@ import { LoginResponse } from "@/types/API-types";
 import Footer from "@/components/footer/Footer";
 import { Eye, EyeOff } from "lucide-react";
 import { useAgentContext } from "@/context/AgentContext";
+import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
 
 const LoginPage = ({ country = "uae" }: { country?: string }) => {
   const [isView, setIsView] = useState(false);
@@ -36,9 +37,13 @@ const LoginPage = ({ country = "uae" }: { country?: string }) => {
   const [countryCode, setCountryCode] = useState("");
   const navigate = useNavigate();
 
-  const { setAppState } = useAgentContext();
+  const { setAppState, updateAppCountry } = useAgentContext();
 
   const initialValues = LoginPageDefaultValues;
+
+  useEffect(() => {
+    updateAppCountry(country === "india" ? "in" : "uae");
+  }, []);
 
   // for phone validation
 
@@ -128,6 +133,9 @@ const LoginPage = ({ country = "uae" }: { country?: string }) => {
             className="object-contain w-full h-full"
           />
         </Link>
+        <div className="absolute right-4 top-6 z-20">
+          <RegisterCountryDropdown country={country} type="login" />
+        </div>
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <h1 className="z-10 mt-20 mb-3 text-5xl font-extrabold text-white max-lg:text-4xl max-md:text-3xl max-lg:text-center">
           SHOWCASE YOUR FLEET TO THE WORLD

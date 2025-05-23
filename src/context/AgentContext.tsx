@@ -26,6 +26,21 @@ type AgentProviderProps = {
   children: ReactNode;
 };
 
+const appSuportedCountries = [
+  {
+    id: "ee8a7c95-303d-4f55-bd6c-85063ff1cf48",
+    name: "UAE",
+    value: "uae",
+    icon: "/assets/icons/country-flags/uae-flag.png",
+  },
+  {
+    id: "68ea1314-08ed-4bba-a2b1-af549946523d",
+    name: "India",
+    value: "in",
+    icon: "/assets/icons/country-flags/india-flag.png",
+  },
+];
+
 type AppState = {
   accessToken: string;
   refreshToken: string;
@@ -35,7 +50,9 @@ type AppState = {
 
 const AgentProvider = ({ children }: AgentProviderProps) => {
   const [isSidebarOpen, setSidebarOpen] = useState(false);
-
+  const [appCountry, setAppCountry] = useState<string>(() => {
+    return localStorage.getItem("appCountry") || appSuportedCountries[0].value;
+  });
   const isSmallScreen = useIsSmallScreen(1100);
 
   const accessToken = load<string>(StorageKeys.ACCESS_TOKEN);
@@ -66,8 +83,19 @@ const AgentProvider = ({ children }: AgentProviderProps) => {
     }
   }, [data?.result]);
 
+  useEffect(() => {
+    if (!localStorage.getItem("appCountry")) {
+      localStorage.setItem("appCountry", appSuportedCountries[0].value);
+    }
+  }, [appCountry]);
+
   const toggleSidebar = () => {
     setSidebarOpen(!isSidebarOpen);
+  };
+
+  const updateAppCountry = (newCountry: string) => {
+    setAppCountry(newCountry);
+    localStorage.setItem("appCountry", newCountry);
   };
 
   useEffect(() => {
@@ -94,6 +122,9 @@ const AgentProvider = ({ children }: AgentProviderProps) => {
         isError,
         appState,
         setAppState,
+        appCountry,
+        updateAppCountry,
+        appSuportedCountries,
       }}
     >
       {children}

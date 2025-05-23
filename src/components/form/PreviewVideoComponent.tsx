@@ -15,7 +15,11 @@ const PreviewVideoComponent: React.FC<PreviewVideoComponentProps> = ({
   useEffect(() => {
     const fetchVideo = async () => {
       try {
-        const apiBaseUrl = import.meta.env.VITE_API_URL;
+        const appCountry = localStorage.getItem("appCountry") || "uae";
+        const apiBaseUrl =
+          appCountry === "in"
+            ? import.meta.env.VITE_API_URL_INDIA
+            : import.meta.env.VITE_API_URL_UAE;
         const url = `${apiBaseUrl}/file/stream?path=${videoPath}`;
         const response = await fetch(url);
 
