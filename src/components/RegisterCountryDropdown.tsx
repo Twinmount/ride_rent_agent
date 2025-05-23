@@ -1,3 +1,5 @@
+type CountryKey = keyof typeof countries;
+
 import { useAgentContext } from "@/context/AgentContext";
 import { useState } from "react";
 
@@ -27,7 +29,7 @@ const RegisterCountryDropdown = ({
   country: string;
   type?: string;
 }) => {
-  const [selectedCountry, setSelectedCountry] = useState(
+  const [selectedCountry, setSelectedCountry] = useState<CountryKey>(
     country === "uae" ? "UAE" : "India"
   );
   const [open, setOpen] = useState(false);
@@ -60,7 +62,7 @@ const RegisterCountryDropdown = ({
               key={key}
               onClick={() => {
                 updateAppCountry(country.value);
-                setSelectedCountry(key);
+                setSelectedCountry(key as CountryKey);
                 setOpen(false);
               }}
               className="flex items-center w-full px-4 py-2 text-sm hover:bg-gray-100"
