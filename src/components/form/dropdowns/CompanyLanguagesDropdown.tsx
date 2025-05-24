@@ -17,12 +17,13 @@ import { ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 
 type LanguagesDropdownProps = {
+  isIndia: boolean;
   value: string[];
   onChangeHandler: (value: string[]) => void;
   placeholder?: string;
 };
 
-const languages = [
+const globalLanguages = [
   "English",
   "French",
   "Russian",
@@ -45,13 +46,41 @@ const languages = [
   "Polish",
 ];
 
+const indianLanguages = [
+  "Assamese",
+  "Bengali",
+  "Bodo",
+  "Dogri",
+  "Gujarati",
+  "Hindi",
+  "Kannada",
+  "Kashmiri",
+  "Konkani",
+  "Maithili",
+  "Malayalam",
+  "Manipuri",
+  "Marathi",
+  "Nepali",
+  "Odia",
+  "Punjabi",
+  "Sanskrit",
+  "Santali",
+  "Sindhi",
+  "Tamil",
+  "Telugu",
+  "Urdu",
+];
+
 const CompanyLanguagesDropdown = ({
+  isIndia = false,
   value = [],
   onChangeHandler,
   placeholder = "Languages",
 }: LanguagesDropdownProps) => {
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(value);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const languages = isIndia ? [...indianLanguages] : [...globalLanguages];
 
   useEffect(() => {
     setSelectedLanguages(value);

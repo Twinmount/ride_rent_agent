@@ -1,4 +1,8 @@
-import { CompanyFormType, ProfileUpdateFormType } from "@/types/types";
+import {
+  CompanyFormType,
+  Location,
+  ProfileUpdateFormType,
+} from "@/types/types";
 import { Slug } from "../Api-Endpoints";
 import { API } from "../ApiService";
 import {
@@ -13,6 +17,7 @@ export interface CompanyType {
   commercialLicense: string;
   expireDate: Date;
   regNumber: string;
+  location?: Location;
 }
 
 // add company
@@ -30,6 +35,8 @@ export const addCompany = async (values: CompanyFormType, userId: string) => {
         commercialLicense: values.commercialLicense, // Assuming this is a URL or string'
         companyAddress: values.companyAddress,
         companyLanguages: values.companyLanguages,
+        accountType: values.accountType,
+        location: values.location,
       },
     });
 
@@ -55,6 +62,7 @@ export const updateCompanyProfile = async (
         commercialLicense: values.commercialLicense, // Assuming this is a URL or string
         companyAddress: values.companyAddress,
         companyLanguages: values.companyLanguages,
+        location: values.location,
       },
     });
 
@@ -77,6 +85,7 @@ export const updateCompany = async (values: CompanyType, companyId: string) => {
         regNumber: values.regNumber,
         companyLogo: values.companyLogo, // Assuming this is a URL or string
         commercialLicense: values.commercialLicense, // Assuming this is a URL or string
+        location: values.location,
       },
     });
 

@@ -102,11 +102,12 @@ const OTPPage = () => {
         sessionStorage.clear();
         save(StorageKeys.ACCESS_TOKEN, data.result.token);
         save(StorageKeys.REFRESH_TOKEN, data.result.refreshToken);
+        save(StorageKeys.USER_ID, data.result.userId);
         toast({
-          title: "Your account is created successfully!. Now you can login",
+          title: "Your account is created successfully!.",
           className: "bg-yellow text-white",
         });
-        navigate("/login", { replace: true });
+        navigate("/");
       }
     } catch (error: any) {
       if (error.response && error.response.status === 400) {

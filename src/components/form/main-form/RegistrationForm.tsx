@@ -26,7 +26,7 @@ import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
 import { Eye, EyeOff } from "lucide-react";
 
-const RegistrationForm = () => {
+const RegistrationForm = ({ country }: { country: string }) => {
   const navigate = useNavigate();
   const [isView, setIsView] = useState(false);
 
@@ -40,6 +40,10 @@ const RegistrationForm = () => {
   const initialValues = {
     phoneNumber: storedCountryCode + storedPhoneNumber,
     password: storedPassword,
+    country:
+      country === "uae"
+        ? "ee8a7c95-303d-4f55-bd6c-85063ff1cf48"
+        : "68ea1314-08ed-4bba-a2b1-af549946523d",
   };
 
   // Define your form.
@@ -65,8 +69,9 @@ const RegistrationForm = () => {
         sessionStorage.setItem("phoneNumber", phoneNumber);
         sessionStorage.setItem("countryCode", countryCode);
         sessionStorage.setItem("password", values.password);
+        sessionStorage.setItem("country", values.country);
 
-        navigate("/verify-otp");
+        navigate(`/verify-otp?country=${country}`);
       }
     } catch (error: any) {
       if (error.response && error.response.status === 400) {
@@ -96,6 +101,7 @@ const RegistrationForm = () => {
   return (
     <Form {...form}>
       <form
+        id="agent-account-registration-form"
         onSubmit={form.handleSubmit(onSubmit)}
         className="flex-1 bg-white shadow-lg p-4 lg:mt-6 pb-6 rounded-[1rem] border w-full min-w-[350px] max-w-[400px]"
       >
@@ -114,7 +120,7 @@ const RegistrationForm = () => {
                 <div className="flex-col items-start w-full">
                   <FormControl>
                     <PhoneInput
-                      defaultCountry="ae"
+                      defaultCountry={country === "india" ? "in" : "ae"}
                       value={field.value}
                       onChange={(value, country) => {
                         field.onChange(value);
@@ -208,7 +214,10 @@ const RegistrationForm = () => {
         <div className="px-2 mt-3 text-center">
           <div>
             Already registered?{" "}
-            <Link to={"/login"} className="font-semibold text-yellow">
+            <Link
+              to={`${country === "india" ? "/in" : "/uae"}/login`}
+              className="font-semibold text-yellow"
+            >
               Login
             </Link>
           </div>

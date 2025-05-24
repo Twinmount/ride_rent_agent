@@ -81,12 +81,22 @@ module.exports = {
           "0%,70%,100%": { opacity: "1" },
           "20%,50%": { opacity: "0" },
         },
+        scaleUpDown: {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.1)" },
+        },
+        "gentle-bounce": {
+          "0%, 100%": { transform: "translateY(0) scale(1)", opacity: "1" },
+          "50%": { transform: "translateY(0) scale(1.01)", opacity: "0.9" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         shimmer: "shimmer 3s linear infinite",
         "caret-blink": "caret-blink 1.25s ease-out infinite",
+        "scale-up-down": "scaleUpDown 1s ease-in-out infinite",
+        "gentle-bounce": "gentle-bounce 1s ease-in-out",
       },
     },
   },

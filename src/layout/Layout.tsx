@@ -19,6 +19,7 @@ export default function Layout() {
     console.warn("Refresh token not found, redirecting..");
     remove(StorageKeys.ACCESS_TOKEN);
     remove(StorageKeys.REFRESH_TOKEN);
+    remove(StorageKeys.USER_ID);
     return <Navigate to={"/login"} replace />;
   }
 
@@ -38,7 +39,7 @@ export default function Layout() {
         {isLoading ? (
           <LazyLoader />
         ) : !data?.result ? (
-          <ProtectedPage />
+          <ProtectedPage userId={decodedData.userId} />
         ) : data.result.approvalStatus === "REJECTED" ? (
           <ApprovalStatusPage
             status="REJECTED"

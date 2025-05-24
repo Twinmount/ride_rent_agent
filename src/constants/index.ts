@@ -81,6 +81,21 @@ export const CompanyFormDefaultValues: CompanyFormType = {
   regNumber: "",
   companyAddress: "", // Default empty value
   companyLanguages: [],
+  accountType: "company",
+  location: undefined,
+};
+
+// Individual registration phase 2 form default values
+export const IndividualFormDefaultValues: CompanyFormType = {
+  companyName: "",
+  companyLogo: "",
+  commercialLicense: "",
+  expireDate: undefined,
+  regNumber: "",
+  companyAddress: "", // Default empty value
+  companyLanguages: [],
+  accountType: "individual",
+  location: undefined,
 };
 
 // Company profile update form default values
@@ -104,12 +119,15 @@ export const LoginPageDefaultValues = {
 };
 
 // primary details form default values
-export const PrimaryFormDefaultValues: PrimaryFormType = {
+export const getPrimaryFormDefaultValues = (
+  isIndia: boolean
+): PrimaryFormType => ({
   vehicleCategoryId: "",
   vehicleTypeId: "",
   vehicleBrandId: "",
   vehicleModel: "",
   vehiclePhotos: [],
+  vehicleVideos: [],
   vehicleRegistrationNumber: "",
   vehicleRegisteredYear: "",
   commercialLicenses: [],
@@ -117,7 +135,7 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
   isLease: false,
   isCryptoAccepted: false,
   isSpotDeliverySupported: false,
-  specification: "UAE_SPEC",
+  specification: isIndia ? "India_SPEC" : "UAE_SPEC",
   rentalDetails: {
     day: { enabled: false, rentInAED: "", mileageLimit: "" },
     week: { enabled: false, rentInAED: "", mileageLimit: "" },
@@ -139,7 +157,10 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
   },
   isCreditOrDebitCardsSupported: false,
   isTabbySupported: false,
-};
+  isCashSupported: false,
+  tempCitys: [],
+  isVehicleModified: false,
+});
 
 // srm user details form default values
 export const SRMCustomerDetailsFormDefaultValues: SRMCustomerDetailsFormType = {

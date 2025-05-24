@@ -4,9 +4,6 @@ import { Link } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import { useQuery } from "@tanstack/react-query";
 import { getCompany } from "@/api/company";
-import { load, StorageKeys } from "@/utils/storage";
-import { DecodedRefreshToken } from "@/layout/ProtectedRoutes";
-import { jwtDecode } from "jwt-decode";
 import { getUser } from "@/api/user";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
 import SupportModal from "@/components/modal/SupportModal";
@@ -20,6 +17,8 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { downloadFileFromStream } from "@/helpers/form";
 import ImagePreviewModal from "@/components/modal/ImagePreviewModal";
+import { useCompanyCountry } from "@/hooks/useCompanyCountry";
+import { useAgentContext } from "@/context/AgentContext";
 
 export default function ProfilePage() {
   const [isCopied, setIsCopied] = useState(false);
@@ -39,14 +38,14 @@ export default function ProfilePage() {
     );
   };
 
-  const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
-
-  const { userId } = jwtDecode<DecodedRefreshToken>(refreshToken as string);
+  const {
+    appState: { userId },
+  } = useAgentContext();
 
   // Query to get company data
   const { data: companyData, isLoading: isCompanyLoading } = useQuery({
     queryKey: ["company"],
-    queryFn: () => getCompany(userId),
+    queryFn: () => getCompany(userId as string),
   });
 
   // Query to get user data
@@ -55,7 +54,10 @@ export default function ProfilePage() {
     queryFn: getUser,
   });
 
-  if (isCompanyLoading || isAgentLoading) {
+  const { data: countryData, isLoading: isLoadingCountry } =
+    useCompanyCountry(userId);
+
+  if (isCompanyLoading || isAgentLoading || isLoadingCountry) {
     return (
       <section className="w-full min-h-screen bg-white flex-center">
         <LazyLoader />
@@ -65,6 +67,10 @@ export default function ProfilePage() {
 
   const profileData = companyData?.result;
   const userData = agentData?.result;
+  const country = countryData?.result || "UAE";
+  const isIndia = country === "India" || country === "india";
+  const isIndividual =
+    !!profileData?.accountType && profileData?.accountType === "individual";
 
   if (!profileData) {
     return (
@@ -115,7 +121,8 @@ export default function ProfilePage() {
         {/* company logo */}
         <div className="flex gap-y-2 justify-start items-start w-full">
           <dt className="flex justify-between items-start w-64 text-gray-800">
-            Company Logo <span className="font-bold">:</span>
+            {isIndividual ? "Photo" : "Company Logo"}{" "}
+            <span className="font-bold">:</span>
           </dt>
           <dd className="flex gap-x-3 items-center ml-4 w-full rounded-lg">
             <div className="overflow-hidden relative w-16 h-16 rounded-2xl border-2 border-yellow">
@@ -148,7 +155,8 @@ export default function ProfilePage() {
         {/* company name */}
         <div className="flex gap-y-2 justify-start items-start w-full">
           <dt className="flex justify-between items-start w-64 text-gray-800">
-            Company Name <span className="font-bold">:</span>
+            {isIndividual ? "Name" : "Company Name"}{" "}
+            <span className="font-bold">:</span>
           </dt>
           <dd className="flex flex-col gap-x-3 items-start px-2 ml-4 w-full rounded-lg bg-slate-50">
             <span className="line-clamp-1">{profileData.companyName}</span>
@@ -158,7 +166,12 @@ export default function ProfilePage() {
         {/* Company Registration Card */}
         <div className="flex gap-y-2 justify-start items-start w-full">
           <dt className="flex justify-between items-start w-64 text-gray-800">
-            Registration Card <span className="font-bold">:</span>
+            {isIndia && !isIndividual
+              ? "Company Registration/GST Registration/Trade License"
+              : isIndia && isIndividual
+              ? "Commercial Registration / Tourist Permit"
+              : "Registration Card"}{" "}
+            <span className="font-bold">:</span>
           </dt>
           <dd className="flex gap-x-3 items-center ml-4 w-full rounded-lg">
             <div className="overflow-hidden relative w-16 h-16 rounded-2xl border-2 border-yellow">
@@ -231,7 +244,11 @@ export default function ProfilePage() {
         {/* registration number */}
         <div className="flex gap-y-2 justify-start items-start w-full">
           <dt className="flex justify-between items-start w-64 text-gray-800">
-            Registration Number
+            {isIndia && !isIndividual
+              ? "GST Number"
+              : isIndia && isIndividual
+              ? "PAN Number"
+              : "Registration Number"}
             <span className="font-bold">:</span>
           </dt>
           <dd className="flex gap-x-3 items-center px-2 ml-4 w-full text-base rounded-lg bg-slate-50">
@@ -242,7 +259,7 @@ export default function ProfilePage() {
         {/* registration number */}
         <div className="flex gap-y-2 justify-start items-start w-full">
           <dt className="flex justify-between items-start w-64 text-gray-800">
-            Company Address
+            {isIndividual ? "Address" : "Company Address"}
             <span className="font-bold">:</span>
           </dt>
           <dd className="flex gap-x-3 items-center px-2 ml-4 w-full text-base rounded-lg bg-slate-50">

@@ -4,25 +4,80 @@ import * as z from "zod";
 export const RegistrationFormSchema = z.object({
   phoneNumber: z.string().min(6, "Provide a valid mobile  number"),
   password: z.string().min(4, "Password must be at least 4 characters"),
+  country: z.string().min(1, "Select a country"),
 });
 
 // Company Form Schema
-export const CompanyFormSchema = z.object({
+export const CompanyFormSchema = (isIndia: boolean) =>
+  z.object({
+    companyName: z
+      .string()
+      .min(1, "Company name is required")
+      .max(50, "Maximum 50 characters allowed"),
+    companyLogo: z.string().min(1, "Company logo is required"),
+    commercialLicense: z.string().min(1, "Commercial License is required"),
+    expireDate: z.date(),
+    regNumber: z
+      .string()
+      .min(1, `${isIndia ? "GST" : "Registration"} number is required`)
+      .refine(
+        (val) => {
+          if (isIndia) {
+            return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/.test(
+              val
+            );
+          }
+          return true; // Skip validation if not India
+        },
+        {
+          message: "Invalid GST number format",
+        }
+      ),
+    companyAddress: z
+      .string()
+      .min(5, "Company address is required")
+      .max(150, "Address can be up to 150 characters"),
+    companyLanguages: z
+      .array(z.string())
+      .min(1, "At least one language must be selected"),
+    accountType: z.enum(["company", "individual"]),
+    location: z
+      .object({
+        lat: z.number(),
+        lng: z.number(),
+        address: z.string(),
+      })
+      .optional(),
+  });
+
+// individual Form Schema
+export const IndividualFormSchema = z.object({
   companyName: z
     .string()
-    .min(1, "Company name is required")
+    .min(1, "Name is required")
     .max(50, "Maximum 50 characters allowed"),
-  companyLogo: z.string().min(1, "Company logo is required"),
-  commercialLicense: z.string().min(1, "Commercial License is required"),
+  companyLogo: z.string().min(1, "Photo is required"),
+  commercialLicense: z.string().min(1, "Commercial Registration is required"),
   expireDate: z.date(),
-  regNumber: z.string().min(1, "Registration number is required"),
+  regNumber: z
+    .string()
+    .min(1, "PAN number is required")
+    .regex(/^[A-Z]{5}[0-9]{4}[A-Z]$/, "Invalid PAN format"),
   companyAddress: z
     .string()
-    .min(5, "Company address is required")
+    .min(5, "Address is required")
     .max(150, "Address can be up to 150 characters"),
   companyLanguages: z
     .array(z.string())
     .min(1, "At least one language must be selected"),
+  accountType: z.enum(["company", "individual"]),
+  location: z
+    .object({
+      lat: z.number(),
+      lng: z.number(),
+      address: z.string(),
+    })
+    .optional(),
 });
 
 // Company Form Schema
@@ -37,6 +92,13 @@ export const ProfileUpdateFormSchema = z.object({
   companyLanguages: z
     .array(z.string())
     .min(1, "At least one language must be selected"),
+  location: z
+    .object({
+      lat: z.number(),
+      lng: z.number(),
+      address: z.string(),
+    })
+    .optional(),
 });
 
 // otp page form schema
@@ -96,13 +158,15 @@ export const PrimaryFormSchema = z
     vehiclePhotos: z
       .array(z.string().min(1, "vehicle photo is required"))
       .min(1, "At least one vehicle photo is required"),
+    vehicleVideos: z.array(z.string().optional()),
     commercialLicenses: z.array(z.string().optional()),
     commercialLicenseExpireDate: z.date(),
     isLease: z.boolean().default(false),
     isCryptoAccepted: z.boolean().default(false),
+    isVehicleModified: z.boolean().default(false),
     isSpotDeliverySupported: z.boolean().default(false),
     specification: z
-      .enum(["USA_SPEC", "UAE_SPEC", "OTHERS"], {
+      .enum(["India_SPEC", "USA_SPEC", "UAE_SPEC", "OTHERS"], {
         required_error: "Specification is required",
       })
       .default("UAE_SPEC"),
@@ -124,6 +188,17 @@ export const PrimaryFormSchema = z
     }),
     isCreditOrDebitCardsSupported: z.boolean().default(false),
     isTabbySupported: z.boolean().default(false),
+    isCashSupported: z.boolean().default(false),
+    tempCitys: z
+      .array(
+        z.object({
+          stateId: z.string(),
+          cityId: z.string(),
+          cityName: z.string(),
+          cityValue: z.string(),
+        })
+      )
+      .optional(),
   })
   .refine(
     (data) => {

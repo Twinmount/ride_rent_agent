@@ -9,6 +9,7 @@ type RentalDetailsFieldProps = {
   description: string;
   isDisabled?: boolean;
   isSRM?: boolean;
+  isIndia?: boolean;
 };
 
 const RentalDetailField = ({
@@ -16,6 +17,7 @@ const RentalDetailField = ({
   description,
   isDisabled = false,
   isSRM = false,
+  isIndia = false,
 }: RentalDetailsFieldProps) => {
   const { control, watch, clearErrors } = useFormContext();
   const isEnabled = watch(`rentalDetails.${period}.enabled`);
@@ -64,13 +66,13 @@ const RentalDetailField = ({
                   htmlFor={`rentalDetails-${period}-rentInAED`}
                   className="block mr-1 mb-5 w-28 text-sm font-medium"
                 >
-                  Rent in AED
+                  Rent in {isIndia ? "INR" : "AED"}
                 </label>
                 <div className="w-full">
                   <Input
                     id={`rentalDetails-${period}-rentInAED`}
                     {...field}
-                    placeholder="Rent in AED"
+                    placeholder={isIndia ? "Rent in INR" : "Rent in AED"}
                     className="input-field"
                     type="text"
                     inputMode="numeric"
@@ -94,7 +96,9 @@ const RentalDetailField = ({
                     readOnly={isDisabled}
                   />
                   <FormDescription>
-                    {`Rent of the Vehicle in AED per ${period} `}
+                    {`Rent of the Vehicle in ${
+                      isIndia ? "INR" : "AED"
+                    } per ${period} `}
                   </FormDescription>
                 </div>
               </div>
@@ -154,9 +158,11 @@ const RentalDetailField = ({
 const RentalDetailsFormField = ({
   isDisabled = false,
   isSRM = false,
+  isIndia = false,
 }: {
   isDisabled?: boolean;
   isSRM?: boolean;
+  isIndia?: boolean;
 }) => {
   return (
     <div className="flex flex-col">
@@ -165,20 +171,27 @@ const RentalDetailsFormField = ({
         description="(Select to set daily rental rates)"
         isDisabled={isDisabled}
         isSRM={isSRM}
+        isIndia={isIndia}
       />
       <RentalDetailField
         period="week"
         description="(Select to set weekly rental rates)"
         isDisabled={isDisabled}
         isSRM={isSRM}
+        isIndia={isIndia}
       />
       <RentalDetailField
         period="month"
         description="(Select to set monthly rental rates)"
         isDisabled={isDisabled}
         isSRM={isSRM}
+        isIndia={isIndia}
       />
-      <HourlyRentalDetailFormField isDisabled={isDisabled} isSRM={isSRM} />
+      <HourlyRentalDetailFormField
+        isDisabled={isDisabled}
+        isSRM={isSRM}
+        isIndia={isIndia}
+      />
     </div>
   );
 };

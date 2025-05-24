@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -28,14 +28,22 @@ import { remove, save, StorageKeys } from "@/utils/storage";
 import { LoginResponse } from "@/types/API-types";
 import Footer from "@/components/footer/Footer";
 import { Eye, EyeOff } from "lucide-react";
+import { useAgentContext } from "@/context/AgentContext";
+import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
 
-const LoginPage = () => {
+const LoginPage = ({ country = "uae" }: { country?: string }) => {
   const [isView, setIsView] = useState(false);
   // State to store the country code separately
   const [countryCode, setCountryCode] = useState("");
   const navigate = useNavigate();
 
+  const { setAppState, updateAppCountry } = useAgentContext();
+
   const initialValues = LoginPageDefaultValues;
+
+  useEffect(() => {
+    updateAppCountry(country === "india" ? "in" : "uae");
+  }, []);
 
   // for phone validation
 
@@ -70,7 +78,12 @@ const LoginPage = () => {
         save(StorageKeys.ACCESS_TOKEN, data.result.token);
         save(StorageKeys.REFRESH_TOKEN, data.result.refreshToken);
         save(StorageKeys.USER_ID, data.result.userId);
-
+        setAppState((prev) => ({
+          ...prev,
+          accessToken: data.result.token,
+          refreshToken: data.result.refreshToken,
+          userId: data.result.userId,
+        }));
         navigate("/");
       }
     } catch (error: any) {
@@ -120,6 +133,9 @@ const LoginPage = () => {
             className="object-contain w-full h-full"
           />
         </Link>
+        <div className="absolute right-4 top-6 z-20">
+          <RegisterCountryDropdown country={country} type="login" />
+        </div>
         <div className="absolute inset-0 bg-black opacity-50"></div>
         <h1 className="z-10 mt-20 mb-3 text-5xl font-extrabold text-white max-lg:text-4xl max-md:text-3xl max-lg:text-center">
           SHOWCASE YOUR FLEET TO THE WORLD
@@ -148,7 +164,7 @@ const LoginPage = () => {
                     <div className="flex-col items-start w-full">
                       <FormControl>
                         <PhoneInput
-                          defaultCountry="ae"
+                          defaultCountry={country === "india" ? "in" : "ae"}
                           value={field.value}
                           onChange={(value, country) => {
                             field.onChange(value);
@@ -231,7 +247,10 @@ const LoginPage = () => {
               </Link>
               <div>
                 New to Ride.Rent?{" "}
-                <Link to={"/register"} className="font-semibold text-yellow">
+                <Link
+                  to={`${country === "india" ? "/in" : "/uae"}/register`}
+                  className="font-semibold text-yellow"
+                >
                   Register
                 </Link>
               </div>

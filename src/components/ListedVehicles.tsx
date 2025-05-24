@@ -4,17 +4,20 @@ import { SingleVehicleType } from "@/types/API-types";
 import ListingsGridSkeleton from "./loading-skelton/ListingsGridSkeleton";
 import VehicleCard from "./cards/VehicleCard";
 import { useToggleVehicleVisibility } from "@/pages/listings/ListingPage.hooks";
+import { Link } from "react-router-dom";
 
 interface ListedVehiclesProps {
   vehicles: SingleVehicleType[];
   isLoading: boolean;
   search: string;
+  userId?: string;
 }
 
 export default function ListedVehicles({
   vehicles,
   isLoading,
   search,
+  userId,
 }: ListedVehiclesProps) {
   const [selectedVehicle, setSelectedVehicle] =
     useState<SingleVehicleType | null>(null);
@@ -43,6 +46,12 @@ export default function ListedVehicles({
   if (vehicles.length === 0 && search) {
     return (
       <div className="pt-28 text-center text-gray-500">
+        <Link
+          to={`/listings/add/${userId}`}
+          className="max-sm:hidden mb-6 flex-center bg-yellow text-white py-2 whitespace-nowrap w-32 min-w-32 font-semibold rounded-2xl transition-all animate-scale-up-down hover:animate-none hover:scale-[1.02]"
+        >
+          List Vehicle +
+        </Link>
         <p className="text-lg font-semibold">No results found for "{search}"</p>
       </div>
     );
@@ -50,7 +59,13 @@ export default function ListedVehicles({
 
   if (vehicles.length === 0) {
     return (
-      <div className="pt-28 text-center text-gray-500">
+      <div className="pt-28 text-gray-500 flex flex-col items-center">
+        <Link
+          to={`/listings/add/${userId}`}
+          className="max-sm:hidden mb-6 flex-center bg-yellow text-white py-2 whitespace-nowrap w-32 min-w-32 font-semibold rounded-2xl transition-all animate-scale-up-down hover:animate-none hover:scale-[1.02]"
+        >
+          List Vehicle +
+        </Link>
         <p className="text-lg font-semibold">
           No vehicles found in this category
         </p>

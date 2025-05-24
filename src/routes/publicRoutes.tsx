@@ -9,6 +9,10 @@ const CompanyRegistration = lazy(
   () => import("../pages/register/CompanyRegistration")
 );
 
+const IndividualRegistration = lazy(
+  () => import("../pages/register/IndividualRegistration")
+);
+
 const RegistrationComplete = lazy(
   () => import("../pages/register/RegistrationComplete")
 );
@@ -31,12 +35,24 @@ export const publicRoutes = [
     element: <RegistrationPage />,
   },
   {
+    path: "/uae/register",
+    element: <RegistrationPage />,
+  },
+  {
+    path: "/in/register",
+    element: <RegistrationPage country="india" />,
+  },
+  {
     path: "/verify-otp",
     element: <OTPPage />,
   },
   {
     path: "/register/company-details",
     element: <CompanyRegistration />,
+  },
+  {
+    path: "/register/individual-details",
+    element: <IndividualRegistration />,
   },
   {
     path: "/register/complete",
@@ -46,6 +62,14 @@ export const publicRoutes = [
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/uae/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/in/login",
+    element: <LoginPage country="india" />,
   },
   {
     path: "/reset-password",

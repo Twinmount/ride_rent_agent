@@ -129,3 +129,14 @@
   filter: brightness(1.1) saturate(200%) invert(50%) sepia(100%) saturate(500%)
     hue-rotate(-20deg) brightness(95%) contrast(90%);
 }
+
+.custom-select-box-div select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none;
+}
+
+.custom-register-modal-content > button {
+  color: #ffffff !important;
+}

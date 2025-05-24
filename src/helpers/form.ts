@@ -288,6 +288,7 @@ export function mapGetPrimaryFormToPrimaryFormType(
     vehicleBrandId: data.vehicleBrandId,
     vehicleModel: data.vehicleModel,
     vehiclePhotos: data.vehiclePhotos,
+    vehicleVideos: data.vehicleVideos,
     vehicleRegistrationNumber: data.vehicleRegistrationNumber,
     vehicleRegisteredYear: data.vehicleRegisteredYear,
     commercialLicenses: data.commercialLicenses,
@@ -297,7 +298,11 @@ export function mapGetPrimaryFormToPrimaryFormType(
     isLease: data.isLease,
     isCryptoAccepted: data.isCryptoAccepted,
     isSpotDeliverySupported: data.isSpotDeliverySupported,
-    specification: data.specification as "UAE_SPEC" | "USA_SPEC" | "OTHERS",
+    specification: data.specification as
+      | "India_SPEC"
+      | "UAE_SPEC"
+      | "USA_SPEC"
+      | "OTHERS",
     rentalDetails: data.rentalDetails,
     phoneNumber: formattedPhoneNumber, // Set the combined phone number
     stateId: data.stateId,
@@ -306,6 +311,9 @@ export function mapGetPrimaryFormToPrimaryFormType(
     securityDeposit: data.securityDeposit,
     isCreditOrDebitCardsSupported: data.isCreditOrDebitCardsSupported,
     isTabbySupported: data.isTabbySupported,
+    isCashSupported: data.isCashSupported,
+    isVehicleModified: data.isVehicleModified,
+    tempCitys: data.tempCitys || [],
   };
 }
 
@@ -447,7 +455,11 @@ export const downloadFileFromStream = async (
   fileName: string
 ) => {
   try {
-    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const appCountry = localStorage.getItem("appCountry") || "uae";
+    const apiBaseUrl =
+      appCountry === "in"
+        ? import.meta.env.VITE_API_URL_INDIA
+        : import.meta.env.VITE_API_URL_UAE;
     const url = `${apiBaseUrl}/file/stream?path=${imagePath}`; // Stream endpoint for download
 
     // Fetch the image stream from the backend API

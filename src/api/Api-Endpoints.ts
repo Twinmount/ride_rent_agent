@@ -39,6 +39,7 @@ export enum Slug {
 
   // States Endpoints
   GET_ALL_STATES = "/states/list",
+  GET_ALL_PARENT_STATES = "/states/parent/list",
 
   // Cities Endpoints
   GET_ALL_CITIES = "/city/list",

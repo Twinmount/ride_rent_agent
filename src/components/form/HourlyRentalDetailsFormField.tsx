@@ -14,9 +14,11 @@ import {
 const HourlyRentalDetailFormField = ({
   isDisabled = false,
   isSRM = false,
+  isIndia = false,
 }: {
   isDisabled?: boolean;
   isSRM?: boolean;
+  isIndia?: boolean;
 }) => {
   const { control, watch, clearErrors } = useFormContext();
   const isEnabled = watch("rentalDetails.hour.enabled");
@@ -109,11 +111,15 @@ const HourlyRentalDetailFormField = ({
             control={control}
             render={({ field }) => (
               <div className="flex items-center mt-4 space-x-2">
-                <label className="w-36 font-medium">Rent in AED:</label>
+                <label className="w-36 font-medium">
+                  Rent in {isIndia ? "INR" : "AED"}:
+                </label>
                 <div className="flex flex-col w-full">
                   <Input
                     {...field}
-                    placeholder="Enter rent in AED"
+                    placeholder={
+                      isIndia ? "Enter rent in INR" : "Enter rent in AED"
+                    }
                     className="input-field"
                     type="text"
                     inputMode="numeric"
@@ -137,7 +143,8 @@ const HourlyRentalDetailFormField = ({
                     readOnly={isDisabled}
                   />
                   <FormDescription>
-                    Specify the hourly rental price in AED.
+                    Specify the hourly rental price in{" "}
+                    {isIndia ? "INR." : "AED."}
                   </FormDescription>
                 </div>
               </div>

@@ -2,8 +2,10 @@ export const features = [
   {
     key: 1,
     title: "Most Affordable Listing Cost",
-    description:
-      "Benefit from the most affordable listing costs in the industry with Ride.Rent. Our competitive pricing model ensures you pay less to showcase your vehicles, making it cost-effective to reach a vast audience in  UAE. Maximize your visibility without straining your budget, ideal for increasing your rental business's profitability and scale.",
+    description: `Enjoy the most affordable listing rates in the Indian vehicle rental industry. With Ride.Rent’s
+competitive pricing, you spend less to promote your fleet - making it easier to reach a large
+audience across UAE. Maximize your visibility, grow your bookings, and boost your rental
+business profitability without overspending.`,
   },
   {
     key: 2,
@@ -15,32 +17,96 @@ damage. Enjoy secure rentals with advanced fraud detection.`,
   {
     key: 3,
     title: "Zero Commission",
-    description:
-      "Eliminate unnecessary intermediaries and fees with Ride.Rent, empowering agents to retain more profits. Our direct booking approach ensures agents gain full control and revenue from each transaction, making vehicle renting in UAE more rewarding.",
+    description: `Eliminate unnecessary intermediaries and fees with Ride.Rent, empowering agents to retain
+more profits. Our direct booking approach ensures agents gain full control and revenue from
+each transaction, making vehicle renting more rewarding.`,
   },
   {
     key: 4,
     title: "Quicker Return on Investment",
-    description:
-      "Accelerate your return on investment by leveraging Ride.Rent's efficient booking system and broad audience. Reduced downtime and higher utilization rates mean you can achieve better financial outcomes faster, with minimal effort.",
+    description: `Accelerate your return on investment by leveraging Ride.Rent's efficient booking system and
+broad audience. Reduced downtime and higher utilization rates mean you can achieve better
+financial outcomes faster, with minimal effort.`,
   },
   {
     key: 5,
     title: "Instant Bookings & High-Quality Leads",
-    description:
-      "Facilitate seamless and instant bookings through Ride.Rent. Our sophisticated matching algorithms connect your vehicles with the most suitable customers, boosting the probability of bookings and optimizing your inventory use.",
+    description: `Facilitate seamless and instant bookings through Ride.Rent. Our sophisticated matching
+algorithms connect your vehicles with the most suitable customers, boosting the probability of
+bookings and optimizing your inventory use.`,
   },
   {
     key: 6,
     title: "Vast Coverage",
-    description:
-      "Expand your reach across the UAE with Ride.Rent's extensive network. From bustling Dubai to scenic Abu Dhabi, our platform ensures your vehicles are bookable across diverse locales, maximizing exposure and increasing booking opportunities.",
+    description: `Showcase your vehicles to a worldwide audience with Ride.Rent. Whether you're based in
+Dubai, Sharjah or Abu Dhabi your listings are accessible to both local and international
+travelers. Our platform connects you with global users looking to rent in UAE, helping you
+increase bookings, boost visibility, and grow your rental business without boundaries.`,
   },
   {
     key: 7,
     title: "Dedicated Profiles",
+    description: `Create a powerful presence with dedicated fleet profiles on Ride.Rent. Designed to highlight
+your unique offerings, each profile showcases detailed information, images, packages and
+features that build trust and attract both local and international renters. Stand out in UAE’s
+competitive rental market while increasing visibility, credibility, and bookings - all in one place.
+`,
+  },
+];
+
+export const featuresIndia = [
+  {
+    key: 1,
+    title: "Most Affordable Listing Cost",
     description:
-      "Showcase your fleet on Ride.Rent with dedicated profiles that highlight your unique offerings and attract more customers. Tailored to represent your brand effectively, these profiles provide detailed information and images, improving visibility and credibility in UAE'S competitive rental market.",
+      "Enjoy the most affordable listing rates in the Indian vehicle rental industry. With Ride.Rent’s competitive pricing, you spend less to promote your fleet - making it easier to reach a large audience across India. Maximize your visibility, grow your bookings, and boost your rental business profitability without overspending.",
+  },
+  {
+    key: 2,
+    title: "Ai Driven Fraud Detection For Secure Rentals",
+    description: `Protect your fleet with Ride.Rent’s AI-driven fraud protection system. The Simple Rental
+Manager feature analyzes user profiles to detect past violations, pending fines, and vehicle
+damage. Enjoy secure rentals with advanced fraud detection.`,
+  },
+  {
+    key: 3,
+    title: "Zero Commission",
+    description: `Eliminate unnecessary intermediaries and fees with Ride.Rent, empowering agents to retain
+more profits. Our direct booking approach ensures agents gain full control and revenue from
+each transaction, making vehicle renting more rewarding.`,
+  },
+  {
+    key: 4,
+    title: "Quicker Return on Investment",
+    description: `Accelerate your return on investment by leveraging Ride.Rent's efficient booking system and
+broad audience. Reduced downtime and higher utilization rates mean you can achieve better
+financial outcomes faster, with minimal effort.
+`,
+  },
+  {
+    key: 5,
+    title: "Instant Bookings & High-Quality Leads",
+    description: `Facilitate seamless and instant bookings through Ride.Rent. Our sophisticated matching
+algorithms connect your vehicles with the most suitable customers, boosting the probability of
+bookings and optimizing your inventory use.`,
+  },
+  {
+    key: 6,
+    title: "Vast Coverage",
+    description: `Showcase your vehicles to a worldwide audience with Ride.Rent. Whether you're based in
+Delhi, Goa, Mumbai, or Himachal, your listings are accessible to both local and international
+travelers. Our platform connects you with global users looking to rent in India, helping you
+increase bookings, boost visibility, and grow your rental business without boundaries.
+`,
+  },
+  {
+    key: 7,
+    title: "Dedicated Profiles",
+    description: `Create a powerful presence with dedicated fleet profiles on Ride.Rent. Designed to highlight
+your unique offerings, each profile showcases detailed information, images, packages and
+features that build trust and attract both Indian and international renters. Stand out in India’s
+competitive rental market while increasing visibility, credibility, and bookings -all in one place.
+`,
   },
 ];
 
