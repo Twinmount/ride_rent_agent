@@ -20,6 +20,18 @@ export interface AddCustomerFormResponse {
   statusCode: number;
 }
 
+export interface AddPublicCustomerFormResponse {
+  result: {
+    userId: string;
+    emailId: string;
+    token: string;
+    refreshToken: string;
+    isPhoneVerified: boolean;
+  };
+  status: string;
+  statusCode: number;
+}
+
 export interface GetIsCustomerSpamResponse {
   result: {
     isSpammed: boolean;

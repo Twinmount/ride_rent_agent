@@ -184,6 +184,12 @@ export const SRMCustomerDetailsFormSchema = z.object({
   phoneNumber: z.string().min(6, "Provide a valid mobile number"),
 });
 
+export const CustomerShareLinkFormSchema = z.object({
+  customerName: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+});
+
 // SRM : Vehicle Details Form Schema
 export const SRMVehicleDetailsFormSchema = z.object({
   vehicleCategoryId: z.string().min(1, "Category is required"),

@@ -32,7 +32,7 @@ export default function SRMFormAddPage() {
   const handleTabChange = (value: string) => {
     const tab = value as SRMTabsTypes;
     if (
-      tab === "vehicle-check-list" &&
+      tab === "check-list" &&
       (!checkListData.vehicleId || !checkListData.bodyType)
     ) {
       toast({
@@ -102,7 +102,7 @@ export default function SRMFormAddPage() {
             </TabsTrigger>
 
             <TabsTrigger
-              value="vehicle-check-list"
+              value="check-list"
               className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
             >
               Vehicle
@@ -136,7 +136,7 @@ export default function SRMFormAddPage() {
             </Suspense>
           </TabsContent>
 
-          <TabsContent value="vehicle-check-list" className="flex-center">
+          <TabsContent value="check-list" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
               <SRMCheckListForm type={"Add"} checkListData={checkListData} />
             </Suspense>

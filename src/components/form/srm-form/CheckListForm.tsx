@@ -12,34 +12,54 @@ import { toast } from "@/components/ui/use-toast";
 
 type Props = {
   type: "Add" | "Update";
-  checkListData: {
+  checkListData?: {
     vehicleId: string;
     bodyType: string;
   };
+  formData?: {
+    vehicleId: string;
+    checklistMetadata: string;
+  } | null;
+  vehicleIdParam?: string | null;
 };
 
-export default function CheckListForm({ type, checkListData }: Props) {
+export default function CheckListForm({
+  type,
+  checkListData,
+  formData,
+  vehicleIdParam,
+}: Props) {
   const [annotationData, setAnnotationData] = useState<AnnotationState | null>(
     null
   );
   const [loadCount] = useState(0);
 
-  // Destructure checkListData
-  const { vehicleId, bodyType } = checkListData;
+  const vehicleId = type === "Add" ? checkListData?.vehicleId : vehicleIdParam;
 
-  // Fetch primary form data
+  // for fetching the image
+  const bodyType = checkListData?.bodyType;
+
+  // Fetch check form data
   const { data, isLoading } = useQuery({
-    queryKey: ["srm-customer-details-form", vehicleId],
+    queryKey: ["srm-check-list", vehicleId],
     queryFn: () => getSRMCheckListFormData(vehicleId as string),
-    enabled: !!vehicleId,
+    // run only if type is Add
+    enabled: type === "Add" || !vehicleId,
   });
 
   useEffect(() => {
-    if (data) {
+    if (data && type === "Add") {
       const parsedData = JSON.parse(data.result.checklistMetadata);
       setAnnotationData(parsedData as AnnotationState);
     }
   }, [data, isLoading]);
+
+  useEffect(() => {
+    if (type === "Update" && formData) {
+      const parsedData = JSON.parse(formData.checklistMetadata);
+      setAnnotationData(parsedData as AnnotationState);
+    }
+  }, [formData]);
 
   const handleSubmit = async (data: AnnotationState) => {
     setAnnotationData(data);
@@ -48,12 +68,12 @@ export default function CheckListForm({ type, checkListData }: Props) {
 
     if (type === "Add") {
       responseData = await postSRMCheckList({
-        vehicleId,
+        vehicleId: vehicleId as string,
         checklistMetadata: JSON.stringify(data),
       });
     } else {
       responseData = await putSRMCheckList({
-        vehicleId,
+        vehicleId: vehicleId as string,
         checklistMetadata: JSON.stringify(data),
       });
     }

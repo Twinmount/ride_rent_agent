@@ -36,9 +36,11 @@ const CompletedTripsPage = lazy(
 const ManageVehiclePage = lazy(
   () => import("../pages/srm/trip-data/ManageVehiclePage")
 );
-const SRMVehicleAddPage = lazy(() => import("../pages/srm/SRMVehicleAddPage"));
+const SRMVehicleAddPage = lazy(
+  () => import("../pages/srm/srm-vehicles/SRMVehicleAddPage")
+);
 const SRMVehicleUpdatePage = lazy(
-  () => import("../pages/srm/SRMVehicleUpdatePage")
+  () => import("../pages/srm/srm-vehicles/SRMVehicleUpdatePage")
 );
 const CustomerListPage = lazy(
   () => import("../pages/srm/trip-data/ManageSRMCustomersPage")
@@ -49,7 +51,7 @@ const EndTripsPage = lazy(() => import("../pages/srm/EndTripsPage"));
  protected routes array
 */
 
-export const protectedRoutes = [
+export const protecteRoutes = [
   { path: "/", element: <Dashboard /> },
   { path: "/listings", element: <ListingsPage /> },
   { path: "/profile", element: <ProfilePage /> },

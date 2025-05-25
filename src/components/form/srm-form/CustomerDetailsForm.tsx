@@ -28,6 +28,7 @@ import { FormFieldLayout } from "../form-ui/FormFieldLayout";
 import { FormSubmitButton } from "../form-ui/FormSubmitButton";
 import { FormContainer } from "../form-ui/FormContainer";
 import { useNavigate } from "react-router-dom";
+import CustomerShareFormDialog from "@/components/dialog/CustomerShareFormDialog";
 
 type SRMCustomerDetailsFormProps = {
   type: "Add" | "Update";
@@ -186,7 +187,8 @@ export default function SRMCustomerDetailsForm({
     : "Update Customer";
 
   return (
-    <>
+    <div className="flex flex-col">
+      {type === "Add" && <CustomerShareFormDialog />}
       {/* Form container */}
       <Form {...form}>
         <FormContainer
@@ -359,6 +361,6 @@ export default function SRMCustomerDetailsForm({
           )}
         </FormContainer>
       </Form>
-    </>
+    </div>
   );
 }

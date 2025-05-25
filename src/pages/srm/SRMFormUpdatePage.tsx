@@ -17,7 +17,9 @@ const SRMVehicleDetailsForm = lazy(
 const SRMPaymentDetailsForm = lazy(
   () => import("@/components/form/srm-form/PaymentDetailsForm")
 );
-
+const SRMCheckListForm = lazy(
+  () => import("@/components/form/srm-form/CheckListForm")
+);
 export default function SRMFormUpdatePage() {
   const { bookingId } = useParams<{
     bookingId: string;
@@ -39,9 +41,12 @@ export default function SRMFormUpdatePage() {
     paymentFormData,
     isPaymentLoading,
     isLevelsFetching,
+    checkListFormData,
+    isCheckListFormDataLoading,
     refetchLevels,
     isAddOrIncompleteSRMVehicleForm,
     isAddOrIncompleteSRMPaymentForm,
+    vehicleIdParam,
   } = useSRMUpdateForm(bookingId);
 
   return (
@@ -52,7 +57,7 @@ export default function SRMFormUpdatePage() {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <TabsList className="gap-x-2 w-full bg-white flex-center max-sm:gap-x-4">
+          <TabsList className="gap-x-2 w-full bg-transparent  flex-center max-sm:gap-x-4">
             <TabsTrigger
               value="customer"
               className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
@@ -78,7 +83,7 @@ export default function SRMFormUpdatePage() {
             </TabsTrigger>
 
             <TabsTrigger
-              value="payment"
+              value="check-list"
               className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
             >
               Vehicle
@@ -124,6 +129,20 @@ export default function SRMFormUpdatePage() {
                   formData={paymentFormData}
                   refetchLevels={refetchLevels}
                   isAddOrIncomplete={isAddOrIncompleteSRMPaymentForm}
+                />
+              )}
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="check-list" className="flex-center">
+            <Suspense fallback={<LazyLoader />}>
+              {isCheckListFormDataLoading ? (
+                <FormSkelton />
+              ) : (
+                <SRMCheckListForm
+                  type={"Update"}
+                  formData={checkListFormData}
+                  vehicleIdParam={vehicleIdParam}
                 />
               )}
             </Suspense>

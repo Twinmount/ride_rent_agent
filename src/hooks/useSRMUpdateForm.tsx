@@ -5,6 +5,7 @@ import {
   getSRMCustomerFormDetails,
   getSRMVehicleFormDetails,
   getSRMPaymentFormDetails,
+  getSRMCheckListFormData,
 } from "@/api/srm";
 import { SRMTabsTypes } from "@/types/types";
 import { useSearchParams } from "react-router-dom";
@@ -45,6 +46,14 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
     staleTime: 60000,
     enabled: !!bookingId && activeTab === "payment",
   });
+
+  const { data: checkListResult, isLoading: isCheckListFormDataLoading } =
+    useQuery({
+      queryKey: ["srm-check-list", vehicleId],
+      queryFn: () => getSRMCheckListFormData(vehicleId as string),
+      staleTime: 60000,
+      enabled: !!vehicleId,
+    });
 
   // Fetch levelsFilled
   const {
@@ -90,6 +99,8 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
   const vehicleRentalDetails =
     paymentFormResult?.result?.vehicle?.rentalDetails;
 
+  const checkListFormData = checkListResult?.result;
+
   // saving to session storage
   useEffect(() => {
     if (!vehicleRentalDetails) return;
@@ -108,10 +119,14 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
     isVehicleLoading,
     paymentFormData,
     isPaymentLoading: isPaymentLoading,
+    checkListResult,
+    checkListFormData,
+    isCheckListFormDataLoading,
     levelsFilled,
     isLevelsFetching,
     refetchLevels,
     isAddOrIncompleteSRMVehicleForm,
     isAddOrIncompleteSRMPaymentForm,
+    vehicleIdParam: vehicleId || null,
   };
 };

@@ -71,6 +71,7 @@ export enum Slug {
 
   // SRM
   GET_SRM_LEVELS_FILLED = "/srm-bookings/levels-filled",
+  POST_SRM_CUSTOMER_PUBLIC_FORM = "/auth/temp-auth-token",
 
   // SRM CUSTOMERS
   POST_SRM_CUSTOMER_FORM = "/srm-customers",

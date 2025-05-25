@@ -1,5 +1,6 @@
 import { Slug } from "@/api/Api-Endpoints";
 import { API } from "@/api/ApiService";
+import { ShareFormData } from "@/components/dialog/CustomerShareFormDialog";
 import {
   AddPaymentFormResponse,
   AddCustomerFormResponse,
@@ -15,6 +16,7 @@ import {
   GetSRMVehicleDetailsResponse,
   GetSRMPaymentDetailsResponse,
   GetSRMChecklistResponse,
+  AddPublicCustomerFormResponse,
 } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
@@ -629,6 +631,52 @@ export const getSRMLevelsFilled = async (
     return data;
   } catch (error) {
     console.error("Error fetching srm levels filled data:", error);
+    throw error;
+  }
+};
+
+export const sendCustomerFormLink = async (
+  values: ShareFormData,
+  countryCode: string
+): Promise<AddPublicCustomerFormResponse> => {
+  try {
+    // creating the customer first, and storing the customer id
+    const customerData = await API.post<AddCustomerFormResponse>({
+      slug: Slug.POST_SRM_CUSTOMER_FORM,
+      body: {
+        customerName: values.customerName,
+      },
+    });
+
+    // extracting customerId
+    const customerId = customerData?.result.customerId;
+
+    // Extracting phone number and removing country code
+    const phoneNumber = values.phoneNumber
+      .replace(`+${countryCode}`, "")
+      .trim();
+
+    // Prepare the request body for the API
+    const requestBody = {
+      countryCode,
+      customerId,
+      email: values.email,
+      phoneNumber,
+    };
+
+    // Sending the request as a JSON object
+    const data = await API.post<AddPublicCustomerFormResponse>({
+      slug: Slug.POST_SRM_CUSTOMER_PUBLIC_FORM,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to post public customer link generation");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on generating public link", error);
     throw error;
   }
 };
