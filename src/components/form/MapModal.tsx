@@ -27,7 +27,7 @@ const MapModal: React.FC<MapModalProps> = ({
   // Google Maps only loads when this component is mounted
   const { isLoaded } = useJsApiLoader({
     id: "google-map-script",
-    googleMapsApiKey: "AIzaSyDv5zqgtn-X-lNQJoaOWwgBa_f0kpCLyDg", // Replace with your actual API key
+    googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries: ["places"],
   });
 
