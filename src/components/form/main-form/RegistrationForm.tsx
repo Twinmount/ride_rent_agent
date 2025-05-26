@@ -41,7 +41,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
     phoneNumber: storedCountryCode + storedPhoneNumber,
     password: storedPassword,
     country:
-      country === "uae"
+      country === "ae"
         ? "ee8a7c95-303d-4f55-bd6c-85063ff1cf48"
         : "68ea1314-08ed-4bba-a2b1-af549946523d",
   };
@@ -215,7 +215,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
           <div>
             Already registered?{" "}
             <Link
-              to={`${country === "india" ? "/in" : "/uae"}/login`}
+              to={`${country === "india" ? "/in" : "/ae"}/login`}
               className="font-semibold text-yellow"
             >
               Login

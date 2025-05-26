@@ -21,7 +21,7 @@ import { useEffect } from "react";
 import { useAgentContext } from "@/context/AgentContext";
 
 export default function RegistrationPage({
-  country = "uae",
+  country = "ae",
 }: {
   country?: string;
 }) {
@@ -31,11 +31,11 @@ export default function RegistrationPage({
   // Check if the current pathname is "/register"
   const isRegisterPage =
     location.pathname === "/register" ||
-    location.pathname === "/uae/register" ||
+    location.pathname === "/ae/register" ||
     location.pathname === "/in/register";
 
   useEffect(() => {
-    updateAppCountry(country === "india" ? "in" : "uae");
+    updateAppCountry(country === "india" ? "in" : "ae");
   }, []);
 
   return (
@@ -98,7 +98,7 @@ export default function RegistrationPage({
                       >
                         <a
                           href={`https://ride.rent/${
-                            country === "india" ? "in" : "uae"
+                            country === "india" ? "in" : "ae"
                           }`}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -126,7 +126,7 @@ export default function RegistrationPage({
                 Already an Agent?
               </h4>
               <Link
-                to={`${country === "india" ? "/in" : "/uae"}/login`}
+                to={`${country === "india" ? "/in" : "/ae"}/login`}
                 className="font-semibold text-yellow"
               >
                 <button className="px-4 py-2 border border-white text-white bg-transparent hover:bg-white hover:text-black hover:border-black transition duration-200 rounded">
@@ -146,7 +146,7 @@ export default function RegistrationPage({
         {/* Why Join Us */}
         <WhyJoin
           country={country}
-          data={country === "uae" ? features : featuresIndia}
+          data={country === "ae" ? features : featuresIndia}
         />
 
         {/* FAQ */}

@@ -15,7 +15,7 @@ const PreviewImageComponent: React.FC<PreviewImageComponentProps> = ({
   useEffect(() => {
     const fetchImage = async () => {
       try {
-        const appCountry = localStorage.getItem("appCountry") || "uae";
+        const appCountry = localStorage.getItem("appCountry") || "ae";
         const apiBaseUrl =
           appCountry === "in"
             ? import.meta.env.VITE_API_URL_INDIA

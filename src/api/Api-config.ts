@@ -6,7 +6,7 @@ interface Config {
   readonly API_URL: string;
 }
 
-const appCountry = localStorage.getItem("appCountry") || "uae";
+const appCountry = localStorage.getItem("appCountry") || "ae";
 
 // A utility function to get environment variables with a fallback to a default value.
 const getConfigValue = <T>(key: string, defaultValue: T): T => {

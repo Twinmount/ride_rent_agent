@@ -30,7 +30,7 @@ const appSuportedCountries = [
   {
     id: "ee8a7c95-303d-4f55-bd6c-85063ff1cf48",
     name: "UAE",
-    value: "uae",
+    value: "ae",
     icon: "/assets/icons/country-flags/uae-flag.png",
   },
   {

@@ -35,7 +35,7 @@ export const publicRoutes = [
     element: <RegistrationPage />,
   },
   {
-    path: "/uae/register",
+    path: "/ae/register",
     element: <RegistrationPage />,
   },
   {
@@ -64,7 +64,7 @@ export const publicRoutes = [
     element: <LoginPage />,
   },
   {
-    path: "/uae/login",
+    path: "/ae/login",
     element: <LoginPage />,
   },
   {

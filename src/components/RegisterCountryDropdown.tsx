@@ -6,11 +6,11 @@ import { useState } from "react";
 const countries = {
   UAE: {
     name: "UAE",
-    value: "uae",
+    value: "ae",
     imagePath:
       "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f1e6-1f1ea.svg",
-    registerUrl: "/uae/register",
-    loginUrl: "/uae/login",
+    registerUrl: "/ae/register",
+    loginUrl: "/ae/login",
   },
   India: {
     name: "India",
@@ -30,7 +30,7 @@ const RegisterCountryDropdown = ({
   type?: string;
 }) => {
   const [selectedCountry, setSelectedCountry] = useState<CountryKey>(
-    country === "uae" ? "UAE" : "India"
+    country === "ae" ? "UAE" : "India"
   );
   const [open, setOpen] = useState(false);
   const { updateAppCountry } = useAgentContext();

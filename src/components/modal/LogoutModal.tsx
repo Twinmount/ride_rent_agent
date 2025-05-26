@@ -22,7 +22,7 @@ export default function LogoutModal() {
     remove(StorageKeys.ACCESS_TOKEN);
     remove(StorageKeys.REFRESH_TOKEN);
     remove(StorageKeys.USER_ID);
-    navigate(appCountry === "in" ? "/in/login" : "/uae/login");
+    navigate(appCountry === "in" ? "/in/login" : "/ae/login");
   };
 
   const handleClose = () => {

@@ -31,7 +31,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { useAgentContext } from "@/context/AgentContext";
 import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
 
-const LoginPage = ({ country = "uae" }: { country?: string }) => {
+const LoginPage = ({ country = "ae" }: { country?: string }) => {
   const [isView, setIsView] = useState(false);
   // State to store the country code separately
   const [countryCode, setCountryCode] = useState("");
@@ -42,7 +42,7 @@ const LoginPage = ({ country = "uae" }: { country?: string }) => {
   const initialValues = LoginPageDefaultValues;
 
   useEffect(() => {
-    updateAppCountry(country === "india" ? "in" : "uae");
+    updateAppCountry(country === "india" ? "in" : "ae");
   }, []);
 
   // for phone validation
@@ -248,7 +248,7 @@ const LoginPage = ({ country = "uae" }: { country?: string }) => {
               <div>
                 New to Ride.Rent?{" "}
                 <Link
-                  to={`${country === "india" ? "/in" : "/uae"}/register`}
+                  to={`${country === "india" ? "/in" : "/ae"}/register`}
                   className="font-semibold text-yellow"
                 >
                   Register

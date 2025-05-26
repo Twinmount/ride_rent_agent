@@ -13,7 +13,7 @@ import { HelmetProvider } from "react-helmet-async";
 import RouteErrorBoundary from "./layout/RouteErrorBoundary";
 import { router } from "./routes/routerConfig";
 
-const appCountry = localStorage.getItem("appCountry") || "uae";
+const appCountry = localStorage.getItem("appCountry") || "ae";
 
 axios.defaults.baseURL =
   appCountry === "in"

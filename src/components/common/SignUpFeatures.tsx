@@ -25,7 +25,7 @@ const SignUpFeatures = ({ country }: { country: string }) => {
         </li>
         <li className="flex gap-x-1 items-center my-1">
           <Check className="mb-auto text-yellow" /> Manage Billing with
-          {country === "uae" ? " VAT" : " GST"}-Compliant Cloud Software
+          {country === "ae" ? " VAT" : " GST"}-Compliant Cloud Software
         </li>
       </ul>
     </div>
