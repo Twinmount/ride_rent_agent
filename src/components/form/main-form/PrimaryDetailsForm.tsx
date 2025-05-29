@@ -102,7 +102,13 @@ export default function PrimaryDetailsForm({
   }>();
 
   const initialValues = formData
-    ? formData
+    ? {
+      ...formData,
+      cityIds: [
+        ...formData.cityIds,
+        ...(formData.tempCitys ?? []).map((city: CityType) => city.cityId),
+      ],
+    }
     : getPrimaryFormDefaultValues(isIndia);
 
   // Define your form.
