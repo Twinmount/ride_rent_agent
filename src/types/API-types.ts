@@ -324,6 +324,17 @@ export interface AddPrimaryFormResponse {
   statusCode: number;
 }
 
+type rentalDetailType = {
+  enabled: boolean;
+  rentInAED: string;
+  mileageLimit: string;
+  unlimitedMileage: boolean;
+};
+
+type hourlyRentalDetailType = rentalDetailType & {
+  minBookingHours: string;
+};
+
 // Primary form data
 export type GetPrimaryForm = {
   vehicleId: string;
@@ -336,27 +347,10 @@ export type GetPrimaryForm = {
   phoneNumber: string;
   specification: "India_SPEC" | "UAE_SPEC" | "USA_SPEC" | "OTHERS";
   rentalDetails: {
-    day: {
-      enabled: boolean;
-      rentInAED: string;
-      mileageLimit: string;
-    };
-    week: {
-      enabled: boolean;
-      rentInAED: string;
-      mileageLimit: string;
-    };
-    month: {
-      enabled: boolean;
-      rentInAED: string;
-      mileageLimit: string;
-    };
-    hour: {
-      enabled: boolean;
-      rentInAED: string;
-      mileageLimit: string;
-      minBookingHours: string;
-    };
+    day: rentalDetailType;
+    week: rentalDetailType;
+    month: rentalDetailType;
+    hour: hourlyRentalDetailType;
   };
   stateId: string;
   cityIds: string[];

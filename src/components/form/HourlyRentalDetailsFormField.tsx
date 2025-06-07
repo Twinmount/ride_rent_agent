@@ -10,6 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Infinity } from "lucide-react";
 
 const HourlyRentalDetailFormField = ({
   isDisabled = false,
@@ -165,6 +166,7 @@ const HourlyRentalDetailFormField = ({
                     className="input-field"
                     type="text"
                     inputMode="numeric"
+                    disabled={watch(`rentalDetails.hour.unlimitedMileage`)}
                     onKeyDown={(e) => {
                       if (
                         !/^\d*$/.test(e.key) &&
@@ -189,6 +191,34 @@ const HourlyRentalDetailFormField = ({
                     KM&#41;.
                   </FormDescription>
                 </div>
+              </div>
+            )}
+          />
+
+          {/* is unlimited */}
+          <Controller
+            name={`rentalDetails.hour.unlimitedMileage`}
+            control={control}
+            render={({ field }) => (
+              <div className="ml-24 mt-4 flex w-fit max-w-full flex-col space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={(value) => field.onChange(value)}
+                    className="h-5 w-5 bg-white data-[state=checked]:border-none data-[state=checked]:bg-yellow"
+                    id="rentalDetails-hour-unlimitedMileage"
+                    disabled={isDisabled}
+                  />
+                  <label
+                    htmlFor="rentalDetails-hour-unlimitedMileage"
+                    className="flex-center gap-x-2 text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Unlimited Mileage <Infinity className="text-yellow" />
+                  </label>
+                </div>
+                <FormDescription>
+                  Check this box if the vehicle has no mileage limit.
+                </FormDescription>
               </div>
             )}
           />
