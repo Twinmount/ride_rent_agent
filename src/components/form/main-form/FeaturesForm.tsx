@@ -11,18 +11,14 @@ import {
 import { Button } from "@/components/ui/button";
 import MultiSelectDropdown from "../dropdowns/MultiSelectDropdown";
 import { useVehicleIdentifiers } from "@/hooks/useVehicleIdentifiers";
-import {
-  addFeatures,
-  updateFeatures,
-} from "@/api/vehicle";
+import { addFeatures, updateFeatures } from "@/api/vehicle";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import Spinner from "@/components/general/Spinner";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
-import { formatFeatures } from "@/helpers/form";
+import { formatFeatures, reorderFeatureValues } from "@/helpers/form";
 import { useEffect } from "react";
 import { useFeaturesFormQuery } from "@/hooks/useFormQuery";
-
 type FeaturesFormType = Record<string, string[] | null>;
 
 type FeaturesFormProps = {
@@ -141,7 +137,7 @@ export default function FeaturesForm({
     }
   }
 
-  const fields = data?.result || [];
+  const fields = reorderFeatureValues(data?.result || []);
 
   return isLoading ? (
     <FormSkelton />

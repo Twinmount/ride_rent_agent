@@ -548,3 +548,45 @@ export const validateRentalDetailsAndSecurityDeposit = (
 
   return null;
 };
+
+// Priority mapping for Level 3 Form (Feature Form).
+// Here "key" is feature form field name  and the value array is the priority fields that should be first in the dropdown
+// NOTE : Key and Values should exactly match data from API
+const FeatureFormFieldsPriorityValues: Record<string, string[]> = {
+  "Comfort and Convenience": ["Spacious Interior", "Air Conditioning"],
+  "Luxury and Style": ["Alloy Wheels", "Ashtrays", "Cigarette Lighter"],
+};
+
+/**
+ * Helper function to reorder feature values based on priority map.
+ * Helps to ensure that certain values are displayed at the top of the form field array dropdown (whether its "selected" or not, it will appear on the top of their corresponding dropdown)
+ *
+ * @param features
+ * @returns
+ */
+export const reorderFeatureValues = (
+  features: FeaturesFormData[]
+): FeaturesFormData[] => {
+  return features.map((feature) => {
+    const priorities = FeatureFormFieldsPriorityValues[feature.name] ?? [];
+
+    const sortFn = (
+      a: (typeof feature.values)[0],
+      b: (typeof feature.values)[0]
+    ) => {
+      const aPriority = priorities.includes(a.name) ? 1 : 0;
+      const bPriority = priorities.includes(b.name) ? 1 : 0;
+
+      const aSelected = a.selected ? 1 : 0;
+      const bSelected = b.selected ? 1 : 0;
+
+      // Sort by selected first (desc), then priority (desc)
+      return bSelected - aSelected || bPriority - aPriority;
+    };
+
+    return {
+      ...feature,
+      values: [...feature.values].sort(sortFn),
+    };
+  });
+};
