@@ -70,13 +70,10 @@ type RentalDetailType = {
   enabled: boolean;
   rentInAED: string;
   mileageLimit: string;
+  unlimitedMileage: boolean;
 };
 
-// Hourly rental detail type, which includes minBookingHours
-type HourlyRentalDetailType = {
-  enabled: boolean;
-  rentInAED: string;
-  mileageLimit: string;
+type HourlyRentalDetailType = RentalDetailType & {
   minBookingHours: string;
 };
 
