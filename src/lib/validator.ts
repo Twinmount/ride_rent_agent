@@ -41,13 +41,13 @@ export const CompanyFormSchema = (isIndia: boolean) =>
       .array(z.string())
       .min(1, "At least one language must be selected"),
     accountType: z.enum(["company", "individual"]),
-    location: z
-      .object({
-        lat: z.number(),
-        lng: z.number(),
-        address: z.string(),
-      })
-      .optional(),
+    location: z.object({
+      lat: z.number(),
+      lng: z.number(),
+      address: z.string().optional(),
+    }).refine((val) => val.lat && val.lng, {
+      message: "Location is required",
+    }),
   });
 
 // individual Form Schema
@@ -71,13 +71,13 @@ export const IndividualFormSchema = z.object({
     .array(z.string())
     .min(1, "At least one language must be selected"),
   accountType: z.enum(["company", "individual"]),
-  location: z
-    .object({
-      lat: z.number(),
-      lng: z.number(),
-      address: z.string(),
-    })
-    .optional(),
+  location: z.object({
+    lat: z.number(),
+    lng: z.number(),
+    address: z.string().optional(),
+  }).refine((val) => val.lat && val.lng, {
+    message: "Location is required",
+  }),
 });
 
 // Company Form Schema
@@ -92,13 +92,13 @@ export const ProfileUpdateFormSchema = z.object({
   companyLanguages: z
     .array(z.string())
     .min(1, "At least one language must be selected"),
-  location: z
-    .object({
-      lat: z.number(),
-      lng: z.number(),
-      address: z.string(),
-    })
-    .optional(),
+  location: z.object({
+    lat: z.number(),
+    lng: z.number(),
+    address: z.string().optional(),
+  }).refine((val) => val.lat && val.lng, {
+    message: "Location is required",
+  }),
 });
 
 // otp page form schema
