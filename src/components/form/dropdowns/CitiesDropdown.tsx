@@ -106,26 +106,24 @@ const CitiesDropdown = ({
 
   useEffect(() => {
     if (value) {
-      const tempCitiesToAdd: CityType[] = value
-        .filter(
-          (id) =>
-            id?.startsWith("temp-") &&
-            !cities.some((city) => city?.cityId === id)
-        )
-        .map((id) => {
-          const name = id.replace("temp-", "").replace(/-/g, " ");
-          return {
-            cityId: id,
-            cityName: name.charAt(0).toUpperCase() + name.slice(1),
-            cityValue: name,
-            stateId,
-          };
-        });
-
-      if (tempCitiesToAdd.length > 0) {
-        setCities((prev) => [...prev, ...tempCitiesToAdd]);
-      }
-
+      // const tempCitiesToAdd: CityType[] = value
+      //   .filter(
+      //     (id) =>
+      //       id?.startsWith("temp-") &&
+      //       !cities.some((city) => city?.cityId === id)
+      //   )
+      //   .map((id) => {
+      //     const name = id.replace("temp-", "").replace(/-/g, " ");
+      //     return {
+      //       cityId: id,
+      //       cityName: name.charAt(0).toUpperCase() + name.slice(1),
+      //       cityValue: name,
+      //       stateId,
+      //     };
+      //   });
+      // if (tempCitiesToAdd.length > 0) {
+      //   setCities((prev) => [...prev, ...tempCitiesToAdd]);
+      // }
       // setSelectedCities((prev) => [
       //   ...prev,
       //   ...value.filter((id) => !prev.includes(id)),
