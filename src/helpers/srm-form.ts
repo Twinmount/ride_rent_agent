@@ -52,6 +52,19 @@ export const mapToSRMVehicleForm = (
       vehicleBrandId: "",
       vehicleRegistrationNumber: "",
       vehiclePhoto: "",
+      numberOfPassengers: "",
+      vehicleColor: "",
+      bodyType: "",
+      chassisNumber: "",
+      additionalMilageChargePerKm: "",
+      registrationDate: undefined,
+      registrationDueDate: undefined,
+      trafficFineId: "",
+      lastServiceDate: undefined,
+      currentKilometre: "",
+      serviceKilometre: "",
+      nextServiceKilometre: "",
+      nextServiceDate: undefined,
       rentalDetails: {
         day: { enabled: false, rentInAED: "", mileageLimit: "" },
         week: { enabled: false, rentInAED: "", mileageLimit: "" },
@@ -67,11 +80,43 @@ export const mapToSRMVehicleForm = (
   }
 
   return {
-    vehicleCategoryId: vehicle.vehicleCategory.categoryId,
-    vehicleBrandId: vehicle.vehicleBrand.id,
-    vehicleRegistrationNumber: vehicle.vehicleRegistrationNumber,
-    vehiclePhoto: vehicle.vehiclePhotoPath,
-    rentalDetails: vehicle.rentalDetails,
+    vehicleCategoryId: vehicle.vehicleCategory?.categoryId ?? "",
+    vehicleBrandId: vehicle.vehicleBrand?.id ?? "",
+    vehicleRegistrationNumber: vehicle.vehicleRegistrationNumber ?? "",
+    vehiclePhoto: vehicle.vehiclePhotoPath ?? "",
+    // convert to string
+    numberOfPassengers: vehicle.numberOfPassengers?.toString() ?? "",
+    vehicleColor: vehicle.vehicleColor ?? "",
+    bodyType: vehicle.bodyType ?? "",
+    chassisNumber: vehicle.chassisNumber ?? "",
+    additionalMilageChargePerKm: vehicle.additionalMilageChargePerKm ?? "",
+    registrationDate: vehicle.registrationDate
+      ? new Date(vehicle.registrationDate)
+      : undefined,
+    registrationDueDate: vehicle.registrationDueDate
+      ? new Date(vehicle.registrationDueDate)
+      : undefined,
+    trafficFineId: vehicle.trafficFineId ?? "",
+    lastServiceDate: vehicle.lastServiceDate
+      ? new Date(vehicle.lastServiceDate)
+      : undefined,
+    currentKilometre: vehicle.currentKilometre ?? "",
+    serviceKilometre: vehicle.serviceKilometre ?? "",
+    nextServiceKilometre: vehicle.nextServiceKilometre ?? "",
+    nextServiceDate: vehicle.nextServiceDate
+      ? new Date(vehicle.nextServiceDate)
+      : undefined,
+    rentalDetails: vehicle.rentalDetails ?? {
+      day: { enabled: false, rentInAED: "", mileageLimit: "" },
+      week: { enabled: false, rentInAED: "", mileageLimit: "" },
+      month: { enabled: false, rentInAED: "", mileageLimit: "" },
+      hour: {
+        enabled: false,
+        minBookingHours: "",
+        rentInAED: "",
+        mileageLimit: "",
+      },
+    },
   };
 };
 

@@ -27,7 +27,7 @@ const SingleSelect = ({
   disabled = false,
 }: SingleSelectProps) => {
   return (
-    <Select onValueChange={onChange} defaultValue={value} disabled={disabled}>
+    <Select onValueChange={onChange} value={value} disabled={disabled}>
       <SelectTrigger className="ring-0 select-field focus:ring-0 input-fields">
         <SelectValue
           placeholder={placeholder}

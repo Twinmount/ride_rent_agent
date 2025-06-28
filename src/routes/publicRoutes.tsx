@@ -25,7 +25,7 @@ const ConfirmNewPassword = lazy(
   () => import("../pages/general/ConfirmNewPassword")
 );
 const PublicCustomerDetailsPage = lazy(
-  () => import("../pages/srm/PublicCustomerDetailsPage")
+  () => import("../pages/srm/srm-customers/PublicCustomerDetailsPage")
 );
 
 export const publicRoutes = [

@@ -1,5 +1,5 @@
 import DashboardSkelton from "@/components/loading-skelton/DashboardSkelton";
-import { ArrowUpRight, Box } from "lucide-react";
+import { ArrowUpRight, Box, Plus } from "lucide-react";
 import React from "react";
 import { Link } from "react-router-dom";
 
@@ -86,9 +86,9 @@ const SRMDashboard: React.FC = () => {
             <div className="flex justify-center">
               <Link
                 to="/srm/trips/new"
-                className="px-6 py-3 font-semibold text-white rounded-full transition-all bg-yellow hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300 focus:ring-opacity-50 focus:outline-none flex-center"
+                className="px-6 py-3 font-semibold text-white rounded-2xl transition-all bg-yellow hover:bg-yellow-600 focus:ring-4 focus:ring-yellow-300 focus:ring-opacity-50 focus:outline-none flex-center"
               >
-                Add a New Trip
+                Add a New Trip <Plus />
               </Link>
             </div>
           </>

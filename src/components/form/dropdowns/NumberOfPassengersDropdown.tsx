@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import SingleSelect from "../SingleSelect";
 
 type NumberOfPassengersDropdownProps = {
@@ -15,6 +16,13 @@ const NumberOfPassengersDropdown = ({
     label: `${i + 1}`,
     value: `${i + 1}`,
   }));
+
+  // select the first one by default
+  useEffect(() => {
+    if (!value) {
+      onChangeHandler(options[0].value);
+    }
+  }, [value]);
 
   return (
     <SingleSelect

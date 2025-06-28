@@ -8,7 +8,7 @@ import { SRMVehicleDetailsFormSchema } from "@/lib/validator";
 import { SRMVehicleDetailsFormType, VehicleType } from "@/types/srm-types";
 import CategoryDropdown from "../dropdowns/CategoryDropdown";
 import { toast } from "@/components/ui/use-toast";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   addVehicleDetailsForm,
   updateBookingDataForVehicle,
@@ -32,6 +32,7 @@ import BodyTypeDropdown from "../dropdowns/BodyTypeDropdown";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useQueryClient } from "@tanstack/react-query";
+import { Pen } from "lucide-react";
 
 type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";
@@ -40,7 +41,7 @@ type SRMVehicleDetailsFormProps = {
   refetchLevels?: () => void;
   isAddOrIncomplete?: boolean;
   showDescription?: boolean;
-  isDedicatedAddPage?: boolean;
+  isDedicatedVehiclePage?: boolean;
   setCheckListData?: (value: { vehicleId: string; bodyType: string }) => void;
 };
 
@@ -51,7 +52,7 @@ export default function SRMVehicleDetailsForm({
   refetchLevels,
   isAddOrIncomplete,
   showDescription = true,
-  isDedicatedAddPage = false,
+  isDedicatedVehiclePage = false,
   setCheckListData,
 }: SRMVehicleDetailsFormProps) {
   const { vehicleId } = useParams<{ vehicleId: string }>();
@@ -84,14 +85,14 @@ export default function SRMVehicleDetailsForm({
     let data;
 
     // if we are in the dedicated SRMVehicleAddPage or SRMVehicleUpdatePage
-    if (isDedicatedAddPage) {
-      if (type === "Add") {
+    if (isDedicatedVehiclePage) {
+      if (type === "Add" || isAddOrIncomplete) {
         data = await addVehicleDetailsForm(values);
       } else if (type === "Update") {
         data = await updateVehicleDetailsForm(vehicleId as string, values);
       }
     } else {
-      // else we are in the SRMFormAddPage or SRMFormUpdatePage, which means we need to update the booking data for the vehicle. No Vehicle Specific Add or Update occurs here, only the srm booking related logic is updated here.
+      // else we are in the SRMFormAddPage or SRMFormUpdatePage. which means we need to update the booking data for the vehicle. No Vehicle Specific Add or Update occurs here, only the srm booking related logic is updated here.
       const bookingId = sessionStorage.getItem("bookingId"); // Retrieve bookingId
 
       if (!bookingId) {
@@ -145,10 +146,7 @@ export default function SRMVehicleDetailsForm({
 
     // form submission
     try {
-      let data;
-      if (isAddOrIncomplete) {
-        data = await handleVehicleSubmit(values);
-      }
+      let data = await handleVehicleSubmit(values);
 
       if (data) {
         await deleteMultipleFiles(deletedFiles);
@@ -162,7 +160,7 @@ export default function SRMVehicleDetailsForm({
           className: "bg-yellow text-white",
         });
 
-        if (isDedicatedAddPage) {
+        if (isDedicatedVehiclePage) {
           queryClient.invalidateQueries({
             queryKey: ["srm-vehicles"],
           });
@@ -203,6 +201,8 @@ export default function SRMVehicleDetailsForm({
       setCurrentVehiclePhoto
     );
 
+    console.log("vehicleData : ", vehicleData);
+
     setCheckListData?.({
       vehicleId: vehicleData?.id as string,
       bodyType: vehicleData?.bodyType as string,
@@ -210,7 +210,7 @@ export default function SRMVehicleDetailsForm({
   };
 
   // form fields are disabled if the type is "Update"
-  const isFieldsDisabled = type === "Update";
+  const isFieldsDisabled = !isDedicatedVehiclePage || !!existingVehicleId;
 
   return (
     <Form {...form}>
@@ -235,7 +235,7 @@ export default function SRMVehicleDetailsForm({
               label="Registration Number"
               description="Add or Search Vehicle Registration Number."
             >
-              {isDedicatedAddPage ? (
+              {isDedicatedVehiclePage ? (
                 <Input
                   placeholder="eg: '12341234'"
                   {...field}
@@ -246,7 +246,6 @@ export default function SRMVehicleDetailsForm({
                   value={field.value}
                   onChangeHandler={handleVehicleSelect}
                   placeholder="Enter / Search Registration Number"
-                  isDisabled={isFieldsDisabled}
                 />
               )}
             </FormFieldLayout>
@@ -267,7 +266,7 @@ export default function SRMVehicleDetailsForm({
                   field.onChange(value);
                   form.setValue("vehicleBrandId", "");
                 }}
-                value={initialValues.vehicleCategoryId || field.value}
+                value={field.value}
                 isDisabled={!!existingVehicleId || isFieldsDisabled}
               />
             </FormFieldLayout>
@@ -314,7 +313,7 @@ export default function SRMVehicleDetailsForm({
               downloadFileName={"vehicle-photo"}
               setDeletedImages={setDeletedFiles}
               additionalClasses="w-[18rem]"
-              isDisabled={!!existingVehicleId || isFieldsDisabled}
+              isDisabled={isFieldsDisabled}
             />
           )}
         />
@@ -389,6 +388,7 @@ export default function SRMVehicleDetailsForm({
                   field.onChange(e);
                   form.clearErrors("chassisNumber");
                 }}
+                disabled={isFieldsDisabled}
               />
             </FormFieldLayout>
           )}
@@ -427,6 +427,7 @@ export default function SRMVehicleDetailsForm({
                   field.onChange(e);
                   form.clearErrors("additionalMilageChargePerKm");
                 }}
+                disabled={isFieldsDisabled}
               />
             </FormFieldLayout>
           )}
@@ -496,6 +497,7 @@ export default function SRMVehicleDetailsForm({
                   field.onChange(e);
                   form.clearErrors("trafficFineId");
                 }}
+                disabled={isFieldsDisabled}
               />
             </FormFieldLayout>
           )}
@@ -557,6 +559,7 @@ export default function SRMVehicleDetailsForm({
                   field.onChange(e);
                   form.clearErrors("currentKilometre");
                 }}
+                disabled={isFieldsDisabled}
               />
             </FormFieldLayout>
           )}
@@ -594,6 +597,7 @@ export default function SRMVehicleDetailsForm({
                   field.onChange(e);
                   form.clearErrors("currentKilometre");
                 }}
+                disabled={isFieldsDisabled}
               />
             </FormFieldLayout>
           )}
@@ -632,6 +636,7 @@ export default function SRMVehicleDetailsForm({
                   field.onChange(e);
                   form.clearErrors("nextServiceKilometre");
                 }}
+                disabled={isFieldsDisabled}
               />
             </FormFieldLayout>
           )}
@@ -649,9 +654,7 @@ export default function SRMVehicleDetailsForm({
               <DatePicker
                 selected={field.value}
                 onChange={(date: Date | null) => field.onChange(date)}
-                showTimeSelect
-                timeInputLabel="Time:"
-                dateFormat="dd/MM/yyyy h:mm aa"
+                dateFormat="dd/MM/yyyy"
                 wrapperClassName="datePicker text-base w-full"
                 placeholderText="DD/MM/YYYY"
                 id="nextServiceDate"
@@ -679,20 +682,32 @@ export default function SRMVehicleDetailsForm({
           )}
         />
 
-        {/* submit  */}
-        {type === "Add" && (
-          <FormSubmitButton
-            text={
-              isDedicatedAddPage
-                ? "Add Vehicle"
-                : type === "Add"
-                ? "Continue to Payment Details"
-                : "Update Vehicle Details"
+        {!!existingVehicleId && (
+          <Link
+            to={`/srm/manage-vehicles/edit`}
+            className={
+              "flex-center -mb-4 button  hover:bg-darkYellow active:scale-[0.97] duration-100 active:shadow-md transition-all  ease-out col-span-2 mx-auto w-full text-white bg-slate-900 hover:bg-slate-800 !text-lg gap-x-2 !font-semibold md:w-10/12 lg:w-8/12"
             }
-            isLoading={form.formState.isSubmitting}
-            className="mt-6 "
-          />
+          >
+            Edit Vehicle <Pen size={16} />
+          </Link>
         )}
+
+        {/* submit  */}
+
+        <FormSubmitButton
+          text={
+            isDedicatedVehiclePage
+              ? type === "Add"
+                ? "Add Vehicle"
+                : "Update Vehicle"
+              : type === "Add"
+              ? "Continue to Customer Details"
+              : "Update Vehicle Details"
+          }
+          isLoading={form.formState.isSubmitting}
+          className="mt-6 "
+        />
       </FormContainer>
     </Form>
   );

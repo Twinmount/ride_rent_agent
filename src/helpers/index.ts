@@ -184,7 +184,6 @@ export const handleCustomerSelect = (
 };
 
 // Helper function to handle vehicle selection to auto fill the SRM Vehicle form
-// Helper function to handle vehicle selection to auto fill the SRM Vehicle form
 export const handleVehicleSelection = (
   vehicleRegistrationNumber: string,
   vehicleData: VehicleType | null,

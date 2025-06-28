@@ -23,11 +23,7 @@ const BodyTypeDropdown = ({
   const assetUrl = import.meta.env.VITE_ASSET_URL;
 
   return (
-    <Select
-      onValueChange={onChangeHandler}
-      defaultValue={value}
-      disabled={isDisabled}
-    >
+    <Select onValueChange={onChangeHandler} value={value} disabled={isDisabled}>
       <SelectTrigger className="ring-0 select-field focus:ring-0 input-fields">
         <SelectValue
           placeholder={placeholder}

@@ -33,6 +33,7 @@ import CustomerShareFormDialog from "@/components/dialog/CustomerShareFormDialog
 type SRMCustomerDetailsFormProps = {
   type: "Add" | "Update";
   formData?: SRMCustomerDetailsFormType | null;
+  isAddOrIncomplete?: boolean;
   onNextTab?: () => void;
   isPublic?: boolean;
 };
@@ -41,6 +42,7 @@ export default function SRMCustomerDetailsForm({
   type,
   onNextTab,
   formData,
+  isAddOrIncomplete,
   isPublic = false,
 }: SRMCustomerDetailsFormProps) {
   const navigate = useNavigate();
@@ -108,12 +110,12 @@ export default function SRMCustomerDetailsForm({
     try {
       let data;
 
-      if (type === "Add") {
+      if (type === "Add" || isAddOrIncomplete) {
         if (existingCustomerId) {
           // Handle existing customer booking
           data = await handleExistingCustomerBooking(existingCustomerId);
         } else if (isPublic) {
-          console.log("isPublic");
+          console.log("isPublic : ", data);
         } else {
           // Handle new customer booking
           data = await handleNewCustomerBooking(values, countryCode);

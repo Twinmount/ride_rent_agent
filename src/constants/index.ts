@@ -1,7 +1,9 @@
 import {
   CustomerStatus,
+  SRMContractFormType,
   SRMCustomerDetailsFormType,
   SRMPaymentDetailsFormType,
+  SRMTaxInfoFormType,
   SRMVehicleDetailsFormType,
   TripEndFormType,
 } from "@/types/srm-types";
@@ -20,6 +22,8 @@ import {
   Lock,
   CalendarCheck,
   Box,
+  Globe,
+  Users,
 } from "lucide-react";
 
 // sidebar content
@@ -69,6 +73,34 @@ export const srmFeatures = [
     description:
       "Agents can track customer bookings, periods, history, and preferences, streamlining communication and improving customer service efficiency.",
     icon: CalendarCheck,
+  },
+];
+
+export const SRMIntroFeatures = [
+  {
+    label: "Efficient Fleet Management",
+    description: "Easily organize and monitor all vehicles from one place.",
+    icon: Box,
+  },
+  {
+    label: "Unlimited Vehicle Tracking",
+    description: "Track your entire fleet with no limitations or hidden costs.",
+    icon: Globe,
+  },
+  {
+    label: "Advanced Protection Against Rental Abuse",
+    description: "AI-backed alerts help detect and prevent rental fraud.",
+    icon: ShieldAlert,
+  },
+  {
+    label: "Cloud-Based Invoicing",
+    description: "Generate, manage, and store invoices securely in the cloud.",
+    icon: UploadCloud,
+  },
+  {
+    label: "Streamlined Customer Management",
+    description: "Centralize and access customer records in seconds.",
+    icon: Users,
   },
 ];
 
@@ -149,6 +181,15 @@ export const SRMCustomerDetailsFormDefaultValues: SRMCustomerDetailsFormType = {
   passportNumber: "", // Passport number
   drivingLicenseNumber: "", // Driving license number
   phoneNumber: "", // Phone number with validation on minimum characters
+};
+
+export const SRMTaxInfoFormDefaultValues: SRMTaxInfoFormType = {
+  countryId: "",
+  taxNumber: "",
+};
+
+export const SRMContractFormDefaultValues: SRMContractFormType = {
+  contractContent: "",
 };
 
 // srm vehicle details form default values

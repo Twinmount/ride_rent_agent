@@ -1,3 +1,6 @@
+import { SRMContractFormSchema, SRMTaxInfoFormSchema } from "@/lib/validator";
+import { z } from "zod";
+
 // CustomerDetailsFormType (level 1)
 export type SRMCustomerDetailsFormType = {
   customerProfilePic?: string; // Optional field for profile photo or identifier
@@ -7,6 +10,10 @@ export type SRMCustomerDetailsFormType = {
   drivingLicenseNumber: string; // Driving license number of the user
   phoneNumber: string; // Mobile number of the user
 };
+
+export type SRMTaxInfoFormType = z.infer<typeof SRMTaxInfoFormSchema>;
+
+export type SRMContractFormType = z.infer<typeof SRMContractFormSchema>;
 
 // Rental detail type for day, week, and month
 type SRMRentalDetailType = {

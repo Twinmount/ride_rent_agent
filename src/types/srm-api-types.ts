@@ -184,6 +184,25 @@ export interface CreateCustomerBookingResponse {
   statusCode: number; // HTTP status code (e.g., 200, 400)
 }
 
+export interface TaxInfoResponse {
+  result: {
+    countryId: string;
+    taxNumber: string;
+  };
+  status: string;
+  statusCode: number;
+}
+
+export interface ContractInfoType {
+  contractContent: string;
+}
+
+export interface ContractInfoResponse {
+  result: ContractInfoType;
+  status: string;
+  statusCode: number;
+}
+
 export interface FetchSingleBookingResponse {
   result: IndividualTrip;
   status: string;

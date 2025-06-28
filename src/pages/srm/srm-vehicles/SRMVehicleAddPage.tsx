@@ -8,7 +8,7 @@ export default function SRMVehicleAddPage() {
         type={"Add"}
         isAddOrIncomplete={true}
         showDescription={false}
-        isDedicatedAddPage={true}
+        isDedicatedVehiclePage={true}
       />
     </PageWrapper>
   );

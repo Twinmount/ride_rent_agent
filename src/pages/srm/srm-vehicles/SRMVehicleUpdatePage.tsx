@@ -27,7 +27,7 @@ export default function SRMVehicleUpdatePage() {
         <SRMVehicleDetailsForm
           type={"Update"}
           formData={vehicleFormData}
-          isDedicatedAddPage={true}
+          isDedicatedVehiclePage={true}
         />
       )}
     </PageWrapper>

@@ -5,13 +5,14 @@ import { validateSRMTabAccess } from "@/helpers/form";
 import { SRMTabsTypes } from "@/types/types";
 import { toast } from "@/components/ui/use-toast";
 import PageWrapper from "@/components/PageWrapper";
+import { TAB_ITEMS } from "@/data/srm-data";
 
 // Lazy-loaded form components
-const SRMCustomerDetailsForm = lazy(
-  () => import("@/components/form/srm-form/CustomerDetailsForm")
-);
 const SRMVehicleDetailsForm = lazy(
   () => import("@/components/form/srm-form/VehicleDetailsForm")
+);
+const SRMCustomerDetailsForm = lazy(
+  () => import("@/components/form/srm-form/CustomerDetailsForm")
 );
 const SRMPaymentDetailsForm = lazy(
   () => import("@/components/form/srm-form/PaymentDetailsForm")
@@ -21,7 +22,7 @@ const SRMCheckListForm = lazy(
 );
 
 export default function SRMFormAddPage() {
-  const [activeTab, setActiveTab] = useState<SRMTabsTypes>("customer");
+  const [activeTab, setActiveTab] = useState<SRMTabsTypes>("vehicle");
   const [levelsFilled, setLevelsFilled] = useState<number>(3);
   const [checkListData, setCheckListData] = useState({
     vehicleId: "",
@@ -65,6 +66,8 @@ export default function SRMFormAddPage() {
       setLevelsFilled(1);
     } else if (nextTab === "payment" && levelsFilled < 2) {
       setLevelsFilled(2);
+    } else if (nextTab === "check-list" && levelsFilled < 3) {
+      setLevelsFilled(3);
     }
   };
 
@@ -77,62 +80,45 @@ export default function SRMFormAddPage() {
           className="w-full"
         >
           <TabsList className="gap-x-2 h-20 w-full bg-transparent flex-center max-sm:gap-x-4 max-w-full overflow-x-auto px-6 pl-20">
-            <TabsTrigger
-              value="customer"
-              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
-            >
-              Customer
-              <span className="text-xs">details</span>
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="vehicle"
-              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
-            >
-              Vehicle
-              <span className="text-xs">details</span>
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="payment"
-              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
-            >
-              Payment
-              <span className="text-xs">details</span>
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="check-list"
-              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
-            >
-              Vehicle
-              <span className="text-xs">Check List</span>
-            </TabsTrigger>
+            {TAB_ITEMS.map((tab) => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
+              >
+                {tab.label}
+                <span className="text-xs">{tab.subLabel}</span>
+              </TabsTrigger>
+            ))}
           </TabsList>
-
-          <TabsContent value="customer" className="flex-center  ">
-            <Suspense fallback={<LazyLoader />}>
-              <SRMCustomerDetailsForm
-                type="Add"
-                onNextTab={() => handleNextTab("vehicle")}
-              />
-            </Suspense>
-          </TabsContent>
 
           <TabsContent value="vehicle" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
               <SRMVehicleDetailsForm
                 type={"Add"}
-                onNextTab={() => handleNextTab("payment")}
-                isAddOrIncomplete={true}
+                onNextTab={() => handleNextTab("customer")}
                 setCheckListData={setCheckListData}
+              />
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="customer" className="flex-center  ">
+            <Suspense fallback={<LazyLoader />}>
+              <SRMCustomerDetailsForm
+                type="Add"
+                isAddOrIncomplete={true}
+                onNextTab={() => handleNextTab("payment")}
               />
             </Suspense>
           </TabsContent>
 
           <TabsContent value="payment" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              <SRMPaymentDetailsForm type={"Add"} isAddOrIncomplete={true} />
+              <SRMPaymentDetailsForm
+                type={"Add"}
+                isAddOrIncomplete={true}
+                onNextTab={() => handleNextTab("check-list")}
+              />
             </Suspense>
           </TabsContent>
 

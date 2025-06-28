@@ -15,13 +15,10 @@ type SpecificationOption = { label: string; value: string };
 const createSpecificationSchemaForCategory = (
   fields: Record<string, SpecificationOption[]>
 ) => {
-  const schemaObject = Object.keys(fields).reduce(
-    (acc, field) => {
-      acc[field] = z.string(); // Adjust type according to your needs
-      return acc;
-    },
-    {} as Record<string, z.ZodTypeAny>
-  );
+  const schemaObject = Object.keys(fields).reduce((acc, field) => {
+    acc[field] = z.string(); // Adjust type according to your needs
+    return acc;
+  }, {} as Record<string, z.ZodTypeAny>);
   return z.object({ specifications: z.object(schemaObject) });
 };
 
@@ -33,13 +30,10 @@ type FeatureOption = { label: string; value: string };
 export const createFeatureSchemaForCategory = (
   fields: Record<string, FeatureOption[]>
 ) => {
-  const schemaObject = Object.keys(fields).reduce(
-    (acc, field) => {
-      acc[field] = z.array(z.string()); // Each field should be an array of strings
-      return acc;
-    },
-    {} as Record<string, z.ZodTypeAny>
-  );
+  const schemaObject = Object.keys(fields).reduce((acc, field) => {
+    acc[field] = z.array(z.string()); // Each field should be an array of strings
+    return acc;
+  }, {} as Record<string, z.ZodTypeAny>);
   return z.object({ features: z.object(schemaObject) });
 };
 
@@ -213,28 +207,25 @@ export function formatFeatures(
   values: Record<string, string[] | null>,
   featureData: FeaturesFormData[]
 ): Record<string, { name: string; value: string; selected: boolean }[]> {
-  return Object.entries(values).reduce(
-    (acc, [key, selectedValues]) => {
-      if (selectedValues && selectedValues.length > 0) {
-        const featureOptions = featureData.find(
-          (feature) => feature.name === key
-        )?.values;
+  return Object.entries(values).reduce((acc, [key, selectedValues]) => {
+    if (selectedValues && selectedValues.length > 0) {
+      const featureOptions = featureData.find(
+        (feature) => feature.name === key
+      )?.values;
 
-        if (featureOptions) {
-          acc[key] = selectedValues.map((value) => {
-            const option = featureOptions.find((v) => v.name === value);
-            return {
-              name: option?.name || value, // The name from the dropdown
-              value: option?.label || value, // The label from the dropdown or value if not found
-              selected: true, // Always true as it's selected
-            };
-          });
-        }
+      if (featureOptions) {
+        acc[key] = selectedValues.map((value) => {
+          const option = featureOptions.find((v) => v.name === value);
+          return {
+            name: option?.name || value, // The name from the dropdown
+            value: option?.label || value, // The label from the dropdown or value if not found
+            selected: true, // Always true as it's selected
+          };
+        });
       }
-      return acc;
-    },
-    {} as Record<string, { name: string; value: string; selected: boolean }[]>
-  );
+    }
+    return acc;
+  }, {} as Record<string, { name: string; value: string; selected: boolean }[]>);
 }
 
 /**
@@ -251,32 +242,26 @@ export function formatSpecifications(
   string,
   { name: string; value: string; selected: boolean; hoverInfo: string }
 > {
-  return Object.keys(values).reduce(
-    (acc, key) => {
-      const selectedLabel = values[key] as string;
-      const specItem = specData.find((spec) => spec.name === key);
+  return Object.keys(values).reduce((acc, key) => {
+    const selectedLabel = values[key] as string;
+    const specItem = specData.find((spec) => spec.name === key);
 
-      if (specItem) {
-        const selectedValueObj = specItem.values.find(
-          (value) => value.name === selectedLabel
-        );
+    if (specItem) {
+      const selectedValueObj = specItem.values.find(
+        (value) => value.name === selectedLabel
+      );
 
-        if (selectedValueObj) {
-          acc[key] = {
-            name: selectedValueObj.name,
-            value: selectedValueObj.label,
-            selected: true,
-            hoverInfo: specItem.hoverInfo, // Adding hoverInfo to the object
-          };
-        }
+      if (selectedValueObj) {
+        acc[key] = {
+          name: selectedValueObj.name,
+          value: selectedValueObj.label,
+          selected: true,
+          hoverInfo: specItem.hoverInfo, // Adding hoverInfo to the object
+        };
       }
-      return acc;
-    },
-    {} as Record<
-      string,
-      { name: string; value: string; selected: boolean; hoverInfo: string }
-    >
-  ); // Updated return type to include hoverInfo
+    }
+    return acc;
+  }, {} as Record<string, { name: string; value: string; selected: boolean; hoverInfo: string }>); // Updated return type to include hoverInfo
 }
 
 /**
@@ -533,4 +518,9 @@ export const validateRentalDetailsAndSecurityDeposit = (
   }
 
   return null;
+};
+
+// form submit button common class
+export const getFormGenericButtonClass = (className?: string) => {
+  return `flex-center button hover:bg-darkYellow active:scale-[0.97] duration-100 active:shadow-md transition-all  ease-out col-span-2 mx-auto w-full bg-yellow !text-lg !font-semibold md:w-10/12 lg:w-8/12 ${className}`;
 };

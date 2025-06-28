@@ -212,6 +212,7 @@ const SingleFileUpload = ({
                       <div className="relative w-24 group/box">
                         {/* Use PreviewImageComponent to handle image fetching */}
                         <PreviewImageComponent imagePath={imagePath} />
+
                         <div className="absolute top-0 right-0 bottom-0 left-0 space-x-2">
                           {!isDisabled && (
                             <DropdownMenu>
@@ -264,9 +265,17 @@ const SingleFileUpload = ({
                         htmlFor={`file-upload-${name}`}
                         className="flex relative justify-center w-24 cursor-pointer"
                       >
-                        <div className="flex flex-col justify-center items-center w-24 h-24 bg-gray-50 rounded-lg border cursor-pointer">
-                          <Upload size={24} className="text-yellow" />
-                          <span className="text-sm text-yellow">Upload</span>
+                        <div
+                          className={`flex flex-col justify-center items-center w-24 h-24 bg-gray-50 rounded-lg border cursor-pointer ${
+                            isDisabled
+                              ? "cursor-not-allowed text-gray-400"
+                              : "text-yellow"
+                          }`}
+                          // cursor disabled is isDisabled is true
+                          style={isDisabled ? { cursor: "not-allowed" } : {}}
+                        >
+                          <Upload size={24} />
+                          <span className="text-sm">Upload</span>
                         </div>
 
                         {/* progress bar */}

@@ -6,6 +6,7 @@ import { SRMTabsTypes } from "@/types/types";
 import { useSRMUpdateForm } from "@/hooks/useSRMUpdateForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import PageWrapper from "@/components/PageWrapper";
+import { TAB_ITEMS } from "@/data/srm-data";
 
 // Lazy-loaded form components
 const SRMCustomerDetailsForm = lazy(
@@ -57,52 +58,18 @@ export default function SRMFormUpdatePage() {
           onValueChange={handleTabChange}
           className="w-full"
         >
-          <TabsList className="gap-x-2 w-full bg-transparent  flex-center max-sm:gap-x-4">
-            <TabsTrigger
-              value="customer"
-              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
-            >
-              Customer
-              <span className="text-xs">details</span>
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="vehicle"
-              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
-            >
-              Vehicle
-              <span className="text-xs">details</span>
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="payment"
-              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
-            >
-              Payment
-              <span className="text-xs">details</span>
-            </TabsTrigger>
-
-            <TabsTrigger
-              value="check-list"
-              className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
-            >
-              Vehicle
-              <span className="text-xs">Check List</span>
-            </TabsTrigger>
+          <TabsList className="gap-x-2 h-20 w-full bg-transparent flex-center max-sm:gap-x-4 max-w-full overflow-x-auto px-6 pl-20">
+            {TAB_ITEMS.map((tab) => (
+              <TabsTrigger
+                key={tab.value}
+                value={tab.value}
+                className="flex flex-col justify-center items-center h-10 max-sm:text-sm max-sm:px-4"
+              >
+                {tab.label}
+                <span className="text-xs">{tab.subLabel}</span>
+              </TabsTrigger>
+            ))}
           </TabsList>
-
-          <TabsContent value="customer" className="flex-center">
-            <Suspense fallback={<LazyLoader />}>
-              {isCustomerLoading ? (
-                <FormSkelton />
-              ) : (
-                <SRMCustomerDetailsForm
-                  type={"Update"}
-                  formData={customerFormData as any}
-                />
-              )}
-            </Suspense>
-          </TabsContent>
 
           <TabsContent value="vehicle" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
@@ -114,6 +81,19 @@ export default function SRMFormUpdatePage() {
                   formData={vehicleFormData}
                   refetchLevels={refetchLevels}
                   isAddOrIncomplete={isAddOrIncompleteSRMVehicleForm}
+                />
+              )}
+            </Suspense>
+          </TabsContent>
+
+          <TabsContent value="customer" className="flex-center">
+            <Suspense fallback={<LazyLoader />}>
+              {isCustomerLoading ? (
+                <FormSkelton />
+              ) : (
+                <SRMCustomerDetailsForm
+                  type={"Update"}
+                  formData={customerFormData as any}
                 />
               )}
             </Suspense>

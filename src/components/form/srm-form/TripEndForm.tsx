@@ -433,7 +433,8 @@ export default function TripEndForm({
               className="w-full rounded-xl text-red-500 font-semibold transition-colors"
               disabled={form.formState.isSubmitting}
             >
-              End Trip {form.formState.isSubmitting && <Spinner />}
+              End Trip & Generate Receipt
+              {form.formState.isSubmitting && <Spinner />}
             </Button>
           </div>
         </form>

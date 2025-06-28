@@ -1,4 +1,4 @@
-import CustomerDetailsPage from "@/pages/srm/CustomerDetailsPage";
+import CustomerDetailsPage from "@/pages/srm/srm-customers/CustomerDetailsPage";
 import { lazy } from "react";
 
 // vehicle  pages
@@ -25,16 +25,20 @@ const ProfileUpdatePage = lazy(
 
 // lazy loading above static imports
 const SRMDashboard = lazy(() => import("../pages/srm/SRMDashboard"));
-const SRMFormAddPage = lazy(() => import("../pages/srm/SRMFormAddPage"));
-const SRMFormUpdatePage = lazy(() => import("../pages/srm/SRMFormUpdatePage"));
+const SRMFormAddPage = lazy(
+  () => import("../pages/srm/srm-trips/SRMFormAddPage")
+);
+const SRMFormUpdatePage = lazy(
+  () => import("../pages/srm/srm-trips/SRMFormUpdatePage")
+);
 const OngoingTripsPage = lazy(
-  () => import("../pages/srm/trip-data/OngoingTripsPage")
+  () => import("../pages/srm/srm-trips/OngoingTripsPage")
 );
 const CompletedTripsPage = lazy(
-  () => import("../pages/srm/trip-data/CompletedTripsPage")
+  () => import("../pages/srm/srm-trips/CompletedTripsPage")
 );
 const ManageVehiclePage = lazy(
-  () => import("../pages/srm/trip-data/ManageVehiclePage")
+  () => import("../pages/srm/srm-vehicles/ManageVehiclePage")
 );
 const SRMVehicleAddPage = lazy(
   () => import("../pages/srm/srm-vehicles/SRMVehicleAddPage")
@@ -43,15 +47,31 @@ const SRMVehicleUpdatePage = lazy(
   () => import("../pages/srm/srm-vehicles/SRMVehicleUpdatePage")
 );
 const CustomerListPage = lazy(
-  () => import("../pages/srm/trip-data/ManageSRMCustomersPage")
+  () => import("../pages/srm/srm-customers/ManageSRMCustomersPage")
 );
-const EndTripsPage = lazy(() => import("../pages/srm/EndTripsPage"));
+const EndTripsPage = lazy(() => import("../pages/srm/srm-trips/EndTripsPage"));
+
+// Tax info pages
+const SRMCountryTaxInfoAddPage = lazy(
+  () => import("../pages/srm/tax-info/SRMCountryTaxInfoAddPage")
+);
+const SRMCountryTaxInfoUpdatePage = lazy(
+  () => import("../pages/srm/tax-info/SRMCountryTaxInfoUpdatePage")
+);
+
+// Contract pages
+const SRMContractAddPage = lazy(
+  () => import("../pages/srm/contract/SRMContractAddPage")
+);
+const SRMContractEditPage = lazy(
+  () => import("../pages/srm/contract/SRMContractEditPage")
+);
 
 /* 
  protected routes array
 */
 
-export const protecteRoutes = [
+export const protectedRoutes = [
   { path: "/", element: <Dashboard /> },
   { path: "/listings", element: <ListingsPage /> },
   { path: "/profile", element: <ProfilePage /> },
@@ -114,5 +134,24 @@ export const protecteRoutes = [
   {
     path: "/srm/customer-details/:customerId",
     element: <CustomerDetailsPage />,
+  },
+
+  {
+    path: "/srm/tax-info",
+    element: <SRMCountryTaxInfoAddPage />,
+  },
+
+  {
+    path: "/srm/tax-info/edit",
+    element: <SRMCountryTaxInfoUpdatePage />,
+  },
+
+  {
+    path: "/srm/contracts/new",
+    element: <SRMContractAddPage />,
+  },
+  {
+    path: "/srm/contracts/edit/:contractId",
+    element: <SRMContractEditPage />,
   },
 ];

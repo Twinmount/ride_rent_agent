@@ -200,6 +200,18 @@ export interface FetchStatesResponse {
   statusCode: number;
 }
 
+export interface CountryType {
+  countryId: string;
+  countryName: string;
+  countryValue: string;
+}
+
+export interface FetchCountryResponse {
+  result: CountryType[];
+  status: string;
+  statusCode: number;
+}
+
 export interface CityType {
   stateId: string;
   cityId: string;

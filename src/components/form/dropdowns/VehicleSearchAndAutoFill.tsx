@@ -194,7 +194,7 @@ const VehicleItem = ({
 // Add new vehicle Link
 const AddNewVehicle = ({ searchTerm }: { searchTerm: string }) => (
   <Link
-    to={"/srm/manages-vehicles/add"}
+    to={"/srm/manage-vehicles/add"}
     className="flex items-center gap-x-2 h-12"
   >
     <div className="h-12  bg-slate-200 w-12 flex-center rounded-xl overflow-hidden">

@@ -1,3 +1,4 @@
+import { SRMTaxInfoFormType } from "@/types/srm-types";
 import * as z from "zod";
 
 // company registration form schema
@@ -190,6 +191,17 @@ export const CustomerShareLinkFormSchema = z.object({
   phoneNumber: z.string().min(1, "Phone number is required"),
 });
 
+export const SRMTaxInfoFormSchema = z.object({
+  countryId: z.string().min(1, "Country is required"),
+  taxNumber: z.string().min(1, "Tax number is required"),
+});
+
+export const SRMContractFormSchema = z.object({
+  contractContent: z
+    .string()
+    .min(10, "Contract must be at least 10 characters long")
+    .max(30000, "Contract length exceeded"),
+});
 // SRM : Vehicle Details Form Schema
 export const SRMVehicleDetailsFormSchema = z.object({
   vehicleCategoryId: z.string().min(1, "Category is required"),

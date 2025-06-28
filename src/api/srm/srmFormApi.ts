@@ -17,6 +17,8 @@ import {
   GetSRMPaymentDetailsResponse,
   GetSRMChecklistResponse,
   AddPublicCustomerFormResponse,
+  TaxInfoResponse,
+  ContractInfoResponse,
 } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
@@ -276,7 +278,8 @@ export const addVehicleDetailsForm = async (
       vehicleBrandId: values.vehicleBrandId,
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
       vehiclePhoto: values.vehiclePhoto,
-      numberOfPassengers: values.numberOfPassengers,
+      // convert to number
+      numberOfPassengers: Number(values.numberOfPassengers),
       vehicleColor: values.vehicleColor,
       bodyType: values.bodyType,
       chassisNumber: values.chassisNumber,
@@ -677,6 +680,166 @@ export const sendCustomerFormLink = async (
     return data;
   } catch (error) {
     console.error("Error on generating public link", error);
+    throw error;
+  }
+};
+
+export const getTaxInfo = async ({
+  id,
+}: {
+  id: string;
+}): Promise<TaxInfoResponse> => {
+  try {
+    const slug = `${Slug.GET_SRM_TAX_INFO}?id=${id}`;
+
+    const data = await API.get<TaxInfoResponse>({
+      slug,
+    });
+
+    if (!data) {
+      throw new Error("Failed to fetch tax info");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on tax info fetch", error);
+    throw error;
+  }
+};
+
+export const addTaxInfo = async (
+  countryId: string,
+  taxNumber: string
+): Promise<TaxInfoResponse> => {
+  try {
+    // Prepare the request body for the API
+    const requestBody = {
+      countryId,
+      taxNumber,
+    };
+
+    // Sending the request as a JSON object
+    const data = await API.post<TaxInfoResponse>({
+      slug: Slug.POST_SRM_TAX_INFO,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to create tax info");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on tax info create", error);
+    throw error;
+  }
+};
+
+export const updateTaxInfo = async (
+  countryId: string,
+  taxNumber: string,
+  id: string
+): Promise<TaxInfoResponse> => {
+  try {
+    // Prepare the request body for the API
+    const requestBody = {
+      id,
+      countryId,
+      taxNumber,
+    };
+
+    // Sending the request as a JSON object
+    const data = await API.put<TaxInfoResponse>({
+      slug: Slug.PUT_SRM_TAX_INFO,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to update tax info");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on tax info update", error);
+    throw error;
+  }
+};
+
+// SRM Contract form api's
+
+export const getContractInfo = async ({
+  contractId,
+}: {
+  contractId: string;
+}): Promise<ContractInfoResponse> => {
+  try {
+    const slug = `${Slug.GET_SRM_CONTRACT}?contractId=${contractId}`;
+
+    const data = await API.get<ContractInfoResponse>({
+      slug,
+    });
+
+    if (!data) {
+      throw new Error("Failed to fetch contract info");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on contract info fetch", error);
+    throw error;
+  }
+};
+
+export const addContractInfo = async (
+  contractContent: string
+): Promise<ContractInfoResponse> => {
+  try {
+    // Prepare the request body for the API
+    const requestBody = {
+      contractContent,
+    };
+
+    // Sending the request as a JSON object
+    const data = await API.post<ContractInfoResponse>({
+      slug: Slug.POST_SRM_CONTRACT,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to create contract info");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on contract info create", error);
+    throw error;
+  }
+};
+
+export const updateContractInfo = async (
+  contractContent: string,
+  contractId: string
+): Promise<ContractInfoResponse> => {
+  try {
+    // Prepare the request body for the API
+    const requestBody = {
+      contractId,
+      contractContent,
+    };
+
+    // Sending the request as a JSON object
+    const data = await API.put<ContractInfoResponse>({
+      slug: Slug.PUT_SRM_CONTRACT,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to update contract info");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on contract info update", error);
     throw error;
   }
 };

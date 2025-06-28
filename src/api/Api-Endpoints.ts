@@ -40,6 +40,10 @@ export enum Slug {
   // States Endpoints
   GET_ALL_STATES = "/states/list",
 
+  // Country Endpoints
+  GET_COUNTRY = "/country",
+  GET_ALL_COUNTRY = "/country/list",
+
   // Cities Endpoints
   GET_ALL_CITIES = "/city/list",
 
@@ -102,6 +106,16 @@ export enum Slug {
   PUT_SRM_BOOKING_PAYMENT = "/srm-bookings/payment",
   GET_SRM_IS_CUSTOMER_SPAM = "/srm-bookings/customer/is-spammed-customer",
   GET_SRM_UPCOMING_BOOKINGS = "/srm-bookings/vehicle/upcoming-booking-dates",
+
+  //SRM TAX INFO
+  GET_SRM_TAX_INFO = "/srm-tax-info",
+  POST_SRM_TAX_INFO = "/srm-tax-info",
+  PUT_SRM_TAX_INFO = "/srm-tax-info",
+
+  // SRM CONTRACT
+  GET_SRM_CONTRACT = "/srm-contract",
+  POST_SRM_CONTRACT = "/srm-contract",
+  PUT_SRM_CONTRACT = "/srm-contract",
 
   // SRM TRIPS
   GET_SRM_TRIP_BY_BOOKING_ID = "/srm-bookings",

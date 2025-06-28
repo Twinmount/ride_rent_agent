@@ -14,7 +14,7 @@ import { mapToSRMPaymentForm, mapToSRMVehicleForm } from "@/helpers/srm-form";
 export type TabsTypes = "primary" | "specifications" | "features";
 
 export const useSRMUpdateForm = (bookingId: string | undefined) => {
-  const [activeTab, setActiveTab] = useState<SRMTabsTypes>("customer");
+  const [activeTab, setActiveTab] = useState<SRMTabsTypes>("vehicle");
   const queryClient = useQueryClient();
 
   const [searchParams] = useSearchParams();

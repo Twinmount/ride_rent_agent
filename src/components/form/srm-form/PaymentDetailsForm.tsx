@@ -44,6 +44,7 @@ type SRMPaymentDetailsFormProps = {
   formData?: SRMPaymentDetailsFormType | null;
   refetchLevels?: () => void;
   isAddOrIncomplete?: boolean;
+  onNextTab?: () => void;
 };
 
 // Mock rental details (replace with actual props later if needed)
@@ -53,6 +54,7 @@ export default function SRMPaymentDetailsForm({
   formData,
   refetchLevels,
   isAddOrIncomplete,
+  onNextTab,
 }: SRMPaymentDetailsFormProps) {
   const {} = useParams<{}>();
   const bookingId = sessionStorage.getItem("bookingId");
