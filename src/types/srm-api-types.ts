@@ -203,6 +203,12 @@ export interface ContractInfoResponse {
   statusCode: number;
 }
 
+export interface GetSRMStatus {
+  result: any;
+  status: string;
+  statusCode: number;
+}
+
 export interface FetchSingleBookingResponse {
   result: IndividualTrip;
   status: string;

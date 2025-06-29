@@ -19,6 +19,7 @@ import {
   AddPublicCustomerFormResponse,
   TaxInfoResponse,
   ContractInfoResponse,
+  GetSRMStatus,
 } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
@@ -840,6 +841,25 @@ export const updateContractInfo = async (
     return data;
   } catch (error) {
     console.error("Error on contract info update", error);
+    throw error;
+  }
+};
+
+export const getSRMStatus = async (): Promise<GetSRMStatus> => {
+  try {
+    const slug = `${Slug.GET_SRM_STATUS}`;
+
+    const data = await API.get<GetSRMStatus>({
+      slug,
+    });
+
+    if (!data) {
+      throw new Error("Failed to fetch contract info");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on contract info fetch", error);
     throw error;
   }
 };
