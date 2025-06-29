@@ -11,23 +11,15 @@ import { toast } from "@/components/ui/use-toast";
 import { FormSubmitButton } from "../form-ui/FormSubmitButton";
 import { FormContainer } from "../form-ui/FormContainer";
 import { useNavigate } from "react-router-dom";
-import {
-  addContractInfo,
-  addTaxInfo,
-  updateContractInfo,
-  updateTaxInfo,
-} from "@/api/srm";
+import { updateSRMUserTaxAndContractInfo } from "@/api/srm";
 import SRMContractTextEditor from "../SRMContractTextEditor";
 
-type SRMCustomerDetailsFormProps = {
+type FormProps = {
   type: "Add" | "Update";
   formData?: SRMContractFormType | null;
 };
 
-export default function TaxInfoForm({
-  type,
-  formData,
-}: SRMCustomerDetailsFormProps) {
+export default function SRMContractForm({ type, formData }: FormProps) {
   const navigate = useNavigate();
 
   //  initial default values for the form
@@ -45,15 +37,9 @@ export default function TaxInfoForm({
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof SRMContractFormSchema>) {
     try {
-      let data;
-
-      if (type === "Add") {
-        // Handle existing customer booking
-        data = await addContractInfo(values.contractContent);
-      } else {
-        // Handle new customer booking
-        data = await updateContractInfo(values.contractContent, "124");
-      }
+      let data = await updateSRMUserTaxAndContractInfo({
+        termsNCondition: values.contractContent,
+      });
 
       if (data) {
         toast({

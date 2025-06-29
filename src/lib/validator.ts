@@ -178,10 +178,43 @@ export const SRMCustomerDetailsFormSchema = z.object({
     .string()
     .min(1, "Passport number is required")
     .max(30, "Maximum 30 characters allowed"),
+  passport: z
+    .array(z.string().min(1, "Passport image is required"))
+    .min(2, "Upload both front and back of the passport"),
   drivingLicenseNumber: z
     .string()
     .min(1, "Driving license number is required")
     .max(30, "Maximum 30 characters allowed"),
+  drivingLicense: z
+    .array(z.string().min(1, "Driving license image is required"))
+    .min(2, "Upload both front and back of the driving license"),
+  phoneNumber: z.string().min(6, "Provide a valid mobile number"),
+});
+
+export const SRMPublicCustomerDetailsFormSchema = z.object({
+  customerProfilePic: z.string().optional(),
+  customerName: z
+    .string()
+    .min(1, "Customer name is required")
+    .max(50, "Maximum 50 characters allowed"),
+  nationality: z
+    .string()
+    .min(1, "Nationality is required")
+    .max(30, "Maximum 30 characters allowed"),
+  passportNumber: z
+    .string()
+    .min(1, "Passport number is required")
+    .max(30, "Maximum 30 characters allowed"),
+  passport: z
+    .array(z.string().min(1, "Passport image is required"))
+    .min(2, "Upload both front and back of the passport"),
+  drivingLicenseNumber: z
+    .string()
+    .min(1, "Driving license number is required")
+    .max(30, "Maximum 30 characters allowed"),
+  drivingLicense: z
+    .array(z.string().min(1, "Driving license image is required"))
+    .min(2, "Upload both front and back of the driving license"),
   phoneNumber: z.string().min(6, "Provide a valid mobile number"),
 });
 

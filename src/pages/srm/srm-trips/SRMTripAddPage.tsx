@@ -21,32 +21,17 @@ const SRMCheckListForm = lazy(
   () => import("@/components/form/srm-form/CheckListForm")
 );
 
-export default function SRMFormAddPage() {
+export default function SRMTripAddPage() {
   const [activeTab, setActiveTab] = useState<SRMTabsTypes>("vehicle");
-  const [levelsFilled, setLevelsFilled] = useState<number>(3);
-  const [checkListData, setCheckListData] = useState({
-    vehicleId: "",
-    bodyType: "",
-  });
+  const [levelsFilled, setLevelsFilled] = useState<number>(0);
 
   // Handle tab change based on levelsFilled state
   const handleTabChange = (value: string) => {
     const tab = value as SRMTabsTypes;
-    if (
-      tab === "check-list" &&
-      (!checkListData.vehicleId || !checkListData.bodyType)
-    ) {
-      toast({
-        title: "Access Restricted",
-        description: "Please fill in Vehicle Details first.",
-        className: "bg-orange text-white",
-      });
-      return;
-    }
 
     const { canAccess, message } = validateSRMTabAccess({ tab, levelsFilled });
 
-    if (true) {
+    if (canAccess) {
       setActiveTab(tab);
     } else {
       toast({
@@ -58,17 +43,11 @@ export default function SRMFormAddPage() {
   };
   // 1234561234;
   // Handle moving to the next tab and update levelsFilled state
-  const handleNextTab = (nextTab: SRMTabsTypes) => {
-    setActiveTab(nextTab);
-
-    // Update levelsFilled based on the next tab
-    if (nextTab === "vehicle" && levelsFilled < 1) {
-      setLevelsFilled(1);
-    } else if (nextTab === "payment" && levelsFilled < 2) {
-      setLevelsFilled(2);
-    } else if (nextTab === "check-list" && levelsFilled < 3) {
-      setLevelsFilled(3);
+  const handleNextTab = (nextTab: SRMTabsTypes, currentLevel: number) => {
+    if (levelsFilled < currentLevel) {
+      setLevelsFilled(currentLevel);
     }
+    setActiveTab(nextTab);
   };
 
   return (
@@ -96,8 +75,7 @@ export default function SRMFormAddPage() {
             <Suspense fallback={<LazyLoader />}>
               <SRMVehicleDetailsForm
                 type={"Add"}
-                onNextTab={() => handleNextTab("customer")}
-                setCheckListData={setCheckListData}
+                onNextTab={() => handleNextTab("customer", 1)}
               />
             </Suspense>
           </TabsContent>
@@ -107,7 +85,7 @@ export default function SRMFormAddPage() {
               <SRMCustomerDetailsForm
                 type="Add"
                 isAddOrIncomplete={true}
-                onNextTab={() => handleNextTab("payment")}
+                onNextTab={() => handleNextTab("payment", 2)}
               />
             </Suspense>
           </TabsContent>
@@ -117,14 +95,14 @@ export default function SRMFormAddPage() {
               <SRMPaymentDetailsForm
                 type={"Add"}
                 isAddOrIncomplete={true}
-                onNextTab={() => handleNextTab("check-list")}
+                onNextTab={() => handleNextTab("check-list", 3)}
               />
             </Suspense>
           </TabsContent>
 
           <TabsContent value="check-list" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              <SRMCheckListForm type={"Add"} checkListData={checkListData} />
+              <SRMCheckListForm type={"Add"} />
             </Suspense>
           </TabsContent>
         </Tabs>

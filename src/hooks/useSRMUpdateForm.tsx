@@ -72,7 +72,7 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
     : 1;
 
   // Determine form states based on levels
-  const isAddOrIncompleteSRMVehicleForm = levelsFilled < 2;
+  const isAddOrIncompleteSRMCustomerForm = levelsFilled < 2;
   const isAddOrIncompleteSRMPaymentForm = levelsFilled < 3;
 
   // Prefetch levelsFilled data
@@ -125,7 +125,7 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
     levelsFilled,
     isLevelsFetching,
     refetchLevels,
-    isAddOrIncompleteSRMVehicleForm,
+    isAddOrIncompleteSRMCustomerForm,
     isAddOrIncompleteSRMPaymentForm,
     vehicleIdParam: vehicleId || null,
   };

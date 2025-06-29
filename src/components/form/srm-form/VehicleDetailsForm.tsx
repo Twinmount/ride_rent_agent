@@ -11,7 +11,7 @@ import { toast } from "@/components/ui/use-toast";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import {
   addVehicleDetailsForm,
-  updateBookingDataForVehicle,
+  createBookingDataForVehicle,
   updateVehicleDetailsForm,
 } from "@/api/srm/srmFormApi";
 import BrandsDropdown from "../dropdowns/BrandsDropdown";
@@ -39,10 +39,8 @@ type SRMVehicleDetailsFormProps = {
   formData?: SRMVehicleDetailsFormType | undefined;
   onNextTab?: () => void;
   refetchLevels?: () => void;
-  isAddOrIncomplete?: boolean;
   showDescription?: boolean;
   isDedicatedVehiclePage?: boolean;
-  setCheckListData?: (value: { vehicleId: string; bodyType: string }) => void;
 };
 
 export default function SRMVehicleDetailsForm({
@@ -50,10 +48,8 @@ export default function SRMVehicleDetailsForm({
   onNextTab,
   formData,
   refetchLevels,
-  isAddOrIncomplete,
   showDescription = true,
   isDedicatedVehiclePage = false,
-  setCheckListData,
 }: SRMVehicleDetailsFormProps) {
   const { vehicleId } = useParams<{ vehicleId: string }>();
   const navigate = useNavigate();
@@ -86,28 +82,17 @@ export default function SRMVehicleDetailsForm({
 
     // if we are in the dedicated SRMVehicleAddPage or SRMVehicleUpdatePage
     if (isDedicatedVehiclePage) {
-      if (type === "Add" || isAddOrIncomplete) {
+      if (type === "Add") {
         data = await addVehicleDetailsForm(values);
       } else if (type === "Update") {
         data = await updateVehicleDetailsForm(vehicleId as string, values);
       }
     } else {
-      // else we are in the SRMFormAddPage or SRMFormUpdatePage. which means we need to update the booking data for the vehicle. No Vehicle Specific Add or Update occurs here, only the srm booking related logic is updated here.
-      const bookingId = sessionStorage.getItem("bookingId"); // Retrieve bookingId
+      // else we are in the SRMFormAddPage or SRMFormUpdatePage. which means we need to Create /Update the booking data with the vehicle. No Vehicle-Specific Add or Update occurs here, only the srm booking related logic is added/updated here
 
-      if (!bookingId) {
-        toast({
-          variant: "destructive",
-          title: "Booking ID Missing",
-          description: "Please complete the Customer Details Form first.",
-        });
-        return;
-      }
-
-      if (existingVehicleId && bookingId) {
-        data = await updateBookingDataForVehicle(bookingId, existingVehicleId);
-
-        // saving the vehicle id for the vehicle-check-list form
+      if (existingVehicleId) {
+        // creating the booking
+        data = await createBookingDataForVehicle(existingVehicleId);
       } else {
         toast({
           variant: "destructive",
@@ -150,6 +135,8 @@ export default function SRMVehicleDetailsForm({
 
       if (data) {
         await deleteMultipleFiles(deletedFiles);
+        sessionStorage.setItem("bookingId", data.result.bookingId);
+        sessionStorage.setItem("vehicleId", data.result.vehicleId);
         sessionStorage.setItem(
           "rentalDetails",
           JSON.stringify(values.rentalDetails)
@@ -203,10 +190,9 @@ export default function SRMVehicleDetailsForm({
 
     console.log("vehicleData : ", vehicleData);
 
-    setCheckListData?.({
-      vehicleId: vehicleData?.id as string,
-      bodyType: vehicleData?.bodyType as string,
-    });
+    // store vehicleId and bodyType in the session storage
+    sessionStorage.setItem("vehicleId", vehicleData?.id as string);
+    sessionStorage.setItem("bodyType", vehicleData?.bodyType as string);
   };
 
   // form fields are disabled if the type is "Update"

@@ -1,15 +1,27 @@
-import { SRMContractFormSchema, SRMTaxInfoFormSchema } from "@/lib/validator";
+import {
+  SRMContractFormSchema,
+  SRMCustomerDetailsFormSchema,
+  SRMPublicCustomerDetailsFormSchema,
+  SRMTaxInfoFormSchema,
+} from "@/lib/validator";
 import { z } from "zod";
 
 // CustomerDetailsFormType (level 1)
-export type SRMCustomerDetailsFormType = {
-  customerProfilePic?: string; // Optional field for profile photo or identifier
-  customerName: string; // User name
-  nationality: string; // Nationality of the user
-  passportNumber: string; // Passport number of the user
-  drivingLicenseNumber: string; // Driving license number of the user
-  phoneNumber: string; // Mobile number of the user
-};
+// export type SRMCustomerDetailsFormType = {
+//   customerProfilePic?: string; // Optional field for profile photo or identifier
+//   customerName: string; // User name
+//   nationality: string; // Nationality of the user
+//   passportNumber: string; // Passport number of the user
+//   drivingLicenseNumber: string; // Driving license number of the user
+//   phoneNumber: string; // Mobile number of the user
+// };
+export type SRMCustomerDetailsFormType = z.infer<
+  typeof SRMCustomerDetailsFormSchema
+>;
+
+export type SRMPublicCustomerDetailsFormType = z.infer<
+  typeof SRMPublicCustomerDetailsFormSchema
+>;
 
 export type SRMTaxInfoFormType = z.infer<typeof SRMTaxInfoFormSchema>;
 
@@ -219,4 +231,11 @@ export type BannedCustomerType = {
   companyName: string | null;
   bookingStartDate: string | null;
   bookingEndDate: string | null;
+};
+
+export type PublicCustomerApiArgs = {
+  email: string;
+  countryCode: string;
+  phoneNumber: string;
+  customerId: string;
 };

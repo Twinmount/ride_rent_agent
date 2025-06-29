@@ -1,15 +1,16 @@
 import { lazy } from "react";
+import { Navigate } from "react-router-dom";
 
 // srm pages
 const SRMIntroduction = lazy(() => import("../../pages/srm/SRMIntroduction"));
 
 // lazy loading above static imports
 const SRMDashboard = lazy(() => import("../../pages/srm/SRMDashboard"));
-const SRMFormAddPage = lazy(
-  () => import("../../pages/srm/srm-trips/SRMFormAddPage")
+const SRMTripAddPage = lazy(
+  () => import("../../pages/srm/srm-trips/SRMTripAddPage")
 );
-const SRMFormUpdatePage = lazy(
-  () => import("../../pages/srm/srm-trips/SRMFormUpdatePage")
+const SRMTripUpdatePage = lazy(
+  () => import("../../pages/srm/srm-trips/SRMTripUpdatePage")
 );
 const OngoingTripsPage = lazy(
   () => import("../../pages/srm/srm-trips/OngoingTripsPage")
@@ -55,21 +56,25 @@ const CustomerDetailsPage = lazy(
 
 /**
  * SRM routes that are **only available after the user completes onboarding** (srm/intro, srm/tax-info, and srm/contracts routes).
- * These are wrapped in the `SRMConditionalWrapper` HOC, which checks (via API) if the setup is complete.
+ * These are wrapped in the `SRMConditionalWrapper` wrapper, which checks (via API) if the onboarding is already completed or not.
  * If the setup is incomplete, access to these routes is redirected to srm/intro, otherwise they are rendered.
  */
 export const srmPostOnboardingRoutes = [
+  {
+    path: "/srm",
+    element: <Navigate to={"/srm/dashboard"} />,
+  },
   {
     path: "/srm/dashboard",
     element: <SRMDashboard />,
   },
   {
     path: "/srm/trips/new",
-    element: <SRMFormAddPage />,
+    element: <SRMTripAddPage />,
   },
   {
     path: "/srm/trips/edit/:bookingId",
-    element: <SRMFormUpdatePage />,
+    element: <SRMTripUpdatePage />,
   },
   {
     path: "/srm/ongoing-trips",
@@ -131,7 +136,7 @@ export const srmOnboardingRoutes = [
     element: <SRMCountryTaxInfoAddPage />,
   },
   {
-    path: "/srm/contracts/new",
+    path: "/srm/contract",
     element: <SRMContractAddPage />,
   },
 ];

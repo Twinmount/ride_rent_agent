@@ -84,6 +84,7 @@ export enum Slug {
   GET_SRM_CUSTOMER_FORM = "/srm-customers",
   GET_SRM_CUSTOMER_FORM_BY_ID = "/srm-customers",
   GET_SRM_CUSTOMER_LIST = "/srm-customers/list",
+  POST_SEND_LINK_FORM_CUSTOMER_CREATION = "/auth/temp-auth-token",
 
   // SRM VEHICLES
   POST_SRM_VEHICLE_FORM = "srm-vehicle",
@@ -102,21 +103,15 @@ export enum Slug {
   PUT_SRM_PAYMENT_FORM = "/srm-payment",
 
   // SRM BOOKINGS (customer, vehicle and payment)
-  POST_SRM_BOOKING_CUSTOMER = "/srm-bookings/customer",
-  PUT_SRM_BOOKING_VEHICLE = "/srm-bookings/vehicle",
+  POST_SRM_BOOKING_VEHICLE = "/srm-bookings/vehicle",
+  PUT_SRM_BOOKING_CUSTOMER = "/srm-bookings/customer",
   PUT_SRM_BOOKING_PAYMENT = "/srm-bookings/payment",
   GET_SRM_IS_CUSTOMER_SPAM = "/srm-bookings/customer/is-spammed-customer",
   GET_SRM_UPCOMING_BOOKINGS = "/srm-bookings/vehicle/upcoming-booking-dates",
 
-  //SRM TAX INFO
-  GET_SRM_TAX_INFO = "/srm-tax-info",
-  POST_SRM_TAX_INFO = "/srm-tax-info",
-  PUT_SRM_TAX_INFO = "/srm-tax-info",
-
-  // SRM CONTRACT
-  GET_SRM_CONTRACT = "/srm-contract",
-  POST_SRM_CONTRACT = "/srm-contract",
-  PUT_SRM_CONTRACT = "/srm-contract",
+  //SRM TAX AND CONTRACT INFO
+  GET_SRM_USER_TAX_AND_CONTRACT_INFO = "/users/agreement-data",
+  PUT_SRM_USER_TAX_AND_CONTRACT_INFO = "/users/agreement-data",
 
   // SRM TRIPS
   GET_SRM_TRIP_BY_BOOKING_ID = "/srm-bookings",

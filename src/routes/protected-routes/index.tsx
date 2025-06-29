@@ -48,15 +48,9 @@ export const protectedRoutes = [
   //  These SRM routes are always accessible (not wrapped by SRMConditionalWrapper)
   ...srmAlwaysAccessibleRoutes,
 
-  //  These SRM routes are for first-time access (wrapped in SRMConditionalWrapper)
+  //  These SRM routes are wrapped in SRMConditionalWrapper
   {
-    element: <SRMConditionalWrapper isOnBoardingRoutes={true} />,
-    children: [...srmOnboardingRoutes],
-  },
-
-  //  These SRM routes require SRM onboarding to be completed (wrapped in SRMConditionalWrapper)
-  {
-    element: <SRMConditionalWrapper isOnBoardingRoutes={false} />,
-    children: [...srmPostOnboardingRoutes],
+    element: <SRMConditionalWrapper />,
+    children: [...srmOnboardingRoutes, ...srmPostOnboardingRoutes],
   },
 ];

@@ -12,10 +12,6 @@ import { toast } from "@/components/ui/use-toast";
 
 type Props = {
   type: "Add" | "Update";
-  checkListData?: {
-    vehicleId: string;
-    bodyType: string;
-  };
   formData?: {
     vehicleId: string;
     checklistMetadata: string;
@@ -25,7 +21,6 @@ type Props = {
 
 export default function CheckListForm({
   type,
-  checkListData,
   formData,
   vehicleIdParam,
 }: Props) {
@@ -34,16 +29,14 @@ export default function CheckListForm({
   );
   const [loadCount] = useState(0);
 
-  const vehicleId = type === "Add" ? checkListData?.vehicleId : vehicleIdParam;
-
-  // for fetching the image
-  const bodyType = checkListData?.bodyType;
+  const vehicleId =
+    type === "Add" ? sessionStorage.getItem("vehicleId") : vehicleIdParam;
+  const bodyType = sessionStorage.getItem("bodyType");
 
   // Fetch check form data
   const { data, isLoading } = useQuery({
     queryKey: ["srm-check-list", vehicleId],
     queryFn: () => getSRMCheckListFormData(vehicleId as string),
-    // run only if type is Add
     enabled: type === "Add" || !vehicleId,
   });
 

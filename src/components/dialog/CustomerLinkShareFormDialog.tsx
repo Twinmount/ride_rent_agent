@@ -24,8 +24,7 @@ import { CustomerShareLinkFormSchema } from "@/lib/validator";
 
 export type ShareFormData = z.infer<typeof CustomerShareLinkFormSchema>;
 
-export default function CustomerShareFormDialog() {
-  const [loading, setLoading] = useState(false);
+export default function CustomerLinkShareFormDialog() {
   const [countryCode, setCountryCode] = useState<string>("");
 
   const form = useForm<ShareFormData>({
@@ -38,20 +37,21 @@ export default function CustomerShareFormDialog() {
   });
 
   const onSubmit = async (data: ShareFormData) => {
-    setLoading(true);
-
     try {
-      // TODO: Add your API call logic here
-      console.log("Submitted data:", data);
-      const response = await sendCustomerFormLink(data, countryCode);
+      const bookingId = sessionStorage.getItem("bookingId");
+      const response = await sendCustomerFormLink(
+        data,
+        countryCode,
+        bookingId as string
+      );
 
-      if (response) {
+      if (response.result) {
         toast({
           title: "Success",
           description:
-            "A link  has been sent to the customer email, You can now close this window and wait for the customer to fill the form, or you can continue to fill the form.",
+            "A link  has been sent to the customer email, You can wait for the customer to fill the form, or you can continue to fill the form  or proceed to next step.",
           duration: 3000,
-          className: "bg-green",
+          className: "bg-green-400",
         });
       }
     } catch (error) {
@@ -62,8 +62,6 @@ export default function CustomerShareFormDialog() {
       });
 
       console.error("Submission failed", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -158,7 +156,7 @@ export default function CustomerShareFormDialog() {
               />
 
               <FormSubmitButton
-                text={loading ? "Sending..." : "Send Link"}
+                text={form.formState.isSubmitting ? "Sending..." : "Send Link"}
                 isLoading={form.formState.isSubmitting}
               />
             </FormContainer>

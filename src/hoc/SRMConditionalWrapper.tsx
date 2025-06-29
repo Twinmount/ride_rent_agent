@@ -1,55 +1,65 @@
-import { getSRMStatus } from "@/api/srm";
+import { getSRMUserTaxAndContractInfo } from "@/api/srm";
 import LazyLoader from "@/components/loading-skelton/LazyLoader";
 import { useQuery } from "@tanstack/react-query";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 
-interface Props {
-  isOnBoardingRoutes: boolean;
-}
-
-/**
- * SRMConditionalWrapper protects onboarding/setup routes like:
- * - /srm/intro
- * - /srm/contracts/new
- * - /srm/tax-info
- *
- * It checks if SRM setup is complete via API:
- * - If setup IS complete (data !== null), render child routes.
- * - If setup is NOT complete (data === null), redirect to /srm/intro.
- */
-export const SRMConditionalWrapper = ({
-  isOnBoardingRoutes = false,
-}: Props) => {
+export const SRMConditionalWrapper = () => {
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["srm-status"],
-    queryFn: () =>
-      new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(null);
-        }, 1000);
-      }),
+    queryKey: ["srm-onboarding-status"],
+    queryFn: getSRMUserTaxAndContractInfo,
   });
 
-  if (isLoading) return <LazyLoader />;
+  const location = useLocation();
+  const currentPath = location.pathname;
 
-  if (isError) {
-    throw new Error("Failed to fetch srm status");
+  if (isLoading) return <LazyLoader />;
+  if (isError) throw new Error("Failed to fetch SRM onboarding status");
+
+  const country = data?.result?.country || null;
+  const taxNumber = data?.result?.taxNumber || null;
+  const termsNCondition = data?.result?.termsNCondition || null;
+
+  const taxInfoCompleted = !!country && !!taxNumber;
+  const contractCompleted = !!termsNCondition;
+  const onboardingCompleted = taxInfoCompleted && contractCompleted;
+
+  // ✅ Allow /srm/intro only if tax info is NOT completed
+  if (currentPath === "/srm/intro") {
+    if (!taxInfoCompleted) {
+      return <Outlet />;
+    }
+    // If tax info is already filled, skip /srm/intro and move to next step
+    return (
+      <Navigate
+        to={contractCompleted ? "/srm/dashboard" : "/srm/contract"}
+        replace
+      />
+    );
   }
 
-  // User has completed onboarding — redirect if they're trying to revisit onboarding routes
-  if (data !== null && isOnBoardingRoutes) {
+  //  If onboarding is complete, block access to any onboarding route
+  if (
+    onboardingCompleted &&
+    ["/srm/tax-info", "/srm/contract"].includes(currentPath)
+  ) {
     return <Navigate to="/srm/dashboard" replace />;
   }
 
-  // User has not completed onboarding and is trying to access a valid onboarding page
-  if (data === null && isOnBoardingRoutes) {
-    return <Outlet />;
+  // If user has NOT filled tax info, allow only tax-info
+  if (!taxInfoCompleted) {
+    if (currentPath === "/srm/tax-info") return <Outlet />;
+    return <Navigate to="/srm/tax-info" replace />;
   }
 
-  // For any other case, redirect to /srm/intro
-  if (data === null && !isOnBoardingRoutes) {
-    return <Navigate to="/srm/intro" replace />;
+  // Tax info is filled, contract is not filled → allow only contract
+  if (taxInfoCompleted && !contractCompleted) {
+    if (currentPath === "/srm/tax-info" || currentPath === "/srm/into") {
+      return <Navigate to="/srm/contract" replace />;
+    }
+    if (currentPath === "/srm/contract") return <Outlet />;
+    return <Navigate to="/srm/contract" replace />;
   }
 
+  // If onboarding is complete and accessing a valid route
   return <Outlet />;
 };

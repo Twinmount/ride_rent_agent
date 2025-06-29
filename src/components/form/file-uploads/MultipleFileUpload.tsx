@@ -67,9 +67,16 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
 
   // Get max file count based on name
   const getMaxCount = () => {
-    if (name === "vehiclePhotos") return 8;
-    if (name === "commercialLicenses") return 2;
-    return 0;
+    switch (name) {
+      case "vehiclePhotos":
+        return 8;
+      case "commercialLicenses":
+      case "passport":
+      case "drivingLicense":
+        return 2;
+      default:
+        return 0;
+    }
   };
 
   const maxCount = getMaxCount();

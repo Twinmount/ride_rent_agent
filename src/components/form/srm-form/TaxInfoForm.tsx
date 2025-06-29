@@ -14,18 +14,17 @@ import { FormSubmitButton } from "../form-ui/FormSubmitButton";
 import { FormContainer } from "../form-ui/FormContainer";
 import { useNavigate } from "react-router-dom";
 import SRMCountryDropdown from "../dropdowns/SRMCountryDropdown";
-import { addTaxInfo, updateTaxInfo } from "@/api/srm";
+import { updateSRMUserTaxAndContractInfo } from "@/api/srm";
+import { useQueryClient } from "@tanstack/react-query";
 
-type SRMCustomerDetailsFormProps = {
+type FormProps = {
   type: "Add" | "Update";
   formData?: SRMTaxInfoFormType | null;
 };
 
-export default function TaxInfoForm({
-  type,
-  formData,
-}: SRMCustomerDetailsFormProps) {
+export default function TaxInfoForm({ type, formData }: FormProps) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   //  initial default values for the form
   const initialValues =
@@ -42,33 +41,28 @@ export default function TaxInfoForm({
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof SRMTaxInfoFormSchema>) {
     try {
-      let data;
-
-      if (type === "Add") {
-        // Handle existing customer booking
-        data = await addTaxInfo(values.countryId, values.taxNumber);
-      } else {
-        // Handle new customer booking
-        data = await updateTaxInfo(values.countryId, values.taxNumber, "124");
-      }
+      let data = await updateSRMUserTaxAndContractInfo({
+        country: values.countryId,
+        taxNumber: values.taxNumber,
+      });
 
       if (data) {
         toast({
-          title: `Customer ${type.toLowerCase()} successful`,
+          title: `Tax Info ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
         });
 
-        // if (isPublic && type === "Add") {
-        //   navigate("/srm/customer-details/public/success");
-        // } else if (type === "Add" && onNextTab) {
-        //   onNextTab();
-        //   window.scrollTo({ top: 0, behavior: "smooth" });
-        // }
+        if (type === "Add") {
+          queryClient.invalidateQueries({
+            queryKey: ["srm-onboarding-status"],
+          });
+          navigate("/srm/contract");
+        }
       }
     } catch (error: any) {
       toast({
         variant: "destructive",
-        title: `${type} Customer failed`,
+        title: `${type} Tax info failed`,
         description: "Something went wrong",
       });
       console.error(error);
@@ -114,11 +108,11 @@ export default function TaxInfoForm({
             name="taxNumber"
             render={({ field }) => (
               <FormFieldLayout
-                label="Passport Number"
-                description="Enter customers passport number"
+                label="Tax Number"
+                description="Enter tax number"
               >
                 <Input
-                  placeholder="Enter passport number"
+                  placeholder="Enter tax number"
                   {...field}
                   className="input-field"
                 />

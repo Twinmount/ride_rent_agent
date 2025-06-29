@@ -36,7 +36,7 @@ export default function RichTextEditorComponent({
   if (!editor) return null; // Prevent rendering if editor is not ready
 
   return (
-    <RichTextEditor editor={editor} className="min-h-36 shadow-lg">
+    <RichTextEditor editor={editor} className="min-h-56 shadow-lg">
       <RichTextEditor.Toolbar sticky stickyOffset={75} className="shadow-lg">
         <RichTextEditor.ColorPicker
           colors={[

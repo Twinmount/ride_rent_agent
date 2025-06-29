@@ -86,7 +86,7 @@ export type SpecificationFormData = {
 };
 
 export type TabsTypes = "primary" | "specifications" | "features";
-export type SRMTabsTypes = "customer" | "vehicle" | "payment" | "check-list";
+export type SRMTabsTypes = "vehicle" | "customer" | "payment" | "check-list";
 export type TabItemsTypes = {
   value: SRMTabsTypes;
   label: string;

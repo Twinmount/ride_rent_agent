@@ -6,7 +6,9 @@ export interface CustomerApiType {
   customerName: string; // User's name
   nationality: string; // User's nationality
   passportNumber: string; // User's passport number
+  passport: string[];
   drivingLicenseNumber: string; // User's driving license number
+  drivingLicense: string[];
   phoneNumber: string; // User's phone number, possibly formatted
   customerProfilePic?: string; // Optional field for the user's profile image or identifier
   customerProfilePicPath?: string; // Optional field for the user's profile image or identifier
@@ -20,14 +22,8 @@ export interface AddCustomerFormResponse {
   statusCode: number;
 }
 
-export interface AddPublicCustomerFormResponse {
-  result: {
-    userId: string;
-    emailId: string;
-    token: string;
-    refreshToken: string;
-    isPhoneVerified: boolean;
-  };
+export interface PublicCustomerLinkShareResponse {
+  result: any;
   status: string;
   statusCode: number;
 }
@@ -184,27 +180,14 @@ export interface CreateCustomerBookingResponse {
   statusCode: number; // HTTP status code (e.g., 200, 400)
 }
 
-export interface TaxInfoResponse {
-  result: {
-    countryId: string;
-    taxNumber: string;
-  };
-  status: string;
-  statusCode: number;
+export interface SRMUserTaxAndContractInfoResponse {
+  country: string | null;
+  taxNumber: string | null;
+  termsNCondition: string | null;
 }
 
-export interface ContractInfoType {
-  contractContent: string;
-}
-
-export interface ContractInfoResponse {
-  result: ContractInfoType;
-  status: string;
-  statusCode: number;
-}
-
-export interface GetSRMStatus {
-  result: any;
+export interface GetSRMUserTaxAndContractInfoResponse {
+  result: SRMUserTaxAndContractInfoResponse;
   status: string;
   statusCode: number;
 }

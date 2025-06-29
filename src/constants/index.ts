@@ -3,6 +3,7 @@ import {
   SRMContractFormType,
   SRMCustomerDetailsFormType,
   SRMPaymentDetailsFormType,
+  SRMPublicCustomerDetailsFormType,
   SRMTaxInfoFormType,
   SRMVehicleDetailsFormType,
   TripEndFormType,
@@ -173,15 +174,30 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
   isTabbySupported: false,
 };
 
-// srm user details form default values
+// srm customer details form default values
 export const SRMCustomerDetailsFormDefaultValues: SRMCustomerDetailsFormType = {
   customerProfilePic: "", // Optional field
   customerName: "", // Name of the Customer
   nationality: "", // Nationality of the user
   passportNumber: "", // Passport number
+  passport: [], // Passport image
   drivingLicenseNumber: "", // Driving license number
+  drivingLicense: [], // Driving license image
   phoneNumber: "", // Phone number with validation on minimum characters
 };
+
+// srm public customer details form default values
+export const SRMPublicCustomerDetailsFormDefaultValues: SRMPublicCustomerDetailsFormType =
+  {
+    customerProfilePic: "",
+    customerName: "",
+    nationality: "",
+    passportNumber: "",
+    passport: [], // Passport image
+    drivingLicenseNumber: "", // Driving license number
+    drivingLicense: [],
+    phoneNumber: "",
+  };
 
 export const SRMTaxInfoFormDefaultValues: SRMTaxInfoFormType = {
   countryId: "",

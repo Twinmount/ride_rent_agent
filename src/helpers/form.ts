@@ -379,40 +379,30 @@ interface SRMTabValidationProps {
   levelsFilled: number;
 }
 
-// srm tab validation
+/**
+ * Function to validate srm tab validation
+ * If vehicle tab is completed, allow free access to any tab
+ * Else, restrict access to all other tabs unless vehicle (level 1) is completed
+ */
 export const validateSRMTabAccess = ({
   tab,
   levelsFilled,
 }: SRMTabValidationProps): { canAccess: boolean; message: string } => {
+  // "vehicle" tab is always accessible
   if (tab === "vehicle") {
-    if (levelsFilled >= 1 && levelsFilled < 2) {
-      return {
-        canAccess: true,
-        message: "",
-      }; // Access allowed
-    } else {
-      return {
-        canAccess: false,
-        message: "Please complete the Customer Details  to proceed.",
-      };
-    }
+    return { canAccess: true, message: "" };
   }
 
-  if (tab === "payment") {
-    if (levelsFilled >= 2 && levelsFilled < 3) {
-      return {
-        canAccess: true,
-        message: "",
-      }; // Access allowed
-    } else {
-      return {
-        canAccess: false,
-        message: "Please complete the Vehicle Details to proceed.",
-      };
-    }
+  // Restrict access to all other tabs unless vehicle (level 1) is completed
+  if (levelsFilled < 1) {
+    return {
+      canAccess: false,
+      message: "Please complete the Vehicle Details to proceed.",
+    };
   }
 
-  return { canAccess: true, message: "" }; // Default case
+  // If vehicle is completed (levelsFilled >= 1), allow free access to any tab
+  return { canAccess: true, message: "" };
 };
 
 // Type guard to check if a value has the 'selected' property for specification form

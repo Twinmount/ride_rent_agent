@@ -7,6 +7,7 @@ import { useSRMUpdateForm } from "@/hooks/useSRMUpdateForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import PageWrapper from "@/components/PageWrapper";
 import { TAB_ITEMS } from "@/data/srm-data";
+import { SRMCustomerDetailsFormType } from "@/types/srm-types";
 
 // Lazy-loaded form components
 const SRMCustomerDetailsForm = lazy(
@@ -21,7 +22,7 @@ const SRMPaymentDetailsForm = lazy(
 const SRMCheckListForm = lazy(
   () => import("@/components/form/srm-form/CheckListForm")
 );
-export default function SRMFormUpdatePage() {
+export default function SRMTripUpdatePage() {
   const { bookingId } = useParams<{
     bookingId: string;
   }>();
@@ -45,7 +46,7 @@ export default function SRMFormUpdatePage() {
     checkListFormData,
     isCheckListFormDataLoading,
     refetchLevels,
-    isAddOrIncompleteSRMVehicleForm,
+    isAddOrIncompleteSRMCustomerForm,
     isAddOrIncompleteSRMPaymentForm,
     vehicleIdParam,
   } = useSRMUpdateForm(bookingId);
@@ -80,7 +81,6 @@ export default function SRMFormUpdatePage() {
                   type={"Update"}
                   formData={vehicleFormData}
                   refetchLevels={refetchLevels}
-                  isAddOrIncomplete={isAddOrIncompleteSRMVehicleForm}
                 />
               )}
             </Suspense>
@@ -93,7 +93,8 @@ export default function SRMFormUpdatePage() {
               ) : (
                 <SRMCustomerDetailsForm
                   type={"Update"}
-                  formData={customerFormData as any}
+                  formData={customerFormData as SRMCustomerDetailsFormType}
+                  isAddOrIncomplete={isAddOrIncompleteSRMCustomerForm}
                 />
               )}
             </Suspense>
