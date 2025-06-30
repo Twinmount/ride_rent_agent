@@ -390,7 +390,11 @@ export const validateSRMTabAccess = ({
 }: SRMTabValidationProps): { canAccess: boolean; message: string } => {
   // "vehicle" tab is always accessible
   if (tab === "vehicle") {
-    return { canAccess: true, message: "" };
+    if (levelsFilled < 1) {
+      return { canAccess: true, message: "" };
+    } else {
+      return { canAccess: true, message: "Vehicle Details already completed" };
+    }
   }
 
   // Restrict access to all other tabs unless vehicle (level 1) is completed

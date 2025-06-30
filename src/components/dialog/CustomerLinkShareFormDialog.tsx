@@ -26,6 +26,7 @@ export type ShareFormData = z.infer<typeof CustomerShareLinkFormSchema>;
 
 export default function CustomerLinkShareFormDialog() {
   const [countryCode, setCountryCode] = useState<string>("");
+  const [open, setOpen] = useState(false);
 
   const form = useForm<ShareFormData>({
     resolver: zodResolver(CustomerShareLinkFormSchema),
@@ -46,10 +47,15 @@ export default function CustomerLinkShareFormDialog() {
       );
 
       if (response.result) {
+        sessionStorage.setItem(
+          "linkSendCustomerId",
+          response.result.customerId
+        );
+        setOpen(false);
         toast({
           title: "Success",
           description:
-            "A link  has been sent to the customer email, You can wait for the customer to fill the form, or you can continue to fill the form  or proceed to next step.",
+            "A link  has been sent to the customer email, You can wait for the customer to fill the form, or you can continue to fill the form  or proceed to  payment phase",
           duration: 3000,
           className: "bg-green-400",
         });
@@ -66,7 +72,7 @@ export default function CustomerLinkShareFormDialog() {
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="w-fit bg-transparent hover:bg-transparent text-blue-500 hover:textblue-600 hover:cursor-pointer ml-auto">
           Let customer fill it? Share link instead.

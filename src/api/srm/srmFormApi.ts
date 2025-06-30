@@ -75,7 +75,7 @@ export const sendCustomerFormLink = async (
   values: ShareFormData,
   countryCode: string,
   bookingId: string
-): Promise<PublicCustomerLinkShareResponse> => {
+): Promise<AddCustomerFormResponse> => {
   try {
     const phoneNumber = values.phoneNumber
       .replace(`+${countryCode}`, "")
@@ -92,12 +92,12 @@ export const sendCustomerFormLink = async (
     /**
      * first create the customer and get the customerId
      */
-    const data = await API.post<AddCustomerFormResponse>({
+    const customerCreationResponse = await API.post<AddCustomerFormResponse>({
       slug: Slug.POST_SRM_CUSTOMER_FORM,
       body: requestBody,
     });
 
-    if (!data) {
+    if (!customerCreationResponse) {
       throw new Error("Failed to create customer for public link share");
     }
 
@@ -106,32 +106,33 @@ export const sendCustomerFormLink = async (
       email: values.email,
       countryCode,
       phoneNumber,
-      customerId: data.result.customerId,
+      customerId: customerCreationResponse.result.customerId,
       bookingId,
       customerName: values.customerName,
     };
 
     // after creating the customer, call the temp-auth-token POST endpoint to send teh link
-    const response = await API.post<PublicCustomerLinkShareResponse>({
+    const linkSendResponse = await API.post<PublicCustomerLinkShareResponse>({
       slug: Slug.POST_SEND_LINK_FORM_CUSTOMER_CREATION,
       body: newRequestBody,
     });
 
-    if (!response) {
+    if (!linkSendResponse) {
       throw new Error("Failed to create public link");
     }
 
-    return response;
+    return customerCreationResponse;
   } catch (error) {
     console.error("Error on generating public link", error);
     throw error;
   }
 };
 
-export const createCustomerByPublic = async (
+export const updateCustomerByPublic = async (
   values: SRMCustomerDetailsFormType,
   countryCode: string,
-  token: string
+  token: string,
+  customerId: string
 ): Promise<AddCustomerFormResponse> => {
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -143,16 +144,20 @@ export const createCustomerByPublic = async (
 
     // Prepare the request body for the API
     const requestBody = {
+      customerId,
       countryCode,
       customerName: values.customerName,
+      email: values.email,
       nationality: values.nationality,
       passportNumber: values.passportNumber,
+      passport: values.passport,
       drivingLicenseNumber: values.drivingLicenseNumber,
       phoneNumber,
+      drivingLicense: values.drivingLicense,
       customerProfilePic: values.customerProfilePic || null,
     };
 
-    const data: AddCustomerFormResponse = await axios.post(
+    const data: AddCustomerFormResponse = await axios.put(
       `${API_URL}${Slug.PUT_SRM_CUSTOMER_FORM}`,
       requestBody,
       {
@@ -246,14 +251,12 @@ export const isCustomerSpam = async (
 };
 
 export const createBookingDataForVehicle = async (
-  vehicleId: string,
-  companyId: string
+  vehicleId: string
 ): Promise<CreateCustomerBookingResponse> => {
   try {
     // Prepare the request body for the API
     const requestBody = {
       vehicleId,
-      companyId,
     };
 
     // Sending the request as a JSON object

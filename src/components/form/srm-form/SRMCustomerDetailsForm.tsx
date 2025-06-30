@@ -20,12 +20,14 @@ import NationalityDropdown from "../dropdowns/NationalityDropdown";
 import CustomerSearchAndAutoFill from "../dropdowns/CustomerSearchAndAutoFill";
 
 import { useFormValidationToast } from "@/hooks/useFormValidationToast";
-import { handleCustomerSelect } from "@/helpers";
+import { handleCustomerRefresh, handleCustomerSelect } from "@/helpers";
 import { FormFieldLayout } from "../form-ui/FormFieldLayout";
 import { FormSubmitButton } from "../form-ui/FormSubmitButton";
 import { FormContainer } from "../form-ui/FormContainer";
 import CustomerLinkShareFormDialog from "@/components/dialog/CustomerLinkShareFormDialog";
 import MultipleFileUpload from "../file-uploads/MultipleFileUpload";
+import useRefreshSRMCustomer from "@/hooks/useRefreshSRMCustomer";
+import useGetSearchParams from "@/hooks/useGetSearchParams";
 
 type SRMCustomerDetailsFormProps = {
   type: "Add" | "Update";
@@ -46,11 +48,23 @@ export default function SRMCustomerDetailsForm({
   const [currentProfilePic, setCurrentProfilePic] = useState<string | null>(
     formData?.customerProfilePic || null
   );
+
   const [existingCustomerId, setExistingCustomerId] = useState<string | null>(
     null
   );
 
   const bookingId = sessionStorage.getItem("bookingId") || "";
+
+  const customerIdParam = useGetSearchParams("customerId");
+  const sessionStorageCustomerId = sessionStorage.getItem("linkSendCustomerId");
+
+  const customerIdForRefetch =
+    type === "Add" ? sessionStorageCustomerId : customerIdParam;
+
+  const { isCustomerRefreshLoading, refetchRefreshCustomer } =
+    useRefreshSRMCustomer({
+      customerId: customerIdForRefetch as string,
+    });
 
   //  initial default values for the form
   const initialValues =
@@ -180,6 +194,28 @@ export default function SRMCustomerDetailsForm({
     );
   };
 
+  const onCustomerRefresh = async () => {
+    const result = await refetchRefreshCustomer();
+    if (result.data?.result) {
+      handleCustomerRefresh(
+        form,
+        result.data.result,
+        setExistingCustomerId,
+        setCurrentProfilePic,
+        setCountryCode
+      );
+      toast({
+        title: "Customer data refreshed",
+        className: "bg-green-500 text-white",
+      });
+    } else {
+      toast({
+        variant: "destructive",
+        title: "No data returned",
+      });
+    }
+  };
+
   // FIELDS DISABLED IF THE TYPE === UPDATE
   const isFieldsDisabled = type === "Update";
 
@@ -188,7 +224,20 @@ export default function SRMCustomerDetailsForm({
 
   return (
     <div className="flex flex-col">
-      {type === "Add" && <CustomerLinkShareFormDialog />}
+      {type === "Add" && (
+        <div>
+          <CustomerLinkShareFormDialog />
+
+          <button
+            type="button"
+            onClick={onCustomerRefresh}
+            disabled={!customerIdForRefetch || isCustomerRefreshLoading}
+            className="text-sm text-blue-600 hover:underline font-medium"
+          >
+            🔄 Refresh Data
+          </button>
+        </div>
+      )}
       {/* Form container */}
       <Form {...form}>
         <FormContainer
@@ -304,9 +353,10 @@ export default function SRMCustomerDetailsForm({
             name="passport"
             render={() => (
               <MultipleFileUpload
+                key={(initialValues.passport ?? []).join(",")}
                 name="passport"
                 label="Passport Images"
-                existingFiles={initialValues.passport || []}
+                existingFiles={initialValues.passport ?? []}
                 description="Upload both front and back of the passport."
                 maxSizeMB={5}
                 setIsFileUploading={setIsFileUploading}
@@ -342,9 +392,10 @@ export default function SRMCustomerDetailsForm({
             name="drivingLicense"
             render={() => (
               <MultipleFileUpload
+                key={(initialValues.drivingLicense ?? []).join(",")}
                 name="drivingLicense"
                 label="Driving License Images"
-                existingFiles={initialValues.drivingLicense || []}
+                existingFiles={initialValues.drivingLicense ?? []}
                 description="Upload both front and back of the driving license."
                 maxSizeMB={5}
                 setIsFileUploading={setIsFileUploading}

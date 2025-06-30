@@ -6,10 +6,8 @@ import * as z from "zod";
 import { Form, FormField } from "@/components/ui/form";
 
 import { Input } from "@/components/ui/input";
-import { SRMPublicCustomerDetailsFormDefaultValues } from "@/constants";
 import { SRMPublicCustomerDetailsFormSchema } from "@/lib/validator";
 import {
-  PublicCustomerApiArgs,
   SRMCustomerDetailsFormType,
   SRMPublicCustomerDetailsFormType,
 } from "@/types/srm-types";
@@ -19,7 +17,7 @@ import { deleteMultipleFiles } from "@/helpers/form";
 import { toast } from "@/components/ui/use-toast";
 import { GcsFilePaths } from "@/constants/enum";
 import SingleFileUpload from "../file-uploads/SingleFileUpload";
-import { createCustomerByPublic } from "@/api/srm/srmFormApi";
+import { updateCustomerByPublic } from "@/api/srm/srmFormApi";
 import NationalityDropdown from "../dropdowns/NationalityDropdown";
 
 import { useFormValidationToast } from "@/hooks/useFormValidationToast";
@@ -27,25 +25,34 @@ import { FormFieldLayout } from "../form-ui/FormFieldLayout";
 import { FormSubmitButton } from "../form-ui/FormSubmitButton";
 import { FormContainer } from "../form-ui/FormContainer";
 import { useNavigate } from "react-router-dom";
-import useGetSearchParams from "@/hooks/useGetSearchParams";
+import MultipleFileUpload from "../file-uploads/MultipleFileUpload";
 
 type Props = {
   token: string;
-  formData?: SRMPublicCustomerDetailsFormType | null;
+  formData: SRMPublicCustomerDetailsFormType;
+  customerId: string;
+  initialCountryCode: string;
 };
 
 /**
  * Public customer details form for SRM
  */
-export default function SRMPublicCustomerDetailsForm({ token }: Props) {
+export default function SRMPublicCustomerDetailsForm({
+  token,
+  formData,
+  customerId,
+  initialCountryCode,
+}: Props) {
   const navigate = useNavigate();
 
-  const [countryCode, setCountryCode] = useState<string>("");
+  const [countryCode, setCountryCode] = useState<string>(
+    initialCountryCode || "+971"
+  );
   const [isFileUploading, setIsFileUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
 
   //  initial default values for the form
-  const initialValues = SRMPublicCustomerDetailsFormDefaultValues;
+  const initialValues = formData;
 
   // Define your form.
   const form = useForm<z.infer<typeof SRMPublicCustomerDetailsFormSchema>>({
@@ -57,20 +64,14 @@ export default function SRMPublicCustomerDetailsForm({ token }: Props) {
     values: SRMCustomerDetailsFormType,
     countryCode: string
   ) => {
-    const customerData = await createCustomerByPublic(
+    const customerData = await updateCustomerByPublic(
       values,
       countryCode,
-      token
+      token,
+      customerId
     );
 
-    const requestBody: PublicCustomerApiArgs = {
-      email: "",
-      phoneNumber: values.phoneNumber,
-      customerId: customerData.result.customerId,
-      countryCode: countryCode,
-    };
-
-    return "";
+    return customerData;
   };
 
   // Define a submit handler.
@@ -87,7 +88,7 @@ export default function SRMPublicCustomerDetailsForm({ token }: Props) {
     }
 
     try {
-      let data;
+      let data = await handlePublicCustomerBooking(values, countryCode);
 
       if (data) {
         await deleteMultipleFiles(deletedFiles);
@@ -144,12 +145,36 @@ export default function SRMPublicCustomerDetailsForm({ token }: Props) {
             render={({ field }) => (
               <FormFieldLayout
                 label="Customer Name"
-                description={"Provide customer name."}
+                description={
+                  "You cannot edit customer name as this field is already provided by the corresponding agent."
+                }
               >
                 <Input
                   placeholder="Enter customer name"
                   {...field}
                   className="input-field"
+                  readOnly
+                  disabled
+                />
+              </FormFieldLayout>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormFieldLayout
+                label="Customer Email"
+                description="You cannot edit customer email as this field is already provided by the corresponding agent."
+              >
+                <Input
+                  placeholder="Enter email"
+                  {...field}
+                  type="email"
+                  className="input-field"
+                  readOnly
+                  disabled
                 />
               </FormFieldLayout>
             )}
@@ -211,6 +236,25 @@ export default function SRMPublicCustomerDetailsForm({ token }: Props) {
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="passport"
+            render={() => (
+              <MultipleFileUpload
+                name="passport"
+                label="Passport Images"
+                existingFiles={initialValues.passport || []}
+                description="Upload both front and back of the passport."
+                maxSizeMB={5}
+                setIsFileUploading={setIsFileUploading}
+                bucketFilePath={GcsFilePaths.IMAGE}
+                isFileUploading={isFileUploading}
+                downloadFileName="passport"
+                setDeletedFiles={setDeletedFiles}
+              />
+            )}
+          />
+
           {/* Driving License Number */}
           <FormField
             control={form.control}
@@ -229,6 +273,25 @@ export default function SRMPublicCustomerDetailsForm({ token }: Props) {
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="drivingLicense"
+            render={() => (
+              <MultipleFileUpload
+                name="drivingLicense"
+                label="Driving License Images"
+                existingFiles={initialValues.drivingLicense || []}
+                description="Upload both front and back of the driving license."
+                maxSizeMB={5}
+                setIsFileUploading={setIsFileUploading}
+                bucketFilePath={GcsFilePaths.IMAGE}
+                isFileUploading={isFileUploading}
+                downloadFileName="driving-license"
+                setDeletedFiles={setDeletedFiles}
+              />
+            )}
+          />
+
           {/* mobile */}
           <FormField
             control={form.control}
@@ -236,7 +299,7 @@ export default function SRMPublicCustomerDetailsForm({ token }: Props) {
             render={({ field }) => (
               <FormFieldLayout
                 label="Mobile Number"
-                description="Enter the contact details of the customer"
+                description="You cannot edit customer phone number as this field is already provided by the corresponding agent."
               >
                 <PhoneInput
                   defaultCountry="ae"
@@ -256,6 +319,7 @@ export default function SRMPublicCustomerDetailsForm({ token }: Props) {
                     buttonClassName:
                       "!border-none outline-none !h-[52px] !w-[50px] !rounded-xl !bg-gray-100",
                   }}
+                  disabled={true}
                 />
               </FormFieldLayout>
             )}

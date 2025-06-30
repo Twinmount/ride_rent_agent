@@ -192,6 +192,7 @@ export const SRMPublicCustomerDetailsFormDefaultValues: SRMPublicCustomerDetails
   {
     customerProfilePic: "",
     customerName: "",
+    email: "",
     nationality: "",
     passportNumber: "",
     passport: [], // Passport image

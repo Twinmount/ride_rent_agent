@@ -62,14 +62,16 @@ export default function SRMVehicleDetailsForm({
   const [currentVehiclePhoto, setCurrentVehiclePhoto] = useState<string | null>(
     formData?.vehiclePhoto || null
   );
+
   const [existingVehicleId, setExistingVehicleId] = useState<string | null>(
     null
   );
-  const { companyId } = useCompany();
 
   // boolean to determine if user reached this form from SRM trip vehicle form
-  const srmQueryParam = useGetSearchParams("srm", false);
+  const srmQueryParam = useGetSearchParams("from", false);
   const isFromSrm = srmQueryParam === "srm";
+
+  console.log("isFromSrm : ", isFromSrm);
 
   // access vehicleRegistrationNumber from the url search params
   const vehicleRegistrationNumber = useGetSearchParams(
@@ -109,10 +111,7 @@ export default function SRMVehicleDetailsForm({
 
       if (existingVehicleId) {
         // creating the booking
-        data = await createBookingDataForVehicle(
-          existingVehicleId,
-          companyId as string
-        );
+        data = await createBookingDataForVehicle(existingVehicleId);
       } else {
         toast({
           variant: "destructive",
@@ -153,29 +152,34 @@ export default function SRMVehicleDetailsForm({
     try {
       let data = await handleVehicleSubmit(values);
 
+      console.log("handle vehicle submit data : ", data);
+
       if (data) {
         await deleteMultipleFiles(deletedFiles);
-        sessionStorage.setItem("bookingId", data.result.bookingId);
-        sessionStorage.setItem("vehicleId", data.result.vehicleId);
+
+        // if we are in the dedicated SRMVehicleAddPage or SRMVehicleUpdatePage, store the vehicleId in the session storage from the data.result.id. Otherwise, store it from the data.result.vehicle.id
+        if (!isDedicatedVehiclePage) {
+          console.log(
+            "we are now not in the dedicated SRMVehicleAddPage or SRMVehicleUpdatePage"
+          );
+          sessionStorage.setItem("vehicleId", data.result.vehicle.id);
+          sessionStorage.setItem("bookingId", data.result.bookingId);
+        }
+
         sessionStorage.setItem(
           "rentalDetails",
           JSON.stringify(values.rentalDetails)
         );
 
-        toast({
-          title: `Vehicle ${type.toLowerCase()} successful`,
-          className: "bg-yellow text-white",
+        queryClient.invalidateQueries({
+          queryKey: ["srm-vehicles"],
         });
 
         if (isDedicatedVehiclePage) {
-          queryClient.invalidateQueries({
-            queryKey: ["srm-vehicles"],
-          });
-
           // if user reached here from SRM vehicle form, navigate them back that same page, otherwise, navigate to srm vehicle list
           if (isFromSrm) {
             toast({
-              title: "Vehicle added successfully",
+              title: "Vehicle added successful",
               className: "bg-yellow text-white",
               description: "You can now search for the new vehicle just added",
             });
@@ -186,6 +190,11 @@ export default function SRMVehicleDetailsForm({
         } else {
           refetchLevels?.();
           if (type === "Add" && onNextTab) {
+            toast({
+              title: `Vehicle phase success, moving to customer details`,
+              className: "bg-yellow text-white",
+            });
+
             onNextTab();
 
             window.scrollTo({ top: 0, behavior: "smooth" });

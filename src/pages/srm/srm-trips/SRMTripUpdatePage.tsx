@@ -12,7 +12,7 @@ import useGetSearchParams from "@/hooks/useGetSearchParams";
 
 // Lazy-loaded form components
 const SRMCustomerDetailsForm = lazy(
-  () => import("@/components/form/srm-form/SMRCustomerDetailsForm")
+  () => import("@/components/form/srm-form/SRMCustomerDetailsForm")
 );
 const SRMVehicleDetailsForm = lazy(
   () => import("@/components/form/srm-form/SRMVehicleDetailsForm")

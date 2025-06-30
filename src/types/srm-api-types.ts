@@ -4,6 +4,7 @@ export interface CustomerApiType {
   id: string; // Unique identifier for the user
   customerId: string;
   customerName: string; // User's name
+  email: string;
   nationality: string; // User's nationality
   passportNumber: string; // User's passport number
   passport: string[];
@@ -13,8 +14,6 @@ export interface CustomerApiType {
   customerProfilePic?: string; // Optional field for the user's profile image or identifier
   customerProfilePicPath?: string; // Optional field for the user's profile image or identifier
   countryCode: string; // The country code associated with the user's phone number
-  createdAt: string; // Timestamp when the record was created
-  updatedAt: string; // Timestamp when the record was last updated
 }
 export interface AddCustomerFormResponse {
   result: CustomerApiType;

@@ -168,9 +168,12 @@ export interface CustomerType {
   id: string;
   customerId: string;
   customerName: string;
+  email: string;
   nationality: string;
   passportNumber: string;
+  passport: string[];
   drivingLicenseNumber: string;
+  drivingLicense: string[];
   phoneNumber: string;
   customerProfilePic?: string;
   countryCode: string;

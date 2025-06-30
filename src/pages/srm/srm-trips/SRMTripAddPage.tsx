@@ -12,7 +12,7 @@ const SRMVehicleDetailsForm = lazy(
   () => import("@/components/form/srm-form/SRMVehicleDetailsForm")
 );
 const SRMCustomerDetailsForm = lazy(
-  () => import("@/components/form/srm-form/SMRCustomerDetailsForm")
+  () => import("@/components/form/srm-form/SRMCustomerDetailsForm")
 );
 const SRMPaymentDetailsForm = lazy(
   () => import("@/components/form/srm-form/PaymentDetailsForm")
@@ -31,7 +31,7 @@ export default function SRMTripAddPage() {
 
     const { canAccess, message } = validateSRMTabAccess({ tab, levelsFilled });
 
-    if (canAccess) {
+    if (true) {
       setActiveTab(tab);
     } else {
       toast({

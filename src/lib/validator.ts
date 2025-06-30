@@ -198,6 +198,7 @@ export const SRMPublicCustomerDetailsFormSchema = z.object({
     .string()
     .min(1, "Customer name is required")
     .max(50, "Maximum 50 characters allowed"),
+  email: z.string().email("Provide a valid email address"),
   nationality: z
     .string()
     .min(1, "Nationality is required")

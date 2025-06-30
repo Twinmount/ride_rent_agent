@@ -65,25 +65,19 @@ export default function CheckListForm({
 
       let responseData;
 
-      if (type === "Add") {
+      if (!data?.result) {
+        // if there is no check list data to fetch initially, create a new one
+        console.log("data.result not found, creating new check list");
         responseData = await postSRMCheckList({
           vehicleId: vehicleId as string,
-          checklistMetadata: JSON.stringify(data),
+          checklistMetadata: JSON.stringify(submittedData),
         });
-      } else if (type === "Update") {
-        if (data?.result) {
-          console.log("data.result found, updating check list");
-          responseData = await putSRMCheckList({
-            vehicleId: vehicleId as string,
-            checklistMetadata: JSON.stringify(data),
-          });
-        } else {
-          console.log("data.result not found, creating new check list");
-          responseData = await postSRMCheckList({
-            vehicleId: vehicleId as string,
-            checklistMetadata: JSON.stringify(data),
-          });
-        }
+      } else {
+        console.log("data.result found, updating check list");
+        responseData = await putSRMCheckList({
+          vehicleId: vehicleId as string,
+          checklistMetadata: JSON.stringify(submittedData),
+        });
       }
 
       if (!responseData) {
@@ -96,7 +90,9 @@ export default function CheckListForm({
         className: "bg-yellow text-white",
       });
 
-      navigate(`/srm/manage-vehicles/${vehicleId}/${bodyType}`);
+      if (type === "Add") {
+        navigate(`/srm/ongoing-trips`);
+      }
     } catch (error) {
       console.error("Checklist submit failed:", error);
       toast({

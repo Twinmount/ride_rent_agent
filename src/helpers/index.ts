@@ -1,8 +1,8 @@
 import { SingleVehicleType } from "@/types/API-types";
-import { differenceInHours } from "date-fns";
+import { differenceInHours, isValid } from "date-fns";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerType } from "@/types/srm-types";
-import { SRMVehicleDetailsFormType, VehicleType } from "@/types/srm-types";
+import { VehicleType } from "@/types/srm-types";
 import {
   format,
   differenceInCalendarDays,
@@ -11,6 +11,7 @@ import {
   isSameDay,
   parseISO,
 } from "date-fns";
+import { CustomerApiType } from "@/types/srm-api-types";
 
 type ApprovalStatusType = "APPROVED" | "UNDER_REVIEW" | "REJECTED" | "PENDING";
 
@@ -157,15 +158,19 @@ export const handleCustomerSelect = (
   form.setValue("customerName", customerName);
 
   if (customerData) {
+    form.setValue("email", customerData.email || "");
     setExistingCustomerId(customerData.customerId);
     form.setValue("customerProfilePic", customerData.customerProfilePic || "");
     setCurrentProfilePic(customerData.customerProfilePic || "");
     form.setValue("nationality", customerData.nationality || "");
     form.setValue("passportNumber", customerData.passportNumber || "");
+    form.setValue("passport", customerData.passport || []);
     form.setValue(
       "drivingLicenseNumber",
       customerData.drivingLicenseNumber || ""
     );
+
+    form.setValue("drivingLicense", customerData.drivingLicense || []);
     form.setValue(
       "phoneNumber",
       (customerData.countryCode || "971") + customerData.phoneNumber || ""
@@ -175,12 +180,45 @@ export const handleCustomerSelect = (
     setExistingCustomerId(null);
     setCurrentProfilePic(null);
     form.setValue("customerProfilePic", "");
+    form.setValue("email", "");
     form.resetField("nationality");
     form.resetField("passportNumber");
+    form.resetField("passport");
     form.resetField("drivingLicenseNumber");
+    form.resetField("drivingLicense");
     form.resetField("phoneNumber");
     setCountryCode("");
   }
+};
+
+export const handleCustomerRefresh = (
+  form: UseFormReturn<any, any>,
+  customerData: CustomerApiType,
+  setExistingCustomerId: (id: string | null) => void,
+  setCurrentProfilePic: (pic: string | null) => void,
+  setCountryCode: (code: string) => void
+) => {
+  if (!customerData) return;
+
+  form.setValue("customerName", customerData.customerName || "");
+  form.setValue("email", customerData.email || "");
+  form.setValue("customerProfilePic", customerData.customerProfilePic || "");
+  form.setValue("nationality", customerData.nationality || "");
+  form.setValue("passportNumber", customerData.passportNumber || "");
+  form.setValue("passport", customerData.passport || []);
+  form.setValue(
+    "drivingLicenseNumber",
+    customerData.drivingLicenseNumber || ""
+  );
+  form.setValue("drivingLicense", customerData.drivingLicense || []);
+  form.setValue(
+    "phoneNumber",
+    (customerData.countryCode || "971") + customerData.phoneNumber || ""
+  );
+
+  setExistingCustomerId(customerData.customerId || null);
+  setCurrentProfilePic(customerData.customerProfilePic || null);
+  setCountryCode(customerData.countryCode || "");
 };
 
 // Helper function to handle vehicle selection to auto fill the SRM Vehicle form
@@ -311,7 +349,7 @@ export const handleVehicleSelection = (
   }
 };
 
-// for showing notification like indication in teh ongoing srm trips card
+// for showing notification like indication in the ongoing srm trips card
 export function getExpiryNotificationText(
   bookingStartDate: string,
   bookingEndDate: string
@@ -319,9 +357,23 @@ export function getExpiryNotificationText(
   reminderMessage: string;
   className: string;
 } {
-  const today = new Date();
+  if (!bookingStartDate || !bookingEndDate) {
+    return {
+      reminderMessage: "Booking date missing",
+      className: "text-gray-400",
+    };
+  }
+
   const startDate = parseISO(bookingStartDate);
   const endDate = parseISO(bookingEndDate);
+
+  if (!isValid(startDate) || !isValid(endDate)) {
+    return {
+      reminderMessage: "Invalid date",
+      className: "text-gray-400",
+    };
+  }
+  const today = new Date();
 
   const daysUntilStart = differenceInCalendarDays(startDate, today);
   const daysUntilEnd = differenceInCalendarDays(endDate, today);
