@@ -9,12 +9,14 @@ import { PaintBucket, PlusCircle, Trash2, XCircle } from "lucide-react";
 import { FormGenericButton } from "../form-ui/FormSubmitButton";
 
 type Props = {
+  type: "Add" | "Update";
   targetImage: string;
   initialAnnotation?: AnnotationState | null;
   onSave: (data: AnnotationState) => void;
 };
 
 const ImageAnnotationEditor = ({
+  type,
   targetImage,
   initialAnnotation,
   onSave,
@@ -144,7 +146,7 @@ const ImageAnnotationEditor = ({
       />
 
       <FormGenericButton className="mt-8" onClick={handleSave}>
-        Add Vehicle Checklist
+        {type === "Add" ? "Save" : "Update"}
       </FormGenericButton>
     </div>
   );

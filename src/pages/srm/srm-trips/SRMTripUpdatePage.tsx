@@ -8,13 +8,14 @@ import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import PageWrapper from "@/components/PageWrapper";
 import { TAB_ITEMS } from "@/data/srm-data";
 import { SRMCustomerDetailsFormType } from "@/types/srm-types";
+import useGetSearchParams from "@/hooks/useGetSearchParams";
 
 // Lazy-loaded form components
 const SRMCustomerDetailsForm = lazy(
-  () => import("@/components/form/srm-form/CustomerDetailsForm")
+  () => import("@/components/form/srm-form/SMRCustomerDetailsForm")
 );
 const SRMVehicleDetailsForm = lazy(
-  () => import("@/components/form/srm-form/VehicleDetailsForm")
+  () => import("@/components/form/srm-form/SRMVehicleDetailsForm")
 );
 const SRMPaymentDetailsForm = lazy(
   () => import("@/components/form/srm-form/PaymentDetailsForm")
@@ -26,6 +27,10 @@ export default function SRMTripUpdatePage() {
   const { bookingId } = useParams<{
     bookingId: string;
   }>();
+
+  const vehicleId = useGetSearchParams("vehicleId", true);
+  console.log("setting vehicle id in session storage : ", vehicleId);
+  sessionStorage.setItem("vehicleId", vehicleId || "");
 
   // Handle tab change based on levelsFilled state
   const handleTabChange = (value: string) => {
@@ -52,7 +57,7 @@ export default function SRMTripUpdatePage() {
   } = useSRMUpdateForm(bookingId);
 
   return (
-    <PageWrapper heading="Edit Trip Record">
+    <PageWrapper heading="View Trip Record">
       <div>
         <Tabs
           value={activeTab}

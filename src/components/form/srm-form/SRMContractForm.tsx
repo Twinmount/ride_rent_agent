@@ -13,6 +13,7 @@ import { FormContainer } from "../form-ui/FormContainer";
 import { useNavigate } from "react-router-dom";
 import { updateSRMUserTaxAndContractInfo } from "@/api/srm";
 import SRMContractTextEditor from "../SRMContractTextEditor";
+import { useQueryClient } from "@tanstack/react-query";
 
 type FormProps = {
   type: "Add" | "Update";
@@ -21,6 +22,8 @@ type FormProps = {
 
 export default function SRMContractForm({ type, formData }: FormProps) {
   const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
 
   //  initial default values for the form
   const initialValues =
@@ -47,12 +50,13 @@ export default function SRMContractForm({ type, formData }: FormProps) {
           className: "bg-yellow text-white",
         });
 
-        // if (isPublic && type === "Add") {
-        //   navigate("/srm/customer-details/public/success");
-        // } else if (type === "Add" && onNextTab) {
-        //   onNextTab();
-        //   window.scrollTo({ top: 0, behavior: "smooth" });
-        // }
+        queryClient.invalidateQueries({
+          queryKey: ["srm-onboarding-status"],
+        });
+
+        if (type === "Add") {
+          navigate("/srm/dashboard");
+        }
       }
     } catch (error: any) {
       toast({
@@ -61,6 +65,10 @@ export default function SRMContractForm({ type, formData }: FormProps) {
         description: "Something went wrong",
       });
       console.error(error);
+    } finally {
+      queryClient.invalidateQueries({
+        queryKey: ["srm-onboarding-status"],
+      });
     }
   }
 
@@ -72,7 +80,7 @@ export default function SRMContractForm({ type, formData }: FormProps) {
           onSubmit={form.handleSubmit(onSubmit)}
           description={
             <p className="text-sm italic text-center text-gray-600">
-              Before you begin, please provide your country and tax information.
+              Please provide your contract before continuing to SRM.
             </p>
           }
           className="mt-4"

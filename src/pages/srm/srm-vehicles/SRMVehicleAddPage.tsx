@@ -1,4 +1,4 @@
-import SRMVehicleDetailsForm from "@/components/form/srm-form/VehicleDetailsForm";
+import SRMVehicleDetailsForm from "@/components/form/srm-form/SRMVehicleDetailsForm";
 import PageWrapper from "@/components/PageWrapper";
 
 export default function SRMVehicleAddPage() {
@@ -6,7 +6,6 @@ export default function SRMVehicleAddPage() {
     <PageWrapper heading="Add Vehicle">
       <SRMVehicleDetailsForm
         type={"Add"}
-        isAddOrIncomplete={true}
         showDescription={false}
         isDedicatedVehiclePage={true}
       />

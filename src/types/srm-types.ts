@@ -96,6 +96,7 @@ export enum BookingStatus {
   COMPLETED = "COMPLETED",
   ONGOING = "ONGOING",
   CANCELLED = "CANCELLED",
+  INCOMPLETE = "INCOMPLETE",
 }
 
 // rental details type of srm

@@ -9,10 +9,10 @@ import { TAB_ITEMS } from "@/data/srm-data";
 
 // Lazy-loaded form components
 const SRMVehicleDetailsForm = lazy(
-  () => import("@/components/form/srm-form/VehicleDetailsForm")
+  () => import("@/components/form/srm-form/SRMVehicleDetailsForm")
 );
 const SRMCustomerDetailsForm = lazy(
-  () => import("@/components/form/srm-form/CustomerDetailsForm")
+  () => import("@/components/form/srm-form/SMRCustomerDetailsForm")
 );
 const SRMPaymentDetailsForm = lazy(
   () => import("@/components/form/srm-form/PaymentDetailsForm")

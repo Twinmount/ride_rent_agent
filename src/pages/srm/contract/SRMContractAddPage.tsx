@@ -3,7 +3,7 @@ import PageWrapper from "@/components/PageWrapper";
 
 export default function SRMContractAddPage() {
   return (
-    <PageWrapper heading="Add Contract">
+    <PageWrapper heading="Submit your Contract and continue ">
       <SRMContractForm type="Add" />
     </PageWrapper>
   );

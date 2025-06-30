@@ -18,6 +18,9 @@ const OngoingTripsPage = lazy(
 const CompletedTripsPage = lazy(
   () => import("../../pages/srm/srm-trips/CompletedTripsPage")
 );
+const InCompletedTripsPage = lazy(
+  () => import("../../pages/srm/srm-trips/InCompleteTripsPage")
+);
 const ManageVehiclePage = lazy(
   () => import("../../pages/srm/srm-vehicles/ManageVehiclePage")
 );
@@ -87,6 +90,10 @@ export const srmPostOnboardingRoutes = [
   {
     path: "/srm/completed-trips",
     element: <CompletedTripsPage />,
+  },
+  {
+    path: "/srm/incomplete-trips",
+    element: <InCompletedTripsPage />,
   },
   {
     path: "/srm/manage-vehicles",

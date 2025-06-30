@@ -32,7 +32,9 @@ import BodyTypeDropdown from "../dropdowns/BodyTypeDropdown";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useQueryClient } from "@tanstack/react-query";
-import { Pen } from "lucide-react";
+import useGetSearchParams from "@/hooks/useGetSearchParams";
+import SRMVehicleEditPrompt from "@/components/dialog/SRMVehicleEditPrompt";
+import { useCompany } from "@/hooks/useCompany";
 
 type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";
@@ -63,12 +65,27 @@ export default function SRMVehicleDetailsForm({
   const [existingVehicleId, setExistingVehicleId] = useState<string | null>(
     null
   );
+  const { companyId } = useCompany();
+
+  // boolean to determine if user reached this form from SRM trip vehicle form
+  const srmQueryParam = useGetSearchParams("srm", false);
+  const isFromSrm = srmQueryParam === "srm";
+
+  // access vehicleRegistrationNumber from the url search params
+  const vehicleRegistrationNumber = useGetSearchParams(
+    "vehicleRegistrationNumber"
+  );
 
   // initial default values for the form
   const initialValues =
     formData && type === "Update"
       ? formData
-      : SRMVehicleDetailsFormDefaultValues;
+      : {
+          ...SRMVehicleDetailsFormDefaultValues,
+          ...(vehicleRegistrationNumber && {
+            vehicleRegistrationNumber,
+          }),
+        };
 
   // Define your form
   const form = useForm<z.infer<typeof SRMVehicleDetailsFormSchema>>({
@@ -92,7 +109,10 @@ export default function SRMVehicleDetailsForm({
 
       if (existingVehicleId) {
         // creating the booking
-        data = await createBookingDataForVehicle(existingVehicleId);
+        data = await createBookingDataForVehicle(
+          existingVehicleId,
+          companyId as string
+        );
       } else {
         toast({
           variant: "destructive",
@@ -151,7 +171,18 @@ export default function SRMVehicleDetailsForm({
           queryClient.invalidateQueries({
             queryKey: ["srm-vehicles"],
           });
-          navigate("/srm/manage-vehicles");
+
+          // if user reached here from SRM vehicle form, navigate them back that same page, otherwise, navigate to srm vehicle list
+          if (isFromSrm) {
+            toast({
+              title: "Vehicle added successfully",
+              className: "bg-yellow text-white",
+              description: "You can now search for the new vehicle just added",
+            });
+            navigate("/srm/trips/new");
+          } else {
+            navigate("/srm/manage-vehicles");
+          }
         } else {
           refetchLevels?.();
           if (type === "Add" && onNextTab) {
@@ -669,14 +700,7 @@ export default function SRMVehicleDetailsForm({
         />
 
         {!!existingVehicleId && (
-          <Link
-            to={`/srm/manage-vehicles/edit`}
-            className={
-              "flex-center -mb-4 button  hover:bg-darkYellow active:scale-[0.97] duration-100 active:shadow-md transition-all  ease-out col-span-2 mx-auto w-full text-white bg-slate-900 hover:bg-slate-800 !text-lg gap-x-2 !font-semibold md:w-10/12 lg:w-8/12"
-            }
-          >
-            Edit Vehicle <Pen size={16} />
-          </Link>
+          <SRMVehicleEditPrompt vehicleId={existingVehicleId} />
         )}
 
         {/* submit  */}

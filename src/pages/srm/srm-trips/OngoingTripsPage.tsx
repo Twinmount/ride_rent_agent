@@ -91,13 +91,11 @@ export default function OngoingTripsPage() {
         isLoading={isLoading || isFetching}
       />
 
-      {totalNumberOfPages > 0 && (
-        <Pagination
-          page={page}
-          setPage={setPage}
-          totalPages={totalNumberOfPages}
-        />
-      )}
+      <Pagination
+        page={page}
+        setPage={setPage}
+        totalPages={totalNumberOfPages}
+      />
 
       {/* ExtendTripModal */}
       {selectedTripBookingId && (

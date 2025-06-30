@@ -128,10 +128,10 @@ export default function SRMPaymentDetailsForm({
           className: "bg-yellow text-white",
         });
 
-        // Safely clear the sessionStorage after successful form submission
-        sessionStorage.removeItem("bookingId");
-        sessionStorage.removeItem("rentalDetails");
-        navigate("/srm/ongoing-trips");
+        if (type === "Add" && onNextTab) {
+          onNextTab();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
       }
     } catch (error) {
       toast({
@@ -394,8 +394,8 @@ export default function SRMPaymentDetailsForm({
           name="currency"
           render={({ field }) => (
             <FormFieldLayout
-              label="Select Currency"
-              description="his currency unit is only used while generating invoice"
+              label="Select Currency (for invoice)"
+              description="This currency unit is only used while generating invoice"
             >
               <CurrencyDropdown
                 onChangeHandler={(value) => {

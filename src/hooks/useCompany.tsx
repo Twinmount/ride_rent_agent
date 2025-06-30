@@ -20,7 +20,7 @@ export const useCompany = () => {
   const companyId = companyData?.result?.companyId;
 
   // Redirect if no userId or companyId is available
-  if (!userId || !companyId) {
+  if ((!userId || !companyId) && !isCompanyLoading) {
     toast({
       variant: "destructive",
       title: "Unauthorized! Login to continue",

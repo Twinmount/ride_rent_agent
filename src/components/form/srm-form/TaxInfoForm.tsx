@@ -46,6 +46,10 @@ export default function TaxInfoForm({ type, formData }: FormProps) {
         taxNumber: values.taxNumber,
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ["srm-onboarding-status"],
+      });
+
       if (data) {
         toast({
           title: `Tax Info ${type.toLowerCase()} successful`,
@@ -53,9 +57,6 @@ export default function TaxInfoForm({ type, formData }: FormProps) {
         });
 
         if (type === "Add") {
-          queryClient.invalidateQueries({
-            queryKey: ["srm-onboarding-status"],
-          });
           navigate("/srm/contract");
         }
       }
@@ -66,6 +67,10 @@ export default function TaxInfoForm({ type, formData }: FormProps) {
         description: "Something went wrong",
       });
       console.error(error);
+    } finally {
+      queryClient.invalidateQueries({
+        queryKey: ["srm-onboarding-status"],
+      });
     }
   }
 

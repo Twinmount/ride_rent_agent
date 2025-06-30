@@ -44,10 +44,13 @@ export const createCustomer = async (
     const requestBody = {
       countryCode,
       customerName: values.customerName,
+      email: values.email,
       nationality: values.nationality,
       passportNumber: values.passportNumber,
+      passport: values.passport,
       drivingLicenseNumber: values.drivingLicenseNumber,
       phoneNumber,
+      drivingLicense: values.drivingLicense,
       customerProfilePic: values.customerProfilePic || null, // Optional field for user profile, default to null if not provided
     };
 
@@ -192,22 +195,24 @@ export const getSRMCustomerFormDetails = async (
 };
 
 export const updateCustomerBooking = async (
-  customerId: string
+  customerId: string,
+  bookingId: string
 ): Promise<CreateCustomerBookingResponse> => {
   try {
     // Prepare the request body for the API
     const requestBody = {
       customerId,
+      bookingId,
     };
 
     // Sending the request as a JSON object
-    const data = await API.post<CreateCustomerBookingResponse>({
+    const data = await API.put<CreateCustomerBookingResponse>({
       slug: Slug.PUT_SRM_BOOKING_CUSTOMER,
       body: requestBody,
     });
 
     if (!data) {
-      throw new Error("Failed to post customer booking");
+      throw new Error("Failed to update srm customer booking");
     }
 
     return data;
@@ -241,12 +246,14 @@ export const isCustomerSpam = async (
 };
 
 export const createBookingDataForVehicle = async (
-  vehicleId: string
+  vehicleId: string,
+  companyId: string
 ): Promise<CreateCustomerBookingResponse> => {
   try {
     // Prepare the request body for the API
     const requestBody = {
       vehicleId,
+      companyId,
     };
 
     // Sending the request as a JSON object
@@ -583,7 +590,7 @@ export const postSRMCheckList = async (values: {
     const requestBody = values;
 
     // Sending the request as a JSON object
-    const data = await API.put<GetSRMChecklistResponse>({
+    const data = await API.post<GetSRMChecklistResponse>({
       slug: Slug.POST_SRM_CHECKLIST,
       body: requestBody,
     });

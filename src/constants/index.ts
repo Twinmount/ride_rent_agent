@@ -176,8 +176,9 @@ export const PrimaryFormDefaultValues: PrimaryFormType = {
 
 // srm customer details form default values
 export const SRMCustomerDetailsFormDefaultValues: SRMCustomerDetailsFormType = {
-  customerProfilePic: "", // Optional field
+  customerProfilePic: "",
   customerName: "", // Name of the Customer
+  email: "",
   nationality: "", // Nationality of the user
   passportNumber: "", // Passport number
   passport: [], // Passport image

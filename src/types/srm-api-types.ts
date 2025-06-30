@@ -345,7 +345,7 @@ export interface ChecklistApiType {
 }
 
 export interface GetSRMChecklistResponse {
-  result: ChecklistApiType;
+  result: ChecklistApiType | null;
   status: string;
   statusCode: number;
 }

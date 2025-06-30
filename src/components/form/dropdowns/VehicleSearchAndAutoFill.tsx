@@ -38,7 +38,7 @@ const VehicleSearch = ({
 
   // Fetch vehicle data based on the search term
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ["searchVehicles", searchTerm],
+    queryKey: ["srm-vehicles", searchTerm],
     queryFn: () => searchVehicle(searchTerm),
     enabled: false, // Do not fetch initially
     staleTime: 0,
@@ -194,7 +194,9 @@ const VehicleItem = ({
 // Add new vehicle Link
 const AddNewVehicle = ({ searchTerm }: { searchTerm: string }) => (
   <Link
-    to={"/srm/manage-vehicles/add"}
+    to={`/srm/manage-vehicles/add?from=srm&vehicleRegistrationNumber=${encodeURIComponent(
+      searchTerm
+    )}`}
     className="flex items-center gap-x-2 h-12"
   >
     <div className="h-12  bg-slate-200 w-12 flex-center rounded-xl overflow-hidden">

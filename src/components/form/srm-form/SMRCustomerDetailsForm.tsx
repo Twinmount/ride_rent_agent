@@ -50,6 +50,8 @@ export default function SRMCustomerDetailsForm({
     null
   );
 
+  const bookingId = sessionStorage.getItem("bookingId") || "";
+
   //  initial default values for the form
   const initialValues =
     formData && type === "Update"
@@ -64,8 +66,12 @@ export default function SRMCustomerDetailsForm({
 
   // Update the existing srm booking for the customer data
   const handleExistingCustomerBooking = async (customerId: string) => {
-    const bookingResponse = await updateCustomerBooking(customerId);
+    console.log(
+      "handleExistingCustomerBooking: updating srm customer booking ..."
+    );
+    const bookingResponse = await updateCustomerBooking(customerId, bookingId);
 
+    console.log("customer booking updated : ...", bookingResponse);
     return bookingResponse;
   };
 
@@ -76,13 +82,19 @@ export default function SRMCustomerDetailsForm({
     values: SRMCustomerDetailsFormType,
     countryCode: string
   ) => {
+    console.log("handle new customer booking function ...");
+    console.log("customer is getting created ...");
     // create new customer
     const customerData = await createCustomer(values, countryCode);
     const customerId = customerData.result.customerId;
 
-    // update customer booking
-    const bookingResponse = await updateCustomerBooking(customerId);
+    console.log("customer created : ...", customerData);
 
+    console.log("updating srm customer booking ...");
+    // update srm customer booking
+    const bookingResponse = await updateCustomerBooking(customerId, bookingId);
+
+    console.log("customer booking updated : ...", bookingResponse);
     return bookingResponse;
   };
 
@@ -205,6 +217,24 @@ export default function SRMCustomerDetailsForm({
                   onChangeHandler={onCustomerSelect}
                   placeholder="Enter / Search customer name"
                   isDisabled={isFieldsDisabled}
+                />
+              </FormFieldLayout>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormFieldLayout
+                label="Customer Email"
+                description="Enter customers email"
+              >
+                <Input
+                  placeholder="Enter email"
+                  {...field}
+                  type="email"
+                  className="input-field"
                 />
               </FormFieldLayout>
             )}

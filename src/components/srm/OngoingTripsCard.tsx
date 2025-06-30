@@ -1,6 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { MapPinned, Phone, Plane, Calendar } from "lucide-react";
+import {
+  MapPinned,
+  Phone,
+  Plane,
+  Calendar,
+  Eye,
+  CalendarArrowUp,
+  CalendarClock,
+  CircleCheckBig,
+  X,
+} from "lucide-react";
 import MotionDiv from "@/components/framer-motion/MotionDiv";
 import { Trip } from "@/types/srm-types";
 import { getExpiryNotificationText } from "@/helpers";
@@ -127,22 +137,22 @@ export const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
           <div className="flex gap-x-2 items-center">
             <Link
               to={`/srm/trips/edit/${trip.bookingId}?customerId=${trip.customer.customerId}&vehicleId=${trip.vehicle.id}&paymentId=${trip.payment.id}`}
-              className="px-3 py-1 text-slate-800 hover:text-white  border-slate-800 border hover:bg-slate-800 rounded-md transition-colors"
+              className="px-3 py-1 text-slate-800 hover:text-white  border-slate-800 border hover:bg-slate-800 rounded-md transition-colors flex-center gap-x-2"
             >
-              View Trip
+              View <Eye size={18} />
             </Link>
 
             <button
               onClick={() => onOpenModal(trip.bookingId)}
-              className="px-3 py-1 text-blue-500 hover:text-white  border-blue-500 border hover:bg-blue-500 rounded-md transition-colors"
+              className="px-3 py-1 text-blue-500 hover:text-white  border-blue-500 border hover:bg-blue-500 rounded-md transition-colors flex-center gap-x-2"
             >
-              Extend Trip
+              Extend <CalendarClock size={16} />
             </button>
             <Link
               to={`/srm/end-trip/${trip.bookingId}`}
-              className="px-3 py-1 text-red-500 hover:text-white  border-red-500 border hover:bg-red-500 rounded-md transition-colors"
+              className="px-3 py-1 text-red-500 hover:text-white  border-red-500 border hover:bg-red-500 rounded-md transition-colors flex-center gap-x-2"
             >
-              End Trip
+              End <X size={18} />
             </Link>
           </div>
         </div>
