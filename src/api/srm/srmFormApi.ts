@@ -1,5 +1,6 @@
 import { Slug } from "@/api/Api-Endpoints";
 import { API } from "@/api/ApiService";
+import { ShareFormData } from "@/components/dialog/CustomerLinkShareFormDialog";
 import {
   AddPaymentFormResponse,
   AddCustomerFormResponse,
@@ -14,6 +15,10 @@ import {
   GetSRMCustomerDetailsResponse,
   GetSRMVehicleDetailsResponse,
   GetSRMPaymentDetailsResponse,
+  GetSRMChecklistResponse,
+  GetSRMUserTaxAndContractInfoResponse,
+  PublicCustomerLinkShareResponse,
+  FetchSRMDashboardAnalytics,
 } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
@@ -21,8 +26,30 @@ import {
   SRMVehicleDetailsFormType,
   TripEndFormType,
 } from "@/types/srm-types";
+import axios from "axios";
 
-export const addCustomerDetails = async (
+export const fetchSRMDashboard =
+  async (): Promise<FetchSRMDashboardAnalytics> => {
+    try {
+      const data = await API.get<FetchSRMDashboardAnalytics>({
+        slug: Slug.GET_SRM_DASHBOARD,
+      });
+
+      if (!data) {
+        throw new Error("Failed to fetch srm dashboard data");
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error fetching srm dashboard:", error);
+      throw error;
+    }
+  };
+
+/*
+ * API function to create a new customer
+ */
+export const createCustomer = async (
   values: SRMCustomerDetailsFormType,
   countryCode: string
 ): Promise<AddCustomerFormResponse> => {
@@ -36,10 +63,13 @@ export const addCustomerDetails = async (
     const requestBody = {
       countryCode,
       customerName: values.customerName,
+      email: values.email,
       nationality: values.nationality,
       passportNumber: values.passportNumber,
+      passport: values.passport,
       drivingLicenseNumber: values.drivingLicenseNumber,
       phoneNumber,
+      drivingLicense: values.drivingLicense,
       customerProfilePic: values.customerProfilePic || null, // Optional field for user profile, default to null if not provided
     };
 
@@ -48,6 +78,114 @@ export const addCustomerDetails = async (
       slug: Slug.POST_SRM_CUSTOMER_FORM,
       body: requestBody,
     });
+
+    if (!data) {
+      throw new Error("Failed to post customer registration response");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on customer registration", error);
+    throw error;
+  }
+};
+
+export const sendCustomerFormLink = async (
+  values: ShareFormData,
+  countryCode: string,
+  bookingId: string
+): Promise<AddCustomerFormResponse> => {
+  try {
+    const phoneNumber = values.phoneNumber
+      .replace(`+${countryCode}`, "")
+      .trim();
+
+    // Prepare the request body for the customer creation API
+    const requestBody = {
+      countryCode,
+      customerName: values.customerName,
+      phoneNumber,
+      email: values.email,
+    };
+
+    /**
+     * first create the customer and get the customerId
+     */
+    const customerCreationResponse = await API.post<AddCustomerFormResponse>({
+      slug: Slug.POST_SRM_CUSTOMER_FORM,
+      body: requestBody,
+    });
+
+    if (!customerCreationResponse) {
+      throw new Error("Failed to create customer for public link share");
+    }
+
+    // Prepare the request body for the temp-auth-token API
+    const newRequestBody = {
+      email: values.email,
+      countryCode,
+      phoneNumber,
+      customerId: customerCreationResponse.result.customerId,
+      bookingId,
+      customerName: values.customerName,
+    };
+
+    // after creating the customer, call the temp-auth-token POST endpoint to send teh link
+    const linkSendResponse = await API.post<PublicCustomerLinkShareResponse>({
+      slug: Slug.POST_SEND_LINK_FORM_CUSTOMER_CREATION,
+      body: newRequestBody,
+    });
+
+    if (!linkSendResponse) {
+      throw new Error("Failed to create public link");
+    }
+
+    return customerCreationResponse;
+  } catch (error) {
+    console.error("Error on generating public link", error);
+    throw error;
+  }
+};
+
+export const updateCustomerByPublic = async (
+  values: SRMCustomerDetailsFormType,
+  countryCode: string,
+  token: string,
+  customerId: string
+): Promise<AddCustomerFormResponse> => {
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  try {
+    // Extracting phone number and removing country code
+    const phoneNumber = values.phoneNumber
+      .replace(`+${countryCode}`, "")
+      .trim();
+
+    // Prepare the request body for the API
+    const requestBody = {
+      customerId,
+      countryCode,
+      customerName: values.customerName,
+      email: values.email,
+      nationality: values.nationality,
+      passportNumber: values.passportNumber,
+      passport: values.passport,
+      drivingLicenseNumber: values.drivingLicenseNumber,
+      phoneNumber,
+      drivingLicense: values.drivingLicense,
+      customerProfilePic: values.customerProfilePic || null,
+    };
+
+    const data: AddCustomerFormResponse = await axios.put(
+      `${API_URL}${Slug.PUT_SRM_CUSTOMER_FORM}`,
+      requestBody,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     if (!data) {
       throw new Error("Failed to post customer registration response");
@@ -80,23 +218,25 @@ export const getSRMCustomerFormDetails = async (
   }
 };
 
-export const createCustomerBooking = async (
-  customerId: string
+export const updateCustomerBooking = async (
+  customerId: string,
+  bookingId: string
 ): Promise<CreateCustomerBookingResponse> => {
   try {
     // Prepare the request body for the API
     const requestBody = {
       customerId,
+      bookingId,
     };
 
     // Sending the request as a JSON object
-    const data = await API.post<CreateCustomerBookingResponse>({
-      slug: Slug.POST_SRM_BOOKING_CUSTOMER,
+    const data = await API.put<CreateCustomerBookingResponse>({
+      slug: Slug.PUT_SRM_BOOKING_CUSTOMER,
       body: requestBody,
     });
 
     if (!data) {
-      throw new Error("Failed to post customer booking");
+      throw new Error("Failed to update srm customer booking");
     }
 
     return data;
@@ -129,20 +269,18 @@ export const isCustomerSpam = async (
   }
 };
 
-export const updateBookingDataForVehicle = async (
-  bookingId: string,
+export const createBookingDataForVehicle = async (
   vehicleId: string
 ): Promise<CreateCustomerBookingResponse> => {
   try {
     // Prepare the request body for the API
     const requestBody = {
-      bookingId,
       vehicleId,
     };
 
     // Sending the request as a JSON object
-    const data = await API.put<CreateCustomerBookingResponse>({
-      slug: Slug.PUT_SRM_BOOKING_VEHICLE,
+    const data = await API.post<CreateCustomerBookingResponse>({
+      slug: Slug.POST_SRM_BOOKING_VEHICLE,
       body: requestBody,
     });
 
@@ -272,8 +410,22 @@ export const addVehicleDetailsForm = async (
       vehicleCategoryId: values.vehicleCategoryId,
       vehicleBrandId: values.vehicleBrandId,
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
-      rentalDetails: values.rentalDetails,
       vehiclePhoto: values.vehiclePhoto,
+      // convert to number
+      numberOfPassengers: Number(values.numberOfPassengers),
+      vehicleColor: values.vehicleColor,
+      bodyType: values.bodyType,
+      chassisNumber: values.chassisNumber,
+      additionalMilageChargePerKm: values.additionalMilageChargePerKm,
+      registrationDate: values.registrationDate,
+      registrationDueDate: values.registrationDueDate,
+      trafficFineId: values.trafficFineId,
+      lastServiceDate: values.lastServiceDate,
+      currentKilometre: values.currentKilometre,
+      serviceKilometre: values.serviceKilometre,
+      nextServiceKilometre: values.nextServiceKilometre,
+      nextServiceDate: values.nextServiceDate,
+      rentalDetails: values.rentalDetails,
     };
 
     // Sending the request as a JSON object
@@ -295,14 +447,30 @@ export const addVehicleDetailsForm = async (
 
 // Function to update vehicle details
 export const updateVehicleDetailsForm = async (
+  vehicleId: string,
   values: SRMVehicleDetailsFormType
 ): Promise<AddVehicleFormResponse> => {
   try {
     // Prepare the request body for the API
     const requestBody = {
+      vehicleId,
       vehicleCategoryId: values.vehicleCategoryId,
       vehicleBrandId: values.vehicleBrandId,
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
+      vehiclePhoto: values.vehiclePhoto,
+      numberOfPassengers: values.numberOfPassengers,
+      vehicleColor: values.vehicleColor,
+      bodyType: values.bodyType,
+      chassisNumber: values.chassisNumber,
+      additionalMilageChargePerKm: values.additionalMilageChargePerKm,
+      registrationDate: values.registrationDate,
+      registrationDueDate: values.registrationDueDate,
+      trafficFineId: values.trafficFineId,
+      lastServiceDate: values.lastServiceDate,
+      currentKilometre: values.currentKilometre,
+      serviceKilometre: values.serviceKilometre,
+      nextServiceKilometre: values.nextServiceKilometre,
+      nextServiceDate: values.nextServiceDate,
       rentalDetails: values.rentalDetails,
     };
 
@@ -410,6 +578,77 @@ export const updatePaymentDetailsForm = async (
     return data;
   } catch (error) {
     console.error("Error updating payment details", error);
+    throw error;
+  }
+};
+
+// get srm check list
+export const getSRMCheckListFormData = async (
+  vehicleId: string
+): Promise<GetSRMChecklistResponse> => {
+  try {
+    // Sending the request as a JSON object
+    const data = await API.get<GetSRMChecklistResponse>({
+      slug: `${Slug.GET_SRM_CHECKLIST}?vehicleId=${vehicleId}`,
+    });
+
+    if (!data) {
+      throw new Error("Failed to srm check list response");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on srm check list", error);
+    throw error;
+  }
+};
+
+export const postSRMCheckList = async (values: {
+  vehicleId: string;
+  checklistMetadata: string;
+}): Promise<GetSRMChecklistResponse> => {
+  try {
+    // Prepare the request body for the API
+    const requestBody = values;
+
+    // Sending the request as a JSON object
+    const data = await API.post<GetSRMChecklistResponse>({
+      slug: Slug.POST_SRM_CHECKLIST,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to update check list");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on updating check list data", error);
+    throw error;
+  }
+};
+
+export const putSRMCheckList = async (values: {
+  vehicleId: string;
+  checklistMetadata: string;
+}): Promise<GetSRMChecklistResponse> => {
+  try {
+    // Prepare the request body for the API
+    const requestBody = values;
+
+    // Sending the request as a JSON object
+    const data = await API.put<GetSRMChecklistResponse>({
+      slug: Slug.PUT_SRM_CHECKLIST,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to update check list");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on updating check list data", error);
     throw error;
   }
 };
@@ -531,3 +770,101 @@ export const getSRMLevelsFilled = async (
     throw error;
   }
 };
+
+export const getSRMUserTaxAndContractInfo =
+  async (): Promise<GetSRMUserTaxAndContractInfoResponse> => {
+    try {
+      const slug = `${Slug.GET_SRM_USER_TAX_AND_CONTRACT_INFO}`;
+
+      const data = await API.get<GetSRMUserTaxAndContractInfoResponse>({
+        slug,
+      });
+
+      if (!data) {
+        throw new Error("Failed to fetch tax info");
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error on tax info fetch", error);
+      throw error;
+    }
+  };
+
+interface UpdateTaxAndContractArgs {
+  country?: string;
+  taxNumber?: string;
+  termsNCondition?: string;
+}
+
+export const updateSRMUserTaxAndContractInfo = async ({
+  country,
+  taxNumber,
+  termsNCondition,
+}: UpdateTaxAndContractArgs): Promise<GetSRMUserTaxAndContractInfoResponse> => {
+  try {
+    // Prepare the request body for the API
+    const requestBody: UpdateTaxAndContractArgs = {};
+
+    if (country) {
+      requestBody.country = country;
+    }
+    if (taxNumber) {
+      requestBody.taxNumber = taxNumber;
+    }
+    if (termsNCondition) {
+      requestBody.termsNCondition = termsNCondition;
+    }
+
+    // Sending the request as a JSON object
+    const data = await API.put<GetSRMUserTaxAndContractInfoResponse>({
+      slug: Slug.PUT_SRM_USER_TAX_AND_CONTRACT_INFO,
+      body: requestBody,
+    });
+
+    if (!data) {
+      throw new Error("Failed to update tax info");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on tax info update", error);
+    throw error;
+  }
+};
+
+export async function downloadSRMExcelBlob({
+  slug,
+  fileName,
+  params,
+}: {
+  slug: string;
+  fileName: string;
+  params: URLSearchParams;
+}): Promise<void> {
+  try {
+    const res = await API.get<any>({
+      slug: `${slug}?${params.toString()}`,
+      axiosConfig: {
+        responseType: "blob",
+      },
+    });
+
+    const blob = new Blob([res.data], {
+      type: res.headers["content-type"],
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (err: any) {
+    // Optionally log to Sentry, etc.
+    console.error("Excel download failed:", err);
+    throw new Error("Failed to download file. Please try again.");
+  }
+}

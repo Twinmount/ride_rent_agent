@@ -1,16 +1,17 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import Pagination from "@/components/Pagination";
+import { fetchCustomerList } from "@/api/srm/trips";
+import { CustomerListColumns } from "@/components/table/columns/CustomerListColumn";
 import { SortDropdown } from "@/components/SortDropdown";
-import { fetchVehicleList } from "@/api/srm/trips";
-
-import { VehicleListColumns } from "@/components/table/columns/VehicleListColumns";
 import Search from "@/components/Search";
 import { GenericTable } from "@/components/table/GenericTable";
 import LinkButton from "@/components/common/LinkButton";
 import PageWrapper from "@/components/PageWrapper";
+import ExcelDownloadDialog from "@/components/ExcelDownloadDialog";
+import { Slug } from "@/api/Api-Endpoints";
 
-export default function ManageVehiclePage() {
+export default function ManageSRMCustomersPage() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC");
@@ -18,9 +19,9 @@ export default function ManageVehiclePage() {
   const LIMIT = 8;
 
   const { data, isLoading } = useQuery({
-    queryKey: ["vehicleList", page, search, sortOrder],
+    queryKey: ["customerList", page, search, sortOrder],
     queryFn: () =>
-      fetchVehicleList({
+      fetchCustomerList({
         page,
         limit: LIMIT,
         sortOrder,
@@ -29,12 +30,12 @@ export default function ManageVehiclePage() {
     staleTime: 0,
   });
 
-  const vehicleData = data?.result?.list || [];
+  const customerData = data?.result?.list || [];
 
   const totalNumberOfPages = data?.result?.totalNumberOfPages || 0;
 
   return (
-    <PageWrapper heading="Manage SRM Vehicles">
+    <PageWrapper heading="Customer List">
       <div className="flex flex-wrap gap-x-2 justify-start items-start mt-3 mb-4 w-full max-sm:mt-3">
         {/* search vehicle */}
         <Search
@@ -43,12 +44,21 @@ export default function ManageVehiclePage() {
           placeholder="Search Trip..."
           description={
             <p className=" italic text-gray-600">
-              You can search with <b>brand and registration number</b>
+              You can search with{" "}
+              <b>customer name, phone, passport and driving license</b>
             </p>
           }
         />
 
-        <LinkButton label="New Vehicle" link="/srm/manage-vehicles/add" />
+        <LinkButton label="New Trip" link="/srm/trips/new" />
+
+        <ExcelDownloadDialog
+          label="Download Customers"
+          slug={Slug.GET_SRM_CUSTOMERS_EXCEL}
+          fileName="customers.xlsx"
+          filters={{ dateRange: true, sortOrder: true }}
+          variant="icon"
+        />
 
         <SortDropdown
           sortOrder={sortOrder}
@@ -58,8 +68,8 @@ export default function ManageVehiclePage() {
       </div>
 
       <GenericTable
-        columns={VehicleListColumns}
-        data={vehicleData}
+        columns={CustomerListColumns()}
+        data={customerData}
         loading={isLoading}
       />
 

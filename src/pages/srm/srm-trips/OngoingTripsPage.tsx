@@ -4,13 +4,14 @@ import Pagination from "@/components/Pagination";
 import { SortDropdown } from "@/components/SortDropdown";
 import ExtendTripModal from "@/components/modal/srm-modal/ExtendTripModal";
 import { fetchSRMBookings } from "@/api/srm/trips";
-import DownloadExcelModal from "@/components/srm/DownloadSRMExcelData";
 import Search from "@/components/Search";
 import OngoingTrips from "@/components/srm/OngoingTrips";
 import { BookingStatus } from "@/types/srm-types";
 import { useCompany } from "@/hooks/useCompany";
 import LinkButton from "@/components/common/LinkButton";
 import PageWrapper from "@/components/PageWrapper";
+import ExcelDownloadDialog from "@/components/ExcelDownloadDialog";
+import { Slug } from "@/api/Api-Endpoints";
 
 // Sample data
 
@@ -26,7 +27,7 @@ export default function OngoingTripsPage() {
   const { companyId, isCompanyLoading } = useCompany();
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["activeTrips", page, limit, search, sortOrder],
+    queryKey: ["srm-trips", "ongoing-trips", page, limit, search, sortOrder],
     queryFn: () =>
       fetchSRMBookings({
         page,
@@ -73,11 +74,14 @@ export default function OngoingTripsPage() {
 
         <LinkButton label="New Trip" link="/srm/trips/new" />
 
-        <DownloadExcelModal
-          title="Excel Data Download"
-          onDownload={async () => {}}
-          additionalClasses=""
+        <ExcelDownloadDialog
+          label="Download Bookings"
+          slug={Slug.GET_SRM_BOOKINGS_EXCEL}
+          fileName="bookings.xlsx"
+          filters={{ dateRange: true, sortOrder: true, bookingStatus: true }}
+          variant="icon"
         />
+
         <SortDropdown
           sortOrder={sortOrder}
           setSortOrder={setSortOrder}
@@ -91,13 +95,11 @@ export default function OngoingTripsPage() {
         isLoading={isLoading || isFetching}
       />
 
-      {totalNumberOfPages > 0 && (
-        <Pagination
-          page={page}
-          setPage={setPage}
-          totalPages={totalNumberOfPages}
-        />
-      )}
+      <Pagination
+        page={page}
+        setPage={setPage}
+        totalPages={totalNumberOfPages}
+      />
 
       {/* ExtendTripModal */}
       {selectedTripBookingId && (

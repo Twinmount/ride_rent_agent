@@ -30,11 +30,7 @@ const CurrencyDropdown = ({
   ];
 
   return (
-    <Select
-      onValueChange={handleChange}
-      defaultValue={value}
-      disabled={isDisabled}
-    >
+    <Select onValueChange={handleChange} value={value} disabled={isDisabled}>
       <SelectTrigger className="ring-0 select-field focus:ring-0 input-fields">
         <SelectValue
           className="!font-bold !text-black"

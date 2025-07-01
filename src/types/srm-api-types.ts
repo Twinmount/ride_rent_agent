@@ -4,18 +4,25 @@ export interface CustomerApiType {
   id: string; // Unique identifier for the user
   customerId: string;
   customerName: string; // User's name
+  email: string;
   nationality: string; // User's nationality
   passportNumber: string; // User's passport number
+  passport: string[];
   drivingLicenseNumber: string; // User's driving license number
+  drivingLicense: string[];
   phoneNumber: string; // User's phone number, possibly formatted
   customerProfilePic?: string; // Optional field for the user's profile image or identifier
   customerProfilePicPath?: string; // Optional field for the user's profile image or identifier
   countryCode: string; // The country code associated with the user's phone number
-  createdAt: string; // Timestamp when the record was created
-  updatedAt: string; // Timestamp when the record was last updated
 }
 export interface AddCustomerFormResponse {
   result: CustomerApiType;
+  status: string;
+  statusCode: number;
+}
+
+export interface PublicCustomerLinkShareResponse {
+  result: any;
   status: string;
   statusCode: number;
 }
@@ -52,6 +59,20 @@ export interface VehicleApiType {
   vehicleRegistrationNumber: string;
   vehiclePhoto: string;
   vehiclePhotoPath: string;
+  numberOfPassengers: string;
+  vehicleColor: string;
+  bodyType: string;
+  chassisNumber: string;
+  additionalMilageChargePerKm: string;
+
+  registrationDate: string;
+  registrationDueDate: string;
+  trafficFineId: string;
+  lastServiceDate: string;
+  currentKilometre: string;
+  serviceKilometre: string;
+  nextServiceKilometre: string;
+  nextServiceDate: string;
   rentalDetails: RentalDetails;
   createdBy: string;
 }
@@ -158,8 +179,32 @@ export interface CreateCustomerBookingResponse {
   statusCode: number; // HTTP status code (e.g., 200, 400)
 }
 
+export interface SRMUserTaxAndContractInfoResponse {
+  country: string | null;
+  taxNumber: string | null;
+  termsNCondition: string | null;
+}
+
+export interface GetSRMUserTaxAndContractInfoResponse {
+  result: SRMUserTaxAndContractInfoResponse;
+  status: string;
+  statusCode: number;
+}
+
 export interface FetchSingleBookingResponse {
   result: IndividualTrip;
+  status: string;
+  statusCode: number;
+}
+
+export interface DashboardAnalytics {
+  ongoingTripsCount: number;
+  completedTripsCount: number;
+  vehicleCount: number;
+  customersCount: number;
+}
+export interface FetchSRMDashboardAnalytics {
+  result: DashboardAnalytics;
   status: string;
   statusCode: number;
 }
@@ -301,6 +346,17 @@ export interface GetSRMCustomerDetailsResponse {
 
 export interface GetSRMVehicleDetailsResponse {
   result: VehicleApiType;
+  status: string;
+  statusCode: number;
+}
+
+export interface ChecklistApiType {
+  vehicleId: string;
+  checklistMetadata: string;
+}
+
+export interface GetSRMChecklistResponse {
+  result: ChecklistApiType | null;
   status: string;
   statusCode: number;
 }

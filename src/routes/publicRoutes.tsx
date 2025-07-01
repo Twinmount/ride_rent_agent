@@ -28,6 +28,13 @@ const ResetPasswordOtpPage = lazy(
 const ConfirmNewPassword = lazy(
   () => import("../pages/general/ConfirmNewPassword")
 );
+const PublicCustomerDetailsPage = lazy(
+  () => import("../pages/srm/srm-customers/PublicCustomerDetailsPage")
+);
+
+const PublicCustomerSuccessPage = lazy(
+  () => import("../pages/srm/srm-customers/PublicCustomerSuccessPage")
+);
 
 export const publicRoutes = [
   {
@@ -82,5 +89,13 @@ export const publicRoutes = [
   {
     path: "/confirm-new-password",
     element: <ConfirmNewPassword />,
+  },
+  {
+    path: "/srm/customer-details/public",
+    element: <PublicCustomerDetailsPage />,
+  },
+  {
+    path: "/srm/customer-details/public/success",
+    element: <PublicCustomerSuccessPage />,
   },
 ];

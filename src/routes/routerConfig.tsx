@@ -3,7 +3,7 @@ import Layout from "../layout/Layout";
 import ErrorPage from "../pages/ErrorPage";
 import ProtectedRoute from "../layout/ProtectedRoutes";
 import { publicRoutes } from "./publicRoutes";
-import { protectedRoutes } from "./protectedRoutes";
+import { protectedRoutes } from "./protected-routes";
 
 export const router: ReturnType<typeof createBrowserRouter> =
   createBrowserRouter([
@@ -17,7 +17,7 @@ export const router: ReturnType<typeof createBrowserRouter> =
           children: [
             {
               element: <Layout />,
-              children: protectedRoutes, // protected routes
+              children: protectedRoutes,
             },
           ],
         },

@@ -1,6 +1,7 @@
 import { Slug } from "../Api-Endpoints";
 import { API } from "../ApiService";
 import {
+  FetchCountryResponse,
   FetchParentStatesResponse,
   FetchStatesResponse,
 } from "@/types/API-types";

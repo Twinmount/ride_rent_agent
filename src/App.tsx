@@ -12,6 +12,7 @@ import LazyLoader from "./components/loading-skelton/LazyLoader";
 import { HelmetProvider } from "react-helmet-async";
 import RouteErrorBoundary from "./layout/RouteErrorBoundary";
 import { router } from "./routes/routerConfig";
+import { MantineProvider } from "@mantine/core";
 
 const appCountry = localStorage.getItem("appCountry") || "ae";
 
@@ -44,7 +45,9 @@ export default function App() {
         <RouteErrorBoundary>
           <Suspense fallback={<LazyLoader />}>
             <HelmetProvider>
-              <RouterProvider router={router} />
+              <MantineProvider>
+                <RouterProvider router={router} />
+              </MantineProvider>
             </HelmetProvider>
           </Suspense>
         </RouteErrorBoundary>

@@ -1,21 +1,21 @@
-import { useEffect, useState } from 'react'
-import { Label } from '@/components/ui/label'
+import { useEffect, useState } from "react";
+import { Label } from "@/components/ui/label";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
   DropdownMenuContent,
-} from '@/components/ui/dropdown-menu'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
-import { ChevronDown } from 'lucide-react'
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { ChevronDown } from "lucide-react";
 
 type MultiSelectDropdownProps = {
-  value?: string[]
-  onChangeHandler: (value: string[]) => void
-  placeholder?: string
-  options: { name: string; label: string; selected: boolean }[]
-  isDisabled?: boolean
-}
+  value?: string[];
+  onChangeHandler: (value: string[]) => void;
+  placeholder?: string;
+  options: { name: string; label: string; selected: boolean }[];
+  isDisabled?: boolean;
+};
 
 const MultiSelectDropdown = ({
   value = [],
@@ -23,7 +23,7 @@ const MultiSelectDropdown = ({
   options,
   isDisabled = false,
 }: MultiSelectDropdownProps) => {
-  const [selectedOptions, setSelectedOptions] = useState<string[]>(value) // Selected options state
+  const [selectedOptions, setSelectedOptions] = useState<string[]>(value); // Selected options state
 
   // Pre-select values on mount (for Update case)
   useEffect(() => {
@@ -31,24 +31,24 @@ const MultiSelectDropdown = ({
       if (selectedOptions.length === 0) {
         const preSelectedValues = options
           .filter((option) => option.selected)
-          .map((option) => option.name)
-        setSelectedOptions(preSelectedValues)
-        onChangeHandler(preSelectedValues) // Sync initial state with form handler
+          .map((option) => option.name);
+        setSelectedOptions(preSelectedValues);
+        onChangeHandler(preSelectedValues); // Sync initial state with form handler
       }
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [onChangeHandler, options, selectedOptions])
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [onChangeHandler, options, selectedOptions]);
 
   const handleOptionSelect = (optionName: string) => {
-    let updatedOptions
+    let updatedOptions;
     if (selectedOptions.includes(optionName)) {
-      updatedOptions = selectedOptions.filter((o) => o !== optionName)
+      updatedOptions = selectedOptions.filter((o) => o !== optionName);
     } else {
-      updatedOptions = [...selectedOptions, optionName]
+      updatedOptions = [...selectedOptions, optionName];
     }
-    setSelectedOptions(updatedOptions)
-    onChangeHandler(updatedOptions) // Update form value
-  }
+    setSelectedOptions(updatedOptions);
+    onChangeHandler(updatedOptions); // Update form value
+  };
 
   return (
     <div className="relative pb-2 border-none top-1">
@@ -58,13 +58,13 @@ const MultiSelectDropdown = ({
           <Button
             variant="outline"
             className={`w-full justify-between px-2 overflow-hidden bg-white border rounded-lg hover:no-underline cursor-pointer ${
-              isDisabled ? 'opacity-50 cursor-not-allowed' : ''
+              isDisabled ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
             <span>
               {selectedOptions.length > 0
                 ? `${selectedOptions.length} selected`
-                : 'Choose features'}
+                : "Choose features"}
             </span>
             <ChevronDown />
           </Button>
@@ -91,7 +91,7 @@ const MultiSelectDropdown = ({
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  )
-}
+  );
+};
 
-export default MultiSelectDropdown
+export default MultiSelectDropdown;

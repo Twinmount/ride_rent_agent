@@ -5,13 +5,14 @@ import { SortDropdown } from "@/components/SortDropdown";
 import { CompletedTripsColumns } from "@/components/table/columns/CompletedTripsColumn";
 import CompletedTripsInvoiceDownloadModal from "@/components/modal/srm-modal/CompletedTripsInvoiceDownloadModal";
 import { fetchSRMBookings } from "@/api/srm/trips";
-import DownloadExcelModal from "@/components/srm/DownloadSRMExcelData";
 import Search from "@/components/Search";
 import { BookingStatus } from "@/types/srm-types";
 import { useCompany } from "@/hooks/useCompany";
 import { GenericTable } from "@/components/table/GenericTable";
 import LinkButton from "@/components/common/LinkButton";
 import PageWrapper from "@/components/PageWrapper";
+import ExcelDownloadDialog from "@/components/ExcelDownloadDialog";
+import { Slug } from "@/api/Api-Endpoints";
 
 export default function CompletedTripsPage() {
   const [page, setPage] = useState(1);
@@ -31,7 +32,7 @@ export default function CompletedTripsPage() {
         sortOrder,
         search,
         bookingStatus: BookingStatus.COMPLETED,
-        companyId: "93eb31e6-0ae0-49c3-9bc1-678c54ddc412",
+        companyId,
       }),
     staleTime: 0,
     enabled: !!companyId && !isCompanyLoading,
@@ -70,11 +71,14 @@ export default function CompletedTripsPage() {
 
         <LinkButton label="New Trip" link="/srm/trips/new" />
 
-        <DownloadExcelModal
-          title="Excel Data Download"
-          onDownload={async () => {}}
-          additionalClasses=""
+        <ExcelDownloadDialog
+          label="Download Bookings"
+          slug={Slug.GET_SRM_BOOKINGS_EXCEL}
+          fileName="bookings.xlsx"
+          filters={{ dateRange: true, sortOrder: true, bookingStatus: true }}
+          variant="icon"
         />
+
         <SortDropdown
           sortOrder={sortOrder}
           setSortOrder={setSortOrder}

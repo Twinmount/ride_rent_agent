@@ -387,57 +387,34 @@ interface SRMTabValidationProps {
   levelsFilled: number;
 }
 
-// srm tab validation
+/**
+ * Function to validate srm tab validation
+ * If vehicle tab is completed, allow free access to any tab
+ * Else, restrict access to all other tabs unless vehicle (level 1) is completed
+ */
 export const validateSRMTabAccess = ({
   tab,
   levelsFilled,
 }: SRMTabValidationProps): { canAccess: boolean; message: string } => {
-  if (tab === "customer" && levelsFilled > 0) {
+  // "vehicle" tab is always accessible
+  if (tab === "vehicle") {
+    if (levelsFilled < 1) {
+      return { canAccess: true, message: "" };
+    } else {
+      return { canAccess: true, message: "Vehicle Details already completed" };
+    }
+  }
+
+  // Restrict access to all other tabs unless vehicle (level 1) is completed
+  if (levelsFilled < 1) {
     return {
       canAccess: false,
-      message: "The Customer Details form is already completed.",
+      message: "Please complete the Vehicle Details to proceed.",
     };
   }
 
-  if (tab === "vehicle") {
-    if (levelsFilled >= 1 && levelsFilled < 2) {
-      return {
-        canAccess: true,
-        message: "",
-      }; // Access allowed
-    } else if (levelsFilled >= 2) {
-      return {
-        canAccess: false,
-        message: "The Vehicle Details  is already completed.",
-      };
-    } else {
-      return {
-        canAccess: false,
-        message: "Please complete the Customer Details  to proceed.",
-      };
-    }
-  }
-
-  if (tab === "payment") {
-    if (levelsFilled >= 2 && levelsFilled < 3) {
-      return {
-        canAccess: true,
-        message: "",
-      }; // Access allowed
-    } else if (levelsFilled === 3) {
-      return {
-        canAccess: false,
-        message: "The Payment details  is already completed.",
-      };
-    } else {
-      return {
-        canAccess: false,
-        message: "Please complete the Vehicle Details to proceed.",
-      };
-    }
-  }
-
-  return { canAccess: true, message: "" }; // Default case
+  // If vehicle is completed (levelsFilled >= 1), allow free access to any tab
+  return { canAccess: true, message: "" };
 };
 
 // Type guard to check if a value has the 'selected' property for specification form
@@ -589,4 +566,9 @@ export const reorderFeatureValues = (
       values: [...feature.values].sort(sortFn),
     };
   });
+};
+
+// form submit button common class
+export const getFormGenericButtonClass = (className?: string) => {
+  return `flex-center button hover:bg-darkYellow active:scale-[0.97] duration-100 active:shadow-md transition-all  ease-out col-span-2 mx-auto w-full bg-yellow !text-lg !font-semibold md:w-10/12 lg:w-8/12 ${className}`;
 };

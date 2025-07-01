@@ -1,12 +1,31 @@
+import {
+  SRMContractFormSchema,
+  SRMCustomerDetailsFormSchema,
+  SRMPublicCustomerDetailsFormSchema,
+  SRMTaxInfoFormSchema,
+} from "@/lib/validator";
+import { z } from "zod";
+
 // CustomerDetailsFormType (level 1)
-export type SRMCustomerDetailsFormType = {
-  customerProfilePic?: string; // Optional field for profile photo or identifier
-  customerName: string; // User name
-  nationality: string; // Nationality of the user
-  passportNumber: string; // Passport number of the user
-  drivingLicenseNumber: string; // Driving license number of the user
-  phoneNumber: string; // Mobile number of the user
-};
+// export type SRMCustomerDetailsFormType = {
+//   customerProfilePic?: string; // Optional field for profile photo or identifier
+//   customerName: string; // User name
+//   nationality: string; // Nationality of the user
+//   passportNumber: string; // Passport number of the user
+//   drivingLicenseNumber: string; // Driving license number of the user
+//   phoneNumber: string; // Mobile number of the user
+// };
+export type SRMCustomerDetailsFormType = z.infer<
+  typeof SRMCustomerDetailsFormSchema
+>;
+
+export type SRMPublicCustomerDetailsFormType = z.infer<
+  typeof SRMPublicCustomerDetailsFormSchema
+>;
+
+export type SRMTaxInfoFormType = z.infer<typeof SRMTaxInfoFormSchema>;
+
+export type SRMContractFormType = z.infer<typeof SRMContractFormSchema>;
 
 // Rental detail type for day, week, and month
 type SRMRentalDetailType = {
@@ -29,6 +48,19 @@ export type SRMVehicleDetailsFormType = {
   vehicleBrandId: string;
   vehicleRegistrationNumber: string;
   vehiclePhoto: string;
+  numberOfPassengers: string;
+  vehicleColor: string;
+  bodyType: string;
+  chassisNumber: string;
+  additionalMilageChargePerKm: string;
+  registrationDate: Date | undefined;
+  registrationDueDate: Date | undefined;
+  trafficFineId: string;
+  lastServiceDate: Date | undefined;
+  currentKilometre: string;
+  serviceKilometre: string;
+  nextServiceKilometre: string;
+  nextServiceDate: Date | undefined;
   rentalDetails: {
     day: SRMRentalDetailType;
     week: SRMRentalDetailType;
@@ -64,9 +96,10 @@ export enum BookingStatus {
   COMPLETED = "COMPLETED",
   ONGOING = "ONGOING",
   CANCELLED = "CANCELLED",
+  INCOMPLETE = "INCOMPLETE",
 }
 
-// vehicle types
+// rental details type of srm
 export interface RentalDetails {
   day: {
     enabled: boolean;
@@ -93,20 +126,40 @@ export interface RentalDetails {
 
 export interface VehicleType {
   id: string;
+
   vehicleCategory: {
     categoryId: string;
     name: string;
     value: string;
   };
+
   vehicleBrand: {
     id: string;
     vehicleCategoryId: string;
     brandName: string;
     brandLogo: string;
   };
+
   vehicleRegistrationNumber: string;
   vehiclePhoto: string;
+
+  numberOfPassengers: string;
+  vehicleColor: string;
+  bodyType: string;
+  chassisNumber: string;
+  additionalMilageChargePerKm: string;
+
+  registrationDate: string; // ISO string from API
+  registrationDueDate: string;
+  trafficFineId: string;
+  lastServiceDate: string;
+  currentKilometre: string;
+  serviceKilometre: string;
+  nextServiceKilometre: string;
+  nextServiceDate: string;
+
   rentalDetails: RentalDetails;
+
   createdBy: string;
 }
 
@@ -115,14 +168,15 @@ export interface CustomerType {
   id: string;
   customerId: string;
   customerName: string;
+  email: string;
   nationality: string;
   passportNumber: string;
+  passport: string[];
   drivingLicenseNumber: string;
+  drivingLicense: string[];
   phoneNumber: string;
   customerProfilePic?: string;
   countryCode: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 // Payment type
@@ -169,6 +223,7 @@ export type TripEndFormType = {
   additionalCharges: ChargeType[];
   discounts?: string;
   totalAmountCollected: string;
+  currentKilometre: string;
 };
 
 export type BannedCustomerType = {
@@ -179,4 +234,24 @@ export type BannedCustomerType = {
   companyName: string | null;
   bookingStartDate: string | null;
   bookingEndDate: string | null;
+};
+
+export type PublicCustomerApiArgs = {
+  email: string;
+  countryCode: string;
+  phoneNumber: string;
+  customerId: string;
+};
+
+// srm excel download type
+export type DownloadDialogConfig = {
+  label: string;
+  slug: string;
+  fileName: string;
+  filters: {
+    dateRange?: boolean;
+    sortOrder?: boolean;
+    bookingStatus?: boolean;
+  };
+  variant?: "card" | "icon";
 };

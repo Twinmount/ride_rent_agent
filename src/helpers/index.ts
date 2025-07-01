@@ -1,8 +1,17 @@
 import { SingleVehicleType } from "@/types/API-types";
-import { differenceInHours } from "date-fns";
+import { differenceInHours, isValid } from "date-fns";
 import { UseFormReturn } from "react-hook-form";
 import { CustomerType } from "@/types/srm-types";
-import { SRMVehicleDetailsFormType, VehicleType } from "@/types/srm-types";
+import { VehicleType } from "@/types/srm-types";
+import {
+  format,
+  differenceInCalendarDays,
+  isBefore,
+  isAfter,
+  isSameDay,
+  parseISO,
+} from "date-fns";
+import { CustomerApiType, DashboardAnalytics } from "@/types/srm-api-types";
 
 type ApprovalStatusType = "APPROVED" | "UNDER_REVIEW" | "REJECTED" | "PENDING";
 
@@ -149,15 +158,19 @@ export const handleCustomerSelect = (
   form.setValue("customerName", customerName);
 
   if (customerData) {
+    form.setValue("email", customerData.email || "");
     setExistingCustomerId(customerData.customerId);
     form.setValue("customerProfilePic", customerData.customerProfilePic || "");
     setCurrentProfilePic(customerData.customerProfilePic || "");
     form.setValue("nationality", customerData.nationality || "");
     form.setValue("passportNumber", customerData.passportNumber || "");
+    form.setValue("passport", customerData.passport || []);
     form.setValue(
       "drivingLicenseNumber",
       customerData.drivingLicenseNumber || ""
     );
+
+    form.setValue("drivingLicense", customerData.drivingLicense || []);
     form.setValue(
       "phoneNumber",
       (customerData.countryCode || "971") + customerData.phoneNumber || ""
@@ -167,30 +180,61 @@ export const handleCustomerSelect = (
     setExistingCustomerId(null);
     setCurrentProfilePic(null);
     form.setValue("customerProfilePic", "");
+    form.setValue("email", "");
     form.resetField("nationality");
     form.resetField("passportNumber");
+    form.resetField("passport");
     form.resetField("drivingLicenseNumber");
+    form.resetField("drivingLicense");
     form.resetField("phoneNumber");
     setCountryCode("");
   }
+};
+
+export const handleCustomerRefresh = (
+  form: UseFormReturn<any, any>,
+  customerData: CustomerApiType,
+  setExistingCustomerId: (id: string | null) => void,
+  setCurrentProfilePic: (pic: string | null) => void,
+  setCountryCode: (code: string) => void
+) => {
+  if (!customerData) return;
+
+  form.setValue("customerName", customerData.customerName || "");
+  form.setValue("email", customerData.email || "");
+  form.setValue("customerProfilePic", customerData.customerProfilePic || "");
+  form.setValue("nationality", customerData.nationality || "");
+  form.setValue("passportNumber", customerData.passportNumber || "");
+  form.setValue("passport", customerData.passport || []);
+  form.setValue(
+    "drivingLicenseNumber",
+    customerData.drivingLicenseNumber || ""
+  );
+  form.setValue("drivingLicense", customerData.drivingLicense || []);
+  form.setValue(
+    "phoneNumber",
+    (customerData.countryCode || "971") + customerData.phoneNumber || ""
+  );
+
+  setExistingCustomerId(customerData.customerId || null);
+  setCurrentProfilePic(customerData.customerProfilePic || null);
+  setCountryCode(customerData.countryCode || "");
 };
 
 // Helper function to handle vehicle selection to auto fill the SRM Vehicle form
 export const handleVehicleSelection = (
   vehicleRegistrationNumber: string,
   vehicleData: VehicleType | null,
-  form: UseFormReturn<SRMVehicleDetailsFormType>,
+  form: any,
   setExistingVehicleId: (id: string | null) => void,
   setCurrentVehiclePhoto: (photo: string | null) => void
 ) => {
-  // Set vehicle registration number in the form
   form.setValue("vehicleRegistrationNumber", vehicleRegistrationNumber);
 
   if (vehicleData) {
-    // Update existing vehicle ID
-    setExistingVehicleId(vehicleData?.id);
+    setExistingVehicleId(vehicleData.id);
+    setCurrentVehiclePhoto(vehicleData.vehiclePhoto || "");
 
-    // Set form values based on selected vehicle data
     form.setValue(
       "vehicleCategoryId",
       vehicleData.vehicleCategory?.categoryId || ""
@@ -198,6 +242,33 @@ export const handleVehicleSelection = (
     form.setValue("vehicleBrandId", vehicleData.vehicleBrand?.id || "");
     form.setValue("vehiclePhoto", vehicleData.vehiclePhoto || "");
 
+    // New Fields
+    form.setValue("numberOfPassengers", vehicleData.numberOfPassengers || "");
+    form.setValue("vehicleColor", vehicleData.vehicleColor || "");
+    form.setValue("bodyType", vehicleData.bodyType || "");
+    form.setValue("chassisNumber", vehicleData.chassisNumber || "");
+    form.setValue(
+      "additionalMilageChargePerKm",
+      vehicleData.additionalMilageChargePerKm || ""
+    );
+    form.setValue("trafficFineId", vehicleData.trafficFineId || "");
+    form.setValue("currentKilometre", vehicleData.currentKilometre || "");
+    form.setValue("serviceKilometre", vehicleData.serviceKilometre || "");
+    form.setValue(
+      "nextServiceKilometre",
+      vehicleData.nextServiceKilometre || ""
+    );
+
+    // Dates - ensure they exist before setting
+    form.setValue("registrationDate", new Date(vehicleData.registrationDate));
+    form.setValue(
+      "registrationDueDate",
+      new Date(vehicleData.registrationDueDate)
+    );
+    form.setValue("lastServiceDate", new Date(vehicleData.lastServiceDate));
+    form.setValue("nextServiceDate", new Date(vehicleData.nextServiceDate));
+
+    // Rental Details
     form.setValue(
       "rentalDetails.day.enabled",
       vehicleData.rentalDetails.day.enabled || false
@@ -253,10 +324,8 @@ export const handleVehicleSelection = (
       "rentalDetails.hour.mileageLimit",
       vehicleData.rentalDetails.hour.mileageLimit || ""
     );
-
-    setCurrentVehiclePhoto(vehicleData.vehiclePhoto || "");
   } else {
-    // Reset fields if no vehicle data is selected
+    // Reset the form if no vehicle is selected
     setExistingVehicleId(null);
     setCurrentVehiclePhoto(null);
 
@@ -264,42 +333,120 @@ export const handleVehicleSelection = (
     form.resetField("vehicleBrandId");
     form.resetField("vehiclePhoto");
     form.resetField("rentalDetails");
+    form.resetField("numberOfPassengers");
+    form.resetField("vehicleColor");
+    form.resetField("bodyType");
+    form.resetField("chassisNumber");
+    form.resetField("additionalMilageChargePerKm");
+    form.resetField("registrationDate");
+    form.resetField("registrationDueDate");
+    form.resetField("trafficFineId");
+    form.resetField("lastServiceDate");
+    form.resetField("currentKilometre");
+    form.resetField("serviceKilometre");
+    form.resetField("nextServiceKilometre");
+    form.resetField("nextServiceDate");
   }
 };
 
-// for showing notification like indication in teh ongoing srm trips card
-export function getExpiryNotificationText(bookingEndDate: string): {
-  text: string;
+// for showing notification like indication in the ongoing srm trips card
+export function getExpiryNotificationText(
+  bookingStartDate: string,
+  bookingEndDate: string
+): {
+  reminderMessage: string;
   className: string;
 } {
+  if (!bookingStartDate || !bookingEndDate) {
+    return {
+      reminderMessage: "Booking date missing",
+      className: "text-gray-400",
+    };
+  }
+
+  const startDate = parseISO(bookingStartDate);
+  const endDate = parseISO(bookingEndDate);
+
+  if (!isValid(startDate) || !isValid(endDate)) {
+    return {
+      reminderMessage: "Invalid date",
+      className: "text-gray-400",
+    };
+  }
   const today = new Date();
-  const endDate = new Date(bookingEndDate);
-  const diffTime = endDate.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24)); // difference in days
 
-  if (diffDays > 7) {
-    return { text: "", className: "" }; // No notification if more than 7 days
-  }
+  const daysUntilStart = differenceInCalendarDays(startDate, today);
+  const daysUntilEnd = differenceInCalendarDays(endDate, today);
 
-  if (diffDays > 0) {
-    // For 7 - 3 days
+  // Case 1: Not started yet
+  if (isBefore(today, startDate)) {
     return {
-      text: `${diffDays} day${diffDays > 1 ? "s" : ""} to end...`,
-      className: "text-yellow", // Yellow/Orange
+      reminderMessage: `Starts in ${daysUntilStart} day${
+        daysUntilStart > 1 ? "s" : ""
+      }`,
+      className: "text-blue-500",
     };
   }
 
-  if (diffDays > -7) {
-    // For 3 - 1 days
+  // Case 2: Ongoing
+  if (!isBefore(today, startDate) && !isAfter(today, endDate)) {
+    if (isSameDay(today, endDate)) {
+      return {
+        reminderMessage: "Ends today",
+        className: "text-orange",
+      };
+    }
+
+    if (daysUntilEnd <= 3) {
+      return {
+        reminderMessage: `${daysUntilEnd} day${
+          daysUntilEnd > 1 ? "s" : ""
+        } left`,
+        className: "text-orange",
+      };
+    }
+
     return {
-      text: `${-diffDays} day${-diffDays > 1 ? "s" : ""} to end...`,
-      className: "text-orange", // Intense color for 3 - 1 days
+      reminderMessage: `${daysUntilEnd} day${daysUntilEnd > 1 ? "s" : ""} left`,
+      className: "text-yellow",
     };
   }
 
-  // For expired bookings
+  // Case 3: Expired
   return {
-    text: `Expired on ${endDate.toLocaleDateString()}`,
-    className: "text-red-500", // Red color for expired bookings
+    reminderMessage: `Ended on ${format(endDate, "dd/MM/yyyy")}`,
+    className: "text-red-500",
   };
 }
+
+/**
+ * Returns an array of dashboard stats objects given the input data from api.
+ */
+export const getDashboardStats = (data: DashboardAnalytics | undefined) => {
+  return [
+    {
+      title: "Ongoing Trips",
+      count: data?.ongoingTripsCount ?? "N/A",
+      link: "/srm/ongoing-trips",
+      overlayText: "Show Ongoing Trips",
+    },
+    {
+      title: "Completed Trips",
+      count: data?.completedTripsCount ?? "N/A",
+      link: "/srm/completed-trips",
+      overlayText: "Show Completed Trips",
+    },
+    {
+      title: "Vehicle List",
+      count: data?.vehicleCount ?? "N/A",
+      link: "/srm/manage-vehicles",
+      overlayText: "Show Vehicle List",
+    },
+    {
+      title: "Customer List",
+      count: data?.customersCount ?? "N/A",
+      link: "/srm/customer-list",
+      overlayText: "Show Customer List",
+    },
+  ];
+};

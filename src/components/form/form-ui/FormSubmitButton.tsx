@@ -1,20 +1,58 @@
 import { Button } from "@/components/ui/button";
 import Spinner from "@/components/general/Spinner";
+import { getFormGenericButtonClass } from "@/helpers/form";
 
 type Props = {
   text: string;
   isLoading: boolean;
+  className?: string;
 };
 
-export const FormSubmitButton = ({ text, isLoading }: Props) => {
+/**
+ * FormSubmitButton
+ *
+ * typical form submit button with loading spinner
+ */
+export const FormSubmitButton = ({ text, isLoading, className }: Props) => {
+  return (
+    <FormGenericButton disabled={isLoading} className={className}>
+      {text}
+      {isLoading && <Spinner />}
+    </FormGenericButton>
+  );
+};
+
+/**
+ * FormGenericButton
+ *
+ * generic button that can be used in forms with "disabled, children and optional className props"
+ */
+
+export const FormGenericButton = ({
+  children,
+  type = "submit",
+  className,
+  disabled = false,
+  onClick,
+  isLoading = false,
+}: {
+  children: React.ReactNode;
+  type?: "submit" | "reset" | "button";
+  className?: string;
+  disabled?: boolean;
+  onClick?: () => void;
+  isLoading?: boolean;
+}) => {
+  const defaultClasses = getFormGenericButtonClass();
   return (
     <Button
-      type="submit"
+      type={type}
       size="lg"
-      disabled={isLoading}
-      className="flex-center button hover:bg-darkYellow col-span-2 mx-auto mt-3 w-full bg-yellow !text-lg !font-semibold md:w-10/12 lg:w-8/12"
+      disabled={disabled || isLoading}
+      onClick={onClick}
+      className={`${defaultClasses} ${className}`}
     >
-      {text}
+      {children}
       {isLoading && <Spinner />}
     </Button>
   );

@@ -31,6 +31,8 @@ import { useFormValidationToast } from "@/hooks/useFormValidationToast";
 import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
 import { validateFieldArray } from "@/helpers/srm-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { FormFieldLayout } from "../form-ui/FormFieldLayout";
 
 export type BookingDataType = {
   advanceCollected: number;
@@ -61,6 +63,8 @@ export default function TripEndForm({
     useState<number>(0);
 
   const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
 
   // form initial values
   const initialValues =
@@ -123,6 +127,9 @@ export default function TripEndForm({
       }
 
       if (data) {
+        queryClient.invalidateQueries({
+          queryKey: ["srm-trips"],
+        });
         navigate("/srm/completed-trips");
       }
     } catch (error) {
@@ -427,13 +434,52 @@ export default function TripEndForm({
               )}
             />
 
+            {/* current kilometre */}
+            <FormField
+              control={form.control}
+              name="currentKilometre"
+              render={({ field }) => (
+                <FormFieldLayout
+                  label="Current Kilometre"
+                  description="Enter the current odometer reading (in KM)."
+                >
+                  <Input
+                    placeholder="Enter current KM"
+                    className="input-field"
+                    type="text"
+                    inputMode="numeric"
+                    {...field}
+                    onKeyDown={(e) => {
+                      if (
+                        !/^\d*$/.test(e.key) &&
+                        ![
+                          "Backspace",
+                          "Delete",
+                          "ArrowLeft",
+                          "ArrowRight",
+                          "Tab",
+                        ].includes(e.key)
+                      ) {
+                        e.preventDefault();
+                      }
+                    }}
+                    onChange={(e) => {
+                      field.onChange(e);
+                      form.clearErrors("currentKilometre");
+                    }}
+                  />
+                </FormFieldLayout>
+              )}
+            />
+
             {/* Submit Button */}
             <Button
               type="submit"
               className="w-full rounded-xl text-red-500 font-semibold transition-colors"
               disabled={form.formState.isSubmitting}
             >
-              End Trip {form.formState.isSubmitting && <Spinner />}
+              End Trip & Generate Receipt
+              {form.formState.isSubmitting && <Spinner />}
             </Button>
           </div>
         </form>

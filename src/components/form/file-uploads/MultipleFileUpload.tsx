@@ -78,6 +78,8 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
     if (name === "vehiclePhotos") return 8;
     if (name === "commercialLicenses") return 2;
     if (name === "vehicleVideos") return 1;
+    if (name === "passport") return 2;
+    if (name === "drivingLicense") return 2;
     return 0;
   };
 

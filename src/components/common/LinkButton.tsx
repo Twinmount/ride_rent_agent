@@ -16,7 +16,7 @@ export default function LinkButton({
     <Link
       to={link}
       className={`group px-3 h-10 bg-white flex gap-x-2 items-center rounded-lg shadow-lg transition-colors duration-300 ease-in-out flex-center text-yellow hover:bg-yellow hover:text-white ${className}`}
-      aria-label="add new record"
+      aria-label={label}
     >
       <span className="text-gray-800 transition-colors group-hover:text-white">
         {label}

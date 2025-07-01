@@ -2,7 +2,7 @@ import FAQ from "@/components/common/Faq";
 import WhyJoin from "@/components/common/WhyJoin";
 import WhyOpt from "@/components/common/WhyOpt";
 import SignUpFeatures from "@/components/common/SignUpFeatures";
-import { features, featuresIndia, FAQ_Data } from "@/constants/data/data";
+import { features, featuresIndia, FAQ_Data } from "@/data/static-content";
 import MotionDiv from "@/components/framer-motion/MotionDiv";
 import RegistrationForm from "@/components/form/main-form/RegistrationForm";
 import Footer from "@/components/footer/Footer";

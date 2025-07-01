@@ -1,5 +1,5 @@
 import { getSRMVehicleFormDetails } from "@/api/srm";
-import SRMVehicleDetailsForm from "@/components/form/srm-form/VehicleDetailsForm";
+import SRMVehicleDetailsForm from "@/components/form/srm-form/SRMVehicleDetailsForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
 import PageWrapper from "@/components/PageWrapper";
 import { mapToSRMVehicleForm } from "@/helpers/srm-form";
@@ -8,6 +8,9 @@ import { useParams } from "react-router-dom";
 
 export default function SRMVehicleUpdatePage() {
   const { vehicleId } = useParams<{ vehicleId: string }>();
+
+  console.log("setting vehicle id in session storage : ", vehicleId);
+  sessionStorage.setItem("vehicleId", vehicleId || "");
 
   // Fetch primary form data
   const { data: vehicleFormResult, isLoading: isVehicleLoading } = useQuery({
@@ -27,7 +30,7 @@ export default function SRMVehicleUpdatePage() {
         <SRMVehicleDetailsForm
           type={"Update"}
           formData={vehicleFormData}
-          isDedicatedAddPage={true}
+          isDedicatedVehiclePage={true}
         />
       )}
     </PageWrapper>

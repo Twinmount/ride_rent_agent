@@ -5,6 +5,7 @@ import {
   getSRMCustomerFormDetails,
   getSRMVehicleFormDetails,
   getSRMPaymentFormDetails,
+  getSRMCheckListFormData,
 } from "@/api/srm";
 import { SRMTabsTypes } from "@/types/types";
 import { useSearchParams } from "react-router-dom";
@@ -13,14 +14,13 @@ import { mapToSRMPaymentForm, mapToSRMVehicleForm } from "@/helpers/srm-form";
 export type TabsTypes = "primary" | "specifications" | "features";
 
 export const useSRMUpdateForm = (bookingId: string | undefined) => {
-  const [activeTab, setActiveTab] = useState<SRMTabsTypes>("customer");
+  const [activeTab, setActiveTab] = useState<SRMTabsTypes>("vehicle");
   const queryClient = useQueryClient();
 
   const [searchParams] = useSearchParams();
 
   const customerId = searchParams.get("customerId");
   const vehicleId = searchParams.get("vehicleId");
-  // const paymentId = searchParams.get("paymentId");
 
   // Fetch primary form data
   const { data: customerFormResult, isLoading: isCustomerLoading } = useQuery({
@@ -46,6 +46,14 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
     enabled: !!bookingId && activeTab === "payment",
   });
 
+  const { data: checkListResult, isLoading: isCheckListFormDataLoading } =
+    useQuery({
+      queryKey: ["srm-check-list", vehicleId],
+      queryFn: () => getSRMCheckListFormData(vehicleId as string),
+      staleTime: 60000,
+      enabled: !!vehicleId,
+    });
+
   // Fetch levelsFilled
   const {
     data: levelsData,
@@ -63,7 +71,7 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
     : 1;
 
   // Determine form states based on levels
-  const isAddOrIncompleteSRMVehicleForm = levelsFilled < 2;
+  const isAddOrIncompleteSRMCustomerForm = levelsFilled < 2;
   const isAddOrIncompleteSRMPaymentForm = levelsFilled < 3;
 
   // Prefetch levelsFilled data
@@ -90,6 +98,8 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
   const vehicleRentalDetails =
     paymentFormResult?.result?.vehicle?.rentalDetails;
 
+  const checkListFormData = checkListResult?.result;
+
   // saving to session storage
   useEffect(() => {
     if (!vehicleRentalDetails) return;
@@ -108,10 +118,14 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
     isVehicleLoading,
     paymentFormData,
     isPaymentLoading: isPaymentLoading,
+    checkListResult,
+    checkListFormData,
+    isCheckListFormDataLoading,
     levelsFilled,
     isLevelsFetching,
     refetchLevels,
-    isAddOrIncompleteSRMVehicleForm,
+    isAddOrIncompleteSRMCustomerForm,
     isAddOrIncompleteSRMPaymentForm,
+    vehicleIdParam: vehicleId || null,
   };
 };

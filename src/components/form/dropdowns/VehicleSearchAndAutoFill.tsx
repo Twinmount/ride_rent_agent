@@ -20,25 +20,25 @@ import { VehicleType } from "@/types/srm-types";
 import PreviewImageComponent from "../PreviewImageComponent";
 import { Link } from "react-router-dom";
 
-type VehicleSearchProps = {
+type VehicleSearchAndAutoFillProps = {
   value?: string;
   onChangeHandler: (value: string, vehicleData?: any) => void;
   placeholder?: string;
   isDisabled?: boolean;
 };
 
-const VehicleSearch = ({
+export default function VehicleSearchAndAutoFill({
   value,
   onChangeHandler,
   placeholder = "Search vehicle name...",
   isDisabled = false,
-}: VehicleSearchProps) => {
+}: VehicleSearchAndAutoFillProps) {
   const [searchTerm, setSearchTerm] = useState(""); // Default to an empty string
   const [open, setOpen] = useState(false);
 
   // Fetch vehicle data based on the search term
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ["searchVehicles", searchTerm],
+    queryKey: ["srm-vehicles", searchTerm],
     queryFn: () => searchVehicle(searchTerm),
     enabled: false, // Do not fetch initially
     staleTime: 0,
@@ -150,9 +150,7 @@ const VehicleSearch = ({
       </PopoverContent>
     </Popover>
   );
-};
-
-export default VehicleSearch;
+}
 
 // individual vehicle box
 const VehicleItem = ({
@@ -194,7 +192,9 @@ const VehicleItem = ({
 // Add new vehicle Link
 const AddNewVehicle = ({ searchTerm }: { searchTerm: string }) => (
   <Link
-    to={"/srm/manages-vehicles/add"}
+    to={`/srm/manage-vehicles/add?from=srm&vehicleRegistrationNumber=${encodeURIComponent(
+      searchTerm
+    )}`}
     className="flex items-center gap-x-2 h-12"
   >
     <div className="h-12  bg-slate-200 w-12 flex-center rounded-xl overflow-hidden">

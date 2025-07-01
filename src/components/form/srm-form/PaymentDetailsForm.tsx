@@ -17,7 +17,7 @@ import { RentalDetails, SRMPaymentDetailsFormType } from "@/types/srm-types";
 import "react-international-phone/style.css";
 
 import { toast } from "@/components/ui/use-toast";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   addPaymentDetailsForm,
   updateBookingDataForPayment,
@@ -33,13 +33,19 @@ import { useFormValidationToast } from "@/hooks/useFormValidationToast";
 import { useState } from "react";
 import { FormContainer } from "../form-ui/FormContainer";
 import { FormFieldLayout } from "../form-ui/FormFieldLayout";
-import { FormSubmitButton } from "../form-ui/FormSubmitButton";
+import {
+  FormGenericButton,
+  FormSubmitButton,
+} from "../form-ui/FormSubmitButton";
+import RentalDetailsPreview from "../SRMRentalDetailsPreview";
+import useGetSearchParams from "@/hooks/useGetSearchParams";
 
 type SRMPaymentDetailsFormProps = {
   type: "Add" | "Update";
   formData?: SRMPaymentDetailsFormType | null;
   refetchLevels?: () => void;
   isAddOrIncomplete?: boolean;
+  onNextTab?: () => void;
 };
 
 // Mock rental details (replace with actual props later if needed)
@@ -49,14 +55,30 @@ export default function SRMPaymentDetailsForm({
   formData,
   refetchLevels,
   isAddOrIncomplete,
+  onNextTab,
 }: SRMPaymentDetailsFormProps) {
-  const {} = useParams<{}>();
-  const bookingId = sessionStorage.getItem("bookingId");
+  const { bookingId: paramBookingId } = useParams<{ bookingId: string }>();
+
+  const queryParamPaymentId = useGetSearchParams("paymentId");
+
+  const isUpdateWithoutQueryParamPaymentId =
+    type === "Update" &&
+    (!queryParamPaymentId || queryParamPaymentId === "undefined");
+
+  const bookingId =
+    type === "Add" ? sessionStorage.getItem("bookingId") : paramBookingId;
+
+  if (type !== "Add") {
+    console.log("booking id from params:", paramBookingId);
+    console.log(
+      "booking id from session storage:",
+      sessionStorage.getItem("bookingId")
+    );
+  }
+
   const [rentalDetails, setRentalDetails] = useState<RentalDetails | null>(
     null
   );
-
-  const navigate = useNavigate();
 
   // Call the useLoadingMessages hook to manage loading messages
   const initialValues =
@@ -122,10 +144,10 @@ export default function SRMPaymentDetailsForm({
           className: "bg-yellow text-white",
         });
 
-        // Safely clear the sessionStorage after successful form submission
-        sessionStorage.removeItem("bookingId");
-        sessionStorage.removeItem("rentalDetails");
-        navigate("/srm/ongoing-trips");
+        if (type === "Add" && onNextTab) {
+          onNextTab();
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
       }
     } catch (error) {
       toast({
@@ -174,13 +196,21 @@ export default function SRMPaymentDetailsForm({
   }, [bookingStartDate, bookingEndDate, advanceAmount, form.setValue]);
 
   // form fields are disabled if the type is "Update"
-  const isFieldsDisabled = type === "Update";
+  const isFieldsDisabled =
+    type === "Update" && !isUpdateWithoutQueryParamPaymentId;
 
   return (
     <Form {...form}>
       <FormContainer
         onSubmit={form.handleSubmit(onSubmit)}
-        description={"Add Payment Details here"}
+        description={
+          type === "Add" ? (
+            <p className="text-sm italic text-center text-gray-600">
+              Add trip payment details here. It will be used to generate
+              invoice.
+            </p>
+          ) : null
+        }
       >
         {/* Booking Period */}
         <div className="flex mb-2 w-full max-sm:flex-col">
@@ -274,13 +304,21 @@ export default function SRMPaymentDetailsForm({
           </div>
         </div>
 
+        {/* rental details preview */}
+        <FormFieldLayout
+          label="Rental Details (Preview)"
+          description="This preview summarizes the rental prices and mileage limits set above."
+        >
+          <RentalDetailsPreview rentalDetails={rentalDetails} />
+        </FormFieldLayout>
+
         <FormField
           control={form.control}
           name="advanceAmount"
           render={({ field }) => (
             <FormFieldLayout
-              label="Advance Paid &#40;AED&#41;"
-              description=" Enter the advance received for this model in AED."
+              label="Advance Paid &#40;optional&#41;"
+              description=" Enter the advance received for this model in AED (if any)."
             >
               <Input
                 {...field}
@@ -327,7 +365,7 @@ export default function SRMPaymentDetailsForm({
             >
               <Input
                 {...field}
-                placeholder="Balance Amount (AED)"
+                placeholder="Balance Amount (optional)"
                 className="input-field !font-semibold !cursor-default"
                 type="text"
                 inputMode="numeric"
@@ -373,8 +411,8 @@ export default function SRMPaymentDetailsForm({
           name="currency"
           render={({ field }) => (
             <FormFieldLayout
-              label="Select Currency"
-              description="his currency unit is only used while generating invoice"
+              label="Select Currency (for invoice)"
+              description="This currency unit is only used while generating invoice"
             >
               <CurrencyDropdown
                 onChangeHandler={(value) => {
@@ -387,8 +425,14 @@ export default function SRMPaymentDetailsForm({
           )}
         />
 
-        {/* submit  */}
         {type === "Add" && (
+          <FormGenericButton type="button">
+            Download Quote/Invoice
+          </FormGenericButton>
+        )}
+
+        {/* submit  */}
+        {(type === "Add" || isUpdateWithoutQueryParamPaymentId) && (
           <FormSubmitButton
             text={type === "Add" ? "Submit" : "Update Payment Details"}
             isLoading={form.formState.isSubmitting}

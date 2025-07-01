@@ -41,6 +41,10 @@ export enum Slug {
   GET_ALL_STATES = "/states/list",
   GET_ALL_PARENT_STATES = "/states/parent/list",
 
+  // Country Endpoints
+  GET_COUNTRY = "/country",
+  GET_ALL_COUNTRY = "/country/list",
+
   // Cities Endpoints
   GET_ALL_CITIES = "/city/list",
 
@@ -72,6 +76,9 @@ export enum Slug {
 
   // SRM
   GET_SRM_LEVELS_FILLED = "/srm-bookings/levels-filled",
+  POST_SRM_CUSTOMER_PUBLIC_FORM = "/auth/temp-auth-token",
+  GET_SRM_STATUS = "/srm-status",
+  GET_SRM_DASHBOARD = "/srm-bookings/dashboard/analytics",
 
   // SRM CUSTOMERS
   POST_SRM_CUSTOMER_FORM = "/srm-customers",
@@ -79,6 +86,7 @@ export enum Slug {
   GET_SRM_CUSTOMER_FORM = "/srm-customers",
   GET_SRM_CUSTOMER_FORM_BY_ID = "/srm-customers",
   GET_SRM_CUSTOMER_LIST = "/srm-customers/list",
+  POST_SEND_LINK_FORM_CUSTOMER_CREATION = "/auth/temp-auth-token",
 
   // SRM VEHICLES
   POST_SRM_VEHICLE_FORM = "srm-vehicle",
@@ -86,17 +94,26 @@ export enum Slug {
   GET_SRM_VEHICLE_LIST = "srm-vehicle/list",
   PUT_SRM_VEHICLE_FORM = "srm-vehicle",
 
+  // SRM VEHICLES CHECKLIST
+  GET_SRM_CHECKLIST = "/srm-vehicle/check-list",
+  POST_SRM_CHECKLIST = "/srm-vehicle/check-list",
+  PUT_SRM_CHECKLIST = "/srm-vehicle/check-list",
+
   // SRM PAYMENTS
   POST_SRM_PAYMENT_FORM = "/srm-payment",
   GET_SRM_PAYMENT_FORM = "/srm-bookings/payment",
   PUT_SRM_PAYMENT_FORM = "/srm-payment",
 
   // SRM BOOKINGS (customer, vehicle and payment)
-  POST_SRM_BOOKING_CUSTOMER = "/srm-bookings/customer",
-  PUT_SRM_BOOKING_VEHICLE = "/srm-bookings/vehicle",
+  POST_SRM_BOOKING_VEHICLE = "/srm-bookings/vehicle/v2",
+  PUT_SRM_BOOKING_CUSTOMER = "/srm-bookings/customer/v2",
   PUT_SRM_BOOKING_PAYMENT = "/srm-bookings/payment",
   GET_SRM_IS_CUSTOMER_SPAM = "/srm-bookings/customer/is-spammed-customer",
   GET_SRM_UPCOMING_BOOKINGS = "/srm-bookings/vehicle/upcoming-booking-dates",
+
+  //SRM TAX AND CONTRACT INFO
+  GET_SRM_USER_TAX_AND_CONTRACT_INFO = "/users/agreement-data",
+  PUT_SRM_USER_TAX_AND_CONTRACT_INFO = "/users/agreement-data",
 
   // SRM TRIPS
   GET_SRM_TRIP_BY_BOOKING_ID = "/srm-bookings",
@@ -105,4 +122,11 @@ export enum Slug {
   GET_SRM_END_TRIP = "/srm-bookings/end-trip",
   GET_SRM_EXTEND_TRIP = "/srm-bookings/extend-trip",
   POST_EXTEND_TRIP = "/srm-bookings/extend-trip",
+
+  // SRM EXCEL
+  GET_SRM_BOOKINGS_EXCEL = "/srm-bookings/download/excel/bookings",
+  GET_SRM_VEHICLES_EXCEL = "/srm-vehicle/download/excel/vehicle/list",
+  GET_SRM_CUSTOMERS_EXCEL = "/srm-customers/download/excel/customer/list",
+
+  // SRM PDF
 }
