@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/select";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { fetchAllCountry } from "@/api/states";
 
 type SRMCountryDropdownProps = {
   value?: string;
@@ -31,7 +30,7 @@ const SRMCountryDropdown = ({
 }: SRMCountryDropdownProps) => {
   const { data, isLoading } = useQuery({
     queryKey: ["country"],
-    queryFn: fetchAllCountry,
+    queryFn: () => {},
   });
   const [countries, setCountries] = useState<Country[]>([]);
 
