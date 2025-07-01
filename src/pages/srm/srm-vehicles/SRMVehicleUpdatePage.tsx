@@ -9,7 +9,6 @@ import { useParams } from "react-router-dom";
 export default function SRMVehicleUpdatePage() {
   const { vehicleId } = useParams<{ vehicleId: string }>();
 
-  console.log("setting vehicle id in session storage : ", vehicleId);
   sessionStorage.setItem("vehicleId", vehicleId || "");
 
   // Fetch primary form data

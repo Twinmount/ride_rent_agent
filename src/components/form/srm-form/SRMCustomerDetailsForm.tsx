@@ -34,7 +34,6 @@ import { useParams } from "react-router-dom";
 type SRMCustomerDetailsFormProps = {
   type: "Add" | "Update";
   formData?: SRMCustomerDetailsFormType | null;
-  isAddOrIncomplete?: boolean;
   onNextTab?: () => void;
 };
 
@@ -42,13 +41,15 @@ export default function SRMCustomerDetailsForm({
   type,
   onNextTab,
   formData,
-  isAddOrIncomplete,
 }: SRMCustomerDetailsFormProps) {
   const [countryCode, setCountryCode] = useState<string>("");
   const [isFileUploading, setIsFileUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
   const [currentProfilePic, setCurrentProfilePic] = useState<string | null>(
     formData?.customerProfilePic || null
+  );
+  const [linkSendCustomerId, setLinkSendCustomerId] = useState(() =>
+    sessionStorage.getItem("linkSendCustomerId")
   );
 
   const [existingCustomerId, setExistingCustomerId] = useState<string | null>(
@@ -58,10 +59,11 @@ export default function SRMCustomerDetailsForm({
   const queryClient = useQueryClient();
 
   const customerIdParam = useGetSearchParams("customerId");
-  const linkSendCustomerId = sessionStorage.getItem("linkSendCustomerId");
 
-  const customerIdForRefetch =
-    type === "Add" ? linkSendCustomerId : customerIdParam;
+  let customerIdForRefetch =
+    !!customerIdParam && customerIdParam !== "undefined"
+      ? customerIdParam
+      : linkSendCustomerId;
 
   // boolean to determine if the type is "Update" and there is no customerId in the url query params. if its true, form will work as "Add Customer"
   const isUpdateWithoutCustomerId =
@@ -98,15 +100,11 @@ export default function SRMCustomerDetailsForm({
 
   // Update the existing srm booking for the customer data
   const handleExistingCustomerBooking = async (customerId: string) => {
-    console.log(
-      "handleExistingCustomerBooking: updating srm customer booking ..."
-    );
     const bookingResponse = await updateCustomerBooking(
       customerId,
       bookingId as string
     );
 
-    console.log("customer booking updated : ...", bookingResponse);
     return bookingResponse;
   };
 
@@ -117,22 +115,16 @@ export default function SRMCustomerDetailsForm({
     values: SRMCustomerDetailsFormType,
     countryCode: string
   ) => {
-    console.log("handle new customer booking function ...");
-    console.log("customer is getting created ...");
     // create new customer
     const customerData = await createCustomer(values, countryCode);
     const customerId = customerData.result.customerId;
 
-    console.log("customer created : ...", customerData);
-
-    console.log("updating srm customer booking ...");
     // update srm customer booking
     const bookingResponse = await updateCustomerBooking(
       customerId,
       bookingId as string
     );
 
-    console.log("customer booking updated : ...", bookingResponse);
     return bookingResponse;
   };
 
@@ -154,7 +146,7 @@ export default function SRMCustomerDetailsForm({
     try {
       let data;
 
-      if (type === "Add" || isAddOrIncomplete || isUpdateWithoutCustomerId) {
+      if (type === "Add" || isUpdateWithoutCustomerId) {
         if (existingCustomerId) {
           // Handle existing customer booking
           data = await handleExistingCustomerBooking(existingCustomerId);
@@ -170,6 +162,8 @@ export default function SRMCustomerDetailsForm({
           title: `Customer ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
         });
+
+        sessionStorage.removeItem("linkSendCustomerId");
 
         queryClient.invalidateQueries({
           queryKey: ["srm-trips"],
@@ -224,8 +218,8 @@ export default function SRMCustomerDetailsForm({
 
   const onCustomerRefresh = async () => {
     if (
-      !customerIdParam ||
-      customerIdParam === "undefined" ||
+      !customerIdParam &&
+      customerIdParam === "undefined" &&
       !linkSendCustomerId
     ) {
       toast({
@@ -249,8 +243,8 @@ export default function SRMCustomerDetailsForm({
       });
     } else {
       toast({
-        variant: "destructive",
         title: "No data returned",
+        className: "bg-orange text-white",
       });
     }
   };
@@ -270,7 +264,9 @@ export default function SRMCustomerDetailsForm({
     <div className="flex flex-col">
       {shouldShowCustomerLinkSection && (
         <div>
-          <CustomerLinkShareFormDialog />
+          <CustomerLinkShareFormDialog
+            setLinkSendCustomerId={setLinkSendCustomerId}
+          />
 
           {!!customerIdForRefetch && (
             <button

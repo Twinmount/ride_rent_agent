@@ -81,6 +81,9 @@ export default function ExtendTripModal({
       if (data) {
         navigate("/srm/ongoing-trips");
         queryClient.invalidateQueries({ queryKey: ["ongoing-trips"] });
+        queryClient.invalidateQueries({
+          queryKey: ["srm-trips", "ongoing-trips"],
+        });
         onClose();
       }
     } catch (error) {

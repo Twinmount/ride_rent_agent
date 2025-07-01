@@ -202,7 +202,10 @@ export const handleCustomerRefresh = (
 
   form.setValue("customerName", customerData.customerName || "");
   form.setValue("email", customerData.email || "");
-  form.setValue("customerProfilePic", customerData.customerProfilePic || "");
+  form.setValue(
+    "customerProfilePic",
+    customerData.customerProfilePicPath || ""
+  );
   form.setValue("nationality", customerData.nationality || "");
   form.setValue("passportNumber", customerData.passportNumber || "");
   form.setValue("passport", customerData.passport || []);
@@ -217,7 +220,7 @@ export const handleCustomerRefresh = (
   );
 
   setExistingCustomerId(customerData.customerId || null);
-  setCurrentProfilePic(customerData.customerProfilePic || null);
+  setCurrentProfilePic(customerData.customerProfilePicPath || null);
   setCountryCode(customerData.countryCode || "");
 };
 

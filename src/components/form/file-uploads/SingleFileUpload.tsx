@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Upload, Eye, Download, Trash2, MoreVertical } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { uploadSingleFile } from "@/api/file-upload";
+import { uploadSingleFile, uploadSingleFilePublic } from "@/api/file-upload";
 import { GcsFilePaths } from "@/constants/enum";
 import {
   DropdownMenu,
@@ -47,6 +47,7 @@ type SingleFileUploadProps = {
   setDeletedImages: (deletedPaths: (prev: string[]) => string[]) => void;
   additionalClasses?: string;
   imageOnly?: boolean;
+  publicAuthToken?: string;
 };
 
 const SingleFileUpload = ({
@@ -63,6 +64,7 @@ const SingleFileUpload = ({
   setDeletedImages,
   additionalClasses,
   imageOnly = false,
+  publicAuthToken,
 }: SingleFileUploadProps) => {
   const { control, setValue, clearErrors } = useFormContext();
   const [isUploading, setIsUploading] = useState(false);
@@ -108,18 +110,37 @@ const SingleFileUpload = ({
       }
 
       setIsUploading(true);
+
+      let uploadResponse;
       try {
-        const uploadResponse = await uploadSingleFile(
-          bucketFilePath,
-          file,
-          (progressEvent) => {
-            if (progressEvent.total) {
-              const progress =
-                (progressEvent.loaded / progressEvent.total) * 100;
-              setProgress(progress);
+        // if there is a public token, upload the file using the public token
+        if (!!publicAuthToken) {
+          uploadResponse = await uploadSingleFilePublic(
+            bucketFilePath,
+            file,
+            publicAuthToken,
+            (progressEvent) => {
+              if (progressEvent.total) {
+                const progress =
+                  (progressEvent.loaded / progressEvent.total) * 100;
+                setProgress(progress);
+              }
             }
-          }
-        );
+          );
+        } else {
+          // else if there is no public token, upload the file regularly
+          uploadResponse = await uploadSingleFile(
+            bucketFilePath,
+            file,
+            (progressEvent) => {
+              if (progressEvent.total) {
+                const progress =
+                  (progressEvent.loaded / progressEvent.total) * 100;
+                setProgress(progress);
+              }
+            }
+          );
+        }
         const uploadedFilePath = uploadResponse.result.path;
 
         setValue(name, uploadedFilePath);
@@ -132,6 +153,8 @@ const SingleFileUpload = ({
           title: "File upload failed",
           description: "Please try again.",
         });
+        setImagePath(null); // Reset the internal state of the imagePath
+        setValue(name, null); // Ensure the form value is cleared
       } finally {
         setIsUploading(false);
         setProgress(0);

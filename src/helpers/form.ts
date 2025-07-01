@@ -401,7 +401,7 @@ export const validateSRMTabAccess = ({
     if (levelsFilled < 1) {
       return { canAccess: true, message: "" };
     } else {
-      return { canAccess: true, message: "Vehicle Details already completed" };
+      return { canAccess: false, message: "Vehicle Details already completed" };
     }
   }
 

@@ -24,7 +24,13 @@ import { CustomerShareLinkFormSchema } from "@/lib/validator";
 
 export type ShareFormData = z.infer<typeof CustomerShareLinkFormSchema>;
 
-export default function CustomerLinkShareFormDialog() {
+type DialogProps = {
+  setLinkSendCustomerId: (customerId: string) => void;
+};
+
+export default function CustomerLinkShareFormDialog({
+  setLinkSendCustomerId,
+}: DialogProps) {
   const [countryCode, setCountryCode] = useState<string>("");
   const [open, setOpen] = useState(false);
 
@@ -47,6 +53,7 @@ export default function CustomerLinkShareFormDialog() {
       );
 
       if (response.result) {
+        setLinkSendCustomerId(response.result.customerId);
         sessionStorage.setItem(
           "linkSendCustomerId",
           response.result.customerId

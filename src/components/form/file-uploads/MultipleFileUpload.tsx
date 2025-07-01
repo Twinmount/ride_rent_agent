@@ -10,7 +10,10 @@ import {
 import { Download, Eye, Trash2, MoreVertical } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { downloadFileFromStream, validateFileSize } from "@/helpers/form";
-import { uploadMultipleFiles } from "@/api/file-upload";
+import {
+  uploadMultipleFiles,
+  uploadMultipleFilesPublic,
+} from "@/api/file-upload";
 import { GcsFilePaths } from "@/constants/enum";
 import {
   DropdownMenu,
@@ -48,6 +51,7 @@ type MultipleFileUploadProps = {
   setDeletedFiles: (deletedPaths: (prev: string[]) => string[]) => void;
   isVideoAccepted?: boolean;
   isImageAccepted?: boolean;
+  publicAuthToken?: string;
 };
 
 const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
@@ -64,6 +68,7 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
   setDeletedFiles,
   isVideoAccepted = false,
   isImageAccepted = true,
+  publicAuthToken,
 }) => {
   const { control, setValue, clearErrors } = useFormContext();
   const [files, setFiles] = useState<string[]>(existingFiles);
@@ -137,10 +142,15 @@ const MultipleFileUpload: React.FC<MultipleFileUploadProps> = ({
     setUploadingCount((prev) => prev + validFiles.length);
 
     try {
-      const uploadResponse = await uploadMultipleFiles(
-        bucketFilePath,
-        validFiles
-      );
+      // if there is a public token, upload the file using the public token file upload api
+      const uploadResponse = !!publicAuthToken
+        ? await uploadMultipleFilesPublic(
+            bucketFilePath,
+            validFiles,
+            publicAuthToken
+          )
+        : await uploadMultipleFiles(bucketFilePath, validFiles);
+
       const uploadedPaths = uploadResponse.result.paths;
 
       setFiles((prevFiles) => [...prevFiles, ...uploadedPaths]);

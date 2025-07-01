@@ -7,7 +7,7 @@ import {
 import { Slug } from "../Api-Endpoints";
 import { API } from "../ApiService";
 import { GcsFilePaths } from "@/constants/enum"; // Import the enum where it's defined
-import { AxiosProgressEvent } from "axios";
+import axios, { AxiosProgressEvent } from "axios";
 
 // Single File Upload Function
 export const uploadSingleFile = async (
@@ -40,6 +40,51 @@ export const uploadSingleFile = async (
     return response; // Response will contain the image path
   } catch (error) {
     console.error("Error uploading file:", error);
+    throw error;
+  }
+};
+
+/**
+ * this function is used to upload a single file for not logged in user. Used in SRM Public Customer Page form file upload logic. Authentication is handled by a custom token as the Authorization header.
+ */
+export const uploadSingleFilePublic = async (
+  fileCategory: GcsFilePaths,
+  file: File,
+  token: string,
+  onUploadProgress?: (progressEvent: AxiosProgressEvent) => void
+): Promise<SingleFileUploadResponse> => {
+  const appCountry = localStorage.getItem("appCountry") || "ae";
+
+  const API_URL =
+    appCountry === "in"
+      ? import.meta.env.VITE_API_URL_INDIA
+      : import.meta.env.VITE_API_URL_UAE;
+
+  const formData = new FormData();
+  formData.append("fileCategory", fileCategory);
+  formData.append("file", file);
+
+  try {
+    const response = await axios.post<SingleFileUploadResponse>(
+      `${API_URL}${Slug.POST_SINGLE_FILE}`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+        onUploadProgress,
+        timeout: 60000,
+      }
+    );
+
+    if (!response) {
+      throw new Error("Failed to post single image by public");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("Error uploading public file:", error);
     throw error;
   }
 };
@@ -80,6 +125,51 @@ export const uploadMultipleFiles = async (
     return response; // Response will contain an array of paths
   } catch (error) {
     console.error("Error uploading multiple files:", error);
+    throw error;
+  }
+};
+
+export const uploadMultipleFilesPublic = async (
+  fileCategory: GcsFilePaths,
+  files: File[],
+  token: string,
+  onUploadProgress?: (progressEvent: AxiosProgressEvent) => void
+): Promise<MultipleFileUploadResponse> => {
+  const appCountry = localStorage.getItem("appCountry") || "ae";
+
+  const API_URL =
+    appCountry === "in"
+      ? import.meta.env.VITE_API_URL_INDIA
+      : import.meta.env.VITE_API_URL_UAE;
+
+  const formData = new FormData();
+  formData.append("fileCategory", fileCategory);
+
+  files.forEach((file) => {
+    formData.append("files", file); // same key as backend expects
+  });
+
+  try {
+    const response = await axios.post<MultipleFileUploadResponse>(
+      `${API_URL}${Slug.POST_MULTIPLE_FILES}`,
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+        timeout: 120000,
+        onUploadProgress,
+      }
+    );
+
+    if (!response) {
+      throw new Error("Failed to post multiple images by public");
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error("Public multiple file upload failed", error);
     throw error;
   }
 };

@@ -90,7 +90,7 @@ export default function SRMPublicCustomerDetailsForm({
       if (data) {
         await deleteMultipleFiles(deletedFiles);
         toast({
-          title: `Customer added successful`,
+          title: `Form submission successful`,
           className: "bg-yellow text-white",
         });
 
@@ -192,6 +192,7 @@ export default function SRMPublicCustomerDetailsForm({
                 downloadFileName={"user profile"}
                 setDeletedImages={setDeletedFiles}
                 additionalClasses="w-[18rem]"
+                publicAuthToken={token}
               />
             )}
           />
@@ -246,6 +247,7 @@ export default function SRMPublicCustomerDetailsForm({
                 isFileUploading={isFileUploading}
                 downloadFileName="passport"
                 setDeletedFiles={setDeletedFiles}
+                publicAuthToken={token}
               />
             )}
           />
@@ -283,6 +285,7 @@ export default function SRMPublicCustomerDetailsForm({
                 isFileUploading={isFileUploading}
                 downloadFileName="driving-license"
                 setDeletedFiles={setDeletedFiles}
+                publicAuthToken={token}
               />
             )}
           />

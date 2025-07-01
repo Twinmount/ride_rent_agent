@@ -54,26 +54,6 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
       enabled: !!vehicleId,
     });
 
-  // Fetch levelsFilled
-  const {
-    data: levelsData,
-    refetch: refetchLevels,
-    isFetching: isLevelsFetching,
-  } = useQuery({
-    queryKey: ["getSRMLevelsFilled", bookingId],
-    queryFn: () => getSRMLevelsFilled(bookingId as string),
-    enabled: !!bookingId,
-  });
-
-  // Calculate levels filled
-  const levelsFilled = levelsData
-    ? parseInt(levelsData.result.levelsFilled, 10)
-    : 1;
-
-  // Determine form states based on levels
-  const isAddOrIncompleteSRMCustomerForm = levelsFilled < 2;
-  const isAddOrIncompleteSRMPaymentForm = levelsFilled < 3;
-
   // Prefetch levelsFilled data
   useEffect(() => {
     queryClient.prefetchQuery({
@@ -121,11 +101,6 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
     checkListResult,
     checkListFormData,
     isCheckListFormDataLoading,
-    levelsFilled,
-    isLevelsFetching,
-    refetchLevels,
-    isAddOrIncompleteSRMCustomerForm,
-    isAddOrIncompleteSRMPaymentForm,
     vehicleIdParam: vehicleId || null,
   };
 };

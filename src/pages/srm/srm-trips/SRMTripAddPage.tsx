@@ -84,7 +84,6 @@ export default function SRMTripAddPage() {
             <Suspense fallback={<LazyLoader />}>
               <SRMCustomerDetailsForm
                 type="Add"
-                isAddOrIncomplete={true}
                 onNextTab={() => handleNextTab("payment", 2)}
               />
             </Suspense>
@@ -94,7 +93,6 @@ export default function SRMTripAddPage() {
             <Suspense fallback={<LazyLoader />}>
               <SRMPaymentDetailsForm
                 type={"Add"}
-                isAddOrIncomplete={true}
                 onNextTab={() => handleNextTab("check-list", 3)}
               />
             </Suspense>

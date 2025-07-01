@@ -29,8 +29,6 @@ export default function PublicCustomerDetailsPage() {
   }
 
   const decodedToken = jwtDecode<DecodedTokenType>(token as string);
-  console.log("token : ", token);
-  console.log("decoded token : ", decodedToken);
 
   const formattedPhoneNumber = `+${decodedToken.countryCode}${decodedToken.phoneNumber}`;
 
@@ -47,9 +45,6 @@ export default function PublicCustomerDetailsPage() {
     <div className="container py-6 pb-10 h-auto min-h-screen bg-slate-50">
       <div className="gap-x-4 mb-5 ml-2 flex flex-col items-start w-fit">
         <h1 className="text-center h3-bold sm:text-left">Customer Details</h1>
-        <h2 className="font-medium text-gray-600">
-          (Form is valid only for 2 hours)
-        </h2>
       </div>
 
       <SRMPublicCustomerDetailsForm

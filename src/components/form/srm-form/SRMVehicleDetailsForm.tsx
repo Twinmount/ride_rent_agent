@@ -39,7 +39,6 @@ type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";
   formData?: SRMVehicleDetailsFormType | undefined;
   onNextTab?: () => void;
-  refetchLevels?: () => void;
   showDescription?: boolean;
   isDedicatedVehiclePage?: boolean;
 };
@@ -48,7 +47,6 @@ export default function SRMVehicleDetailsForm({
   type,
   onNextTab,
   formData,
-  refetchLevels,
   showDescription = true,
   isDedicatedVehiclePage = false,
 }: SRMVehicleDetailsFormProps) {
@@ -69,8 +67,6 @@ export default function SRMVehicleDetailsForm({
   // boolean to determine if user reached this form from SRM trip vehicle form
   const srmQueryParam = useGetSearchParams("from", false);
   const isFromSrm = srmQueryParam === "srm";
-
-  console.log("isFromSrm : ", isFromSrm);
 
   // access vehicleRegistrationNumber from the url search params
   const vehicleRegistrationNumber = useGetSearchParams(
@@ -151,16 +147,11 @@ export default function SRMVehicleDetailsForm({
     try {
       let data = await handleVehicleSubmit(values);
 
-      console.log("handle vehicle submit data : ", data);
-
       if (data) {
         await deleteMultipleFiles(deletedFiles);
 
         // if we are in the dedicated SRMVehicleAddPage or SRMVehicleUpdatePage, store the vehicleId in the session storage from the data.result.id. Otherwise, store it from the data.result.vehicle.id
         if (!isDedicatedVehiclePage) {
-          console.log(
-            "we are now not in the dedicated SRMVehicleAddPage or SRMVehicleUpdatePage"
-          );
           sessionStorage.setItem("vehicleId", data.result.vehicle.id);
           sessionStorage.setItem("bookingId", data.result.bookingId);
         }
@@ -187,7 +178,6 @@ export default function SRMVehicleDetailsForm({
             navigate("/srm/manage-vehicles");
           }
         } else {
-          refetchLevels?.();
           if (type === "Add" && onNextTab) {
             toast({
               title: `Vehicle phase success, moving to customer details`,
@@ -226,8 +216,6 @@ export default function SRMVehicleDetailsForm({
       setExistingVehicleId,
       setCurrentVehiclePhoto
     );
-
-    console.log("vehicleData : ", vehicleData);
 
     // store vehicleId and bodyType in the session storage
     sessionStorage.setItem("vehicleId", vehicleData?.id as string);

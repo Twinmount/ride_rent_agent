@@ -45,8 +45,6 @@ export default function CheckListForm({
     enabled: type === "Add" || !!vehicleId,
   });
 
-  useEffect(() => console.log("data : ", data), [isLoading]);
-
   useEffect(() => {
     if (data?.result && type === "Add") {
       const parsedData = JSON.parse(data.result.checklistMetadata);
@@ -70,13 +68,11 @@ export default function CheckListForm({
 
       if (!data?.result) {
         // if there is no check list data to fetch initially, create a new one
-        console.log("data.result not found, creating new check list");
         responseData = await postSRMCheckList({
           vehicleId: vehicleId as string,
           checklistMetadata: JSON.stringify(submittedData),
         });
       } else {
-        console.log("data.result found, updating check list");
         responseData = await putSRMCheckList({
           vehicleId: vehicleId as string,
           checklistMetadata: JSON.stringify(submittedData),

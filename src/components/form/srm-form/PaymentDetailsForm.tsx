@@ -39,12 +39,11 @@ import {
 } from "../form-ui/FormSubmitButton";
 import RentalDetailsPreview from "../SRMRentalDetailsPreview";
 import useGetSearchParams from "@/hooks/useGetSearchParams";
+import { useQueryClient } from "@tanstack/react-query";
 
 type SRMPaymentDetailsFormProps = {
   type: "Add" | "Update";
   formData?: SRMPaymentDetailsFormType | null;
-  refetchLevels?: () => void;
-  isAddOrIncomplete?: boolean;
   onNextTab?: () => void;
 };
 
@@ -53,11 +52,11 @@ type SRMPaymentDetailsFormProps = {
 export default function SRMPaymentDetailsForm({
   type,
   formData,
-  refetchLevels,
-  isAddOrIncomplete,
   onNextTab,
 }: SRMPaymentDetailsFormProps) {
   const { bookingId: paramBookingId } = useParams<{ bookingId: string }>();
+
+  const queryClient = useQueryClient();
 
   const queryParamPaymentId = useGetSearchParams("paymentId");
 
@@ -67,14 +66,6 @@ export default function SRMPaymentDetailsForm({
 
   const bookingId =
     type === "Add" ? sessionStorage.getItem("bookingId") : paramBookingId;
-
-  if (type !== "Add") {
-    console.log("booking id from params:", paramBookingId);
-    console.log(
-      "booking id from session storage:",
-      sessionStorage.getItem("bookingId")
-    );
-  }
 
   const [rentalDetails, setRentalDetails] = useState<RentalDetails | null>(
     null
@@ -119,7 +110,7 @@ export default function SRMPaymentDetailsForm({
     // Append other form data
     try {
       let data;
-      if (isAddOrIncomplete) {
+      if (type === "Add" || isUpdateWithoutQueryParamPaymentId) {
         data = await addPaymentDetailsForm(values);
         const paymentId = data?.result?.id;
 
@@ -138,10 +129,13 @@ export default function SRMPaymentDetailsForm({
       }
 
       if (data) {
-        refetchLevels?.();
         toast({
           title: `Trip ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ["srm-payment-details-form"],
         });
 
         if (type === "Add" && onNextTab) {
@@ -287,7 +281,7 @@ export default function SRMPaymentDetailsForm({
                         wrapperClassName="datePicker text-base "
                         placeholderText="DD/MM/YYYY"
                         id="bookingEndDate"
-                        minDate={form.watch("bookingStartDate")}
+                        minDate={form.watch("bookingStartDate") || new Date()}
                         disabled={
                           !form.watch("bookingStartDate") || isFieldsDisabled
                         }
@@ -426,7 +420,7 @@ export default function SRMPaymentDetailsForm({
         />
 
         {type === "Add" && (
-          <FormGenericButton type="button">
+          <FormGenericButton type="button" disabled={true}>
             Download Quote/Invoice
           </FormGenericButton>
         )}
@@ -434,7 +428,11 @@ export default function SRMPaymentDetailsForm({
         {/* submit  */}
         {(type === "Add" || isUpdateWithoutQueryParamPaymentId) && (
           <FormSubmitButton
-            text={type === "Add" ? "Submit" : "Update Payment Details"}
+            text={
+              type === "Add"
+                ? "Submit Payment Details"
+                : "Update Payment Details"
+            }
             isLoading={form.formState.isSubmitting}
           />
         )}

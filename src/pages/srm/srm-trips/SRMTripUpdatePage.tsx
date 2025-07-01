@@ -29,7 +29,6 @@ export default function SRMTripUpdatePage() {
   }>();
 
   const vehicleId = useGetSearchParams("vehicleId", true);
-  console.log("setting vehicle id in session storage : ", vehicleId);
   sessionStorage.setItem("vehicleId", vehicleId || "");
 
   // Handle tab change based on levelsFilled state
@@ -47,18 +46,13 @@ export default function SRMTripUpdatePage() {
     isVehicleLoading,
     paymentFormData,
     isPaymentLoading,
-    isLevelsFetching,
     checkListFormData,
     isCheckListFormDataLoading,
-    refetchLevels,
-    isAddOrIncompleteSRMCustomerForm,
-    isAddOrIncompleteSRMPaymentForm,
+
     vehicleIdParam,
   } = useSRMUpdateForm(bookingId);
 
-  console.log(
-    "saving vehicle rental details also in session storage for third form (payment form)"
-  );
+  // saving rental details to session storage for further use in third form (payment form)
   sessionStorage.setItem(
     "rentalDetails",
     JSON.stringify(vehicleFormData.rentalDetails)
@@ -87,13 +81,12 @@ export default function SRMTripUpdatePage() {
 
           <TabsContent value="vehicle" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              {isLevelsFetching || isVehicleLoading ? (
+              {isVehicleLoading ? (
                 <FormSkelton />
               ) : (
                 <SRMVehicleDetailsForm
                   type={"Update"}
                   formData={vehicleFormData}
-                  refetchLevels={refetchLevels}
                 />
               )}
             </Suspense>
@@ -107,7 +100,6 @@ export default function SRMTripUpdatePage() {
                 <SRMCustomerDetailsForm
                   type={"Update"}
                   formData={customerFormData as SRMCustomerDetailsFormType}
-                  isAddOrIncomplete={isAddOrIncompleteSRMCustomerForm}
                 />
               )}
             </Suspense>
@@ -115,14 +107,12 @@ export default function SRMTripUpdatePage() {
 
           <TabsContent value="payment" className="flex-center">
             <Suspense fallback={<LazyLoader />}>
-              {isLevelsFetching || isPaymentLoading ? (
+              {isPaymentLoading ? (
                 <FormSkelton />
               ) : (
                 <SRMPaymentDetailsForm
                   type={"Update"}
                   formData={paymentFormData}
-                  refetchLevels={refetchLevels}
-                  isAddOrIncomplete={isAddOrIncompleteSRMPaymentForm}
                 />
               )}
             </Suspense>

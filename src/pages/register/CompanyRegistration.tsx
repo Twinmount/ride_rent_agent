@@ -6,12 +6,10 @@ import { useCompanyCountry } from "@/hooks/useCompanyCountry";
 
 export default function CompanyRegistration() {
   const {
-    appState: { accessToken, refreshToken, agentId, userId },
+    appState: { agentId, userId },
     isLoading,
     isError,
   } = useAgentContext();
-
-  console.log(accessToken, refreshToken);
 
   const { data: countryData, isLoading: isLoadingCountry } =
     useCompanyCountry(userId);
