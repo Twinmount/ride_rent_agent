@@ -18,6 +18,7 @@ import {
   GetSRMChecklistResponse,
   GetSRMUserTaxAndContractInfoResponse,
   PublicCustomerLinkShareResponse,
+  FetchSRMDashboardAnalytics,
 } from "@/types/srm-api-types";
 import {
   SRMPaymentDetailsFormType,
@@ -26,6 +27,24 @@ import {
   TripEndFormType,
 } from "@/types/srm-types";
 import axios from "axios";
+
+export const fetchSRMDashboard =
+  async (): Promise<FetchSRMDashboardAnalytics> => {
+    try {
+      const data = await API.get<FetchSRMDashboardAnalytics>({
+        slug: Slug.GET_SRM_DASHBOARD,
+      });
+
+      if (!data) {
+        throw new Error("Failed to fetch srm dashboard data");
+      }
+
+      return data;
+    } catch (error) {
+      console.error("Error fetching srm dashboard:", error);
+      throw error;
+    }
+  };
 
 /*
  * API function to create a new customer

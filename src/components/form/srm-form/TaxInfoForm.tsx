@@ -50,6 +50,10 @@ export default function TaxInfoForm({ type, formData }: FormProps) {
         queryKey: ["srm-onboarding-status"],
       });
 
+      queryClient.invalidateQueries({
+        queryKey: ["srm-contract"],
+      });
+
       if (data) {
         toast({
           title: `Tax Info ${type.toLowerCase()} successful`,

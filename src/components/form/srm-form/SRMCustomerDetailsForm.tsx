@@ -28,6 +28,8 @@ import CustomerLinkShareFormDialog from "@/components/dialog/CustomerLinkShareFo
 import MultipleFileUpload from "../file-uploads/MultipleFileUpload";
 import useRefreshSRMCustomer from "@/hooks/useRefreshSRMCustomer";
 import useGetSearchParams from "@/hooks/useGetSearchParams";
+import { useQueryClient } from "@tanstack/react-query";
+import { useParams } from "react-router-dom";
 
 type SRMCustomerDetailsFormProps = {
   type: "Add" | "Update";
@@ -53,13 +55,30 @@ export default function SRMCustomerDetailsForm({
     null
   );
 
-  const bookingId = sessionStorage.getItem("bookingId") || "";
+  const queryClient = useQueryClient();
 
   const customerIdParam = useGetSearchParams("customerId");
-  const sessionStorageCustomerId = sessionStorage.getItem("linkSendCustomerId");
+  const linkSendCustomerId = sessionStorage.getItem("linkSendCustomerId");
 
   const customerIdForRefetch =
-    type === "Add" ? sessionStorageCustomerId : customerIdParam;
+    type === "Add" ? linkSendCustomerId : customerIdParam;
+
+  // boolean to determine if the type is "Update" and there is no customerId in the url query params. if its true, form will work as "Add Customer"
+  const isUpdateWithoutCustomerId =
+    type === "Update" && (!customerIdParam || customerIdParam === "undefined");
+
+  // boolean to determine whether "<CustomerLinkShareFormDialog />" and "refresh data" button should be shown or not. if the type is "Add" OR if the type is "Update" and there is no customer id (customerIdParam), then it should be shown
+  const shouldShowCustomerLinkSection =
+    type === "Add" || isUpdateWithoutCustomerId;
+
+  // get the booking id from the session storage that is set up the vehicle form during the Add phase
+  const bookingIdFromSessionStorage = sessionStorage.getItem("bookingId") || "";
+  const { bookingId: bookingIdFromUrlParam } = useParams<{
+    bookingId: string;
+  }>();
+
+  const bookingId =
+    type === "Add" ? bookingIdFromSessionStorage : bookingIdFromUrlParam;
 
   const { isCustomerRefreshLoading, refetchRefreshCustomer } =
     useRefreshSRMCustomer({
@@ -67,10 +86,9 @@ export default function SRMCustomerDetailsForm({
     });
 
   //  initial default values for the form
-  const initialValues =
-    formData && type === "Update"
-      ? formData
-      : SRMCustomerDetailsFormDefaultValues;
+  const initialValues = formData
+    ? formData
+    : SRMCustomerDetailsFormDefaultValues;
 
   // Define your form.
   const form = useForm<z.infer<typeof SRMCustomerDetailsFormSchema>>({
@@ -83,7 +101,10 @@ export default function SRMCustomerDetailsForm({
     console.log(
       "handleExistingCustomerBooking: updating srm customer booking ..."
     );
-    const bookingResponse = await updateCustomerBooking(customerId, bookingId);
+    const bookingResponse = await updateCustomerBooking(
+      customerId,
+      bookingId as string
+    );
 
     console.log("customer booking updated : ...", bookingResponse);
     return bookingResponse;
@@ -106,7 +127,10 @@ export default function SRMCustomerDetailsForm({
 
     console.log("updating srm customer booking ...");
     // update srm customer booking
-    const bookingResponse = await updateCustomerBooking(customerId, bookingId);
+    const bookingResponse = await updateCustomerBooking(
+      customerId,
+      bookingId as string
+    );
 
     console.log("customer booking updated : ...", bookingResponse);
     return bookingResponse;
@@ -130,7 +154,7 @@ export default function SRMCustomerDetailsForm({
     try {
       let data;
 
-      if (type === "Add" || isAddOrIncomplete) {
+      if (type === "Add" || isAddOrIncomplete || isUpdateWithoutCustomerId) {
         if (existingCustomerId) {
           // Handle existing customer booking
           data = await handleExistingCustomerBooking(existingCustomerId);
@@ -145,6 +169,10 @@ export default function SRMCustomerDetailsForm({
         toast({
           title: `Customer ${type.toLowerCase()} successful`,
           className: "bg-yellow text-white",
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ["srm-trips"],
         });
 
         if (type === "Add" && onNextTab) {
@@ -195,6 +223,17 @@ export default function SRMCustomerDetailsForm({
   };
 
   const onCustomerRefresh = async () => {
+    if (
+      !customerIdParam ||
+      customerIdParam === "undefined" ||
+      !linkSendCustomerId
+    ) {
+      toast({
+        title: "No Customer ID found",
+        className: "bg-orange text-white",
+      });
+      return;
+    }
     const result = await refetchRefreshCustomer();
     if (result.data?.result) {
       handleCustomerRefresh(
@@ -216,26 +255,33 @@ export default function SRMCustomerDetailsForm({
     }
   };
 
-  // FIELDS DISABLED IF THE TYPE === UPDATE
-  const isFieldsDisabled = type === "Update";
+  // FIELDS DISABLED IF THE TYPE === UPDATE and IF THERE IS NO CUSTOMER ID in the URL
+  const isFieldsDisabled = type === "Update" && !isUpdateWithoutCustomerId;
 
   // submit button text
-  const submitButtonText = type === "Add" ? "Add Customer" : "Update Customer";
+  const submitButtonText =
+    type === "Add"
+      ? "Submit and proceed to payment"
+      : isUpdateWithoutCustomerId
+      ? "Update trip details"
+      : "Update Customer Details";
 
   return (
     <div className="flex flex-col">
-      {type === "Add" && (
+      {shouldShowCustomerLinkSection && (
         <div>
           <CustomerLinkShareFormDialog />
 
-          <button
-            type="button"
-            onClick={onCustomerRefresh}
-            disabled={!customerIdForRefetch || isCustomerRefreshLoading}
-            className="text-sm text-blue-600 hover:underline font-medium"
-          >
-            🔄 Refresh Data
-          </button>
+          {!!customerIdForRefetch && (
+            <button
+              type="button"
+              onClick={onCustomerRefresh}
+              disabled={!customerIdForRefetch || isCustomerRefreshLoading}
+              className="text-sm text-blue-600 hover:underline font-medium"
+            >
+              🔄 Refresh Data
+            </button>
+          )}
         </div>
       )}
       {/* Form container */}
@@ -351,21 +397,29 @@ export default function SRMCustomerDetailsForm({
           <FormField
             control={form.control}
             name="passport"
-            render={() => (
-              <MultipleFileUpload
-                key={(initialValues.passport ?? []).join(",")}
-                name="passport"
-                label="Passport Images"
-                existingFiles={initialValues.passport ?? []}
-                description="Upload both front and back of the passport."
-                maxSizeMB={5}
-                setIsFileUploading={setIsFileUploading}
-                bucketFilePath={GcsFilePaths.IMAGE}
-                isFileUploading={isFileUploading}
-                downloadFileName="passport"
-                setDeletedFiles={setDeletedFiles}
-              />
-            )}
+            render={() => {
+              const watchedPassport = form.watch("passport") ?? [];
+              const existingFiles =
+                watchedPassport.length > 0
+                  ? watchedPassport
+                  : initialValues.passport ?? [];
+
+              return (
+                <MultipleFileUpload
+                  key={existingFiles.join(",")}
+                  name="passport"
+                  label="Passport Images"
+                  existingFiles={existingFiles}
+                  description="Upload both front and back of the passport."
+                  maxSizeMB={5}
+                  setIsFileUploading={setIsFileUploading}
+                  bucketFilePath={GcsFilePaths.IMAGE}
+                  isFileUploading={isFileUploading}
+                  downloadFileName="passport"
+                  setDeletedFiles={setDeletedFiles}
+                />
+              );
+            }}
           />
 
           {/* Driving License Number */}
@@ -390,21 +444,29 @@ export default function SRMCustomerDetailsForm({
           <FormField
             control={form.control}
             name="drivingLicense"
-            render={() => (
-              <MultipleFileUpload
-                key={(initialValues.drivingLicense ?? []).join(",")}
-                name="drivingLicense"
-                label="Driving License Images"
-                existingFiles={initialValues.drivingLicense ?? []}
-                description="Upload both front and back of the driving license."
-                maxSizeMB={5}
-                setIsFileUploading={setIsFileUploading}
-                bucketFilePath={GcsFilePaths.IMAGE}
-                isFileUploading={isFileUploading}
-                downloadFileName="driving-license"
-                setDeletedFiles={setDeletedFiles}
-              />
-            )}
+            render={() => {
+              const watchedDrivingLicense = form.watch("drivingLicense") ?? [];
+              const existingFiles =
+                watchedDrivingLicense.length > 0
+                  ? watchedDrivingLicense
+                  : initialValues.drivingLicense ?? [];
+
+              return (
+                <MultipleFileUpload
+                  key={existingFiles.join(",")}
+                  name="drivingLicense"
+                  label="Driving License Images"
+                  existingFiles={existingFiles}
+                  description="Upload both front and back of the driving license."
+                  maxSizeMB={5}
+                  setIsFileUploading={setIsFileUploading}
+                  bucketFilePath={GcsFilePaths.IMAGE}
+                  isFileUploading={isFileUploading}
+                  downloadFileName="driving-license"
+                  setDeletedFiles={setDeletedFiles}
+                />
+              );
+            }}
           />
 
           {/* mobile */}
@@ -448,7 +510,7 @@ export default function SRMCustomerDetailsForm({
           )}
 
           {/* submit  */}
-          {type === "Add" && (
+          {(type === "Add" || isUpdateWithoutCustomerId) && (
             <FormSubmitButton
               text={submitButtonText}
               isLoading={form.formState.isSubmitting}

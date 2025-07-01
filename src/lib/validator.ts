@@ -231,7 +231,7 @@ export const SRMTaxInfoFormSchema = z.object({
 });
 
 export const SRMContractFormSchema = z.object({
-  contractContent: z
+  termsNCondition: z
     .string()
     .min(10, "Contract must be at least 10 characters long")
     .max(30000, "Contract length exceeded"),
@@ -262,9 +262,11 @@ export const SRMVehicleDetailsFormSchema = z.object({
     .min(1, { message: "Traffic Fine ID is required" })
     .max(50, { message: "Traffic Fine ID must be at most 50 characters" }),
   lastServiceDate: z.date(),
-  currentKilometre: z.string().min(1, "Current kilometre is required"),
-  serviceKilometre: z.string().min(1, "Current kilometre is required"),
-  nextServiceKilometre: z.string().min(1, "Service kilometre is required"),
+  currentKilometre: z
+    .string()
+    .min(1, "Current kilometre (odometer) is required"),
+  serviceKilometre: z.string().min(1, "service kilometre is required"),
+  nextServiceKilometre: z.string().min(1, "next service kilometre is required"),
   nextServiceDate: z.date(),
   rentalDetails: z.object({
     day: SRMRentalDetailTypeSchema,
@@ -277,7 +279,7 @@ export const SRMVehicleDetailsFormSchema = z.object({
 // SRM : Payment Details Form Schema
 export const SRMPaymentDetailsFormSchema = z.object({
   currency: z.string().min(1, "Currency is required"),
-  advanceAmount: z.string().min(1, "Advance amount is required"),
+  advanceAmount: z.string().optional().default("0"),
   remainingAmount: z.string().min(1, "Remaining amount is required"),
   securityDeposit: z.object({
     enabled: z.boolean().default(false),
@@ -302,4 +304,7 @@ export const TripEndFormSchema = z.object({
   additionalCharges: z.any().optional(),
   discounts: z.string().default("0").optional(),
   totalAmountCollected: z.string().min(1, "Total amount is required"),
+  currentKilometre: z
+    .string()
+    .min(1, "Current kilometre (odometer) is required"),
 });

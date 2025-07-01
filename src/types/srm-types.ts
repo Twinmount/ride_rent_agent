@@ -223,6 +223,7 @@ export type TripEndFormType = {
   additionalCharges: ChargeType[];
   discounts?: string;
   totalAmountCollected: string;
+  currentKilometre: string;
 };
 
 export type BannedCustomerType = {

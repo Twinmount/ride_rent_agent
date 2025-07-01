@@ -125,6 +125,14 @@ export const srmPostOnboardingRoutes = [
     path: "/srm/contracts/edit",
     element: <SRMContractEditPage />,
   },
+  {
+    path: "/srm/tax-info/edit",
+    element: <SRMCountryTaxInfoUpdatePage />,
+  },
+  {
+    path: "/srm/contracts/edit",
+    element: <SRMContractEditPage />,
+  },
 ];
 
 /**
@@ -145,21 +153,5 @@ export const srmOnboardingRoutes = [
   {
     path: "/srm/contract",
     element: <SRMContractAddPage />,
-  },
-];
-
-/**
- * These SRM routes are accessible at any time, regardless
- * of whether the user has completed onboarding or not.
- * They are **NOT** wrapped in the SRMConditionalWrapper.
- */
-export const srmAlwaysAccessibleRoutes = [
-  {
-    path: "/srm/tax-info/edit",
-    element: <SRMCountryTaxInfoUpdatePage />,
-  },
-  {
-    path: "/srm/contracts/edit",
-    element: <SRMContractEditPage />,
   },
 ];

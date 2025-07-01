@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import { AnnotationState } from "@markerjs/markerjs3";
 import ImageAnnotationEditor from "../image-annotation-editor/ImageAnnotationEditor";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   getSRMCheckListFormData,
   postSRMCheckList,
@@ -28,9 +28,11 @@ export default function CheckListForm({
   const [annotationData, setAnnotationData] = useState<AnnotationState | null>(
     null
   );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = useNavigate();
   const [loadCount] = useState(0);
+  const queryClient = useQueryClient();
 
   const vehicleId =
     type === "Add" ? sessionStorage.getItem("vehicleId") : vehicleIdParam;
@@ -62,6 +64,7 @@ export default function CheckListForm({
   const handleSubmit = async (submittedData: AnnotationState) => {
     try {
       setAnnotationData(submittedData);
+      setIsSubmitting(true);
 
       let responseData;
 
@@ -84,15 +87,17 @@ export default function CheckListForm({
         throw new Error("Failed to update check list");
       }
 
+      queryClient.invalidateQueries({
+        queryKey: ["srm-check-list", vehicleId],
+      });
+
       toast({
         title: "Success",
         description: "Check List Updated Successfully",
         className: "bg-yellow text-white",
       });
 
-      if (type === "Add") {
-        navigate(`/srm/ongoing-trips`);
-      }
+      navigate(`/srm/ongoing-trips`);
     } catch (error) {
       console.error("Checklist submit failed:", error);
       toast({
@@ -101,6 +106,8 @@ export default function CheckListForm({
         description:
           error instanceof Error ? error.message : "Something went wrong.",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -117,6 +124,7 @@ export default function CheckListForm({
           targetImage="/1.png"
           initialAnnotation={annotationData}
           onSave={handleSubmit}
+          isSubmitting={isSubmitting}
         />
       )}
     </div>

@@ -80,7 +80,7 @@ export default function ExtendTripModal({
       data = await extendTrip(bookingId, values);
       if (data) {
         navigate("/srm/ongoing-trips");
-        queryClient.invalidateQueries({ queryKey: ["activeTrips"] });
+        queryClient.invalidateQueries({ queryKey: ["ongoing-trips"] });
         onClose();
       }
     } catch (error) {

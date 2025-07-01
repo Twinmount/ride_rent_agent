@@ -20,19 +20,19 @@ import { VehicleType } from "@/types/srm-types";
 import PreviewImageComponent from "../PreviewImageComponent";
 import { Link } from "react-router-dom";
 
-type VehicleSearchProps = {
+type VehicleSearchAndAutoFillProps = {
   value?: string;
   onChangeHandler: (value: string, vehicleData?: any) => void;
   placeholder?: string;
   isDisabled?: boolean;
 };
 
-const VehicleSearch = ({
+export default function VehicleSearchAndAutoFill({
   value,
   onChangeHandler,
   placeholder = "Search vehicle name...",
   isDisabled = false,
-}: VehicleSearchProps) => {
+}: VehicleSearchAndAutoFillProps) {
   const [searchTerm, setSearchTerm] = useState(""); // Default to an empty string
   const [open, setOpen] = useState(false);
 
@@ -150,9 +150,7 @@ const VehicleSearch = ({
       </PopoverContent>
     </Popover>
   );
-};
-
-export default VehicleSearch;
+}
 
 // individual vehicle box
 const VehicleItem = ({

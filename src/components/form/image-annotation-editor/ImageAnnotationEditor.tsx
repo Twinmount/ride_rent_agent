@@ -13,6 +13,7 @@ type Props = {
   targetImage: string;
   initialAnnotation?: AnnotationState | null;
   onSave: (data: AnnotationState) => void;
+  isSubmitting: boolean;
 };
 
 const ImageAnnotationEditor = ({
@@ -20,6 +21,7 @@ const ImageAnnotationEditor = ({
   targetImage,
   initialAnnotation,
   onSave,
+  isSubmitting,
 }: Props) => {
   const editorContainer = useRef<HTMLDivElement | null>(null);
   const markerAreaRef = useRef<MarkerArea | null>(null);
@@ -145,7 +147,11 @@ const ImageAnnotationEditor = ({
         onDragOver={(e) => e.preventDefault()}
       />
 
-      <FormGenericButton className="mt-8" onClick={handleSave}>
+      <FormGenericButton
+        className="mt-8"
+        onClick={handleSave}
+        isLoading={isSubmitting}
+      >
         {type === "Add" ? "Save" : "Update"}
       </FormGenericButton>
     </div>

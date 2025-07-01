@@ -2,9 +2,7 @@ import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-
 import { Form, FormField } from "@/components/ui/form";
-
 import { Input } from "@/components/ui/input";
 import { SRMPublicCustomerDetailsFormSchema } from "@/lib/validator";
 import {
@@ -19,7 +17,6 @@ import { GcsFilePaths } from "@/constants/enum";
 import SingleFileUpload from "../file-uploads/SingleFileUpload";
 import { updateCustomerByPublic } from "@/api/srm/srmFormApi";
 import NationalityDropdown from "../dropdowns/NationalityDropdown";
-
 import { useFormValidationToast } from "@/hooks/useFormValidationToast";
 import { FormFieldLayout } from "../form-ui/FormFieldLayout";
 import { FormSubmitButton } from "../form-ui/FormSubmitButton";
@@ -154,7 +151,6 @@ export default function SRMPublicCustomerDetailsForm({
                   {...field}
                   className="input-field"
                   readOnly
-                  disabled
                 />
               </FormFieldLayout>
             )}
@@ -174,7 +170,6 @@ export default function SRMPublicCustomerDetailsForm({
                   type="email"
                   className="input-field"
                   readOnly
-                  disabled
                 />
               </FormFieldLayout>
             )}

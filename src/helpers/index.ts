@@ -11,7 +11,7 @@ import {
   isSameDay,
   parseISO,
 } from "date-fns";
-import { CustomerApiType } from "@/types/srm-api-types";
+import { CustomerApiType, DashboardAnalytics } from "@/types/srm-api-types";
 
 type ApprovalStatusType = "APPROVED" | "UNDER_REVIEW" | "REJECTED" | "PENDING";
 
@@ -418,3 +418,35 @@ export function getExpiryNotificationText(
     className: "text-red-500",
   };
 }
+
+/**
+ * Returns an array of dashboard stats objects given the input data from api.
+ */
+export const getDashboardStats = (data: DashboardAnalytics | undefined) => {
+  return [
+    {
+      title: "Ongoing Trips",
+      count: data?.ongoingTripsCount ?? "N/A",
+      link: "/srm/ongoing-trips",
+      overlayText: "Show Ongoing Trips",
+    },
+    {
+      title: "Completed Trips",
+      count: data?.completedTripsCount ?? "N/A",
+      link: "/srm/completed-trips",
+      overlayText: "Show Completed Trips",
+    },
+    {
+      title: "Vehicle List",
+      count: data?.vehicleCount ?? "N/A",
+      link: "/srm/manage-vehicles",
+      overlayText: "Show Vehicle List",
+    },
+    {
+      title: "Customer List",
+      count: data?.customersCount ?? "N/A",
+      link: "/srm/customer-list",
+      overlayText: "Show Customer List",
+    },
+  ];
+};

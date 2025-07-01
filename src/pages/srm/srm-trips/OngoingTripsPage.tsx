@@ -27,7 +27,7 @@ export default function OngoingTripsPage() {
   const { companyId, isCompanyLoading } = useCompany();
 
   const { data, isLoading, isFetching } = useQuery({
-    queryKey: ["activeTrips", page, limit, search, sortOrder],
+    queryKey: ["srm-trips", "ongoing-trips", page, limit, search, sortOrder],
     queryFn: () =>
       fetchSRMBookings({
         page,

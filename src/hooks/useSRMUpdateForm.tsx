@@ -21,7 +21,6 @@ export const useSRMUpdateForm = (bookingId: string | undefined) => {
 
   const customerId = searchParams.get("customerId");
   const vehicleId = searchParams.get("vehicleId");
-  // const paymentId = searchParams.get("paymentId");
 
   // Fetch primary form data
   const { data: customerFormResult, isLoading: isCustomerLoading } = useQuery({

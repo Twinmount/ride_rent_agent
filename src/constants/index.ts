@@ -207,7 +207,7 @@ export const SRMTaxInfoFormDefaultValues: SRMTaxInfoFormType = {
 };
 
 export const SRMContractFormDefaultValues: SRMContractFormType = {
-  contractContent: "",
+  termsNCondition: "",
 };
 
 // srm vehicle details form default values
@@ -263,6 +263,7 @@ export const TripEndFormDefaultValues: TripEndFormType = {
   additionalCharges: [], // Initially no additional charges
   discounts: "0",
   totalAmountCollected: "",
+  currentKilometre: "",
 };
 
 export const ADDITIONAL_CHARGES_OPTIONS = [

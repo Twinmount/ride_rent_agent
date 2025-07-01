@@ -41,7 +41,7 @@ export default function SRMContractForm({ type, formData }: FormProps) {
   async function onSubmit(values: z.infer<typeof SRMContractFormSchema>) {
     try {
       let data = await updateSRMUserTaxAndContractInfo({
-        termsNCondition: values.contractContent,
+        termsNCondition: values.termsNCondition,
       });
 
       if (data) {
@@ -52,6 +52,10 @@ export default function SRMContractForm({ type, formData }: FormProps) {
 
         queryClient.invalidateQueries({
           queryKey: ["srm-onboarding-status"],
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: ["srm-contract"],
         });
 
         if (type === "Add") {
@@ -76,18 +80,10 @@ export default function SRMContractForm({ type, formData }: FormProps) {
     <div className="flex flex-col">
       {/* Form container */}
       <Form {...form}>
-        <FormContainer
-          onSubmit={form.handleSubmit(onSubmit)}
-          description={
-            <p className="text-sm italic text-center text-gray-600">
-              Please provide your contract before continuing to SRM.
-            </p>
-          }
-          className="mt-4"
-        >
+        <FormContainer onSubmit={form.handleSubmit(onSubmit)} className="mt-4">
           <FormField
             control={form.control}
-            name="contractContent"
+            name="termsNCondition"
             render={({ field }) => (
               <SRMContractTextEditor
                 content={field.value}

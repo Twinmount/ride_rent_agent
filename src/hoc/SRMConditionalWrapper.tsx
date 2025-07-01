@@ -48,7 +48,7 @@ export const SRMConditionalWrapper = () => {
   // If user has NOT filled tax info, allow only tax-info
   if (!taxInfoCompleted) {
     if (currentPath === "/srm/tax-info") return <Outlet />;
-    return <Navigate to="/srm/tax-info" replace />;
+    return <Navigate to="/srm/intro" replace />;
   }
 
   // Tax info is filled, contract is not filled → allow only contract

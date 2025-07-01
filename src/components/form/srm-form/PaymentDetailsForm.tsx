@@ -38,6 +38,7 @@ import {
   FormSubmitButton,
 } from "../form-ui/FormSubmitButton";
 import RentalDetailsPreview from "../SRMRentalDetailsPreview";
+import useGetSearchParams from "@/hooks/useGetSearchParams";
 
 type SRMPaymentDetailsFormProps = {
   type: "Add" | "Update";
@@ -56,8 +57,25 @@ export default function SRMPaymentDetailsForm({
   isAddOrIncomplete,
   onNextTab,
 }: SRMPaymentDetailsFormProps) {
-  const {} = useParams<{}>();
-  const bookingId = sessionStorage.getItem("bookingId");
+  const { bookingId: paramBookingId } = useParams<{ bookingId: string }>();
+
+  const queryParamPaymentId = useGetSearchParams("paymentId");
+
+  const isUpdateWithoutQueryParamPaymentId =
+    type === "Update" &&
+    (!queryParamPaymentId || queryParamPaymentId === "undefined");
+
+  const bookingId =
+    type === "Add" ? sessionStorage.getItem("bookingId") : paramBookingId;
+
+  if (type !== "Add") {
+    console.log("booking id from params:", paramBookingId);
+    console.log(
+      "booking id from session storage:",
+      sessionStorage.getItem("bookingId")
+    );
+  }
+
   const [rentalDetails, setRentalDetails] = useState<RentalDetails | null>(
     null
   );
@@ -178,7 +196,8 @@ export default function SRMPaymentDetailsForm({
   }, [bookingStartDate, bookingEndDate, advanceAmount, form.setValue]);
 
   // form fields are disabled if the type is "Update"
-  const isFieldsDisabled = type === "Update";
+  const isFieldsDisabled =
+    type === "Update" && !isUpdateWithoutQueryParamPaymentId;
 
   return (
     <Form {...form}>
@@ -298,8 +317,8 @@ export default function SRMPaymentDetailsForm({
           name="advanceAmount"
           render={({ field }) => (
             <FormFieldLayout
-              label="Advance Paid &#40;AED&#41;"
-              description=" Enter the advance received for this model in AED."
+              label="Advance Paid &#40;optional&#41;"
+              description=" Enter the advance received for this model in AED (if any)."
             >
               <Input
                 {...field}
@@ -346,7 +365,7 @@ export default function SRMPaymentDetailsForm({
             >
               <Input
                 {...field}
-                placeholder="Balance Amount (AED)"
+                placeholder="Balance Amount (optional)"
                 className="input-field !font-semibold !cursor-default"
                 type="text"
                 inputMode="numeric"
@@ -413,7 +432,7 @@ export default function SRMPaymentDetailsForm({
         )}
 
         {/* submit  */}
-        {type === "Add" && (
+        {(type === "Add" || isUpdateWithoutQueryParamPaymentId) && (
           <FormSubmitButton
             text={type === "Add" ? "Submit" : "Update Payment Details"}
             isLoading={form.formState.isSubmitting}

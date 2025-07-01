@@ -1,10 +1,6 @@
 import { SRMConditionalWrapper } from "@/hoc/SRMConditionalWrapper";
 import { lazy } from "react";
-import {
-  srmAlwaysAccessibleRoutes,
-  srmOnboardingRoutes,
-  srmPostOnboardingRoutes,
-} from "./srm-routes";
+import { srmOnboardingRoutes, srmPostOnboardingRoutes } from "./srm-routes";
 
 // vehicle  pages
 const VehiclesFormAddPage = lazy(
@@ -46,7 +42,6 @@ export const protectedRoutes = [
   },
 
   //  These SRM routes are always accessible (not wrapped by SRMConditionalWrapper)
-  ...srmAlwaysAccessibleRoutes,
 
   //  These SRM routes are wrapped in SRMConditionalWrapper
   {

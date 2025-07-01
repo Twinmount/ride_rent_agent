@@ -11,11 +11,11 @@ import { SRMCustomerDetailsFormType } from "@/types/srm-types";
 import useGetSearchParams from "@/hooks/useGetSearchParams";
 
 // Lazy-loaded form components
-const SRMCustomerDetailsForm = lazy(
-  () => import("@/components/form/srm-form/SRMCustomerDetailsForm")
-);
 const SRMVehicleDetailsForm = lazy(
   () => import("@/components/form/srm-form/SRMVehicleDetailsForm")
+);
+const SRMCustomerDetailsForm = lazy(
+  () => import("@/components/form/srm-form/SRMCustomerDetailsForm")
 );
 const SRMPaymentDetailsForm = lazy(
   () => import("@/components/form/srm-form/PaymentDetailsForm")
@@ -55,6 +55,14 @@ export default function SRMTripUpdatePage() {
     isAddOrIncompleteSRMPaymentForm,
     vehicleIdParam,
   } = useSRMUpdateForm(bookingId);
+
+  console.log(
+    "saving vehicle rental details also in session storage for third form (payment form)"
+  );
+  sessionStorage.setItem(
+    "rentalDetails",
+    JSON.stringify(vehicleFormData.rentalDetails)
+  );
 
   return (
     <PageWrapper heading="View Trip Record">

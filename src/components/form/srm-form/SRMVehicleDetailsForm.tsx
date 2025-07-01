@@ -474,7 +474,6 @@ export default function SRMVehicleDetailsForm({
                 wrapperClassName="datePicker text-base w-full"
                 placeholderText="DD/MM/YYYY"
                 id="registrationDate"
-                minDate={new Date()}
                 disabled={isFieldsDisabled}
               />
             </FormFieldLayout>
@@ -497,7 +496,6 @@ export default function SRMVehicleDetailsForm({
                 wrapperClassName="datePicker text-base w-full"
                 placeholderText="DD/MM/YYYY"
                 id="registrationDueDate"
-                minDate={new Date()}
                 disabled={isFieldsDisabled}
               />
             </FormFieldLayout>
@@ -544,7 +542,6 @@ export default function SRMVehicleDetailsForm({
                 wrapperClassName="datePicker text-base w-full"
                 placeholderText="DD/MM/YYYY"
                 id="lastServiceDate"
-                minDate={new Date()}
                 disabled={isFieldsDisabled}
               />
             </FormFieldLayout>
@@ -683,7 +680,6 @@ export default function SRMVehicleDetailsForm({
                 wrapperClassName="datePicker text-base w-full"
                 placeholderText="DD/MM/YYYY"
                 id="nextServiceDate"
-                minDate={new Date()}
                 disabled={isFieldsDisabled}
               />
             </FormFieldLayout>
@@ -713,19 +709,19 @@ export default function SRMVehicleDetailsForm({
 
         {/* submit  */}
 
-        <FormSubmitButton
-          text={
-            isDedicatedVehiclePage
-              ? type === "Add"
-                ? "Add Vehicle"
-                : "Update Vehicle"
-              : type === "Add"
-              ? "Continue to Customer Details"
-              : "Update Vehicle Details"
-          }
-          isLoading={form.formState.isSubmitting}
-          className="mt-6 "
-        />
+        {(isDedicatedVehiclePage || type === "Add") && (
+          <FormSubmitButton
+            text={
+              isDedicatedVehiclePage
+                ? type === "Add"
+                  ? "Add Vehicle"
+                  : "Update Vehicle"
+                : "Continue to Customer Details"
+            }
+            isLoading={form.formState.isSubmitting}
+            className="mt-6"
+          />
+        )}
       </FormContainer>
     </Form>
   );

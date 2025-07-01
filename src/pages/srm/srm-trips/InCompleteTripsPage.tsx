@@ -20,7 +20,7 @@ export default function InCompletedTripsPage() {
   const { companyId, isCompanyLoading } = useCompany();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["incomplete-trips", page, limit, search, sortOrder],
+    queryKey: ["srm-trips", "incomplete-trips", page, limit, search, sortOrder],
     queryFn: () =>
       fetchSRMBookings({
         page,

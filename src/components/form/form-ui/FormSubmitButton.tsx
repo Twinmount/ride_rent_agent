@@ -48,7 +48,7 @@ export const FormGenericButton = ({
     <Button
       type={type}
       size="lg"
-      disabled={disabled}
+      disabled={disabled || isLoading}
       onClick={onClick}
       className={`${defaultClasses} ${className}`}
     >

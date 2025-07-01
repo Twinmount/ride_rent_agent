@@ -197,6 +197,18 @@ export interface FetchSingleBookingResponse {
   statusCode: number;
 }
 
+export interface DashboardAnalytics {
+  ongoingTripsCount: number;
+  completedTripsCount: number;
+  vehicleCount: number;
+  customersCount: number;
+}
+export interface FetchSRMDashboardAnalytics {
+  result: DashboardAnalytics;
+  status: string;
+  statusCode: number;
+}
+
 export interface FetchBookingsResponse {
   result: {
     list: IndividualTrip[];

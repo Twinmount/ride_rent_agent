@@ -1,7 +1,7 @@
 import { downloadItems } from "@/constants/dashboardDownloadItems";
 import ExcelDownloadDialog from "./ExcelDownloadDialog";
 
-export default function DashboardDownloadSection() {
+export default function SRMDashboardDownloadSection() {
   return (
     <section className="mt-10 border-t-2 pt-6 space-y-4">
       <h2 className="text-xl font-semibold text-gray-800">Download Reports</h2>

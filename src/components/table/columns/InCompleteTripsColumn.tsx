@@ -1,9 +1,28 @@
+import { IndividualTrip } from "@/types/srm-api-types";
 import { ColumnDef } from "@tanstack/react-table";
+import { Link } from "react-router-dom";
 
-export const InCompleteTripsColumn = (): ColumnDef<any>[] => [
+export const InCompleteTripsColumn = (): ColumnDef<IndividualTrip>[] => [
   {
     accessorKey: "vehicle.vehicleRegistrationNumber",
     header: "Registration No.",
+    cell: ({ row }) => {
+      const {
+        vehicle: { id: vehicleId },
+        bookingId,
+        customer: { customerId },
+        payment: { id: paymentId },
+      } = row.original;
+
+      return (
+        <Link
+          to={`/srm/trips/edit/${bookingId}?customerId=${customerId}&vehicleId=${vehicleId}&paymentId=${paymentId}`}
+          className="font-semibold text-blue-600 hover:underline"
+        >
+          {row.original.vehicle.vehicleRegistrationNumber}
+        </Link>
+      );
+    },
   },
   {
     accessorKey: "vehicle.vehicleBrand.brandName",
