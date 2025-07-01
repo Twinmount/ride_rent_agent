@@ -9,7 +9,7 @@ export default function SRMCountryTaxInfoUpdatePage() {
     contractId: string;
   }>();
 
-  const { data, isLoading } = useQuery({
+  const { isLoading } = useQuery({
     queryKey: ["srm-contract", contractId],
     queryFn: () => {},
   });

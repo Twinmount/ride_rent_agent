@@ -4,7 +4,6 @@ import useDashboard from "@/hooks/useDashboard";
 import DashboardOverlay from "@/components/DashboardOverlay";
 import DashboardCard from "@/components/DashboardCard";
 import DashboardBoost from "@/components/DashboardBoost";
-import DashboardDownloadSection from "@/components/DashboardDownloadSection";
 
 const AgentDashboard: React.FC = () => {
   const { vehicleCount, isVehiclesLoading, metricCards, userId } =
@@ -38,9 +37,6 @@ const AgentDashboard: React.FC = () => {
 
         {/* Free Boost Information */}
         <DashboardBoost />
-
-        {/* download reports */}
-        <DashboardDownloadSection />
       </div>
     </section>
   );

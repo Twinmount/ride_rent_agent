@@ -34,7 +34,7 @@ export default function CheckListForm({
 
   const vehicleId =
     type === "Add" ? sessionStorage.getItem("vehicleId") : vehicleIdParam;
-  const bodyType = sessionStorage.getItem("bodyType");
+  // const bodyType = sessionStorage.getItem("bodyType");
 
   // Fetch check form data
   const { data, isLoading } = useQuery({

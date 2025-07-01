@@ -20,7 +20,7 @@ const BodyTypeDropdown = ({
   isDisabled = false,
   placeholder = "Select body type",
 }: BodyTypeDropdownProps) => {
-  const assetUrl = import.meta.env.VITE_ASSET_URL;
+  // const assetUrl = import.meta.env.VITE_ASSET_URL;
 
   return (
     <Select onValueChange={onChangeHandler} value={value} disabled={isDisabled}>

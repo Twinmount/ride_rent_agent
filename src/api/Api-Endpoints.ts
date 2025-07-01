@@ -120,4 +120,11 @@ export enum Slug {
   GET_SRM_END_TRIP = "/srm-bookings/end-trip",
   GET_SRM_EXTEND_TRIP = "/srm-bookings/extend-trip",
   POST_EXTEND_TRIP = "/srm-bookings/extend-trip",
+
+  // SRM EXCEL
+  GET_SRM_BOOKINGS_EXCEL = "/srm-bookings/download/excel/bookings",
+  GET_SRM_VEHICLES_EXCEL = "/srm-vehicle/download/excel/vehicle/list",
+  GET_SRM_CUSTOMERS_EXCEL = "/srm-customers/download/excel/customer/list",
+
+  // SRM PDF
 }

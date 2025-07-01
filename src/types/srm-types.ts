@@ -177,8 +177,6 @@ export interface CustomerType {
   phoneNumber: string;
   customerProfilePic?: string;
   countryCode: string;
-  createdAt: string;
-  updatedAt: string;
 }
 
 // Payment type
@@ -242,4 +240,17 @@ export type PublicCustomerApiArgs = {
   countryCode: string;
   phoneNumber: string;
   customerId: string;
+};
+
+// srm excel download type
+export type DownloadDialogConfig = {
+  label: string;
+  slug: string;
+  fileName: string;
+  filters: {
+    dateRange?: boolean;
+    sortOrder?: boolean;
+    bookingStatus?: boolean;
+  };
+  variant?: "card" | "icon";
 };

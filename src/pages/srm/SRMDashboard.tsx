@@ -1,3 +1,4 @@
+import DashboardDownloadSection from "@/components/DashboardDownloadSection";
 import DashboardSkelton from "@/components/loading-skelton/DashboardSkelton";
 import { ArrowUpRight, Box, Plus } from "lucide-react";
 import React from "react";
@@ -7,28 +8,28 @@ const SRMDashboard: React.FC = () => {
   const stats = [
     {
       title: "Ongoing Trips",
-      count: 70,
+      count: 100,
       link: "/srm/ongoing-trips",
 
       overlayText: "Show Ongoing Trips",
     },
     {
       title: "Completed Trips",
-      count: 3,
+      count: 100,
       link: "/srm/completed-trips",
 
       overlayText: "Show Completed Trips",
     },
     {
       title: "Vehicle List",
-      count: 47,
+      count: 100,
       link: "/srm/vehicle-list",
 
       overlayText: "Show Vehicle List",
     },
     {
       title: "Customer List",
-      count: 289,
+      count: 100,
       link: "/srm/customer-list",
       overlayText: "Show Customer List",
     },
@@ -36,7 +37,7 @@ const SRMDashboard: React.FC = () => {
 
   return (
     <section className="relative p-6 py-10 h-auto min-h-screen bg-gray-50">
-      <div className="mx-auto max-w-5xl">
+      <div className="mx-auto max-w-5xl pb-12">
         {/* Title and Logo */}
         <div className="flex items-center mb-8">
           <div className="flex items-center">
@@ -91,6 +92,9 @@ const SRMDashboard: React.FC = () => {
                 Add a New Trip <Plus />
               </Link>
             </div>
+
+            {/* download reports */}
+            <DashboardDownloadSection />
           </>
         )}
       </div>

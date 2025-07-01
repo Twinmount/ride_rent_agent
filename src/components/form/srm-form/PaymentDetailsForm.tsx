@@ -17,7 +17,7 @@ import { RentalDetails, SRMPaymentDetailsFormType } from "@/types/srm-types";
 import "react-international-phone/style.css";
 
 import { toast } from "@/components/ui/use-toast";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import {
   addPaymentDetailsForm,
   updateBookingDataForPayment,
@@ -61,8 +61,6 @@ export default function SRMPaymentDetailsForm({
   const [rentalDetails, setRentalDetails] = useState<RentalDetails | null>(
     null
   );
-
-  const navigate = useNavigate();
 
   // Call the useLoadingMessages hook to manage loading messages
   const initialValues =

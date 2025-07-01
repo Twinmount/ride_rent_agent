@@ -1,28 +1,33 @@
-import { Users, Car, MapPinned, ReceiptText } from "lucide-react";
+import { Slug } from "@/api/Api-Endpoints";
+import { DownloadDialogConfig } from "@/types/srm-types";
 
-export const dashboardDownloadItems = [
+export const downloadItems: DownloadDialogConfig[] = [
   {
-    label: "Download Customer List",
-    apiPath: "/api/downloads/customers",
+    label: "Download Bookings",
+    slug: Slug.GET_SRM_BOOKINGS_EXCEL,
+    fileName: "bookings.xlsx",
+    filters: {
+      dateRange: true,
+      sortOrder: true,
+      bookingStatus: true,
+    },
+  },
+  {
+    label: "Download Customers",
+    slug: Slug.GET_SRM_CUSTOMERS_EXCEL,
     fileName: "customers.xlsx",
-    icon: Users,
+    filters: {
+      dateRange: true,
+      sortOrder: true,
+    },
   },
   {
-    label: "Download Vehicle List",
-    apiPath: "/api/downloads/vehicles",
+    label: "Download Vehicles",
+    slug: Slug.GET_SRM_VEHICLES_EXCEL,
     fileName: "vehicles.xlsx",
-    icon: Car,
-  },
-  {
-    label: "Download Trip Details",
-    apiPath: "/api/downloads/trips",
-    fileName: "trips.xlsx",
-    icon: MapPinned,
-  },
-  {
-    label: "Download Receipts",
-    apiPath: "/api/downloads/receipts",
-    fileName: "receipts.xlsx",
-    icon: ReceiptText,
+    filters: {
+      dateRange: true,
+      sortOrder: true,
+    },
   },
 ];

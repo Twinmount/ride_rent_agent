@@ -8,6 +8,8 @@ import Search from "@/components/Search";
 import { GenericTable } from "@/components/table/GenericTable";
 import LinkButton from "@/components/common/LinkButton";
 import PageWrapper from "@/components/PageWrapper";
+import ExcelDownloadDialog from "@/components/ExcelDownloadDialog";
+import { Slug } from "@/api/Api-Endpoints";
 
 export default function ManageSRMCustomersPage() {
   const [page, setPage] = useState(1);
@@ -49,6 +51,14 @@ export default function ManageSRMCustomersPage() {
         />
 
         <LinkButton label="New Trip" link="/srm/trips/new" />
+
+        <ExcelDownloadDialog
+          label="Download Customers"
+          slug={Slug.GET_SRM_CUSTOMERS_EXCEL}
+          fileName="customers.xlsx"
+          filters={{ dateRange: true, sortOrder: true }}
+          variant="icon"
+        />
 
         <SortDropdown
           sortOrder={sortOrder}

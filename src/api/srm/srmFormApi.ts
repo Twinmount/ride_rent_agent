@@ -813,3 +813,39 @@ export const updateSRMUserTaxAndContractInfo = async ({
     throw error;
   }
 };
+
+export async function downloadSRMExcelBlob({
+  slug,
+  fileName,
+  params,
+}: {
+  slug: string;
+  fileName: string;
+  params: URLSearchParams;
+}): Promise<void> {
+  try {
+    const res = await API.get<any>({
+      slug: `${slug}?${params.toString()}`,
+      axiosConfig: {
+        responseType: "blob",
+      },
+    });
+
+    const blob = new Blob([res.data], {
+      type: res.headers["content-type"],
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (err: any) {
+    // Optionally log to Sentry, etc.
+    console.error("Excel download failed:", err);
+    throw new Error("Failed to download file. Please try again.");
+  }
+}

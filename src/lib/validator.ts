@@ -1,4 +1,3 @@
-import { SRMTaxInfoFormType } from "@/types/srm-types";
 import * as z from "zod";
 
 // company registration form schema

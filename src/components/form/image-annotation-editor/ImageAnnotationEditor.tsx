@@ -5,7 +5,7 @@ import {
 } from "@markerjs/markerjs3";
 import { useEffect, useRef, useState } from "react";
 import TooltipButton from "./TooltipButton";
-import { PaintBucket, PlusCircle, Trash2, XCircle } from "lucide-react";
+import { PlusCircle, Trash2, XCircle } from "lucide-react";
 import { FormGenericButton } from "../form-ui/FormSubmitButton";
 
 type Props = {

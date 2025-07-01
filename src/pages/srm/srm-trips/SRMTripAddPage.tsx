@@ -31,7 +31,7 @@ export default function SRMTripAddPage() {
 
     const { canAccess, message } = validateSRMTabAccess({ tab, levelsFilled });
 
-    if (true) {
+    if (canAccess) {
       setActiveTab(tab);
     } else {
       toast({

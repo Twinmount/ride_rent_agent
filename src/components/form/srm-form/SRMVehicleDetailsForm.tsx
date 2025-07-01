@@ -8,7 +8,7 @@ import { SRMVehicleDetailsFormSchema } from "@/lib/validator";
 import { SRMVehicleDetailsFormType, VehicleType } from "@/types/srm-types";
 import CategoryDropdown from "../dropdowns/CategoryDropdown";
 import { toast } from "@/components/ui/use-toast";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   addVehicleDetailsForm,
   createBookingDataForVehicle,
@@ -34,7 +34,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { useQueryClient } from "@tanstack/react-query";
 import useGetSearchParams from "@/hooks/useGetSearchParams";
 import SRMVehicleEditPrompt from "@/components/dialog/SRMVehicleEditPrompt";
-import { useCompany } from "@/hooks/useCompany";
 
 type SRMVehicleDetailsFormProps = {
   type: "Add" | "Update";

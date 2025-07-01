@@ -9,6 +9,8 @@ import Search from "@/components/Search";
 import { GenericTable } from "@/components/table/GenericTable";
 import LinkButton from "@/components/common/LinkButton";
 import PageWrapper from "@/components/PageWrapper";
+import { Slug } from "@/api/Api-Endpoints";
+import ExcelDownloadDialog from "@/components/ExcelDownloadDialog";
 
 export default function ManageVehiclePage() {
   const [page, setPage] = useState(1);
@@ -49,6 +51,14 @@ export default function ManageVehiclePage() {
         />
 
         <LinkButton label="New Vehicle" link="/srm/manage-vehicles/add" />
+
+        <ExcelDownloadDialog
+          label="Download Vehicles"
+          slug={Slug.GET_SRM_VEHICLES_EXCEL}
+          fileName="vehicles.xlsx"
+          filters={{ dateRange: true, sortOrder: true }}
+          variant="icon"
+        />
 
         <SortDropdown
           sortOrder={sortOrder}
