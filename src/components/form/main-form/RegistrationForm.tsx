@@ -106,7 +106,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
         className="flex-1 bg-white shadow-lg p-4 lg:mt-6 pb-6 rounded-[1rem] border w-full min-w-[350px] max-w-[400px]"
       >
         <h3 className="text-2xl font-bold text-center">Register Now</h3>
-        <h4 className="text-base text-center">No Credit Card Required</h4>
+        <h4 className="text-base text-center">No Payment Required</h4>
         <div className="flex flex-col gap-5 w-full max-w-full md:max-w-[800px] mx-auto ">
           {/* mobile / whatsapp*/}
           <FormField

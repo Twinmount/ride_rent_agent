@@ -47,6 +47,7 @@ const globalLanguages = [
 ];
 
 const indianLanguages = [
+  "English",
   "Assamese",
   "Bengali",
   "Bodo",

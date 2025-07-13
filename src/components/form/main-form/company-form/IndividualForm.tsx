@@ -116,7 +116,7 @@ export default function IndividualRegistrationForm({
           title: `Company Added successfully`,
           className: "bg-yellow text-white",
         });
-        navigate("/listings");
+        navigate("/");
       }
     } catch (error) {
       console.error(error);
@@ -288,8 +288,8 @@ export default function IndividualRegistrationForm({
           name="location"
           render={({ field }) => (
             <FormFieldLayout
-              label="GPS Location"
-              description={<span>Enter the GSP location.</span>}
+              label="Location"
+              description={<span>Choose the GSP location.</span>}
             >
               <LocationPicker
                 onChangeHandler={field.onChange}

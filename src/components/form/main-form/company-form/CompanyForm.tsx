@@ -119,7 +119,7 @@ export default function CompanyRegistrationForm({
           title: `Company Added successfully`,
           className: "bg-yellow text-white",
         });
-        navigate("/listings");
+        navigate("/");
       }
     } catch (error) {
       console.error(error);
@@ -196,7 +196,7 @@ export default function CompanyRegistrationForm({
           render={({ field }) => (
             <SingleFileUpload
               name={field.name}
-              label={isIndia ? "Registration Detail" : "Commercial License"}
+              label={isIndia ? "Registration Details" : "Commercial License"}
               description={
                 <>
                   Please upload a <strong>PHOTO</strong> or a{" "}
@@ -307,10 +307,10 @@ export default function CompanyRegistrationForm({
           name="location"
           render={({ field }) => (
             <FormFieldLayout
-              label="GPS Location"
+              label="Office Location"
               description={
                 <span>
-                  Enter the GSP location where the company is registered or
+                  Choose the GSP location where the company is registered or
                   operates.
                 </span>
               }

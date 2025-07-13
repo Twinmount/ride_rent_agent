@@ -395,7 +395,7 @@ export default function PrimaryDetailsForm({
           render={({ field }) => (
             <FormFieldLayout
               label="Modified?"
-              description="Select if this vehicle is modified."
+              description="Select this if the vehicle is modified for show/display purposes and can't be used on the road."
             >
               <FormCheckbox
                 id="isVehicleModified"
@@ -802,25 +802,27 @@ export default function PrimaryDetailsForm({
           >
             <div className="w-full rounded-lg border-b p-2 shadow">
               {/* Crypto */}
-              <FormField
-                control={form.control}
-                name="isCryptoAccepted"
-                render={({ field }) => (
-                  <div className="mb-2">
-                    <FormCheckbox
-                      id="isCryptoAccepted"
-                      label="Crypto"
-                      checked={field.value}
-                      onChange={field.onChange}
-                    />
-                    <FormDescription className="ml-7 mt-1">
-                      Select if your company accepts payments via
-                      cryptocurrency.
-                    </FormDescription>
-                    <FormMessage className="ml-2" />
-                  </div>
-                )}
-              />
+              {!isIndia && (
+                <FormField
+                  control={form.control}
+                  name="isCryptoAccepted"
+                  render={({ field }) => (
+                    <div className="mb-2">
+                      <FormCheckbox
+                        id="isCryptoAccepted"
+                        label="Crypto"
+                        checked={field.value}
+                        onChange={field.onChange}
+                      />
+                      <FormDescription className="ml-7 mt-1">
+                        Select if your company accepts payments via
+                        cryptocurrency.
+                      </FormDescription>
+                      <FormMessage className="ml-2" />
+                    </div>
+                  )}
+                />
+              )}
 
               {/* Credit/Debit Cards */}
               <FormField
@@ -844,24 +846,26 @@ export default function PrimaryDetailsForm({
               />
 
               {/* Tabby */}
-              <FormField
-                control={form.control}
-                name="isTabbySupported"
-                render={({ field }) => (
-                  <div className="mb-2">
-                    <FormCheckbox
-                      id="isTabby"
-                      label="Tabby"
-                      checked={field.value}
-                      onChange={field.onChange}
-                    />
-                    <FormDescription className="ml-7 mt-1">
-                      Select if your company accepts payments via Tabby.
-                    </FormDescription>
-                    <FormMessage className="ml-2" />
-                  </div>
-                )}
-              />
+              {!isIndia && (
+                <FormField
+                  control={form.control}
+                  name="isTabbySupported"
+                  render={({ field }) => (
+                    <div className="mb-2">
+                      <FormCheckbox
+                        id="isTabby"
+                        label="Tabby"
+                        checked={field.value}
+                        onChange={field.onChange}
+                      />
+                      <FormDescription className="ml-7 mt-1">
+                        Select if your company accepts payments via Tabby.
+                      </FormDescription>
+                      <FormMessage className="ml-2" />
+                    </div>
+                  )}
+                />
+              )}
 
               {/* Cash */}
               {isIndia && (

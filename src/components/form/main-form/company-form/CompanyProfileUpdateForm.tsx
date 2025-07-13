@@ -138,7 +138,7 @@ export default function CompanyProfileUpdateForm({
                 name={field.name}
                 label={
                   isIndia && !isIndividual
-                    ? "Registration Detail"
+                    ? "Registration Details"
                     : isIndia && isIndividual
                     ? "Commercial Registration"
                     : "Commercial License"
@@ -273,7 +273,7 @@ export default function CompanyProfileUpdateForm({
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-52 text-base max-sm:w-fit lg:text-lg">
-                  GPS Location <span className="mr-5 max-sm:hidden">:</span>
+                  Office Location <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-fit">
                   <LocationPicker
@@ -283,7 +283,7 @@ export default function CompanyProfileUpdateForm({
                     buttonClassName="w-full cursor-pointer bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-900"
                   />
                   <FormDescription className="mt-1 ml-1">
-                    Enter the GSP location where the company is registered or
+                    Choose the GSP location where the company is registered or
                     operates.
                   </FormDescription>
                 </div>
