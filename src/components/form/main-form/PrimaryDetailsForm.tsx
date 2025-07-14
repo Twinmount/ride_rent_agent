@@ -449,6 +449,24 @@ export default function PrimaryDetailsForm({
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="isFancyNumber"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Lease?"
+              description="Select if this vehicle is available for lease."
+            >
+              <FormCheckbox
+                id="isFancyNumber"
+                label="Fancy Number Highlight"
+                checked={field.value}
+                onChange={field.onChange}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
         {/* Vehicle Photos */}
         <FormField
           control={form.control}

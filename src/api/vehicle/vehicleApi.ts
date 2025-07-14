@@ -33,6 +33,7 @@ export const addPrimaryDetailsForm = async (
       vehicleBrandId: values.vehicleBrandId,
       vehicleModel: values.vehicleModel,
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
+      isFancyNumber: values.isFancyNumber,
       vehicleRegisteredYear: values.vehicleRegisteredYear,
       commercialLicenseExpireDate:
         values.commercialLicenseExpireDate!.toISOString(),
@@ -104,6 +105,7 @@ export const updatePrimaryDetailsForm = async (
       vehicleBrandId: values.vehicleBrandId,
       vehicleModel: values.vehicleModel,
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
+      isFancyNumber: values.isFancyNumber,
       vehicleRegisteredYear: values.vehicleRegisteredYear,
       commercialLicenseExpireDate:
         values.commercialLicenseExpireDate!.toISOString(),

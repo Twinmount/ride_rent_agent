@@ -95,6 +95,7 @@ export type PrimaryFormType = {
   vehiclePhotos: string[]; // Array of  URLs
   vehicleVideos: string[];
   vehicleRegistrationNumber: string;
+  isFancyNumber: boolean;
   vehicleRegisteredYear: string;
   commercialLicenses: string[]; // Array of  URLs
   commercialLicenseExpireDate: Date | undefined;
