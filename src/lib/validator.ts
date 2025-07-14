@@ -41,13 +41,15 @@ export const CompanyFormSchema = (isIndia: boolean) =>
       .array(z.string())
       .min(1, "At least one language must be selected"),
     accountType: z.enum(["company", "individual"]),
-    location: z.object({
-      lat: z.number(),
-      lng: z.number(),
-      address: z.string().optional(),
-    }).refine((val) => val.lat && val.lng, {
-      message: "Location is required",
-    }),
+    location: z
+      .object({
+        lat: z.number(),
+        lng: z.number(),
+        address: z.string().optional(),
+      })
+      .refine((val) => val.lat && val.lng, {
+        message: "Location is required",
+      }),
   });
 
 // individual Form Schema
@@ -71,13 +73,15 @@ export const IndividualFormSchema = z.object({
     .array(z.string())
     .min(1, "At least one language must be selected"),
   accountType: z.enum(["company", "individual"]),
-  location: z.object({
-    lat: z.number(),
-    lng: z.number(),
-    address: z.string().optional(),
-  }).refine((val) => val.lat && val.lng, {
-    message: "Location is required",
-  }),
+  location: z
+    .object({
+      lat: z.number(),
+      lng: z.number(),
+      address: z.string().optional(),
+    })
+    .refine((val) => val.lat && val.lng, {
+      message: "Location is required",
+    }),
 });
 
 // Company Form Schema
@@ -92,13 +96,15 @@ export const ProfileUpdateFormSchema = z.object({
   companyLanguages: z
     .array(z.string())
     .min(1, "At least one language must be selected"),
-  location: z.object({
-    lat: z.number(),
-    lng: z.number(),
-    address: z.string().optional(),
-  }).refine((val) => val.lat && val.lng, {
-    message: "Location is required",
-  }),
+  location: z
+    .object({
+      lat: z.number(),
+      lng: z.number(),
+      address: z.string().optional(),
+    })
+    .refine((val) => val.lat && val.lng, {
+      message: "Location is required",
+    }),
 });
 
 // otp page form schema
@@ -152,6 +158,7 @@ export const PrimaryFormSchema = z
       .string()
       .min(1, "Vehicle registration number is required")
       .max(15, "Vehicle registration number cannot exceed 15 characters"),
+    isFancyNumber: z.boolean().default(false),
     vehicleRegisteredYear: z.string().min(1, "Registered Year is required"),
     vehiclePhotos: z
       .array(z.string().min(1, "vehicle photo is required"))
