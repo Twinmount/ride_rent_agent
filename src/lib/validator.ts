@@ -159,7 +159,7 @@ export const PrimaryFormSchema = z
       .min(1, "Vehicle registration number is required")
       .max(15, "Vehicle registration number cannot exceed 15 characters"),
     isFancyNumber: z.boolean().default(false),
-    vehicleRegisteredYear: z.string().min(1, "Registered Year is required"),
+    vehicleRegisteredYear: z.string().min(1, "Year of Manufacture is required"),
     vehiclePhotos: z
       .array(z.string().min(1, "vehicle photo is required"))
       .min(1, "At least one vehicle photo is required"),
