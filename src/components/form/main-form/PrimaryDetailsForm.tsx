@@ -163,6 +163,10 @@ export default function PrimaryDetailsForm({
         queryKey: ["primary-details-form", vehicleId],
         exact: true,
       });
+
+      queryClient.invalidateQueries({
+        queryKey: ["primary-details-form-default"],
+      });
     }
   }
 
@@ -269,7 +273,6 @@ export default function PrimaryDetailsForm({
         )}
 
         {/* brand name */}
-        {/* Brand Name */}
         <FormField
           control={form.control}
           name="vehicleBrandId"
