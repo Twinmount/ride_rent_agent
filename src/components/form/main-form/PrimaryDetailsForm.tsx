@@ -700,19 +700,19 @@ export default function PrimaryDetailsForm({
           name="rentalDetails"
           render={() => {
             const rentalDetails = form.watch('rentalDetails') || {};
-            const handleApplyBestPrice = (field, value) => {
-              form.setValue(`rentalDetails.${field}.rentInAED`, value.toString());
+            const handleApplyBestPrice = (field: 'hour' | 'day' | 'week' | 'month', value: number) => {
+              form.setValue(`rentalDetails.${field}.rentInAED` as const, value.toString());
             };
             // Helper to get target price
-            const getTarget = (obj) => {
-              if (!obj) return 0;
-              return obj.assigned > 0 ? obj.assigned : obj.avg > 0 ? obj.avg : 0;
-            };
-            // Helper to determine if button should show
-            const shouldShowBtn = (entered, obj) => {
+            // Helper to determine if button should show (entered > 1.05 * recommended)
+            const shouldShowBtn = (entered: string | number | undefined, recommended: number | undefined) => {
               const enteredNum = Number(entered);
-              const target = getTarget(obj);
-              return enteredNum > target && target > 0;
+              const recommendedNum = Number(recommended);
+
+              if (isNaN(recommendedNum) || recommendedNum <= 0) return false;
+              if (isNaN(enteredNum) || enteredNum <= 0) return false;
+
+              return enteredNum > recommendedNum * 1.05;
             };
             const priceData = data || {};
             return (
@@ -725,11 +725,11 @@ export default function PrimaryDetailsForm({
                     <RentalDetailsFormField
                       isIndia={isIndia}
                       priceRecommendationData={{
-                        hourly: {
+                        hour: {
                           data: priceData.hourly,
-                          enteredValue: rentalDetails.hourly?.rentInAED,
-                          onApplyBestPrice: (v) => handleApplyBestPrice('hourly', v),
-                          showBtn: shouldShowBtn(rentalDetails.hourly?.rentInAED, priceData.hourly)
+                          enteredValue: rentalDetails.hour?.rentInAED,
+                          onApplyBestPrice: (v) => handleApplyBestPrice('hour', v),
+                          showBtn: shouldShowBtn(rentalDetails.hour?.rentInAED, priceData.hourly)
                         },
                         day: {
                           data: priceData.daily,

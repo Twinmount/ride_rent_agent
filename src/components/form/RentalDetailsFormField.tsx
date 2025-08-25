@@ -104,14 +104,12 @@ const RentalDetailField: React.FC<RentalDetailsFieldProps> = ({
 
                   {/* Position the recommendation button absolutely on the right of the input */}
                   {priceRecommendationData &&
-                    priceRecommendationData[period] &&
-                    priceRecommendationData[period].showBtn && (
+                    priceRecommendationData[period]?.showBtn && (
                       <div className="absolute right-3 top-[36%] transform -translate-y-1/2">
                         <PriceRecommendationBar
                           priceData={priceRecommendationData[period].data}
-                          onApplyBestPrice={
-                            priceRecommendationData[period].onApplyBestPrice
-                          }
+                          currentPrice={Number(priceRecommendationData[period].enteredValue)}
+                          onApplyBestPrice={priceRecommendationData[period].onApplyBestPrice}
                           compact={true}
                           className="!mt-0"
                         />
