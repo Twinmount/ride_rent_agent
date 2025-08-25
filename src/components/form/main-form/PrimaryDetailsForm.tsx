@@ -52,6 +52,7 @@ import { FormSubmitButton } from "../form-ui/FormSubmitButton";
 import { FormContainer } from "../form-ui/FormContainer";
 import { FormFieldLayout } from "../form-ui/FormFieldLayout";
 import { FormCheckbox } from "../form-ui/FormCheckbox";
+import { API } from "@/api/ApiService";
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
@@ -89,6 +90,7 @@ export default function PrimaryDetailsForm({
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
   const [isCarsCategory, setIsCarsCategory] = useState(false);
   const [hideCommercialLicenses, setHideCommercialLicenses] = useState(false);
+  const [data, setData] = useState<any | null>(null);
 
   const [cities, setCities] = useState<CityType[]>([]);
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
@@ -101,14 +103,23 @@ export default function PrimaryDetailsForm({
     userId: string;
   }>();
 
+  useEffect(() => {
+    if (!vehicleId) return;
+    API.get({ slug: `/vehicle/price-matching/single?vehicleId=${vehicleId}` })
+      .then((res: any) => {
+        setData(res?.result);
+      })
+      .catch(() => setData(null))
+  }, [vehicleId]);
+
   const initialValues = formData
     ? {
-        ...formData,
-        cityIds: [
-          ...formData.cityIds,
-          ...(formData.tempCitys ?? []).map((city: CityType) => city.cityId),
-        ],
-      }
+      ...formData,
+      cityIds: [
+        ...formData.cityIds,
+        ...(formData.tempCitys ?? []).map((city: CityType) => city.cityId),
+      ],
+    }
     : getPrimaryFormDefaultValues(isIndia);
 
   // Define your form.
@@ -591,9 +602,8 @@ export default function PrimaryDetailsForm({
                   <span className="text-sm text-gray-500">(DD/MM/YYYY)</span>
                 </span>
               }
-              description={`Enter the expiry date for the Registration Card ${
-                isIndia ? "" : "/ Mulkia"
-              } in the format DD/MM/YYYY.`}
+              description={`Enter the expiry date for the Registration Card ${isIndia ? "" : "/ Mulkia"
+                } in the format DD/MM/YYYY.`}
             >
               <DatePicker
                 selected={field.value}
@@ -689,6 +699,22 @@ export default function PrimaryDetailsForm({
           control={form.control}
           name="rentalDetails"
           render={() => {
+            const rentalDetails = form.watch('rentalDetails') || {};
+            const handleApplyBestPrice = (field, value) => {
+              form.setValue(`rentalDetails.${field}.rentInAED`, value.toString());
+            };
+            // Helper to get target price
+            const getTarget = (obj) => {
+              if (!obj) return 0;
+              return obj.assigned > 0 ? obj.assigned : obj.avg > 0 ? obj.avg : 0;
+            };
+            // Helper to determine if button should show
+            const shouldShowBtn = (entered, obj) => {
+              const enteredNum = Number(entered);
+              const target = getTarget(obj);
+              return enteredNum > target && target > 0;
+            };
+            const priceData = data || {};
             return (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
@@ -696,11 +722,38 @@ export default function PrimaryDetailsForm({
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
-                    <RentalDetailsFormField isIndia={isIndia} />
+                    <RentalDetailsFormField
+                      isIndia={isIndia}
+                      priceRecommendationData={{
+                        hourly: {
+                          data: priceData.hourly,
+                          enteredValue: rentalDetails.hourly?.rentInAED,
+                          onApplyBestPrice: (v) => handleApplyBestPrice('hourly', v),
+                          showBtn: shouldShowBtn(rentalDetails.hourly?.rentInAED, priceData.hourly)
+                        },
+                        day: {
+                          data: priceData.daily,
+                          enteredValue: rentalDetails.day?.rentInAED,
+                          onApplyBestPrice: (v) => handleApplyBestPrice('day', v),
+                          showBtn: shouldShowBtn(rentalDetails.day?.rentInAED, priceData.daily)
+                        },
+                        week: {
+                          data: priceData.weekly,
+                          enteredValue: rentalDetails.week?.rentInAED,
+                          onApplyBestPrice: (v) => handleApplyBestPrice('week', v),
+                          showBtn: shouldShowBtn(rentalDetails.week?.rentInAED, priceData.weekly)
+                        },
+                        month: {
+                          data: priceData.monthly,
+                          enteredValue: rentalDetails.month?.rentInAED,
+                          onApplyBestPrice: (v) => handleApplyBestPrice('month', v),
+                          showBtn: shouldShowBtn(rentalDetails.month?.rentInAED, priceData.monthly)
+                        }
+                      }}
+                    />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    Provide rent details. At least one of "day," "week," or
-                    "month" must be selected.
+                    Provide rent details. At least one of "day," "week," or "month" must be selected.
                   </FormDescription>
                   <FormMessage className="ml-2" />
                 </div>
