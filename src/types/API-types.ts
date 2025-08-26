@@ -545,6 +545,7 @@ export type SingleVehicleType = {
   updatedAt: string;
   createdAt: string;
   thumbnail: string;
+  isPriceHigh?: boolean;
 };
 
 // get all vehicles api response
