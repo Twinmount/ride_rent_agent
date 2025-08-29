@@ -49,12 +49,14 @@ export default function ListingsPage() {
           setSearch={setSearch}
           placeholder="Search model..."
         />
-        <Link
-          to={`/listings/add/${userId}`}
-          className="max-sm:hidden md:mr-4 lg:mr-8 flex-center bg-yellow text-white py-2 whitespace-nowrap w-32 min-w-32 font-semibold rounded-2xl hover:scale-[1.02] transition-all"
-        >
-          List Vehicle +
-        </Link>
+        {vehicles.length > 0 && (
+          <Link
+            to={`/listings/add/${userId}`}
+            className="max-sm:hidden md:mr-4 lg:mr-8 flex-center bg-yellow text-white py-2 whitespace-nowrap w-32 min-w-32 font-semibold rounded-2xl hover:scale-[1.02] transition-all"
+          >
+            List Vehicle +
+          </Link>
+        )}
       </div>
 
       {/* filters */}
@@ -65,6 +67,7 @@ export default function ListingsPage() {
         vehicles={vehicles || []}
         isLoading={isLoading || isCompanyLoading || isRefetching}
         search={search}
+        userId={userId as string}
       />
 
       {totalNumberOfPages > 0 && (

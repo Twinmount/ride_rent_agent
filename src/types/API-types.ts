@@ -62,6 +62,12 @@ export interface FetchUserResponse {
   statusCode: number;
 }
 
+interface Location {
+  lat: number;
+  lng: number;
+  address?: string;
+}
+
 // company type
 export interface companyType {
   agentId: string;
@@ -76,6 +82,10 @@ export interface companyType {
   plan: string;
   companyAddress: string;
   companyLanguages: string[];
+  accountType?: string;
+  countryName?: string;
+  countryId: string;
+  location?: Location;
 }
 
 //  interface for the get-all-companies  API response
@@ -200,6 +210,24 @@ export interface FetchStatesResponse {
   statusCode: number;
 }
 
+export interface FetchParentStatesResponse {
+  result: StateType;
+  status: string;
+  statusCode: number;
+}
+
+export interface CountryType {
+  countryId: string;
+  countryName: string;
+  countryValue: string;
+}
+
+export interface FetchCountryResponse {
+  result: CountryType[];
+  status: string;
+  statusCode: number;
+}
+
 export interface CityType {
   stateId: string;
   cityId: string;
@@ -291,7 +319,7 @@ export interface AddPrimaryFormResponse {
     vehicleModel: string;
     registredYear: string; // corrected to match the response field name
     rentalDetails: RentalDetailsType; // Assuming this is a JSON string, as in the response example
-    specification: "USA_SPEC" | "UAE_SPEC" | "OTHERS";
+    specification: "India_SPEC" | "USA_SPEC" | "UAE_SPEC" | "OTHERS";
     countryCode: string;
     phoneNumber: string;
     state: StateType;
@@ -308,39 +336,34 @@ export interface AddPrimaryFormResponse {
   statusCode: number;
 }
 
+type rentalDetailType = {
+  enabled: boolean;
+  rentInAED: string;
+  mileageLimit: string;
+  unlimitedMileage: boolean;
+};
+
+type hourlyRentalDetailType = rentalDetailType & {
+  minBookingHours: string;
+};
+
 // Primary form data
 export type GetPrimaryForm = {
   vehicleId: string;
   vehicleRegistrationNumber: string;
+  isFancyNumber: boolean;
   vehicleCategoryId: string;
   vehicleTypeId: string;
   vehicleBrandId: string;
   vehicleModel: string;
   countryCode: string;
   phoneNumber: string;
-  specification: "UAE_SPEC" | "USA_SPEC" | "OTHERS";
+  specification: "India_SPEC" | "UAE_SPEC" | "USA_SPEC" | "OTHERS";
   rentalDetails: {
-    day: {
-      enabled: boolean;
-      rentInAED: string;
-      mileageLimit: string;
-    };
-    week: {
-      enabled: boolean;
-      rentInAED: string;
-      mileageLimit: string;
-    };
-    month: {
-      enabled: boolean;
-      rentInAED: string;
-      mileageLimit: string;
-    };
-    hour: {
-      enabled: boolean;
-      rentInAED: string;
-      mileageLimit: string;
-      minBookingHours: string;
-    };
+    day: rentalDetailType;
+    week: rentalDetailType;
+    month: rentalDetailType;
+    hour: hourlyRentalDetailType;
   };
   stateId: string;
   cityIds: string[];
@@ -348,9 +371,11 @@ export type GetPrimaryForm = {
   commercialLicenseExpireDate: string;
   isLease: boolean;
   isCryptoAccepted: boolean;
+  isVehicleModified: boolean;
   isSpotDeliverySupported: boolean;
   description: string;
   vehiclePhotos: string[];
+  vehicleVideos: string[];
   commercialLicenses: string[];
   additionalVehicleTypes?: string[];
   securityDeposit: {
@@ -359,6 +384,8 @@ export type GetPrimaryForm = {
   };
   isCreditOrDebitCardsSupported: boolean;
   isTabbySupported: boolean;
+  isCashSupported: boolean;
+  tempCitys: CityType[];
 };
 
 // Primary form get all response
@@ -518,6 +545,7 @@ export type SingleVehicleType = {
   updatedAt: string;
   createdAt: string;
   thumbnail: string;
+  isPriceHigh?: boolean;
 };
 
 // get all vehicles api response

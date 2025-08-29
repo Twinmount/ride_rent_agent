@@ -33,6 +33,7 @@ export const addPrimaryDetailsForm = async (
       vehicleBrandId: values.vehicleBrandId,
       vehicleModel: values.vehicleModel,
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
+      isFancyNumber: values.isFancyNumber,
       vehicleRegisteredYear: values.vehicleRegisteredYear,
       commercialLicenseExpireDate:
         values.commercialLicenseExpireDate!.toISOString(),
@@ -45,10 +46,14 @@ export const addPrimaryDetailsForm = async (
       cityIds: values.cityIds,
       rentalDetails: JSON.stringify(values.rentalDetails),
       vehiclePhotos: values.vehiclePhotos,
+      vehicleVideos: values.vehicleVideos,
       commercialLicenses: values.commercialLicenses,
       securityDeposit: values.securityDeposit,
       isCreditOrDebitCardsSupported: values.isCreditOrDebitCardsSupported,
       isTabbySupported: values.isTabbySupported,
+      isCashSupported: values.isCashSupported,
+      tempCitys: values.tempCitys,
+      isVehicleModified: values.isVehicleModified.toString(),
     };
 
     // Include additionalVehicleTypes only if isCarsCategory is true
@@ -100,6 +105,7 @@ export const updatePrimaryDetailsForm = async (
       vehicleBrandId: values.vehicleBrandId,
       vehicleModel: values.vehicleModel,
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
+      isFancyNumber: values.isFancyNumber,
       vehicleRegisteredYear: values.vehicleRegisteredYear,
       commercialLicenseExpireDate:
         values.commercialLicenseExpireDate!.toISOString(),
@@ -112,10 +118,14 @@ export const updatePrimaryDetailsForm = async (
       cityIds: values.cityIds,
       rentalDetails: JSON.stringify(values.rentalDetails),
       vehiclePhotos: values.vehiclePhotos,
+      vehicleVideos: values.vehicleVideos,
       commercialLicenses: values.commercialLicenses,
       securityDeposit: values.securityDeposit,
       isCreditOrDebitCardsSupported: values.isCreditOrDebitCardsSupported,
       isTabbySupported: values.isTabbySupported,
+      isCashSupported: values.isCashSupported,
+      tempCitys: values.tempCitys,
+      isVehicleModified: values.isVehicleModified.toString(),
     };
 
     // Include additionalVehicleTypes only if isCarsCategory is true
@@ -190,7 +200,6 @@ export const getPrimaryDetailsFormData = async (
     if (!data) {
       throw new Error("Failed to fetch primary form data");
     }
-
     return data;
   } catch (error) {
     console.error("Error fetching primary form data:", error);

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { PrimaryFormSchema } from "@/lib/validator";
-import { PrimaryFormDefaultValues } from "@/constants";
+import { getPrimaryFormDefaultValues } from "@/constants";
 import { PrimaryFormType } from "@/types/types";
 import YearPicker from "../YearPicker";
 import { Label } from "@/components/ui/label";
@@ -52,6 +52,7 @@ import { FormSubmitButton } from "../form-ui/FormSubmitButton";
 import { FormContainer } from "../form-ui/FormContainer";
 import { FormFieldLayout } from "../form-ui/FormFieldLayout";
 import { FormCheckbox } from "../form-ui/FormCheckbox";
+import { API } from "@/api/ApiService";
 
 type PrimaryFormProps = {
   type: "Add" | "Update";
@@ -59,6 +60,16 @@ type PrimaryFormProps = {
   onNextTab?: () => void;
   levelsFilled?: number;
   initialCountryCode?: string;
+  isIndia?: boolean;
+  countryId: string;
+};
+
+type CityType = {
+  _id?: string;
+  stateId: string;
+  cityId: string;
+  cityName: string;
+  cityValue: string;
 };
 
 export default function PrimaryDetailsForm({
@@ -67,15 +78,23 @@ export default function PrimaryDetailsForm({
   formData,
   levelsFilled,
   initialCountryCode,
+  isIndia = false,
+  countryId,
 }: PrimaryFormProps) {
   const [countryCode, setCountryCode] = useState<string>(
-    initialCountryCode || "+971"
+    initialCountryCode || isIndia ? "+91" : "+971"
   );
   const [isPhotosUploading, setIsPhotosUploading] = useState(false);
+  const [isVideoUploading, setIsVideoUploading] = useState(false);
   const [isLicenseUploading, setIsLicenseUploading] = useState(false);
   const [deletedFiles, setDeletedFiles] = useState<string[]>([]);
   const [isCarsCategory, setIsCarsCategory] = useState(false);
   const [hideCommercialLicenses, setHideCommercialLicenses] = useState(false);
+  const [data, setData] = useState<any | null>(null);
+
+  const [cities, setCities] = useState<CityType[]>([]);
+  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const [temoraryCities, setTemoraryCities] = useState<CityType[]>([]);
 
   const queryClient = useQueryClient();
 
@@ -84,7 +103,24 @@ export default function PrimaryDetailsForm({
     userId: string;
   }>();
 
-  const initialValues = formData ? formData : PrimaryFormDefaultValues;
+  useEffect(() => {
+    if (!vehicleId) return;
+    API.get({ slug: `/vehicle/price-matching/single?vehicleId=${vehicleId}` })
+      .then((res: any) => {
+        setData(res?.result);
+      })
+      .catch(() => setData(null))
+  }, [vehicleId]);
+
+  const initialValues = formData
+    ? {
+      ...formData,
+      cityIds: [
+        ...formData.cityIds,
+        ...(formData.tempCitys ?? []).map((city: CityType) => city.cityId),
+      ],
+    }
+    : getPrimaryFormDefaultValues(isIndia);
 
   // Define your form.
   const form = useForm<z.infer<typeof PrimaryFormSchema>>({
@@ -92,6 +128,27 @@ export default function PrimaryDetailsForm({
     defaultValues: initialValues as PrimaryFormType,
     shouldFocusError: true,
   });
+
+  useEffect(() => {
+    if (formData?.tempCitys && Array.isArray(formData.tempCitys)) {
+      setCities((prevCities) => {
+        const newCities = formData.tempCitys?.filter(
+          (newCity: CityType) =>
+            !prevCities.some((city) => city.cityId === newCity.cityId)
+        );
+        return [...prevCities, ...(newCities || [])];
+      });
+
+      setTemoraryCities(formData.tempCitys);
+
+      setSelectedCities((prevSelected) => {
+        const newCityIds = formData?.tempCitys
+          ?.map((city: CityType) => city.cityId)
+          .filter((id) => !prevSelected.includes(id));
+        return [...prevSelected, ...(newCityIds || [])];
+      });
+    }
+  }, [formData?.tempCitys]);
 
   // Define a submit handler.
   async function onSubmit(values: z.infer<typeof PrimaryFormSchema>) {
@@ -106,16 +163,21 @@ export default function PrimaryDetailsForm({
       return;
     }
 
-    if (isPhotosUploading || isLicenseUploading) {
+    if (isPhotosUploading || isLicenseUploading || isVideoUploading) {
       showFileUploadInProgressToast();
       return;
     }
 
-    // Append other form data
+    const cityIds = selectedCities.filter((city) => !city.includes("temp-"));
+    const tempCitys = cities.filter(
+      (city) =>
+        city.cityId.includes("temp-") && selectedCities.includes(city.cityId)
+    );
+
     try {
       const data = await handleLevelOneFormSubmission(
         type,
-        values as PrimaryFormType,
+        { ...values, cityIds, tempCitys } as PrimaryFormType,
         {
           countryCode,
           userId,
@@ -127,6 +189,34 @@ export default function PrimaryDetailsForm({
 
       if (data) {
         showSuccessToast(type);
+
+        if (data.result) {
+          setCities((prev) => {
+            let approvedCities = prev.filter(
+              (city) => !city.cityId.includes("temp-") && !city._id
+            );
+
+            return [...approvedCities, ...data.result.tempCitys];
+          });
+          setSelectedCities([
+            ...data.result.city?.map((city: CityType) => city.cityId),
+            ...data.result.tempCitys.map((city: CityType) => city.cityId),
+          ]);
+          setTemoraryCities(data.result.tempCitys);
+        }
+
+        setCities((prev) =>
+          prev.map((city) => {
+            if (
+              city.cityId.includes("temp-") &&
+              !selectedCities.includes(city.cityId)
+            ) {
+              const { _id, ...rest } = city; // remove _id
+              return rest;
+            }
+            return city;
+          })
+        );
 
         if (type === "Add") {
           save(StorageKeys.VEHICLE_ID, data.result.vehicleId);
@@ -188,7 +278,6 @@ export default function PrimaryDetailsForm({
   return (
     <Form {...form}>
       <FormContainer onSubmit={form.handleSubmit(onSubmit)}>
-        {/* category of the vehicle */}
         {/* Vehicle Category */}
         <FormField
           control={form.control}
@@ -272,7 +361,7 @@ export default function PrimaryDetailsForm({
           />
         )}
 
-        {/* brand name */}
+        {/* Brand  */}
         <FormField
           control={form.control}
           name="vehicleBrandId"
@@ -286,6 +375,24 @@ export default function PrimaryDetailsForm({
                 value={field.value}
                 onChangeHandler={field.onChange}
                 isDisabled={!form.watch("vehicleCategoryId")}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        {/* Year of Manufacture */}
+        <FormField
+          control={form.control}
+          name="vehicleRegisteredYear"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Year of Manufacture"
+              description="Enter the year in which the vehicle was manufactured."
+            >
+              <YearPicker
+                onChangeHandler={field.onChange}
+                value={initialValues.vehicleRegisteredYear}
+                placeholder="year"
               />
             </FormFieldLayout>
           )}
@@ -314,6 +421,25 @@ export default function PrimaryDetailsForm({
           )}
         />
 
+        {/* is Modified */}
+        <FormField
+          control={form.control}
+          name="isVehicleModified"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Modified?"
+              description="Select this if the vehicle is modified for show/display purposes and can't be used on the road."
+            >
+              <FormCheckbox
+                id="isVehicleModified"
+                label="Is this vehicle modified?"
+                checked={field.value}
+                onChange={field.onChange}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
         {/* vehicle registration number */}
         <FormField
           control={form.control}
@@ -324,7 +450,7 @@ export default function PrimaryDetailsForm({
               description={
                 <span>
                   Enter your vehicle registration number (e.g.,{" "}
-                  <strong>ABC12345</strong>).
+                  <strong>{isIndia ? "KL02AB1234" : "ABC12345"}</strong>).
                   <br />
                   The number should be a combination of letters and numbers,
                   without spaces or special characters, up to 15 characters.
@@ -332,7 +458,7 @@ export default function PrimaryDetailsForm({
               }
             >
               <Input
-                placeholder="e.g., ABC12345"
+                placeholder={isIndia ? "e.g., KL02AB1234" : "e.g., ABC12345"}
                 {...field}
                 className="input-field"
                 type="text"
@@ -356,6 +482,24 @@ export default function PrimaryDetailsForm({
           )}
         />
 
+        <FormField
+          control={form.control}
+          name="isFancyNumber"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Lease?"
+              description="Select if this vehicle is available for lease."
+            >
+              <FormCheckbox
+                id="isFancyNumber"
+                label="Fancy Number Highlight"
+                checked={field.value}
+                onChange={field.onChange}
+              />
+            </FormFieldLayout>
+          )}
+        />
+
         {/* Vehicle Photos */}
         <FormField
           control={form.control}
@@ -363,9 +507,9 @@ export default function PrimaryDetailsForm({
           render={() => (
             <MultipleFileUpload
               name="vehiclePhotos"
-              label="Vehicle Photos"
+              label="Vehicle Photos & videos"
               existingFiles={initialValues.vehiclePhotos || []}
-              description="Add Vehicle Photos. Up to 8 photos can be added."
+              description="Add Vehicle Photos / Videos. Up to 8 photos / videos can be added."
               maxSizeMB={30}
               setIsFileUploading={setIsPhotosUploading}
               bucketFilePath={GcsFilePaths.IMAGE_VEHICLES}
@@ -376,6 +520,34 @@ export default function PrimaryDetailsForm({
                   : "vehicle-image"
               }
               setDeletedFiles={setDeletedFiles}
+              isVideoAccepted={false}
+              isImageAccepted={true}
+            />
+          )}
+        />
+
+        {/* Vehicle Videos */}
+        <FormField
+          control={form.control}
+          name="vehicleVideos"
+          render={() => (
+            <MultipleFileUpload
+              name="vehicleVideos"
+              label="Vehicle Video"
+              existingFiles={initialValues.vehicleVideos || []}
+              description="Add Vehicle Videos (if any). Up to 1 video can be added."
+              maxVideoSizeMB={100}
+              setIsFileUploading={setIsVideoUploading}
+              bucketFilePath={GcsFilePaths.VIDEO_VEHICLES}
+              isFileUploading={isVideoUploading}
+              downloadFileName={
+                formData?.vehicleModel
+                  ? ` ${formData.vehicleModel}`
+                  : "vehicle-video"
+              }
+              setDeletedFiles={setDeletedFiles}
+              isVideoAccepted={true}
+              isImageAccepted={false}
             />
           )}
         />
@@ -390,16 +562,20 @@ export default function PrimaryDetailsForm({
                 name="commercialLicenses"
                 label={
                   isCustomCommercialLicenseLabel
-                    ? "Registration Card / Certificate"
-                    : "Registration Card / Mulkia"
+                    ? `Registration Card ${isIndia ? "" : "/ Certificate"}`
+                    : `Registration Card  ${isIndia ? "" : "/ Mulkia"}`
                 }
                 existingFiles={initialValues.commercialLicenses || []}
                 description={
                   <>
                     Upload <span className="font-bold text-yellow">front</span>{" "}
                     & <span className="font-bold text-yellow">back</span> images
-                    of the Registration Card /{" "}
-                    {isCustomCommercialLicenseLabel ? "Certificate" : "Mulkia"}
+                    of the Registration Card{" "}
+                    {!isIndia
+                      ? isCustomCommercialLicenseLabel
+                        ? "/ Certificate"
+                        : "/ Mulkia"
+                      : ""}
                   </>
                 }
                 maxSizeMB={15}
@@ -425,11 +601,13 @@ export default function PrimaryDetailsForm({
             <FormFieldLayout
               label={
                 <span>
-                  Registration Card / Mulkia Expiry Date <br />
+                  {`Registration Card ${isIndia ? "" : "/ Mulkia"} Expiry Date`}{" "}
+                  <br />
                   <span className="text-sm text-gray-500">(DD/MM/YYYY)</span>
                 </span>
               }
-              description="Enter the expiry date for the Registration Card/Mulkia in the format DD/MM/YYYY."
+              description={`Enter the expiry date for the Registration Card ${isIndia ? "" : "/ Mulkia"
+                } in the format DD/MM/YYYY.`}
             >
               <DatePicker
                 selected={field.value}
@@ -437,24 +615,6 @@ export default function PrimaryDetailsForm({
                 dateFormat="dd/MM/yyyy"
                 wrapperClassName="datePicker text-base -ml-4"
                 placeholderText="DD/MM/YYYY"
-              />
-            </FormFieldLayout>
-          )}
-        />
-
-        {/* registered year */}
-        <FormField
-          control={form.control}
-          name="vehicleRegisteredYear"
-          render={({ field }) => (
-            <FormFieldLayout
-              label="Registered Year"
-              description="Enter the year in which the vehicle was registered."
-            >
-              <YearPicker
-                onChangeHandler={field.onChange}
-                value={initialValues.vehicleRegisteredYear}
-                placeholder="year"
               />
             </FormFieldLayout>
           )}
@@ -474,11 +634,16 @@ export default function PrimaryDetailsForm({
                   value={field.value}
                   onValueChange={field.onChange}
                   className="flex gap-x-5 items-center"
-                  defaultValue="UAE_SPEC"
                 >
+                  {isIndia && (
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="India_SPEC" id="India_SPEC" />
+                      <Label htmlFor="India">India</Label>
+                    </div>
+                  )}
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="UAE_SPEC" id="UAE_SPEC" />
-                    <Label htmlFor="UAE">UAE</Label>
+                    <Label htmlFor="UAE">GCC</Label>
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="USA_SPEC" id="USA_SPEC" />
@@ -486,7 +651,7 @@ export default function PrimaryDetailsForm({
                   </div>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="OTHERS" id="others" />
-                    <Label htmlFor="others">Others</Label>
+                    <Label htmlFor="others">Other</Label>
                   </div>
                 </RadioGroup>
               </div>
@@ -511,7 +676,7 @@ export default function PrimaryDetailsForm({
               }
             >
               <PhoneInput
-                defaultCountry="ae"
+                defaultCountry={isIndia ? "in" : "ae"}
                 value={field.value}
                 onChange={(value, country) => {
                   field.onChange(value);
@@ -538,6 +703,22 @@ export default function PrimaryDetailsForm({
           control={form.control}
           name="rentalDetails"
           render={() => {
+            const rentalDetails = form.watch('rentalDetails') || {};
+            const handleApplyBestPrice = (field: 'hour' | 'day' | 'week' | 'month', value: number) => {
+              form.setValue(`rentalDetails.${field}.rentInAED` as const, value.toString());
+            };
+            // Helper to get target price
+            // Helper to determine if button should show (entered > 1.05 * recommended)
+            const shouldShowBtn = (entered: string | number | undefined, recommended: number | undefined) => {
+              const enteredNum = Number(entered);
+              const recommendedNum = Number(recommended);
+
+              if (isNaN(recommendedNum) || recommendedNum <= 0) return false;
+              if (isNaN(enteredNum) || enteredNum <= 0) return false;
+
+              return enteredNum > recommendedNum * 1.05;
+            };
+            const priceData = data || {};
             return (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base lg:text-lg">
@@ -545,11 +726,38 @@ export default function PrimaryDetailsForm({
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
-                    <RentalDetailsFormField />
+                    <RentalDetailsFormField
+                      isIndia={isIndia}
+                      priceRecommendationData={{
+                        hour: {
+                          data: priceData.hourly,
+                          enteredValue: rentalDetails.hour?.rentInAED,
+                          onApplyBestPrice: (v) => handleApplyBestPrice('hour', v),
+                          showBtn: shouldShowBtn(rentalDetails.hour?.rentInAED, priceData.hourly)
+                        },
+                        day: {
+                          data: priceData.daily,
+                          enteredValue: rentalDetails.day?.rentInAED,
+                          onApplyBestPrice: (v) => handleApplyBestPrice('day', v),
+                          showBtn: shouldShowBtn(rentalDetails.day?.rentInAED, priceData.daily)
+                        },
+                        week: {
+                          data: priceData.weekly,
+                          enteredValue: rentalDetails.week?.rentInAED,
+                          onApplyBestPrice: (v) => handleApplyBestPrice('week', v),
+                          showBtn: shouldShowBtn(rentalDetails.week?.rentInAED, priceData.weekly)
+                        },
+                        month: {
+                          data: priceData.monthly,
+                          enteredValue: rentalDetails.month?.rentInAED,
+                          onApplyBestPrice: (v) => handleApplyBestPrice('month', v),
+                          showBtn: shouldShowBtn(rentalDetails.month?.rentInAED, priceData.monthly)
+                        }
+                      }}
+                    />
                   </FormControl>
                   <FormDescription className="ml-2">
-                    Provide rent details. At least one of "day," "week," or
-                    "month" must be selected.
+                    Provide rent details. At least one of "day," "week," or "month" must be selected.
                   </FormDescription>
                   <FormMessage className="ml-2" />
                 </div>
@@ -565,15 +773,24 @@ export default function PrimaryDetailsForm({
           render={({ field }) => (
             <FormFieldLayout
               label="Location"
-              description="Choose your state/location"
+              description={
+                isIndia
+                  ? "Choose your state and location"
+                  : "Choose your state/location"
+              }
             >
               <StatesDropdown
                 onChangeHandler={(value) => {
                   field.onChange(value);
                   form.setValue("cityIds", []); //
+                  form.setValue("tempCitys", []); //
                 }}
                 value={initialValues.stateId}
                 placeholder="location"
+                isIndia={isIndia}
+                countryId={countryId}
+                setCities={setCities}
+                setSelectedCities={setSelectedCities}
               />
             </FormFieldLayout>
           )}
@@ -587,19 +804,33 @@ export default function PrimaryDetailsForm({
             <FormFieldLayout
               label={
                 <span>
-                  City / Serving Areas <br />
+                  {isIndia
+                    ? "Available Places / Areas"
+                    : "City / Serving Areas"}{" "}
+                  <br />
                   <span className="text-xs text-gray-500">
                     (multiple selection allowed)
                   </span>
                 </span>
               }
-              description="Select all the cities of operation/serving areas."
+              description={
+                isIndia
+                  ? "Select / Create serviceable. You can select up to 10 serviceable areas."
+                  : "Select all the cities of operation/serving areas."
+              }
             >
               <CitiesDropdown
                 stateId={form.watch("stateId")}
                 value={field.value}
                 onChangeHandler={field.onChange}
                 placeholder="cities"
+                setSelectedCities={setSelectedCities}
+                selectedCities={selectedCities}
+                cities={cities}
+                setCities={setCities}
+                setTemoraryCities={setTemoraryCities}
+                temoraryCities={temoraryCities}
+                isTempCreatable={!!isIndia}
               />
             </FormFieldLayout>
           )}
@@ -633,7 +864,7 @@ export default function PrimaryDetailsForm({
               label="Security Deposit"
               description="Specify if a security deposit is required and provide the amount if applicable."
             >
-              <SecurityDepositField />
+              <SecurityDepositField isIndia={isIndia} />
             </FormFieldLayout>
           )}
         />
@@ -646,25 +877,27 @@ export default function PrimaryDetailsForm({
           >
             <div className="w-full rounded-lg border-b p-2 shadow">
               {/* Crypto */}
-              <FormField
-                control={form.control}
-                name="isCryptoAccepted"
-                render={({ field }) => (
-                  <div className="mb-2">
-                    <FormCheckbox
-                      id="isCryptoAccepted"
-                      label="Crypto"
-                      checked={field.value}
-                      onChange={field.onChange}
-                    />
-                    <FormDescription className="ml-7 mt-1">
-                      Select if your company accepts payments via
-                      cryptocurrency.
-                    </FormDescription>
-                    <FormMessage className="ml-2" />
-                  </div>
-                )}
-              />
+              {!isIndia && (
+                <FormField
+                  control={form.control}
+                  name="isCryptoAccepted"
+                  render={({ field }) => (
+                    <div className="mb-2">
+                      <FormCheckbox
+                        id="isCryptoAccepted"
+                        label="Crypto"
+                        checked={field.value}
+                        onChange={field.onChange}
+                      />
+                      <FormDescription className="ml-7 mt-1">
+                        Select if your company accepts payments via
+                        cryptocurrency.
+                      </FormDescription>
+                      <FormMessage className="ml-2" />
+                    </div>
+                  )}
+                />
+              )}
 
               {/* Credit/Debit Cards */}
               <FormField
@@ -688,24 +921,48 @@ export default function PrimaryDetailsForm({
               />
 
               {/* Tabby */}
-              <FormField
-                control={form.control}
-                name="isTabbySupported"
-                render={({ field }) => (
-                  <div className="mb-2">
-                    <FormCheckbox
-                      id="isTabby"
-                      label="Tabby"
-                      checked={field.value}
-                      onChange={field.onChange}
-                    />
-                    <FormDescription className="ml-7 mt-1">
-                      Select if your company accepts payments via Tabby.
-                    </FormDescription>
-                    <FormMessage className="ml-2" />
-                  </div>
-                )}
-              />
+              {!isIndia && (
+                <FormField
+                  control={form.control}
+                  name="isTabbySupported"
+                  render={({ field }) => (
+                    <div className="mb-2">
+                      <FormCheckbox
+                        id="isTabby"
+                        label="Tabby"
+                        checked={field.value}
+                        onChange={field.onChange}
+                      />
+                      <FormDescription className="ml-7 mt-1">
+                        Select if your company accepts payments via Tabby.
+                      </FormDescription>
+                      <FormMessage className="ml-2" />
+                    </div>
+                  )}
+                />
+              )}
+
+              {/* Cash */}
+              {isIndia && (
+                <FormField
+                  control={form.control}
+                  name="isCashSupported"
+                  render={({ field }) => (
+                    <div className="mb-2">
+                      <FormCheckbox
+                        id="isCash"
+                        label="Cash"
+                        checked={field.value}
+                        onChange={field.onChange}
+                      />
+                      <FormDescription className="ml-7 mt-1">
+                        Select if your accepts payments via Cash.
+                      </FormDescription>
+                      <FormMessage className="ml-2" />
+                    </div>
+                  )}
+                />
+              )}
             </div>
           </FormFieldLayout>
         </div>

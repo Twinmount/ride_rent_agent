@@ -4,17 +4,25 @@ export interface CustomerApiType {
   id: string; // Unique identifier for the user
   customerId: string;
   customerName: string; // User's name
+  email: string;
   nationality: string; // User's nationality
   passportNumber: string; // User's passport number
+  passport: string[];
   drivingLicenseNumber: string; // User's driving license number
+  drivingLicense: string[];
   phoneNumber: string; // User's phone number, possibly formatted
   customerProfilePic?: string; // Optional field for the user's profile image or identifier
+  customerProfilePicPath?: string; // Optional field for the user's profile image or identifier
   countryCode: string; // The country code associated with the user's phone number
-  createdAt: string; // Timestamp when the record was created
-  updatedAt: string; // Timestamp when the record was last updated
 }
 export interface AddCustomerFormResponse {
   result: CustomerApiType;
+  status: string;
+  statusCode: number;
+}
+
+export interface PublicCustomerLinkShareResponse {
+  result: any;
   status: string;
   statusCode: number;
 }
@@ -46,13 +54,52 @@ export interface VehicleApiType {
     id: string;
     vehicleCategoryId: string;
     brandName: string;
-    brandValue: string;
     brandLogo: string;
   };
   vehicleRegistrationNumber: string;
   vehiclePhoto: string;
+  vehiclePhotoPath: string;
+  numberOfPassengers: string;
+  vehicleColor: string;
+  bodyType: string;
+  chassisNumber: string;
+  additionalMilageChargePerKm: string;
+
+  registrationDate: string;
+  registrationDueDate: string;
+  trafficFineId: string;
+  lastServiceDate: string;
+  currentKilometre: string;
+  serviceKilometre: string;
+  nextServiceKilometre: string;
+  nextServiceDate: string;
   rentalDetails: RentalDetails;
   createdBy: string;
+}
+
+export interface OngoingListVehicleType {
+  _id: string;
+  vehicleRegistrationNumber: string;
+  vehicleCategoryId: string;
+  vehicleBrandId: string;
+  vehiclePhoto: string;
+  rentalDetails: {
+    day: {
+      enabled: boolean;
+      rentInAED: string;
+      mileageLimit: string;
+    };
+    week: {
+      enabled: boolean;
+      rentInAED: string;
+      mileageLimit: string;
+    };
+    month: {
+      enabled: boolean;
+      rentInAED: string;
+      mileageLimit: string;
+    };
+  };
 }
 
 export interface AddVehicleFormResponse {
@@ -63,8 +110,26 @@ export interface AddVehicleFormResponse {
 
 // Payment type
 export interface PaymentApiType {
+  bookingId: string;
+  payment: {
+    id: string;
+    advanceAmount: string;
+    remainingAmount: string;
+    securityDeposits: {
+      enabled: boolean;
+      amountInAED: string;
+    };
+    currency: string;
+  };
+  vehicle: {
+    rentalDetails: RentalDetails;
+  };
+  bookingStartDate: string;
+  bookingEndDate: string;
+}
+
+export interface ListPaymentType {
   id: string;
-  paymentId: string;
   advanceAmount: string;
   remainingAmount: string;
   securityDeposits: {
@@ -94,7 +159,7 @@ export interface IndividualTrip {
   levelsFilled: number;
   vehicle: VehicleApiType;
   customer: CustomerApiType;
-  payment: PaymentApiType;
+  payment: ListPaymentType;
   bookingStatus: string;
   bookingStartDate: string; // ISO date string
   bookingEndDate: string; // ISO date string
@@ -114,8 +179,32 @@ export interface CreateCustomerBookingResponse {
   statusCode: number; // HTTP status code (e.g., 200, 400)
 }
 
+export interface SRMUserTaxAndContractInfoResponse {
+  country: string | null;
+  taxNumber: string | null;
+  termsNCondition: string | null;
+}
+
+export interface GetSRMUserTaxAndContractInfoResponse {
+  result: SRMUserTaxAndContractInfoResponse;
+  status: string;
+  statusCode: number;
+}
+
 export interface FetchSingleBookingResponse {
   result: IndividualTrip;
+  status: string;
+  statusCode: number;
+}
+
+export interface DashboardAnalytics {
+  ongoingTripsCount: number;
+  completedTripsCount: number;
+  vehicleCount: number;
+  customersCount: number;
+}
+export interface FetchSRMDashboardAnalytics {
+  result: DashboardAnalytics;
   status: string;
   statusCode: number;
 }
@@ -237,6 +326,42 @@ export interface FetchPaymentFormRequiredDataResponse {
     bookingId: string;
     vehicle: VehicleApiType;
   };
+  status: string;
+  statusCode: number;
+}
+
+export interface GetSRMLevelsFilledResponse {
+  result: {
+    levelsFilled: string;
+  };
+  status: string;
+  statusCode: number;
+}
+
+export interface GetSRMCustomerDetailsResponse {
+  result: CustomerApiType;
+  status: string;
+  statusCode: number;
+}
+
+export interface GetSRMVehicleDetailsResponse {
+  result: VehicleApiType;
+  status: string;
+  statusCode: number;
+}
+
+export interface ChecklistApiType {
+  vehicleId: string;
+  checklistMetadata: string;
+}
+
+export interface GetSRMChecklistResponse {
+  result: ChecklistApiType | null;
+  status: string;
+  statusCode: number;
+}
+export interface GetSRMPaymentDetailsResponse {
+  result: PaymentApiType;
   status: string;
   statusCode: number;
 }

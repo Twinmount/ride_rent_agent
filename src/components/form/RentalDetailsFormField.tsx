@@ -1,45 +1,60 @@
+import React from "react";
 import { useFormContext, Controller } from "react-hook-form";
+import PriceRecommendationBar from "./PriceRecommendationBar";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormDescription } from "../ui/form";
-import HourlyRentalDetailFormField from "./HourlyRentalDetailsFormField";
 
-type RentalDetailsFieldProps = {
-  period: "day" | "week" | "month";
-  description: string;
-  isDisabled?: boolean;
+type Period = "hourly" | "day" | "week" | "month";
+
+type PriceRec = {
+  data?: any;
+  enteredValue?: any;
+  onApplyBestPrice?: (v: number) => void;
+  showBtn?: boolean;
 };
 
-const RentalDetailField = ({
+type RentalDetailsFieldProps = {
+  period: Period;
+  description: string;
+  isDisabled?: boolean;
+  isSRM?: boolean;
+  isIndia?: boolean;
+  priceRecommendationData?: Record<Period, PriceRec> | any;
+};
+
+const RentalDetailField: React.FC<RentalDetailsFieldProps> = ({
   period,
   description,
   isDisabled = false,
-}: RentalDetailsFieldProps) => {
+  isSRM = false,
+  isIndia = false,
+  priceRecommendationData,
+}) => {
   const { control, watch, clearErrors } = useFormContext();
   const isEnabled = watch(`rentalDetails.${period}.enabled`);
 
   return (
     <div className="p-2 mb-2 rounded-lg border-b shadow">
       <Controller
-        name={`rentalDetails.${period}.enabled`}
+        name={`rentalDetails.${period}.enabled` as any}
         control={control}
         render={({ field }) => (
           <div className="flex items-center mt-3 space-x-2">
             <Checkbox
               checked={field.value}
-              onCheckedChange={(value) => {
-                field.onChange(value);
-                if (!value) {
-                  clearErrors([`rentalDetails`]); // Clear related errors when checkbox is unchecked
-                }
+              onCheckedChange={(val: any) => {
+                if (isSRM && !val) return;
+                field.onChange(val);
+                if (!val) clearErrors(["rentalDetails"]);
               }}
-              className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
               id={`rentalDetails-${period}-enabled`}
               disabled={isDisabled}
+              className="w-5 h-5 bg-white"
             />
             <label
               htmlFor={`rentalDetails-${period}-enabled`}
-              className="text-base font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              className="text-base font-medium"
             >
               {period.charAt(0).toUpperCase() + period.slice(1)}{" "}
               <span className="text-sm italic text-gray-700">
@@ -49,10 +64,11 @@ const RentalDetailField = ({
           </div>
         )}
       />
+
       {isEnabled && (
         <>
           <Controller
-            name={`rentalDetails.${period}.rentInAED`}
+            name={`rentalDetails.${period}.rentInAED` as any}
             control={control}
             render={({ field }) => (
               <div className="flex items-center mt-2">
@@ -60,44 +76,56 @@ const RentalDetailField = ({
                   htmlFor={`rentalDetails-${period}-rentInAED`}
                   className="block mr-1 mb-5 w-28 text-sm font-medium"
                 >
-                  Rent in AED
+                  Rent in {isIndia ? "INR" : "AED"}
                 </label>
-                <div className="w-full">
+                <div className="w-full relative">
                   <Input
                     id={`rentalDetails-${period}-rentInAED`}
                     {...field}
-                    placeholder="Rent in AED"
-                    className="input-field"
+                    placeholder={isIndia ? "Rent in INR" : "Rent in AED"}
+                    className="input-field pr-28"
                     type="text"
                     inputMode="numeric"
-                    onKeyDown={(e) => {
+                    onKeyDown={(e: any) => {
                       if (
                         !/^\d*$/.test(e.key) &&
-                        ![
-                          "Backspace",
-                          "Delete",
-                          "ArrowLeft",
-                          "ArrowRight",
-                        ].includes(e.key)
-                      ) {
+                        !["Backspace", "Delete", "ArrowLeft", "ArrowRight"].includes(
+                          e.key
+                        )
+                      )
                         e.preventDefault();
-                      }
                     }}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       field.onChange(e);
-                      clearErrors(`rentalDetails`);
+                      clearErrors("rentalDetails");
                     }}
                     readOnly={isDisabled}
                   />
+
+                  {/* Position the recommendation button absolutely on the right of the input */}
+                  {priceRecommendationData &&
+                    priceRecommendationData[period]?.showBtn && (
+                      <div className="absolute right-3 top-[36%] transform -translate-y-1/2">
+                        <PriceRecommendationBar
+                          priceData={priceRecommendationData[period].data}
+                          currentPrice={Number(priceRecommendationData[period].enteredValue)}
+                          onApplyBestPrice={priceRecommendationData[period].onApplyBestPrice}
+                          compact={true}
+                          className="!mt-0"
+                        />
+                      </div>
+                    )}
+
                   <FormDescription>
-                    {`Rent of the Vehicle in AED per ${period} `}
+                    {`Rent of the Vehicle in ${isIndia ? "INR" : "AED"} per ${period}`}
                   </FormDescription>
                 </div>
               </div>
             )}
           />
+
           <Controller
-            name={`rentalDetails.${period}.mileageLimit`}
+            name={`rentalDetails.${period}.mileageLimit` as any}
             control={control}
             render={({ field }) => (
               <div className="flex items-center mt-2">
@@ -115,29 +143,55 @@ const RentalDetailField = ({
                     className="input-field"
                     type="text"
                     inputMode="numeric"
-                    onKeyDown={(e) => {
+                    disabled={watch(
+                      `rentalDetails.${period}.unlimitedMileage`
+                    )}
+                    onKeyDown={(e: any) => {
                       if (
                         !/^\d*$/.test(e.key) &&
-                        ![
-                          "Backspace",
-                          "Delete",
-                          "ArrowLeft",
-                          "ArrowRight",
-                        ].includes(e.key)
-                      ) {
+                        !["Backspace", "Delete", "ArrowLeft", "ArrowRight"].includes(
+                          e.key
+                        )
+                      )
                         e.preventDefault();
-                      }
                     }}
-                    onChange={(e) => {
+                    onChange={(e: any) => {
                       field.onChange(e);
-                      clearErrors(`rentalDetails`);
+                      clearErrors("rentalDetails");
                     }}
                     readOnly={isDisabled}
                   />
+
                   <FormDescription>
                     {`Mileage of the vehicle per ${period} (KM)`}
                   </FormDescription>
                 </div>
+              </div>
+            )}
+          />
+
+          <Controller
+            name={`rentalDetails.${period}.unlimitedMileage` as any}
+            control={control}
+            render={({ field }) => (
+              <div className="ml-24 mt-4 flex w-fit max-w-full flex-col space-y-2">
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={(val: any) => field.onChange(val)}
+                    id={`rentalDetails-${period}-unlimitedMileage`}
+                    disabled={isDisabled}
+                  />
+                  <label
+                    htmlFor={`rentalDetails-${period}-unlimitedMileage`}
+                    className="flex-center gap-x-2 text-sm font-medium leading-none"
+                  >
+                    Unlimited Mileage
+                  </label>
+                </div>
+                <FormDescription>
+                  Check this box if the vehicle has no mileage limit.
+                </FormDescription>
               </div>
             )}
           />
@@ -147,29 +201,46 @@ const RentalDetailField = ({
   );
 };
 
-const RentalDetailsFormField = ({
-  isDisabled = false,
-}: {
+const RentalDetailsFormField: React.FC<{
   isDisabled?: boolean;
-}) => {
+  isSRM?: boolean;
+  isIndia?: boolean;
+  priceRecommendationData?: any;
+}> = ({ isDisabled = false, isSRM = false, isIndia = false, priceRecommendationData }) => {
   return (
     <div className="flex flex-col">
+      <RentalDetailField
+        period="hourly"
+        description="(Select to set hourly rental rates)"
+        isDisabled={isDisabled}
+        isSRM={isSRM}
+        isIndia={isIndia}
+        priceRecommendationData={priceRecommendationData}
+      />
       <RentalDetailField
         period="day"
         description="(Select to set daily rental rates)"
         isDisabled={isDisabled}
+        isSRM={isSRM}
+        isIndia={isIndia}
+        priceRecommendationData={priceRecommendationData}
       />
       <RentalDetailField
         period="week"
         description="(Select to set weekly rental rates)"
         isDisabled={isDisabled}
+        isSRM={isSRM}
+        isIndia={isIndia}
+        priceRecommendationData={priceRecommendationData}
       />
       <RentalDetailField
         period="month"
         description="(Select to set monthly rental rates)"
         isDisabled={isDisabled}
+        isSRM={isSRM}
+        isIndia={isIndia}
+        priceRecommendationData={priceRecommendationData}
       />
-      <HourlyRentalDetailFormField isDisabled={isDisabled} />
     </div>
   );
 };

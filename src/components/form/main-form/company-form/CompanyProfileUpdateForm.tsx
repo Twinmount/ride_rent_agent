@@ -35,14 +35,17 @@ import SingleFileUpload from "../../file-uploads/SingleFileUpload";
 import CompanyLanguagesDropdown from "../../dropdowns/CompanyLanguagesDropdown";
 import { Textarea } from "@/components/ui/textarea";
 import { useQueryClient } from "@tanstack/react-query";
+import LocationPicker from "../../LocationPicker";
 
 type CompanyProfileUpdateFormProps = {
   formData?: ProfileUpdateFormType | null;
   agentId: string;
+  country: string;
 };
 
 export default function CompanyProfileUpdateForm({
   formData,
+  country,
 }: CompanyProfileUpdateFormProps) {
   const [isLicenseUploading, setIsLicenseUploading] = useState(false);
   const [deletedImages, setDeletedImages] = useState<string[]>([]);
@@ -65,12 +68,15 @@ export default function CompanyProfileUpdateForm({
   // accessing refresh token to get the userId
   const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
   const { userId } = jwtDecode<DecodedRefreshToken>(refreshToken as string);
-
+  const isIndia = country === "India" || country === "india";
   // creating form
   const form = useForm<z.infer<typeof ProfileUpdateFormSchema>>({
     resolver: zodResolver(ProfileUpdateFormSchema),
     defaultValues: initialValues,
   });
+
+  const isIndividual =
+    !!formData?.accountType && formData?.accountType === "individual";
 
   async function onSubmit(values: z.infer<typeof ProfileUpdateFormSchema>) {
     if (isLicenseUploading) {
@@ -130,11 +136,23 @@ export default function CompanyProfileUpdateForm({
             render={({ field }) => (
               <SingleFileUpload
                 name={field.name}
-                label="Commercial License"
+                label={
+                  isIndia && !isIndividual
+                    ? "Registration Details"
+                    : isIndia && isIndividual
+                    ? "Commercial Registration"
+                    : "Commercial License"
+                }
                 description={
                   <>
                     Please upload a <strong>PHOTO</strong> or a{" "}
-                    <strong>SCREENSHOT</strong> of your commercial license,
+                    <strong>SCREENSHOT</strong> of your{" "}
+                    {isIndia && !isIndividual
+                      ? `Company Registration / GST Registration / Trade License,`
+                      : isIndia && isIndividual
+                      ? "Commercial Registration / Tourist Permit"
+                      : `commercial license,
+                    `}{" "}
                     maximum file size 5MB.
                   </>
                 }
@@ -148,7 +166,6 @@ export default function CompanyProfileUpdateForm({
               />
             )}
           />
-
           {/* expiry date */}
           <FormField
             control={form.control}
@@ -170,7 +187,12 @@ export default function CompanyProfileUpdateForm({
                     />
                   </FormControl>
                   <FormDescription className="mt-1 ml-1">
-                    Enter the expiry of your Commercial License/Trade License
+                    Enter the expiry of your
+                    {isIndia && !isIndividual
+                      ? " Commercial License / GST Registration / Trade License"
+                      : isIndia && isIndividual
+                      ? " Commercial Registration / Tourist Permit"
+                      : " Commercial License / Trade License"}{" "}
                     &#40;DD/MM/YYYY&#41;.
                   </FormDescription>
                   <FormMessage />
@@ -178,7 +200,6 @@ export default function CompanyProfileUpdateForm({
               </FormItem>
             )}
           />
-
           {/* registration number */}
           <FormField
             control={form.control}
@@ -186,28 +207,37 @@ export default function CompanyProfileUpdateForm({
             render={({ field }) => (
               <FormItem className="flex mb-2 w-full max-sm:flex-col">
                 <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg">
-                  Registration Number / Trade License Number{" "}
+                  {isIndia && !isIndividual
+                    ? "GST Number"
+                    : isIndia && isIndividual
+                    ? "PAN Number"
+                    : "Registration Number / Trade License Number"}{" "}
                   <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
                     <Input
-                      placeholder="Enter your company registration number"
+                      placeholder={
+                        isIndia
+                          ? "Enter your company GST number"
+                          : "Enter your company registration number"
+                      }
                       {...field}
                       className="input-field"
                     />
                   </FormControl>
                   <FormDescription className="mt-1 ml-1">
-                    Enter your company registration number. The number should be
-                    a combination of letters and numbers, without any spaces or
-                    special characters, up to 15 characters.
+                    {isIndia && !isIndividual
+                      ? `Enter your company GST number. The number should be a combination of letters and numbers, without any spaces or special characters.`
+                      : isIndia && isIndividual
+                      ? "Enter your company PAN. The number should be a combination of letters and numbers, without any spaces or special characters."
+                      : `Enter your company registration number. The number should be a combination of letters and numbers, without any spaces or special characters, up to 15 characters.`}
                   </FormDescription>
                   <FormMessage />
                 </div>
               </FormItem>
             )}
           />
-
           <FormField
             control={form.control}
             name="companyLanguages"
@@ -220,17 +250,42 @@ export default function CompanyProfileUpdateForm({
                 <div className="flex-col items-start w-full">
                   <FormControl>
                     <CompanyLanguagesDropdown
+                      isIndia={isIndia}
                       value={field.value}
                       onChangeHandler={field.onChange}
                       placeholder="Languages"
                     />
                   </FormControl>
                   <FormDescription className="mt-1 ml-1">
-                    Select all the languages your staff can speak or understand.
-                    These will be displayed on your company's public profile
-                    page, helping customers feel comfortable with communication.
+                    {isIndividual
+                      ? "Select all the languages you can speak or understand. These will be shown on your public profile to help customers communicate comfortably with you."
+                      : "Select all the languages your staff can speak or understand. These will be displayed on your company's public profile page, helping customers feel comfortable with communication."}
                   </FormDescription>
                   <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="location"
+            render={({ field }) => (
+              <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                <FormLabel className="flex justify-between mt-4 ml-2 w-52 text-base max-sm:w-fit lg:text-lg">
+                  Office Location <span className="mr-5 max-sm:hidden">:</span>
+                </FormLabel>
+                <div className="flex-col items-start w-fit">
+                  <LocationPicker
+                    onChangeHandler={field.onChange}
+                    initialLocation={field.value}
+                    buttonText="Choose Location"
+                    buttonClassName="w-full cursor-pointer bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-900"
+                  />
+                  <FormDescription className="mt-1 ml-1">
+                    Choose the GSP location where the company is registered or
+                    operates.
+                  </FormDescription>
                 </div>
               </FormItem>
             )}
@@ -257,7 +312,7 @@ export default function CompanyProfileUpdateForm({
               return (
                 <FormItem className="flex mb-2 w-full max-sm:flex-col">
                   <FormLabel className="flex justify-between mt-4 ml-2 w-52 text-base h-fit min-w-52 lg:text-lg">
-                    Company Address
+                    {isIndividual ? "" : "Company"} Address
                     <span className="mr-5 max-sm:hidden">:</span>
                   </FormLabel>
                   <div className="flex-col items-start w-full">
@@ -271,8 +326,9 @@ export default function CompanyProfileUpdateForm({
                     </FormControl>
                     <FormDescription className="mt-1 ml-2 w-full flex-between">
                       <span className="w-full max-w-[90%]">
-                        Provide company address. This will be showed in your
-                        public company profile page. 150 characters max.
+                        {isIndividual
+                          ? "Provide your address. It will appear on your public profile and must match your registered details"
+                          : "Provide company address. This will be showed in your public company profile page. 150 characters max."}
                       </span>{" "}
                       <span className="ml-auto"> {`${charCount}/150`}</span>
                     </FormDescription>

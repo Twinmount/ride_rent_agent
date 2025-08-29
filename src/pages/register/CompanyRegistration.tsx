@@ -1,16 +1,20 @@
-import { getUser } from "@/api/user";
 import FloatingWhatsAppButton from "@/components/FloatingWhatsappIcon";
 import CompanyForm from "@/components/form/main-form/company-form/CompanyForm";
 import FormSkelton from "@/components/loading-skelton/FormSkelton";
-import { useQuery } from "@tanstack/react-query";
+import { useAgentContext } from "@/context/AgentContext";
+import { useCompanyCountry } from "@/hooks/useCompanyCountry";
 
 export default function CompanyRegistration() {
-  const { data, isLoading, isError } = useQuery({
-    queryKey: ["users"],
-    queryFn: getUser,
-  });
+  const {
+    appState: { agentId, userId },
+    isLoading,
+    isError,
+  } = useAgentContext();
 
-  const { agentId } = data?.result || {};
+  const { data: countryData, isLoading: isLoadingCountry } =
+    useCompanyCountry(userId);
+
+  const country = countryData?.result || "UAE";
 
   return (
     <section className="py-5 pt-10 pb-24">
@@ -19,14 +23,14 @@ export default function CompanyRegistration() {
         Provide your company details to complete the registration
       </h2>
 
-      {isLoading ? (
+      {isLoading || isLoadingCountry ? (
         <FormSkelton />
-      ) : !data || isError ? (
+      ) : !agentId || isError ? (
         <div className="mt-36 text-2xl font-semibold text-center text-red-500">
           failed to fetch your agent id
         </div>
       ) : (
-        <CompanyForm type="Add" agentId={agentId as string} />
+        <CompanyForm country={country} type="Add" agentId={agentId as string} />
       )}
 
       {/* whatsapp floating button */}

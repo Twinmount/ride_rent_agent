@@ -3,7 +3,13 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FormDescription, FormMessage } from "@/components/ui/form";
 
-const SecurityDepositField = () => {
+const SecurityDepositField = ({
+  isDisabled = false,
+  isIndia = false,
+}: {
+  isDisabled?: boolean;
+  isIndia?: boolean;
+}) => {
   const { control, watch, clearErrors } = useFormContext();
   const isEnabled = watch("securityDeposit.enabled");
 
@@ -20,6 +26,7 @@ const SecurityDepositField = () => {
               onCheckedChange={field.onChange}
               className="w-5 h-5 bg-white data-[state=checked]:bg-yellow data-[state=checked]:border-none"
               id="securityDeposit-enabled"
+              disabled={isDisabled}
             />
             <label
               htmlFor="securityDeposit-enabled"
@@ -43,16 +50,21 @@ const SecurityDepositField = () => {
                   htmlFor="securityDeposit-amountInAED"
                   className="block mr-1 mb-5 w-28 text-[0.8rem] font-medium"
                 >
-                  Deposit in AED
+                  Deposit in {isIndia ? "INR" : "AED"}
                 </label>
                 <div className="w-full h-fit">
                   <Input
                     id="securityDeposit-amountInAED"
                     {...field}
-                    placeholder="Enter deposit amount in AED"
+                    placeholder={
+                      isIndia
+                        ? "Enter deposit amount in INR"
+                        : "Enter deposit amount in AED"
+                    }
                     className="input-field"
                     type="text"
                     inputMode="numeric"
+                    readOnly={isDisabled}
                     onKeyDown={(e) => {
                       if (
                         !/^\d*$/.test(e.key) &&

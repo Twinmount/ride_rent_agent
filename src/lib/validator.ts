@@ -4,25 +4,84 @@ import * as z from "zod";
 export const RegistrationFormSchema = z.object({
   phoneNumber: z.string().min(6, "Provide a valid mobile  number"),
   password: z.string().min(4, "Password must be at least 4 characters"),
+  country: z.string().min(1, "Select a country"),
 });
 
 // Company Form Schema
-export const CompanyFormSchema = z.object({
+export const CompanyFormSchema = (isIndia: boolean) =>
+  z.object({
+    companyName: z
+      .string()
+      .min(1, "Company name is required")
+      .max(50, "Maximum 50 characters allowed"),
+    companyLogo: z.string().min(1, "Company logo is required"),
+    commercialLicense: z.string().min(1, "Commercial License is required"),
+    expireDate: z.date(),
+    regNumber: z
+      .string()
+      .min(1, `${isIndia ? "GST" : "Registration"} number is required`)
+      .refine(
+        (val) => {
+          if (isIndia) {
+            return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/.test(
+              val
+            );
+          }
+          return true; // Skip validation if not India
+        },
+        {
+          message: "Invalid GST number format",
+        }
+      ),
+    companyAddress: z
+      .string()
+      .min(5, "Company address is required")
+      .max(150, "Address can be up to 150 characters"),
+    companyLanguages: z
+      .array(z.string())
+      .min(1, "At least one language must be selected"),
+    accountType: z.enum(["company", "individual"]),
+    location: z
+      .object({
+        lat: z.number(),
+        lng: z.number(),
+        address: z.string().optional(),
+      })
+      .refine((val) => val.lat && val.lng, {
+        message: "Location is required",
+      }),
+  });
+
+// individual Form Schema
+export const IndividualFormSchema = z.object({
   companyName: z
     .string()
-    .min(1, "Company name is required")
+    .min(1, "Name is required")
     .max(50, "Maximum 50 characters allowed"),
-  companyLogo: z.string().min(1, "Company logo is required"),
-  commercialLicense: z.string().min(1, "Commercial License is required"),
+  companyLogo: z.string().min(1, "Photo is required"),
+  commercialLicense: z.string().min(1, "Commercial Registration is required"),
   expireDate: z.date(),
-  regNumber: z.string().min(1, "Registration number is required"),
+  regNumber: z
+    .string()
+    .min(1, "PAN number is required")
+    .regex(/^[A-Z]{5}[0-9]{4}[A-Z]$/, "Invalid PAN format"),
   companyAddress: z
     .string()
-    .min(5, "Company address is required")
+    .min(5, "Address is required")
     .max(150, "Address can be up to 150 characters"),
   companyLanguages: z
     .array(z.string())
     .min(1, "At least one language must be selected"),
+  accountType: z.enum(["company", "individual"]),
+  location: z
+    .object({
+      lat: z.number(),
+      lng: z.number(),
+      address: z.string().optional(),
+    })
+    .refine((val) => val.lat && val.lng, {
+      message: "Location is required",
+    }),
 });
 
 // Company Form Schema
@@ -37,6 +96,15 @@ export const ProfileUpdateFormSchema = z.object({
   companyLanguages: z
     .array(z.string())
     .min(1, "At least one language must be selected"),
+  location: z
+    .object({
+      lat: z.number(),
+      lng: z.number(),
+      address: z.string().optional(),
+    })
+    .refine((val) => val.lat && val.lng, {
+      message: "Location is required",
+    }),
 });
 
 // otp page form schema
@@ -66,19 +134,17 @@ export const ResetPasswordFormSchema = z.object({
   phoneNumber: z.string().min(1, "Provide your registered phone number"),
 });
 
-// RentalDetailType Schema for day, week, and month rentals )
+// Base schema for day/week/month rentals
 const RentalDetailTypeSchema = z.object({
   enabled: z.boolean().optional().default(false),
   rentInAED: z.string().optional().default(""),
   mileageLimit: z.string().optional().default(""),
+  unlimitedMileage: z.boolean().optional().default(false),
 });
 
-// HourlyRentalDetailType Schema with minBookingHours
-const HourlyRentalDetailTypeSchema = z.object({
-  enabled: z.boolean().optional().default(false),
-  rentInAED: z.string().optional().default(""),
-  mileageLimit: z.string().optional().default(""),
-  minBookingHours: z.string().optional().default(""), // Only for hourly rentals
+// Extended schema for hourly rentals
+const HourlyRentalDetailTypeSchema = RentalDetailTypeSchema.extend({
+  minBookingHours: z.string().optional().default(""),
 });
 
 // Primary Form Schema
@@ -92,17 +158,20 @@ export const PrimaryFormSchema = z
       .string()
       .min(1, "Vehicle registration number is required")
       .max(15, "Vehicle registration number cannot exceed 15 characters"),
-    vehicleRegisteredYear: z.string().min(1, "Registered Year is required"),
+    isFancyNumber: z.boolean().default(false),
+    vehicleRegisteredYear: z.string().min(1, "Year of Manufacture is required"),
     vehiclePhotos: z
       .array(z.string().min(1, "vehicle photo is required"))
       .min(1, "At least one vehicle photo is required"),
+    vehicleVideos: z.array(z.string().optional()),
     commercialLicenses: z.array(z.string().optional()),
     commercialLicenseExpireDate: z.date(),
     isLease: z.boolean().default(false),
     isCryptoAccepted: z.boolean().default(false),
+    isVehicleModified: z.boolean().default(false),
     isSpotDeliverySupported: z.boolean().default(false),
     specification: z
-      .enum(["USA_SPEC", "UAE_SPEC", "OTHERS"], {
+      .enum(["India_SPEC", "USA_SPEC", "UAE_SPEC", "OTHERS"], {
         required_error: "Specification is required",
       })
       .default("UAE_SPEC"),
@@ -124,6 +193,17 @@ export const PrimaryFormSchema = z
     }),
     isCreditOrDebitCardsSupported: z.boolean().default(false),
     isTabbySupported: z.boolean().default(false),
+    isCashSupported: z.boolean().default(false),
+    tempCitys: z
+      .array(
+        z.object({
+          stateId: z.string(),
+          cityId: z.string(),
+          cityName: z.string(),
+          cityValue: z.string(),
+        })
+      )
+      .optional(),
   })
   .refine(
     (data) => {
@@ -165,13 +245,77 @@ const SRMHourlyRentalDetailTypeSchema = z.object({
 // SRM : Customer Details Form Schema
 export const SRMCustomerDetailsFormSchema = z.object({
   customerProfilePic: z.string().optional(),
-  customerName: z.string().min(1, "Customer name is required"),
-  nationality: z.string().min(1, "Nationality is required"),
-  passportNumber: z.string().min(1, "Passport number is required"),
-  drivingLicenseNumber: z.string().min(1, "Driving license number is required"),
+  customerName: z
+    .string()
+    .min(1, "Customer name is required")
+    .max(50, "Maximum 50 characters allowed"),
+  email: z.string().email("Provide a valid email address"),
+  nationality: z
+    .string()
+    .min(1, "Nationality is required")
+    .max(30, "Maximum 30 characters allowed"),
+  passportNumber: z
+    .string()
+    .min(1, "Passport number is required")
+    .max(30, "Maximum 30 characters allowed"),
+  passport: z
+    .array(z.string().min(1, "Passport image is required"))
+    .min(2, "Upload both front and back of the passport"),
+  drivingLicenseNumber: z
+    .string()
+    .min(1, "Driving license number is required")
+    .max(30, "Maximum 30 characters allowed"),
+  drivingLicense: z
+    .array(z.string().min(1, "Driving license image is required"))
+    .min(2, "Upload both front and back of the driving license"),
   phoneNumber: z.string().min(6, "Provide a valid mobile number"),
 });
 
+export const SRMPublicCustomerDetailsFormSchema = z.object({
+  customerProfilePic: z.string().optional(),
+  customerName: z
+    .string()
+    .min(1, "Customer name is required")
+    .max(50, "Maximum 50 characters allowed"),
+  email: z.string().email("Provide a valid email address"),
+  nationality: z
+    .string()
+    .min(1, "Nationality is required")
+    .max(30, "Maximum 30 characters allowed"),
+  passportNumber: z
+    .string()
+    .min(1, "Passport number is required")
+    .max(30, "Maximum 30 characters allowed"),
+  passport: z
+    .array(z.string().min(1, "Passport image is required"))
+    .min(2, "Upload both front and back of the passport"),
+  drivingLicenseNumber: z
+    .string()
+    .min(1, "Driving license number is required")
+    .max(30, "Maximum 30 characters allowed"),
+  drivingLicense: z
+    .array(z.string().min(1, "Driving license image is required"))
+    .min(2, "Upload both front and back of the driving license"),
+  phoneNumber: z.string().min(6, "Provide a valid mobile number"),
+});
+
+export const CustomerShareLinkFormSchema = z.object({
+  customerName: z.string().min(1, "Name is required"),
+  email: z.string().email("Invalid email"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+});
+
+export const SRMTaxInfoFormSchema = z.object({
+  countryId: z.string().min(1, "Country is required"),
+  taxNumber: z.string().min(1, "Tax number is required"),
+});
+
+export const SRMContractFormSchema = z.object({
+  termsNCondition: z
+    .string()
+    .min(10, "Contract must be at least 10 characters long")
+    .max(30000, "Contract length exceeded"),
+});
 // SRM : Vehicle Details Form Schema
 export const SRMVehicleDetailsFormSchema = z.object({
   vehicleCategoryId: z.string().min(1, "Category is required"),
@@ -181,6 +325,29 @@ export const SRMVehicleDetailsFormSchema = z.object({
     .min(1, "Vehicle registration number is required")
     .max(15, "Vehicle registration number cannot exceed 15 characters"),
   vehiclePhoto: z.string(),
+  numberOfPassengers: z.string().min(1, "Number of passengers is required"),
+  vehicleColor: z.string().min(1, { message: "Please select a vehicle color" }),
+  bodyType: z.string().min(1, { message: "Please select a body type" }),
+  chassisNumber: z
+    .string()
+    .min(1, { message: "Chassis number is required" })
+    .max(50, { message: "Chassis number must be at most 50 characters" }),
+  additionalMilageChargePerKm: z
+    .string()
+    .min(1, "Additional milage charge per km is required"),
+  registrationDate: z.date(),
+  registrationDueDate: z.date(),
+  trafficFineId: z
+    .string()
+    .min(1, { message: "Traffic Fine ID is required" })
+    .max(50, { message: "Traffic Fine ID must be at most 50 characters" }),
+  lastServiceDate: z.date(),
+  currentKilometre: z
+    .string()
+    .min(1, "Current kilometre (odometer) is required"),
+  serviceKilometre: z.string().min(1, "service kilometre is required"),
+  nextServiceKilometre: z.string().min(1, "next service kilometre is required"),
+  nextServiceDate: z.date(),
   rentalDetails: z.object({
     day: SRMRentalDetailTypeSchema,
     week: SRMRentalDetailTypeSchema,
@@ -192,7 +359,7 @@ export const SRMVehicleDetailsFormSchema = z.object({
 // SRM : Payment Details Form Schema
 export const SRMPaymentDetailsFormSchema = z.object({
   currency: z.string().min(1, "Currency is required"),
-  advanceAmount: z.string().min(1, "Advance amount is required"),
+  advanceAmount: z.string().optional().default("0"),
   remainingAmount: z.string().min(1, "Remaining amount is required"),
   securityDeposit: z.object({
     enabled: z.boolean().default(false),
@@ -217,4 +384,7 @@ export const TripEndFormSchema = z.object({
   additionalCharges: z.any().optional(),
   discounts: z.string().default("0").optional(),
   totalAmountCollected: z.string().min(1, "Total amount is required"),
+  currentKilometre: z
+    .string()
+    .min(1, "Current kilometre (odometer) is required"),
 });

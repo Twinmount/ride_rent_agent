@@ -1,18 +1,25 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { MapPinned, Phone, Plane, Calendar } from "lucide-react";
+import { MapPinned, Phone, Plane } from "lucide-react";
 import MotionDiv from "@/components/framer-motion/MotionDiv";
 import { Trip } from "@/types/srm-types";
+import { getExpiryNotificationText } from "@/helpers";
+import { TripActionButtons } from "./TripActionButtons";
+import { BookingPeriodDisplay } from "./BookingPeriodDisplay";
 
 interface OngoingTripsCardProps {
   trip: Trip;
   onOpenModal: (id: string) => void;
 }
 
-const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
+export const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
   trip,
   onOpenModal,
 }) => {
+  const { reminderMessage, className } = getExpiryNotificationText(
+    trip.bookingStartDate,
+    trip.bookingEndDate
+  );
+
   return (
     <MotionDiv
       key={trip.id}
@@ -88,28 +95,10 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
         </div>
 
         {/* calendar */}
-        <div className="flex flex-col gap-4 items-start px-2 py-1 my-3 bg-gray-800 rounded-lg md:items-center md:justify-between md:flex-row h-fit">
-          <dl className="flex gap-x-2 items-center px-2 h-full text-sm text-gray-200 rounded-lg">
-            <dt className="flex gap-x-1 items-center">
-              <span className="gap-1 w-[4.5rem] flex items-center">
-                <Calendar /> From
-              </span>
-              :
-            </dt>
-            <dd>{new Date(trip.bookingStartDate).toLocaleDateString()}</dd>
-          </dl>
-          <dl className="flex gap-x-4 items-center px-2 h-full text-sm text-gray-200 rounded-lg">
-            <dt className="flex gap-x-1 justify-between items-center w-16">
-              <span className="flex gap-1 items-center max-md:min-w-[4.5rem]  w-[4.5rem]">
-                <Calendar /> To
-              </span>
-              :
-            </dt>
-            <dd className="ml-2">
-              {new Date(trip.bookingEndDate).toLocaleDateString()}
-            </dd>
-          </dl>
-        </div>
+        <BookingPeriodDisplay
+          bookingStartDate={trip.bookingStartDate}
+          bookingEndDate={trip.bookingEndDate}
+        />
 
         {/* buttons */}
         <div className="gap-x-3 flex-between md:justify-end">
@@ -127,24 +116,24 @@ const OngoingTripsCard: React.FC<OngoingTripsCardProps> = ({
             )}
           </div>
 
-          <div className="flex gap-x-2 items-center">
-            <button
-              onClick={() => onOpenModal(trip.bookingId)}
-              className="px-3 py-1 text-white bg-blue-500 rounded-md"
+          {/* notification on expiry */}
+          {reminderMessage && (
+            <span
+              className={`max-md:hidden w-fit p-2 px-4 font-[500] mr-auto text-sm rounded-lg bg-slate-100 ${className}`}
             >
-              Extend Trip
-            </button>
-            <Link
-              to={`/srm/end-trip/${trip.bookingId}`}
-              className="px-3 py-1 text-white bg-red-500 rounded-md"
-            >
-              End Trip
-            </Link>
-          </div>
+              {reminderMessage}
+            </span>
+          )}
+
+          <TripActionButtons
+            bookingId={trip.bookingId}
+            customerId={trip.customer.customerId}
+            vehicleId={trip.vehicle.id}
+            paymentId={trip.payment.id}
+            onExtend={() => onOpenModal(trip.bookingId)}
+          />
         </div>
       </div>
     </MotionDiv>
   );
 };
-
-export default OngoingTripsCard;

@@ -5,7 +5,13 @@ import { fetchAllCities } from "@/api/cities";
 import { CityType, StateType } from "@/types/API-types";
 import CitiesSkelton from "../loading-skelton/CitiesSkelton";
 
-const Locations = () => {
+const Locations = ({
+  countryId,
+  isIndia,
+}: {
+  countryId: string;
+  isIndia: boolean;
+}) => {
   // State management for selected state and cities
   const [selectedState, setSelectedState] = useState<StateType | null>(null);
   const [cities, setCities] = useState<CityType[]>([]);
@@ -13,8 +19,9 @@ const Locations = () => {
 
   // Fetch all states
   const { data: statesData, isLoading: isStatesLoading } = useQuery({
-    queryKey: ["states"],
-    queryFn: fetchAllStates,
+    queryKey: ["states", countryId],
+    queryFn: () => fetchAllStates(countryId, isIndia),
+    enabled: !!countryId && isIndia,
   });
 
   // Fetch cities based on the selected state

@@ -80,7 +80,10 @@ export default function ExtendTripModal({
       data = await extendTrip(bookingId, values);
       if (data) {
         navigate("/srm/ongoing-trips");
-        queryClient.invalidateQueries({ queryKey: ["activeTrips"] });
+        queryClient.invalidateQueries({ queryKey: ["ongoing-trips"] });
+        queryClient.invalidateQueries({
+          queryKey: ["srm-trips", "ongoing-trips"],
+        });
         onClose();
       }
     } catch (error) {
@@ -95,7 +98,7 @@ export default function ExtendTripModal({
 
   if (isLoading)
     return (
-      <div className="h-screen fixed inset-0 w-full flex-center bg-black/40">
+      <div className="h-screen fixed top-0 right-0 left-0 bottom-0 w-full flex-center bg-black/40 z-[101]">
         <div className="h-80 w-80 flex-center bg-white rounded-lg text-lg">
           Loading...
         </div>

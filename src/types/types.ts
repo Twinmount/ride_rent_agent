@@ -1,14 +1,46 @@
 // agent context  type
+
+import React from "react";
+
+type AppState = {
+  accessToken: string;
+  refreshToken: string;
+  userId: string;
+  agentId: string;
+};
+
+export type AppSuportedCountries = {
+  id: string;
+  name: string;
+  value: string;
+  icon: string;
+};
+
 export type AgentContextType = {
   isSidebarOpen: boolean;
   toggleSidebar: () => void;
   isSmallScreen: boolean;
+  agentId: string | undefined;
+  userId: string | undefined;
+  isLoading: boolean;
+  isError: boolean;
+  appState: AppState;
+  setAppState: React.Dispatch<React.SetStateAction<AppState>>;
+  appCountry: string;
+  updateAppCountry: (country: string) => void;
+  appSuportedCountries: AppSuportedCountries[];
 };
 
 export type RegistrationType = {
   mobile: string;
   password: string;
 };
+
+export interface Location {
+  lat: number;
+  lng: number;
+  address?: string;
+}
 
 export type CompanyFormType = {
   companyName: string;
@@ -18,6 +50,9 @@ export type CompanyFormType = {
   regNumber: string;
   companyAddress: string;
   companyLanguages: string[];
+  accountType?: "company" | "individual";
+  countryId?: string;
+  location?: Location;
 };
 
 export type ProfileUpdateFormType = {
@@ -26,6 +61,8 @@ export type ProfileUpdateFormType = {
   regNumber: string;
   companyAddress: string;
   companyLanguages: string[];
+  accountType?: string;
+  location?: Location;
 };
 
 // Rental detail type for day, week, and month
@@ -33,14 +70,19 @@ type RentalDetailType = {
   enabled: boolean;
   rentInAED: string;
   mileageLimit: string;
+  unlimitedMileage: boolean;
 };
 
-// Hourly rental detail type, which includes minBookingHours
-type HourlyRentalDetailType = {
-  enabled: boolean;
-  rentInAED: string;
-  mileageLimit: string;
+type HourlyRentalDetailType = RentalDetailType & {
   minBookingHours: string;
+};
+
+type CityType = {
+  _id?: string;
+  stateId: string;
+  cityId: string;
+  cityName: string;
+  cityValue: string;
 };
 
 // primary details form type
@@ -51,14 +93,16 @@ export type PrimaryFormType = {
   vehicleBrandId: string;
   vehicleModel: string;
   vehiclePhotos: string[]; // Array of  URLs
+  vehicleVideos: string[];
   vehicleRegistrationNumber: string;
+  isFancyNumber: boolean;
   vehicleRegisteredYear: string;
   commercialLicenses: string[]; // Array of  URLs
   commercialLicenseExpireDate: Date | undefined;
   isLease: boolean;
   isCryptoAccepted: boolean;
   isSpotDeliverySupported: boolean;
-  specification: "UAE_SPEC" | "USA_SPEC" | "OTHERS";
+  specification: "India_SPEC" | "UAE_SPEC" | "USA_SPEC" | "OTHERS";
   rentalDetails: {
     day: RentalDetailType;
     week: RentalDetailType;
@@ -76,6 +120,9 @@ export type PrimaryFormType = {
   };
   isCreditOrDebitCardsSupported: boolean;
   isTabbySupported: boolean;
+  isCashSupported: boolean;
+  tempCitys?: CityType[];
+  isVehicleModified: boolean;
 };
 
 export type SpecificationFormData = {
@@ -86,7 +133,12 @@ export type SpecificationFormData = {
 };
 
 export type TabsTypes = "primary" | "specifications" | "features";
-export type SRMTabsTypes = "customer" | "vehicle" | "payment";
+export type SRMTabsTypes = "vehicle" | "customer" | "payment" | "check-list";
+export type TabItemsTypes = {
+  value: SRMTabsTypes;
+  label: string;
+  subLabel: string;
+}[];
 
 export interface ApiError {
   response?: {

@@ -1,0 +1,45 @@
+name: Deploy to HostHatch
+
+on:
+  push:
+    branches:
+      - development
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy via SSH
+        run: |
+          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            set -e
+
+            # Go to repo folder and update code
+            cd /root/docker/ride-rent/ride_rent_agent
+            git fetch origin
+            git checkout development || git checkout -b development origin/development
+            git reset --hard origin/development
+
+            # Move back to central compose folder
+            cd ..
+
+            # Stop old container
+            docker compose down ride-rent-agent || true
+
+            # Build fresh image without cache
+            docker compose build --no-cache ride-rent-agent
+
+            # Start container in detached mode
+            docker compose up -d ride-rent-agent
+          EOF

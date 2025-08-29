@@ -13,28 +13,32 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, Plus } from "lucide-react";
 import { debounce } from "@/lib/utils";
 import { searchVehicle } from "@/api/srm";
 import { VehicleType } from "@/types/srm-types";
+import PreviewImageComponent from "../PreviewImageComponent";
+import { Link } from "react-router-dom";
 
-type VehicleSearchProps = {
+type VehicleSearchAndAutoFillProps = {
   value?: string;
-  onChangeHandler: (value: string, customerData?: any) => void;
+  onChangeHandler: (value: string, vehicleData?: any) => void;
   placeholder?: string;
+  isDisabled?: boolean;
 };
 
-const VehicleSearch = ({
+export default function VehicleSearchAndAutoFill({
   value,
   onChangeHandler,
   placeholder = "Search vehicle name...",
-}: VehicleSearchProps) => {
+  isDisabled = false,
+}: VehicleSearchAndAutoFillProps) {
   const [searchTerm, setSearchTerm] = useState(""); // Default to an empty string
   const [open, setOpen] = useState(false);
 
   // Fetch vehicle data based on the search term
   const { data, isFetching, refetch } = useQuery({
-    queryKey: ["searchVehicles", searchTerm],
+    queryKey: ["srm-vehicles", searchTerm],
     queryFn: () => searchVehicle(searchTerm),
     enabled: false, // Do not fetch initially
     staleTime: 0,
@@ -80,7 +84,7 @@ const VehicleSearch = ({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+      <PopoverTrigger asChild disabled={isDisabled}>
         <Button
           variant="outline"
           role="combobox"
@@ -114,41 +118,15 @@ const VehicleSearch = ({
                     }
                     className="border mb-1"
                   >
-                    <div className="flex flex-col">
-                      <span className="font-medium ">"{searchTerm}"</span>
-                    </div>
+                    <AddNewVehicle searchTerm={searchTerm} />
                   </CommandItem>
                 )}
                 {vehicleData.map((vehicle: VehicleType) => (
-                  <CommandItem
+                  <VehicleItem
                     key={vehicle.id}
-                    onSelect={() =>
-                      handleSelectVehicle(
-                        vehicle.vehicleRegistrationNumber,
-                        vehicle
-                      )
-                    }
-                    className="border mb-1"
-                  >
-                    <div className="flex h-12 gap-x-3">
-                      <div className="h-12 bg-slate-200 w-12 rounded-xl overflow-hidden">
-                        <img
-                          src={vehicle.vehiclePhoto}
-                          className="object-cover w-full h-full"
-                          alt={"vehicle logo"}
-                        />
-                      </div>
-                      <div className="flex flex-col justify-center">
-                        <span className="font-medium">
-                          {vehicle.vehicleRegistrationNumber}
-                        </span>
-
-                        <span className="text-sm text-gray-500">
-                          {vehicle.vehicleBrand.brandName || "N/A"}
-                        </span>
-                      </div>
-                    </div>
-                  </CommandItem>
+                    vehicle={vehicle}
+                    handleSelectVehicle={handleSelectVehicle}
+                  />
                 ))}
               </CommandGroup>
             ) : (
@@ -160,15 +138,8 @@ const VehicleSearch = ({
                 </CommandEmpty>
                 {searchTerm && (
                   <CommandGroup>
-                    <CommandItem
-                      key="manual-entry"
-                      onSelect={() =>
-                        handleSelectVehicle(searchTerm, {} as VehicleType)
-                      }
-                    >
-                      <div className="flex flex-col">
-                        <span className="font-medium">"{searchTerm}"</span>
-                      </div>
+                    <CommandItem key="manual-entry">
+                      <AddNewVehicle searchTerm={searchTerm} />
                     </CommandItem>
                   </CommandGroup>
                 )}
@@ -179,6 +150,57 @@ const VehicleSearch = ({
       </PopoverContent>
     </Popover>
   );
+}
+
+// individual vehicle box
+const VehicleItem = ({
+  vehicle,
+  handleSelectVehicle,
+}: {
+  vehicle: VehicleType;
+  handleSelectVehicle: (
+    vehicleRegistrationNumber: string,
+    vehicleData?: VehicleType
+  ) => void;
+}) => {
+  return (
+    <CommandItem
+      key={vehicle.id}
+      onSelect={() =>
+        handleSelectVehicle(vehicle.vehicleRegistrationNumber, vehicle)
+      }
+      className="border mb-1"
+    >
+      <div className="flex h-12 gap-x-3">
+        <div className="h-12 bg-slate-200 w-12 rounded-xl overflow-hidden">
+          <PreviewImageComponent imagePath={vehicle.vehiclePhoto} />
+        </div>
+        <div className="flex flex-col justify-center">
+          <span className="font-medium">
+            {vehicle.vehicleRegistrationNumber}
+          </span>
+
+          <span className="text-sm text-gray-500">
+            {vehicle.vehicleBrand.brandName || "N/A"}
+          </span>
+        </div>
+      </div>
+    </CommandItem>
+  );
 };
 
-export default VehicleSearch;
+// Add new vehicle Link
+const AddNewVehicle = ({ searchTerm }: { searchTerm: string }) => (
+  <Link
+    to={`/srm/manage-vehicles/add?from=srm&vehicleRegistrationNumber=${encodeURIComponent(
+      searchTerm
+    )}`}
+    className="flex items-center gap-x-2 h-12"
+  >
+    <div className="h-12  bg-slate-200 w-12 flex-center rounded-xl overflow-hidden">
+      <Plus />
+    </div>
+    Add new vehicle
+    <span className="font-medium italic">"{searchTerm}"</span>?
+  </Link>
+);

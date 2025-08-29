@@ -288,7 +288,9 @@ export function mapGetPrimaryFormToPrimaryFormType(
     vehicleBrandId: data.vehicleBrandId,
     vehicleModel: data.vehicleModel,
     vehiclePhotos: data.vehiclePhotos,
+    vehicleVideos: data.vehicleVideos,
     vehicleRegistrationNumber: data.vehicleRegistrationNumber,
+    isFancyNumber: data.isFancyNumber,
     vehicleRegisteredYear: data.vehicleRegisteredYear,
     commercialLicenses: data.commercialLicenses,
     commercialLicenseExpireDate: data.commercialLicenseExpireDate
@@ -297,7 +299,11 @@ export function mapGetPrimaryFormToPrimaryFormType(
     isLease: data.isLease,
     isCryptoAccepted: data.isCryptoAccepted,
     isSpotDeliverySupported: data.isSpotDeliverySupported,
-    specification: data.specification as "UAE_SPEC" | "USA_SPEC" | "OTHERS",
+    specification: data.specification as
+      | "India_SPEC"
+      | "UAE_SPEC"
+      | "USA_SPEC"
+      | "OTHERS",
     rentalDetails: data.rentalDetails,
     phoneNumber: formattedPhoneNumber, // Set the combined phone number
     stateId: data.stateId,
@@ -306,6 +312,9 @@ export function mapGetPrimaryFormToPrimaryFormType(
     securityDeposit: data.securityDeposit,
     isCreditOrDebitCardsSupported: data.isCreditOrDebitCardsSupported,
     isTabbySupported: data.isTabbySupported,
+    isCashSupported: data.isCashSupported,
+    isVehicleModified: data.isVehicleModified,
+    tempCitys: data.tempCitys || [],
   };
 }
 
@@ -379,57 +388,34 @@ interface SRMTabValidationProps {
   levelsFilled: number;
 }
 
-// srm tab validation
+/**
+ * Function to validate srm tab validation
+ * If vehicle tab is completed, allow free access to any tab
+ * Else, restrict access to all other tabs unless vehicle (level 1) is completed
+ */
 export const validateSRMTabAccess = ({
   tab,
   levelsFilled,
 }: SRMTabValidationProps): { canAccess: boolean; message: string } => {
-  if (tab === "customer" && levelsFilled > 0) {
+  // "vehicle" tab is always accessible
+  if (tab === "vehicle") {
+    if (levelsFilled < 1) {
+      return { canAccess: true, message: "" };
+    } else {
+      return { canAccess: false, message: "Vehicle Details already completed" };
+    }
+  }
+
+  // Restrict access to all other tabs unless vehicle (level 1) is completed
+  if (levelsFilled < 1) {
     return {
       canAccess: false,
-      message: "The Customer Details form is already completed.",
+      message: "Please complete the Vehicle Details to proceed.",
     };
   }
 
-  if (tab === "vehicle") {
-    if (levelsFilled >= 1 && levelsFilled < 2) {
-      return {
-        canAccess: true,
-        message: "",
-      }; // Access allowed
-    } else if (levelsFilled >= 2) {
-      return {
-        canAccess: false,
-        message: "The Vehicle Details  is already completed.",
-      };
-    } else {
-      return {
-        canAccess: false,
-        message: "Please complete the Customer Details  to proceed.",
-      };
-    }
-  }
-
-  if (tab === "payment") {
-    if (levelsFilled >= 2 && levelsFilled < 3) {
-      return {
-        canAccess: true,
-        message: "",
-      }; // Access allowed
-    } else if (levelsFilled === 3) {
-      return {
-        canAccess: false,
-        message: "The Payment details  is already completed.",
-      };
-    } else {
-      return {
-        canAccess: false,
-        message: "Please complete the Vehicle Details to proceed.",
-      };
-    }
-  }
-
-  return { canAccess: true, message: "" }; // Default case
+  // If vehicle is completed (levelsFilled >= 1), allow free access to any tab
+  return { canAccess: true, message: "" };
 };
 
 // Type guard to check if a value has the 'selected' property for specification form
@@ -447,7 +433,11 @@ export const downloadFileFromStream = async (
   fileName: string
 ) => {
   try {
-    const apiBaseUrl = import.meta.env.VITE_API_URL;
+    const appCountry = localStorage.getItem("appCountry") || "ae";
+    const apiBaseUrl =
+      appCountry === "in"
+        ? import.meta.env.VITE_API_URL_INDIA
+        : import.meta.env.VITE_API_URL_UAE;
     const url = `${apiBaseUrl}/file/stream?path=${imagePath}`; // Stream endpoint for download
 
     // Fetch the image stream from the backend API
@@ -535,4 +525,51 @@ export const validateRentalDetailsAndSecurityDeposit = (
   }
 
   return null;
+};
+
+// Priority mapping for Level 3 Form (Feature Form).
+// Here "key" is feature form field name  and the value array is the priority fields that should be first in the dropdown
+// NOTE : Key and Values should exactly match data from API
+const FeatureFormFieldsPriorityValues: Record<string, string[]> = {
+  "Comfort and Convenience": ["Spacious Interior", "Air Conditioning"],
+  "Luxury and Style": ["Alloy Wheels", "Ashtrays", "Cigarette Lighter"],
+};
+
+/**
+ * Helper function to reorder feature values based on priority map.
+ * Helps to ensure that certain values are displayed at the top of the form field array dropdown (whether its "selected" or not, it will appear on the top of their corresponding dropdown)
+ *
+ * @param features
+ * @returns
+ */
+export const reorderFeatureValues = (
+  features: FeaturesFormData[]
+): FeaturesFormData[] => {
+  return features.map((feature) => {
+    const priorities = FeatureFormFieldsPriorityValues[feature.name] ?? [];
+
+    const sortFn = (
+      a: (typeof feature.values)[0],
+      b: (typeof feature.values)[0]
+    ) => {
+      const aPriority = priorities.includes(a.name) ? 1 : 0;
+      const bPriority = priorities.includes(b.name) ? 1 : 0;
+
+      const aSelected = a.selected ? 1 : 0;
+      const bSelected = b.selected ? 1 : 0;
+
+      // Sort by selected first (desc), then priority (desc)
+      return bSelected - aSelected || bPriority - aPriority;
+    };
+
+    return {
+      ...feature,
+      values: [...feature.values].sort(sortFn),
+    };
+  });
+};
+
+// form submit button common class
+export const getFormGenericButtonClass = (className?: string) => {
+  return `flex-center button hover:bg-darkYellow active:scale-[0.97] duration-100 active:shadow-md transition-all  ease-out col-span-2 mx-auto w-full bg-yellow !text-lg !font-semibold md:w-10/12 lg:w-8/12 ${className}`;
 };

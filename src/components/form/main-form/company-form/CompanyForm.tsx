@@ -32,14 +32,17 @@ import { FormFieldLayout } from "../../form-ui/FormFieldLayout";
 import { FormSubmitButton } from "../../form-ui/FormSubmitButton";
 import EmailOtpVerification from "./EmailOtpVerification";
 import { FormContainer } from "../../form-ui/FormContainer";
+import LocationPicker from "../../LocationPicker";
 
 type CompanyRegistrationFormProps = {
+  country: string;
   type: "Add" | "Update";
   formData?: CompanyFormType | null;
   agentId: string;
 };
 
 export default function CompanyRegistrationForm({
+  country = "UAE",
   type,
   formData,
   agentId,
@@ -56,6 +59,8 @@ export default function CompanyRegistrationForm({
 
   const initialValues = CompanyFormDefaultValues;
 
+  const isIndia = country === "India" || country === "india";
+
   //  API call to check if email is verified
   const checkEmailVerification = useMutation({
     mutationFn: (variables: { email: string }) =>
@@ -63,14 +68,17 @@ export default function CompanyRegistrationForm({
   });
 
   // creating form
-  const form = useForm<z.infer<typeof CompanyFormSchema>>({
-    resolver: zodResolver(CompanyFormSchema),
+  const form = useForm<z.infer<ReturnType<typeof CompanyFormSchema>>>({
+    resolver: zodResolver(CompanyFormSchema(isIndia)),
     defaultValues: initialValues,
   });
 
-  async function onSubmit(values: z.infer<typeof CompanyFormSchema>) {
+  async function onSubmit(
+    values: z.infer<ReturnType<typeof CompanyFormSchema>>
+  ) {
     // Check if OTP is verified before submitting the form
     // 1️⃣ Before submitting, check if email is verified
+
     const { result } = await checkEmailVerification.mutateAsync({ email });
 
     if (!result.isEmailVerified) {
@@ -111,7 +119,7 @@ export default function CompanyRegistrationForm({
           title: `Company Added successfully`,
           className: "bg-yellow text-white",
         });
-        navigate("/listings");
+        navigate("/");
       }
     } catch (error) {
       console.error(error);
@@ -188,11 +196,15 @@ export default function CompanyRegistrationForm({
           render={({ field }) => (
             <SingleFileUpload
               name={field.name}
-              label="Commercial License"
+              label={isIndia ? "Registration Details" : "Commercial License"}
               description={
                 <>
                   Please upload a <strong>PHOTO</strong> or a{" "}
-                  <strong>SCREENSHOT</strong> of your commercial license,
+                  <strong>SCREENSHOT</strong> of your{" "}
+                  {isIndia
+                    ? `Company Registration / GST Registration / Trade License,`
+                    : `commercial license,
+                  `}{" "}
                   maximum file size 5MB.
                 </>
               }
@@ -220,7 +232,10 @@ export default function CompanyRegistrationForm({
               label="Expiry Date"
               description={
                 <span>
-                  Enter the expiry of your Commercial License/Trade License
+                  Enter the expiry of your{" "}
+                  {isIndia
+                    ? `Company Registration / GST Registration / Trade License`
+                    : "Commercial License/Trade License"}{" "}
                   &#40;DD/MM/YYYY&#41;.
                 </span>
               }
@@ -242,13 +257,23 @@ export default function CompanyRegistrationForm({
           name="regNumber"
           render={({ field }) => (
             <FormFieldLayout
-              label="Registration Number / Trade License Number"
-              description="Enter your company registration number. The number should be
-                    a combination of letters and numbers, without any spaces or
-                    special characters, up to 15 characters."
+              label={
+                isIndia
+                  ? "GST Number"
+                  : "Registration Number / Trade License Number"
+              }
+              description={
+                isIndia
+                  ? `Enter your company GST number. The number should be a combination of letters and numbers, without any spaces or special characters.`
+                  : `Enter your company registration number. The number should be a combination of letters and numbers, without any spaces or special characters, up to 15 characters.`
+              }
             >
               <Input
-                placeholder="Enter your company registration number"
+                placeholder={
+                  isIndia
+                    ? "Enter your company GST number"
+                    : "Enter your company registration number"
+                }
                 {...field}
                 className="input-field"
               />
@@ -268,9 +293,33 @@ export default function CompanyRegistrationForm({
                     page, helping customers feel comfortable with communication."
             >
               <CompanyLanguagesDropdown
+                isIndia={isIndia}
                 value={field.value}
                 onChangeHandler={field.onChange}
                 placeholder="Languages"
+              />
+            </FormFieldLayout>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormFieldLayout
+              label="Office Location"
+              description={
+                <span>
+                  Choose the GSP location where the company is registered or
+                  operates.
+                </span>
+              }
+            >
+              <LocationPicker
+                onChangeHandler={field.onChange}
+                initialLocation={field.value}
+                buttonText="Choose Location"
+                buttonClassName="w-full cursor-pointer bg-gray-100 border border-gray-300 rounded-lg px-4 py-2 text-sm text-gray-900"
               />
             </FormFieldLayout>
           )}

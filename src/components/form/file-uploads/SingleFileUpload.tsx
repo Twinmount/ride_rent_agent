@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Upload, Eye, Download, Trash2, MoreVertical } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
-import { uploadSingleFile } from "@/api/file-upload";
+import { uploadSingleFile, uploadSingleFilePublic } from "@/api/file-upload";
 import { GcsFilePaths } from "@/constants/enum";
 import {
   DropdownMenu,
@@ -47,6 +47,7 @@ type SingleFileUploadProps = {
   setDeletedImages: (deletedPaths: (prev: string[]) => string[]) => void;
   additionalClasses?: string;
   imageOnly?: boolean;
+  publicAuthToken?: string;
 };
 
 const SingleFileUpload = ({
@@ -63,6 +64,7 @@ const SingleFileUpload = ({
   setDeletedImages,
   additionalClasses,
   imageOnly = false,
+  publicAuthToken,
 }: SingleFileUploadProps) => {
   const { control, setValue, clearErrors } = useFormContext();
   const [isUploading, setIsUploading] = useState(false);
@@ -108,18 +110,37 @@ const SingleFileUpload = ({
       }
 
       setIsUploading(true);
+
+      let uploadResponse;
       try {
-        const uploadResponse = await uploadSingleFile(
-          bucketFilePath,
-          file,
-          (progressEvent) => {
-            if (progressEvent.total) {
-              const progress =
-                (progressEvent.loaded / progressEvent.total) * 100;
-              setProgress(progress);
+        // if there is a public token, upload the file using the public token
+        if (!!publicAuthToken) {
+          uploadResponse = await uploadSingleFilePublic(
+            bucketFilePath,
+            file,
+            publicAuthToken,
+            (progressEvent) => {
+              if (progressEvent.total) {
+                const progress =
+                  (progressEvent.loaded / progressEvent.total) * 100;
+                setProgress(progress);
+              }
             }
-          }
-        );
+          );
+        } else {
+          // else if there is no public token, upload the file regularly
+          uploadResponse = await uploadSingleFile(
+            bucketFilePath,
+            file,
+            (progressEvent) => {
+              if (progressEvent.total) {
+                const progress =
+                  (progressEvent.loaded / progressEvent.total) * 100;
+                setProgress(progress);
+              }
+            }
+          );
+        }
         const uploadedFilePath = uploadResponse.result.path;
 
         setValue(name, uploadedFilePath);
@@ -132,6 +153,8 @@ const SingleFileUpload = ({
           title: "File upload failed",
           description: "Please try again.",
         });
+        setImagePath(null); // Reset the internal state of the imagePath
+        setValue(name, null); // Ensure the form value is cleared
       } finally {
         setIsUploading(false);
         setProgress(0);
@@ -212,6 +235,7 @@ const SingleFileUpload = ({
                       <div className="relative w-24 group/box">
                         {/* Use PreviewImageComponent to handle image fetching */}
                         <PreviewImageComponent imagePath={imagePath} />
+
                         <div className="absolute top-0 right-0 bottom-0 left-0 space-x-2">
                           {!isDisabled && (
                             <DropdownMenu>
@@ -264,9 +288,17 @@ const SingleFileUpload = ({
                         htmlFor={`file-upload-${name}`}
                         className="flex relative justify-center w-24 cursor-pointer"
                       >
-                        <div className="flex flex-col justify-center items-center w-24 h-24 bg-gray-50 rounded-lg border cursor-pointer">
-                          <Upload size={24} className="text-yellow" />
-                          <span className="text-sm text-yellow">Upload</span>
+                        <div
+                          className={`flex flex-col justify-center items-center w-24 h-24 bg-gray-50 rounded-lg border cursor-pointer ${
+                            isDisabled
+                              ? "cursor-not-allowed text-gray-400"
+                              : "text-yellow"
+                          }`}
+                          // cursor disabled is isDisabled is true
+                          style={isDisabled ? { cursor: "not-allowed" } : {}}
+                        >
+                          <Upload size={24} />
+                          <span className="text-sm">Upload</span>
                         </div>
 
                         {/* progress bar */}

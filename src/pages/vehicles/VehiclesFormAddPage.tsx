@@ -35,12 +35,14 @@ export default function VehiclesFormAddPage() {
 
   // Fetch company data based on userId
   const { data: companyData, isLoading: isCompanyLoading } = useQuery({
-    queryKey: ["company"],
+    queryKey: ["company", userId],
     queryFn: () => getCompany(userId as string),
     enabled: !!userId,
   });
 
   const companyId = companyData?.result?.companyId;
+  const isIndia = companyData?.result?.countryName === "India";
+  const countryId = companyData?.result?.countryId || "";
 
   // fetching primary form data default values
   const { data, isLoading } = useQuery({
@@ -128,6 +130,8 @@ export default function VehiclesFormAddPage() {
                   type="Add"
                   formData={formData}
                   onNextTab={() => handleNextTab("specifications")}
+                  isIndia={isIndia}
+                  countryId={countryId}
                 />
               )}
             </Suspense>

@@ -1,11 +1,13 @@
 import { SingleVehicleType } from "@/types/API-types";
 import { Link } from "react-router-dom";
 import VehicleStatusOverlay from "../VehicleStatusOverlay";
-import { Share2 } from "lucide-react";
+import { AlertTriangle, Share2 } from "lucide-react";
 import { Switch } from "../ui/switch";
 import { generateModelDetailsUrl } from "@/helpers";
 import { toast } from "../ui/use-toast";
 import { useCompany } from "@/hooks/useCompany";
+import { useState } from "react";
+import { Dialog, DialogContent } from "../ui/dialog";
 
 type VehicleCardProps = {
   vehicle: SingleVehicleType;
@@ -19,6 +21,7 @@ export default function VehicleCard({
   isUpdating,
 }: VehicleCardProps) {
   const { userId, companyId } = useCompany();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const handleShare = (vehicle: SingleVehicleType) => {
     const modelDetails = generateModelDetailsUrl(vehicle);
@@ -73,11 +76,10 @@ export default function VehicleCard({
         </Link>
         <div className="flex justify-between items-center mt-2">
           <button
-            className={`text-black ${
-              vehicle.approvalStatus !== "APPROVED"
-                ? "cursor-not-allowed text-gray-600"
-                : "hover:text-yellow"
-            }`}
+            className={`text-black ${vehicle.approvalStatus !== "APPROVED"
+              ? "cursor-not-allowed text-gray-600"
+              : "hover:text-yellow"
+              }`}
             onClick={() => handleShare(vehicle)}
             disabled={vehicle.approvalStatus !== "APPROVED"}
           >
@@ -94,7 +96,38 @@ export default function VehicleCard({
             }
           />
         </div>
+        {vehicle.isPriceHigh && (
+          <div className="mt-3 px-2 py-2 bg-orange-100 border border-orange-300 rounded-md flex items-center justify-between cursor-pointer" onClick={() => setIsDialogOpen(true)}>
+            {/* Left side: warning icon + text */}
+            <div className="flex items-center gap-2">
+              <AlertTriangle size={15} className="text-orange-600 flex-shrink-0" />
+              <div>
+                <p className="text-[0.7rem] font-medium text-orange-700">Price&nbsp;Recommendation</p>
+                <p className="text-[0.6rem] text-orange-600">Low/No bookings expected.</p>
+              </div>
+            </div>
+
+            {/* Right side: info icon to open popup */}
+            {/* <div className="flex items-start">
+              <Info
+                size={10}
+                className="text-gray-500 cursor-pointer hover:text-gray-700"
+                onClick={() => setIsDialogOpen(true)}
+              />
+            </div> */}
+          </div>
+        )}
       </div>
+      {isDialogOpen && (
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent>
+            <h2 className="text-lg font-semibold">Booking Boost Pricing Tool</h2>
+            <p className="mt-2 text-sm">
+              Our system suggests that this vehicle is priced higher than market rates, which may reduce your chances of receiving bookings.
+            </p>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
