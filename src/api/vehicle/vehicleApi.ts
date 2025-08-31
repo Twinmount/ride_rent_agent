@@ -9,6 +9,7 @@ import {
   GetPrimaryFormResponse,
   GetSpecificationFormDataResponse,
   GetSpecificationFormFieldsResponse,
+  GetVehicleResponse,
 } from "@/types/API-types";
 import { ApprovalStatusTypes, PrimaryFormType } from "@/types/types";
 import { extractPhoneNumber } from "@/helpers/form";
@@ -255,7 +256,7 @@ export const getSpecificationFormData = async (
   }
 };
 
-// add specification form data type
+// add specification form item type
 type SpecificationItem = {
   name: string;
   value: string;
@@ -514,3 +515,75 @@ export const getLevelsFilled = async (
     throw error;
   }
 };
+
+export async function fetchAgentVehicles(userId: string, token: string): Promise<GetVehicleResponse[]> {
+  try {
+    const response = await fetch(`/vehicle/listed/all?userId=${encodeURIComponent(userId)}`, {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("API Response status:", response.status);
+    const data = await response.json();
+    console.log("API Response data:", data);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch vehicles: ${response.statusText}`);
+    }
+    // Adjust this line if your backend returns a different key
+    return data.vehicles || [];
+  } catch (error) {
+    console.error("Error fetching agent vehicles:", error);
+    throw error;
+  }
+}
+
+export const bulkUpdateRatesFromFile = async (file: File) => {
+  try {
+    const formData = new FormData();
+    // 'file' must match the key in the @UseInterceptors(FileInterceptor('file')) on the backend
+    formData.append('file', file);
+
+    const data = await API.post({
+      slug: '/vehicle/bulk-update-rates',
+      body: formData,
+      axiosConfig: {
+        headers: {
+          // This header is crucial for file uploads
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    });
+
+    if (!data) {
+      throw new Error("Failed to get response from bulk update");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on bulk vehicle update:", error);
+    throw error;
+  }
+};
+
+export const downloadRatesTemplate = async () => {
+  try {
+    // We use a different API call here to handle the file blob response
+    const response = await API.get<Blob>({
+      slug: '/vehicle/download-rates-template',
+      axiosConfig: {
+        responseType: 'blob', // This is crucial for file downloads
+      },
+    });
+
+    if (!response) {
+      throw new Error("Failed to download the template file.");
+    }
+    return response;
+  } catch (error) {
+    console.error("Error downloading template:", error);
+    throw error;
+  }
+};
+

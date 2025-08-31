@@ -28,5 +28,9 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "hooks", "src/pages/vehicles/asfs/.tsx"]
+  "include": [
+    "src",
+    "hooks",
+    "src/pages/vehicles/asfs/.tsx"
+  ]
 }

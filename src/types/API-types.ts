@@ -288,24 +288,20 @@ export interface CityType {
   cityValue: string;
 }
 
-// type fo rental details
-export type RentalDetailsType = {
-  day: {
-    enabled: boolean;
-    rentInAED: string;
-    mileageLimit: string;
-  };
-  week: {
-    enabled: boolean;
-    rentInAED: string;
-    mileageLimit: string;
-  };
-  month: {
-    enabled: boolean;
-    rentInAED: string;
-    mileageLimit: string;
-  };
+// Define allowed rental periods
+export type RentalPeriod = "day" | "week" | "month";
+// later you can extend: "hour" | "year"
+
+// Generic rental info structure
+export type RentalInfo = {
+  enabled: boolean;
+  rentInAED: string;
+  mileageLimit: string;
 };
+
+// Final type - reusable & extensible
+export type RentalDetailsType = Record<RentalPeriod, RentalInfo>;
+
 
 // Interface for the Primary Form (POST) API response
 export interface AddPrimaryFormResponse {
@@ -512,6 +508,31 @@ export type CompanyType = {
   expireDate: string;
 };
 
+// Rental entry
+export type RentalType = {
+  type: "Daily" | "Weekly" | "Monthly";
+  mileage: number;
+  rate: number;
+  discount: number;
+  recurring: boolean;
+  weekdays: string[];
+  isDiscountActive: boolean;
+};
+
+// Bulk discount
+export type BulkDiscountType = {
+  _id?: string;
+  companyId?: string;
+  dailyDiscount: number;
+  weeklyDiscount: number;
+  monthlyDiscount: number;
+  applicableDays: string[];
+  isRecurring: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+};
+
 // Vehicle Type
 export type SingleVehicleType = {
   vehicleId: string;
@@ -549,10 +570,17 @@ export type SingleVehicleType = {
   isPriceHigh?: boolean;
 };
 
-// get all vehicles api response
+export type RateManagerVehicleType = SingleVehicleType & {
+  hasManualOverride?: boolean;
+  rentals?: RentalType[];
+  bulkDiscount?: BulkDiscountType;
+};
+
+export type GetVehicleResponse = RateManagerVehicleType;
+// Get all vehicles API response
 export interface FetchAllVehiclesResponse {
   result: {
-    list: SingleVehicleType[]; // Adjusted to match the nested structure
+    list: SingleVehicleType[];
     page: number;
     limit: number;
     total: number;
@@ -561,6 +589,7 @@ export interface FetchAllVehiclesResponse {
   status: string;
   statusCode: number;
 }
+
 
 //  response for dashboard enquiries and portfolios response
 export interface FetchDashboardResponse {
