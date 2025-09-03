@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -22,10 +22,11 @@ import Spinner from "@/components/general/Spinner";
 import { toast } from "@/components/ui/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { resendOTP, verifyOTP } from "@/api/auth";
-import { save, StorageKeys } from "@/utils/storage";
+// import { save, StorageKeys } from "@/utils/storage";
 
 const OTPPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [timer, setTimer] = useState(60);
 
   const form = useForm<z.infer<typeof OTPFormSchema>>({
@@ -100,14 +101,15 @@ const OTPPage = () => {
 
       if (data) {
         sessionStorage.clear();
-        save(StorageKeys.ACCESS_TOKEN, data.result.token);
-        save(StorageKeys.REFRESH_TOKEN, data.result.refreshToken);
-        save(StorageKeys.USER_ID, data.result.userId);
+        // save(StorageKeys.ACCESS_TOKEN, data.result.token);
+        // save(StorageKeys.REFRESH_TOKEN, data.result.refreshToken);
+        // save(StorageKeys.USER_ID, data.result.userId);
         toast({
-          title: "Your account is created successfully!.",
+          title: "Your account is created successfully!. Please login.",
           className: "bg-yellow text-white",
         });
-        navigate("/");
+        let link = searchParams.get("country") || "ae";
+        navigate(`/${link}/login`);
       }
     } catch (error: any) {
       if (error.response && error.response.status === 400) {
@@ -190,9 +192,8 @@ const OTPPage = () => {
               <Button
                 onClick={() => resendOTPMutation()}
                 disabled={isPending || timer > 0}
-                className={`bg-transparent hover:bg-transparent w-fit h-fit text-yellow ${
-                  isPending || (timer > 0 && "text-black")
-                }`}
+                className={`bg-transparent hover:bg-transparent w-fit h-fit text-yellow ${isPending || (timer > 0 && "text-black")
+                  }`}
               >
                 {timer > 0 ? `Resend otp in ${timer} seconds` : "Resend otp"}
               </Button>
