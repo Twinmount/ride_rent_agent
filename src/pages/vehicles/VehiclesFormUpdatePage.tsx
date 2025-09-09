@@ -69,11 +69,11 @@ export default function VehiclesFormUpdatePage() {
     ? parseInt(levelsData.result.levelsFilled, 10)
     : 1;
 
-  const isAddOrIncompleteSpecifications = levelsFilled < 2; // true if only level 1 is filled
+  const isAddOrIncompleteSpecifications = levelsFilled < 2;
   const isAddOrIncompleteFeatures = levelsFilled < 3;
 
   const formData = data
-    ? mapGetPrimaryFormToPrimaryFormType(data.result)
+    ? mapGetPrimaryFormToPrimaryFormType(data.result, isIndia)
     : null;
 
   const vehicleCategoryId = data?.result?.vehicleCategoryId;

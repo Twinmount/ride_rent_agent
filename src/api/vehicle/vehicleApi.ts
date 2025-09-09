@@ -11,6 +11,7 @@ import {
   GetSpecificationFormFieldsResponse,
 } from "@/types/API-types";
 import { ApprovalStatusTypes, PrimaryFormType } from "@/types/types";
+import { extractPhoneNumber } from "@/helpers/form";
 
 export const addPrimaryDetailsForm = async (
   values: PrimaryFormType,
@@ -20,9 +21,7 @@ export const addPrimaryDetailsForm = async (
 ): Promise<AddPrimaryFormResponse> => {
   try {
     // Extracting phone number and country code
-    const phoneNumber = values.phoneNumber
-      .replace(`+${countryCode}`, "")
-      .trim();
+    const phoneNumber = extractPhoneNumber(values.phoneNumber, countryCode);
 
     // Prepare the request body as a regular object (no FormData)
     const requestBody: Record<string, any> = {
@@ -92,9 +91,7 @@ export const updatePrimaryDetailsForm = async (
 ): Promise<AddPrimaryFormResponse> => {
   try {
     // Extracting phone number and country code
-    const phoneNumber = values.phoneNumber
-      .replace(`+${countryCode}`, "")
-      .trim();
+    const phoneNumber = extractPhoneNumber(values.phoneNumber, countryCode);
 
     // Prepare the request body as a regular object (no FormData)
     const requestBody: Record<string, any> = {
