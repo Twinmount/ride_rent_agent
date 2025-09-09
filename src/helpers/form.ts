@@ -276,10 +276,21 @@ export function formatSpecifications(
  * @returns {PrimaryFormType} The transformed data that conforms to the `PrimaryFormType`, ready to be used in the form.
  */
 export function mapGetPrimaryFormToPrimaryFormType(
-  data: GetPrimaryForm
+  data: GetPrimaryForm,
+  isIndia: boolean
 ): PrimaryFormType {
   // Combine countryCode and phoneNumber into a single phoneNumber string
-  const formattedPhoneNumber = `+${data.countryCode}${data.phoneNumber}`;
+  const isPhoneNumberExist = data.countryCode && data.phoneNumber;
+  const countryCode =
+    data?.countryCode && data?.countryCode.startsWith("+")
+      ? data.countryCode
+      : `+${data.countryCode}`;
+
+  const formattedPhoneNumber = isPhoneNumberExist
+    ? `${countryCode}${data.phoneNumber}`
+    : isIndia
+    ? "+91"
+    : "+971";
 
   return {
     vehicleId: data.vehicleId,
@@ -572,4 +583,17 @@ export const reorderFeatureValues = (
 // form submit button common class
 export const getFormGenericButtonClass = (className?: string) => {
   return `flex-center button hover:bg-darkYellow active:scale-[0.97] duration-100 active:shadow-md transition-all  ease-out col-span-2 mx-auto w-full bg-yellow !text-lg !font-semibold md:w-10/12 lg:w-8/12 ${className}`;
+};
+
+/**
+ * Extract a phone number from a full phone number string by removing the country code and trimming any remaining whitespace.
+ */
+export const extractPhoneNumber = (
+  fullPhoneNumber: string,
+  countryCode: string
+): string => {
+  const cleanCountryCode = countryCode.startsWith("+")
+    ? countryCode
+    : `+${countryCode}`;
+  return fullPhoneNumber.replace(cleanCountryCode, "").trim();
 };
