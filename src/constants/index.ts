@@ -153,7 +153,8 @@ export const LoginPageDefaultValues = {
 
 // primary details form default values
 export const getPrimaryFormDefaultValues = (
-  isIndia: boolean
+  isIndia: boolean,
+  countryCode: string
 ): PrimaryFormType => ({
   vehicleCategoryId: "",
   vehicleTypeId: "",
@@ -197,7 +198,7 @@ export const getPrimaryFormDefaultValues = (
       unlimitedMileage: false,
     },
   },
-  phoneNumber: "",
+  phoneNumber: countryCode.startsWith("+") ? countryCode : `+${countryCode}`,
   stateId: "", //required
   cityIds: [], //required
   additionalVehicleTypes: [],
