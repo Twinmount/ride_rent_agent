@@ -497,8 +497,8 @@ export default function PrimaryDetailsForm({
           name="isFancyNumber"
           render={({ field }) => (
             <FormFieldLayout
-              label="Lease?"
-              description="Select if this vehicle is available for lease."
+              label="Fancy Number?"
+              description="Select if the vehicle has a fancy number."
             >
               <FormCheckbox
                 id="isFancyNumber"
