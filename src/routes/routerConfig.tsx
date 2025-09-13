@@ -4,7 +4,6 @@ import ErrorPage from "../pages/ErrorPage";
 import ProtectedRoute from "../layout/ProtectedRoutes";
 import { publicRoutes } from "./publicRoutes";
 import { protectedRoutes } from "./protected-routes";
-import RateManager from "../pages/RateManager/RateManager";
 
 export const router: ReturnType<typeof createBrowserRouter> =
   createBrowserRouter([
@@ -18,13 +17,7 @@ export const router: ReturnType<typeof createBrowserRouter> =
           children: [
             {
               element: <Layout />,
-              children: [
-                ...protectedRoutes,
-                {
-                  path: "/rate-manager",
-                  element: <RateManager />,
-                },
-              ],
+              children: protectedRoutes,
             },
           ],
         },

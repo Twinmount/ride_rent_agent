@@ -1,9 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getBulkDiscount, updateBulkDiscount, BulkDiscountData } from '../api/rateManager';
-import { toast } from 'react-hot-toast';
+import { toast as baseToast } from "@/components/ui/use-toast";
 import { useCompany } from './useCompany'; // Import useCompany to get the userId
 
 const BULK_DISCOUNT_QUERY_KEY = 'bulkDiscountSettings';
+
+// ✅ Extend toast with success/error helpers (local only)
+const toast = Object.assign(baseToast, {
+  success: (message: string) =>
+    baseToast({
+      title: "Success",
+      description: message,
+      variant: "default",
+    }),
+  error: (message: string) =>
+    baseToast({
+      title: "Error",
+      description: message,
+      variant: "destructive",
+    }),
+});
 
 /**
  * Custom hook to manage fetching and updating bulk discount data.
@@ -12,7 +28,7 @@ export const useBulkDiscounts = () => {
   const queryClient = useQueryClient();
   const { userId } = useCompany(); // Get the logged-in user's ID
 
-  // ✅ MODIFIED: Fetches data only when we have a userId.
+  // ✅ Fetches data only when we have a userId.
   const { 
     data: discountData, 
     isLoading, 
@@ -29,19 +45,13 @@ export const useBulkDiscounts = () => {
   } = useMutation({
     mutationFn: (updatedData: Partial<BulkDiscountData>) => updateBulkDiscount(updatedData),
     
-    // ✅ MODIFIED: We go back to invalidating the query.
-    // Since the GET endpoint now returns the correct data, this is the best approach.
     onSuccess: (data) => {
-  // data should be the saved BulkDiscountData
-  toast.success('Discounts updated successfully!');
-  queryClient.setQueryData([BULK_DISCOUNT_QUERY_KEY, userId], data);
-  // optionally still refetch:
-  queryClient.invalidateQueries({ queryKey: [BULK_DISCOUNT_QUERY_KEY, userId] });
-},
+      toast.success('Discounts updated successfully!');
+      queryClient.setQueryData([BULK_DISCOUNT_QUERY_KEY, userId], data);
+      queryClient.invalidateQueries({ queryKey: [BULK_DISCOUNT_QUERY_KEY, userId] });
+    },
 
-    
-    // ✅ MODIFIED: Fixed the TypeScript warning by renaming unused parameters with an underscore.
-    onError: (error, _variables, _context) => {
+    onError: (error: any, _variables, _context) => {
       toast.error(`Failed to update discounts: ${error.message}`);
     },
   });

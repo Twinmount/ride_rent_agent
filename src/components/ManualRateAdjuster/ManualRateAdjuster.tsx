@@ -1,18 +1,15 @@
-// ====================================================================
-// FRONTEND: ManualRateAdjuster.tsx - CORRECTED VERSION
-// ====================================================================
 
 import React, { useRef, useState, useEffect } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { API } from "@/api/ApiService";
 import { downloadRatesTemplate } from "@/api/vehicle";
 import RateManagerCard from "./RateManagerCard";
 import * as XLSX from "xlsx";
 import SuccessModal from "@/components/modal/SuccessModal";
-import { Dialog } from "@/components/ui/dialog"; // If you use a dialog/modal component
-import { Loader2 } from "lucide-react"; // Add spinner icon
+import { Dialog } from "@/components/ui/dialog"; 
+import { Loader2 } from "lucide-react"; 
 
 type Car = {
   id: string;
@@ -387,6 +384,7 @@ export default function ManualRateAdjuster({ cars, refetch }: ManualRateAdjuster
   const [bulkLoading, setBulkLoading] = useState(false); // NEW: Bulk update loading state
   const [lastSubmitSuccess, setLastSubmitSuccess] = useState(false);
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   useEffect(() => {
     if (!modalOpen && lastSubmitSuccess) {
@@ -420,6 +418,7 @@ export default function ManualRateAdjuster({ cars, refetch }: ManualRateAdjuster
   };
 
   const handleBulkUpdate = async (file: File | null) => {
+    const { toast } = useToast();
     if (!file) {
       toast({ title: "No file selected", description: "Please upload an Excel file.", variant: "destructive" });
       return;

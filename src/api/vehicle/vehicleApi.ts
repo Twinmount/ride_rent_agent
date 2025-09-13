@@ -256,7 +256,7 @@ export const getSpecificationFormData = async (
   }
 };
 
-// add specification form item type
+// add specification form data type
 type SpecificationItem = {
   name: string;
   value: string;
@@ -378,7 +378,7 @@ type FeatureItem = {
 
 // add features form function
 type AddFeaturesRequestBody = {
-  features: Record<string, FeatureItem[]>; // Dynamic keys for features, each key contains an array of selected features
+  features: Record<string, FeatureItem[]>; // Dynamic keys for features, each key contains an array of selected features 
   userId: string;
   vehicleId: string;
   vehicleCategoryId: string;
@@ -525,13 +525,13 @@ export async function fetchAgentVehicles(userId: string, token: string): Promise
         "Content-Type": "application/json",
       },
     });
+
     console.log("API Response status:", response.status);
     const data = await response.json();
     console.log("API Response data:", data);
     if (!response.ok) {
       throw new Error(`Failed to fetch vehicles: ${response.statusText}`);
     }
-    // Adjust this line if your backend returns a different key
     return data.vehicles || [];
   } catch (error) {
     console.error("Error fetching agent vehicles:", error);
@@ -550,7 +550,6 @@ export const bulkUpdateRatesFromFile = async (file: File) => {
       body: formData,
       axiosConfig: {
         headers: {
-          // This header is crucial for file uploads
           'Content-Type': 'multipart/form-data',
         },
       },
@@ -569,11 +568,11 @@ export const bulkUpdateRatesFromFile = async (file: File) => {
 
 export const downloadRatesTemplate = async () => {
   try {
-    // We use a different API call here to handle the file blob response
     const response = await API.get<Blob>({
       slug: '/vehicle/download-rates-template',
       axiosConfig: {
-        responseType: 'blob', // This is crucial for file downloads
+        responseType: 'blob',
+        timeout: 10000,
       },
     });
 

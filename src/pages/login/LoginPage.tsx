@@ -139,9 +139,6 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
       ? "/assets/img/bg/india.webp"
       : "/assets/img/bg/uae.webp";
 
-  console.log("API BASE URL:", API.config.baseURL);
-  console.log("LOGIN SLUG:", Slug.LOGIN);
-
   return (
     <>
       <section

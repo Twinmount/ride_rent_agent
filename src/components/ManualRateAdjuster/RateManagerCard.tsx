@@ -4,7 +4,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { API } from "@/api/ApiService";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAgentContext } from "@/context/AgentContext";
 
@@ -108,6 +108,7 @@ export default function RateManagerCard({ car, refetch }: { car: any, refetch: a
   const [currency] = useState(defaultCurrency); // Make currency read-only
   const queryClient = useQueryClient();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const defaultRentalState = { rate: 0, discount: 0, recurring: false, selectedDays: [], mileage: 0 };
   const [dailyError, setDailyError] = useState<string | null>(null);

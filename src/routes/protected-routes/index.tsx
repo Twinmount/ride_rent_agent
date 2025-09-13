@@ -22,6 +22,8 @@ const ProfileUpdatePage = lazy(
   () => import("../../pages/profile/ProfileUpdatePage")
 );
 
+const RateManager = lazy(() => import("../../pages/RateManager/RateManager"));
+
 /*
  * These routes are protected routes and intended to be accessed only by authenticated users
  */
@@ -44,6 +46,10 @@ export const protectedRoutes = [
   {
     path: "/enquiries",
     element: <AgentTableView />,
+  },
+  {
+    path: "/rate-manager",
+    element: <RateManager />
   },
 
   //  These SRM routes are always accessible (not wrapped by SRMConditionalWrapper)

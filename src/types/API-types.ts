@@ -288,20 +288,24 @@ export interface CityType {
   cityValue: string;
 }
 
-// Define allowed rental periods
-export type RentalPeriod = "day" | "week" | "month";
-// later you can extend: "hour" | "year"
-
-// Generic rental info structure
-export type RentalInfo = {
-  enabled: boolean;
-  rentInAED: string;
-  mileageLimit: string;
+// type fo rental details
+export type RentalDetailsType = {
+  day: {
+    enabled: boolean;
+    rentInAED: string;
+    mileageLimit: string;
+  };
+  week: {
+    enabled: boolean;
+    rentInAED: string;
+    mileageLimit: string;
+  };
+  month: {
+    enabled: boolean;
+    rentInAED: string;
+    mileageLimit: string;
+  };
 };
-
-// Final type - reusable & extensible
-export type RentalDetailsType = Record<RentalPeriod, RentalInfo>;
-
 
 // Interface for the Primary Form (POST) API response
 export interface AddPrimaryFormResponse {

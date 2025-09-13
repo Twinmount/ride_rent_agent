@@ -1,8 +1,6 @@
 import { API } from "./ApiService";
 import { Slug } from "./Api-Endpoints";
 
-// Define a TypeScript interface for the data structure.
-// This matches your backend Mongoose schema.
 export interface BulkDiscountData {
   dailyDiscount: number;
   weeklyDiscount: number;
@@ -12,9 +10,6 @@ export interface BulkDiscountData {
   _id?: string;
 }
 
-/**
- * Fetches the current bulk discount settings using the central ApiService.
- */
 export const getBulkDiscount = async (): Promise<BulkDiscountData> => {
   const res = await API.get<{ status: string; result: BulkDiscountData }>({
     slug: Slug.BULK_DISCOUNTS,

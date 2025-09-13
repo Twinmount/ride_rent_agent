@@ -96,8 +96,6 @@ export class ApiService {
         return Promise.reject(error);
       }
     );
-
-    console.log("API BASE URL:", this.config.baseURL);
   }
 
   public async get<T>({
