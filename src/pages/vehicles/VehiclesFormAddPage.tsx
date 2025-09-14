@@ -53,7 +53,7 @@ export default function VehiclesFormAddPage() {
   });
 
   const formData = data
-    ? mapGetPrimaryFormToPrimaryFormType(data.result)
+    ? mapGetPrimaryFormToPrimaryFormType(data.result, isIndia)
     : null;
 
   // Handle tab change based on levelsFilled state
@@ -132,6 +132,7 @@ export default function VehiclesFormAddPage() {
                   onNextTab={() => handleNextTab("specifications")}
                   isIndia={isIndia}
                   countryId={countryId}
+                  initialCountryCode={isIndia ? "+91" : "+971"}
                 />
               )}
             </Suspense>
