@@ -60,7 +60,9 @@ const fetchEnquiriesApi = async (
   }
 
   const response = await axios.get<EnquiryApiResponse>(
-    `${DEFAULT_API_CONFIG.baseURL}/enquiries/agent/${agentId}?${queryParams.toString()}`
+    `${
+      DEFAULT_API_CONFIG.baseURL
+    }/enquiries/agent/${agentId}?${queryParams.toString()}`
   );
 
   if (response.data?.result && Array.isArray(response.data.result.list)) {
@@ -104,11 +106,13 @@ const updateEnquiryStatusApi = async ({
   }
 
   const response = await axios.patch(
-    `${DEFAULT_API_CONFIG.baseURL}/enquiries/${enquiryId}/status?${queryParams.toString()}`,
+    `${
+      DEFAULT_API_CONFIG.baseURL
+    }/enquiries/${enquiryId}/status?${queryParams.toString()}`,
     body,
     {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     }
   );
@@ -139,11 +143,13 @@ const cancelEnquiryApi = async ({
   }
 
   const response = await axios.patch(
-    `${DEFAULT_API_CONFIG.baseURL}/enquiries/${enquiryId}/status?${queryParams.toString()}`,
+    `${
+      DEFAULT_API_CONFIG.baseURL
+    }/enquiries/${enquiryId}/status?${queryParams.toString()}`,
     body,
     {
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     }
   );
@@ -184,15 +190,19 @@ export const useUpdateEnquiryStatus = () => {
   return useMutation({
     mutationFn: updateEnquiryStatusApi,
     onSuccess: (data) => {
-      // Invalidate and refetch enquiries for this agent
+      // Invalidate all enquiry list queries for this agent
       queryClient.invalidateQueries({
-        queryKey: [...enquiryKeys.lists(), data.agentId],
+        queryKey: enquiryKeys.lists(),
+        predicate: (query) => {
+          const [, , agentId] = query.queryKey;
+          return agentId === data.agentId;
+        },
       });
 
-      // You could also optimistically update the cache here
-      // queryClient.setQueryData(enquiryKeys.list(variables.agentId), (oldData) => {
-      //   // Update the specific enquiry status in the cached data
-      // });
+      // Also invalidate the general enquiry lists
+      queryClient.invalidateQueries({
+        queryKey: enquiryKeys.lists(),
+      });
     },
     onError: (error) => {
       console.error("Failed to update enquiry status:", error);
@@ -207,9 +217,18 @@ export const useDeleteEnquiry = () => {
   return useMutation({
     mutationFn: cancelEnquiryApi,
     onSuccess: (data) => {
-      // Invalidate and refetch enquiries
+      // Invalidate all enquiry list queries for this agent
       queryClient.invalidateQueries({
-        queryKey: [...enquiryKeys.lists(), data.agentId],
+        queryKey: enquiryKeys.lists(),
+        predicate: (query) => {
+          const [, , agentId] = query.queryKey;
+          return agentId === data.agentId;
+        },
+      });
+
+      // Also invalidate the general enquiry lists
+      queryClient.invalidateQueries({
+        queryKey: enquiryKeys.lists(),
       });
     },
     onError: (error) => {
