@@ -98,4 +98,8 @@ export const publicRoutes = [
     path: "/srm/customer-details/public/success",
     element: <PublicCustomerSuccessPage />,
   },
+  {
+    path: "/enquiries",
+    element: <PublicCustomerSuccessPage />,
+  },
 ];
