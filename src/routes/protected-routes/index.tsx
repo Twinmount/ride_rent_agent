@@ -1,6 +1,7 @@
 import { SRMConditionalWrapper } from "@/hoc/SRMConditionalWrapper";
 import { lazy } from "react";
 import { srmOnboardingRoutes, srmPostOnboardingRoutes } from "./srm-routes";
+import AgentTableView from "@/pages/enquiry/EnquiryPage";
 
 // vehicle  pages
 const VehiclesFormAddPage = lazy(
@@ -39,6 +40,10 @@ export const protectedRoutes = [
   {
     path: "/listings/view/:vehicleId/:companyId/:userId",
     element: <VehiclesFormUpdatePage />,
+  },
+  {
+    path: "/enquiries",
+    element: <AgentTableView />,
   },
 
   //  These SRM routes are always accessible (not wrapped by SRMConditionalWrapper)
