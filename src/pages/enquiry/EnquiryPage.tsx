@@ -176,23 +176,6 @@ export default function AgentTableView() {
     }
   };
 
-  const getPriorityBadge = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return <Badge className="bg-accent text-accent-foreground">High</Badge>;
-      case "medium":
-        return (
-          <Badge variant="outline" className="border-primary text-primary">
-            Medium
-          </Badge>
-        );
-      case "low":
-        return <Badge variant="outline">Low</Badge>;
-      default:
-        return null;
-    }
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <div className="flex">
@@ -422,7 +405,6 @@ export default function AgentTableView() {
                     <TableHead>Customer</TableHead>
                     <TableHead>Booking Details</TableHead>
                     <TableHead>Status</TableHead>
-                    <TableHead>Priority</TableHead>
                     <TableHead>Enquiry Date</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -430,7 +412,7 @@ export default function AgentTableView() {
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8">
+                      <TableCell colSpan={7} className="text-center py-8">
                         <div className="flex items-center justify-center gap-2">
                           <Loader2 className="h-5 w-5 animate-spin" />
                           <span>Loading enquiries...</span>
@@ -439,7 +421,7 @@ export default function AgentTableView() {
                     </TableRow>
                   ) : filteredEnquiries.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={8} className="text-center py-8">
+                      <TableCell colSpan={7} className="text-center py-8">
                         <div className="text-muted-foreground">
                           {enquiries.length === 0
                             ? "No enquiries found"
@@ -531,11 +513,6 @@ export default function AgentTableView() {
 
                         {/* Status */}
                         <TableCell>{getStatusBadge(enquiry.status)}</TableCell>
-
-                        {/* Priority */}
-                        <TableCell>
-                          {getPriorityBadge(enquiry.priority)}
-                        </TableCell>
 
                         {/* Enquiry Date */}
                         <TableCell className="text-sm text-muted-foreground">

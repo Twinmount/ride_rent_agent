@@ -24,7 +24,6 @@ export interface TransformedEnquiry {
   };
   status: string;
   enquiryDate: string;
-  priority: string;
 }
 
 export interface ApiEnquiry {
@@ -36,6 +35,10 @@ export interface ApiEnquiry {
   status: string;
   rentalStartDate: string;
   rentalEndDate: string;
+  name: string;
+  phone: string;
+  email: string;
+  isMasked?: boolean;
   createdAt: string;
   updatedAt: string;
   version: number;
@@ -70,10 +73,31 @@ export interface ApiEnquiry {
     vehicleRegistrationNumber: string;
     vehicleSpefication: string;
     rentalDetails: {
-      day?: { enabled: boolean; rentInAED: string; mileageLimit?: string; unlimitedMileage?: boolean };
-      week?: { enabled: boolean; rentInAED: string; mileageLimit?: string; unlimitedMileage?: boolean };
-      month?: { enabled: boolean; rentInAED: string; mileageLimit?: string; unlimitedMileage?: boolean };
-      hour?: { enabled: boolean; rentInAED: string; mileageLimit?: string; unlimitedMileage?: boolean; minBookingHours?: string };
+      day?: {
+        enabled: boolean;
+        rentInAED: string;
+        mileageLimit?: string;
+        unlimitedMileage?: boolean;
+      };
+      week?: {
+        enabled: boolean;
+        rentInAED: string;
+        mileageLimit?: string;
+        unlimitedMileage?: boolean;
+      };
+      month?: {
+        enabled: boolean;
+        rentInAED: string;
+        mileageLimit?: string;
+        unlimitedMileage?: boolean;
+      };
+      hour?: {
+        enabled: boolean;
+        rentInAED: string;
+        mileageLimit?: string;
+        unlimitedMileage?: boolean;
+        minBookingHours?: string;
+      };
     };
     levelsFilled: number;
     companyId: string;
@@ -117,12 +141,16 @@ export interface ApiEnquiry {
   };
 }
 
-export const transformEnquiryData = (apiEnquiries: any): TransformedEnquiry[] => {
+export const transformEnquiryData = (
+  apiEnquiries: any
+): TransformedEnquiry[] => {
   return apiEnquiries.map((enquiry: ApiEnquiry) => {
     // Calculate duration in days
     const startDate = new Date(enquiry.rentalStartDate);
     const endDate = new Date(enquiry.rentalEndDate);
-    const duration = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+    const duration = Math.ceil(
+      (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
 
     // Get the best available rental price (prioritize day, then week, then month)
     let price = 0;
@@ -137,9 +165,17 @@ export const transformEnquiryData = (apiEnquiries: any): TransformedEnquiry[] =>
       price = parseFloat(rentalDetails.hour.rentInAED) * 24; // Convert hourly to daily
     }
 
-    // Generate customer avatar from agent email (since there's no user object in the response)
-    const generateAvatar = (email: string): string => {
-      const nameParts = email.split('@')[0].split('.');
+    // Generate customer avatar from customer name or email
+    const generateAvatar = (name: string, email: string): string => {
+      if (name && name.trim()) {
+        const nameParts = name.trim().split(" ");
+        if (nameParts.length >= 2) {
+          return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
+        }
+        return name.substring(0, 2).toUpperCase();
+      }
+
+      const nameParts = email.split("@")[0].split(".");
       if (nameParts.length >= 2) {
         return (nameParts[0][0] + nameParts[1][0]).toUpperCase();
       }
@@ -150,22 +186,19 @@ export const transformEnquiryData = (apiEnquiries: any): TransformedEnquiry[] =>
     const formatEnquiryDate = (dateString: string): string => {
       const date = new Date(dateString);
       const now = new Date();
-      const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-      
-      if (diffInHours < 1) return 'Just now';
-      if (diffInHours < 24) return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
-      
-      const diffInDays = Math.floor(diffInHours / 24);
-      if (diffInDays < 7) return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
-      
-      return date.toLocaleDateString();
-    };
+      const diffInHours = Math.floor(
+        (now.getTime() - date.getTime()) / (1000 * 60 * 60)
+      );
 
-    // Determine priority based on rental duration and price
-    const getPriority = (duration: number, price: number): string => {
-      if (duration >= 7 || price >= 500) return 'high';
-      if (duration >= 3 || price >= 200) return 'medium';
-      return 'low';
+      if (diffInHours < 1) return "Just now";
+      if (diffInHours < 24)
+        return `${diffInHours} hour${diffInHours > 1 ? "s" : ""} ago`;
+
+      const diffInDays = Math.floor(diffInHours / 24);
+      if (diffInDays < 7)
+        return `${diffInDays} day${diffInDays > 1 ? "s" : ""} ago`;
+
+      return date.toLocaleDateString();
     };
 
     // Get location from coordinates or default
@@ -176,36 +209,47 @@ export const transformEnquiryData = (apiEnquiries: any): TransformedEnquiry[] =>
       if (enquiry.car.location?.coordinates) {
         return `Location: ${enquiry.car.location.coordinates[1]}, ${enquiry.car.location.coordinates[0]}`;
       }
-      return 'Location not specified';
+      return "Location not specified";
     };
 
     // Get vehicle title or model
     const getVehicleName = (): string => {
-      return enquiry.car.vehicleTitle || enquiry.car.vehicleModel || 'Unknown Vehicle';
+      return (
+        enquiry.car.vehicleTitle ||
+        enquiry.car.vehicleModel ||
+        "Unknown Vehicle"
+      );
     };
 
-    // Get customer name from agent data (since there's no user object)
+    // Get customer name from the actual customer data
     const getCustomerName = (): string => {
-      // Extract name from email or use agent ID
-      const emailPrefix = enquiry.agent.email.split('@')[0];
-      const nameFromEmail = emailPrefix.replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      return nameFromEmail || enquiry.agent.agentId || 'Unknown Customer';
+      return enquiry.name || "Unknown Customer";
+    };
+
+    // Get customer phone from the actual customer data
+    const getCustomerPhone = (): string => {
+      return enquiry.phone || "N/A";
+    };
+
+    // Get customer email from the actual customer data
+    const getCustomerEmail = (): string => {
+      return enquiry.email || "N/A";
     };
 
     return {
       id: enquiry._id,
       car: {
         name: getVehicleName(),
-        image: enquiry.car.vehiclePhotos[0] || '/placeholder.svg',
+        image: enquiry.car.vehiclePhotos[0] || "/placeholder.svg",
         location: getLocation(),
         registrationNumber: enquiry.car.vehicleRegistrationNumber,
         vehicleCode: enquiry.car.vehicleCode,
       },
       customer: {
         name: getCustomerName(),
-        phone: `${enquiry.agent.countryCode} ${enquiry.agent.phoneNumber}`,
-        email: enquiry.agent.email,
-        avatar: generateAvatar(enquiry.agent.email),
+        phone: getCustomerPhone(),
+        email: getCustomerEmail(),
+        avatar: generateAvatar(getCustomerName(), getCustomerEmail()),
       },
       booking: {
         message: enquiry.message,
@@ -217,27 +261,23 @@ export const transformEnquiryData = (apiEnquiries: any): TransformedEnquiry[] =>
       },
       status: enquiry.status.toLowerCase(),
       enquiryDate: formatEnquiryDate(enquiry.createdAt),
-      priority: getPriority(duration || 1, price),
     };
   });
 };
 
 export const getStatusDisplayName = (status: string): string => {
   switch (status.toLowerCase()) {
-    case 'new': return 'New';
-    case 'contacted': return 'Contacted';
-    case 'cancelled': return 'Cancelled';
-    case 'confirmed': return 'Confirmed';
-    case 'completed': return 'Completed';
-    default: return status;
-  }
-};
-
-export const getPriorityColor = (priority: string): string => {
-  switch (priority) {
-    case 'high': return 'bg-red-100 text-red-800 border-red-300';
-    case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-300';
-    case 'low': return 'bg-green-100 text-green-800 border-green-300';
-    default: return 'bg-gray-100 text-gray-800 border-gray-300';
+    case "new":
+      return "New";
+    case "contacted":
+      return "Contacted";
+    case "cancelled":
+      return "Cancelled";
+    case "confirmed":
+      return "Confirmed";
+    case "completed":
+      return "Completed";
+    default:
+      return status;
   }
 };

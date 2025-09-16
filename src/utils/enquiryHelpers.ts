@@ -5,7 +5,6 @@ import { type TransformedEnquiry } from './enquiryUtils';
 export interface EnquiryFilters {
   searchTerm: string;
   statusFilter: string;
-  priorityFilter: string;
   locationFilter: string;
 }
 
@@ -14,33 +13,14 @@ export interface EnquiryStats {
   new: number;
   contacted: number;
   cancelled: number;
-  highPriority: number;
-  mediumPriority: number;
-  lowPriority: number;
 }
 
 // Utility functions for enquiry management
 export const enquiryHelpers = {
-  // Calculate priority score for sorting
-  getPriorityScore: (priority: string): number => {
-    switch (priority) {
-      case 'high': return 3;
-      case 'medium': return 2;
-      case 'low': return 1;
-      default: return 0;
-    }
-  },
-
-  // Sort enquiries by priority and date
-  sortEnquiries: (enquiries: TransformedEnquiry[], sortBy: 'priority' | 'date' | 'amount' = 'date'): TransformedEnquiry[] => {
+  // Sort enquiries by date and amount
+  sortEnquiries: (enquiries: TransformedEnquiry[], sortBy: 'date' | 'amount' = 'date'): TransformedEnquiry[] => {
     return [...enquiries].sort((a, b) => {
       switch (sortBy) {
-        case 'priority':
-          const priorityDiff = enquiryHelpers.getPriorityScore(b.priority) - enquiryHelpers.getPriorityScore(a.priority);
-          if (priorityDiff !== 0) return priorityDiff;
-          // If priority is same, sort by date
-          return new Date(b.enquiryDate).getTime() - new Date(a.enquiryDate).getTime();
-        
         case 'amount':
           return b.booking.totalAmount - a.booking.totalAmount;
         
@@ -51,10 +31,10 @@ export const enquiryHelpers = {
     });
   },
 
-  // Get enquiries that need attention (new + high priority)
+  // Get enquiries that need attention (new enquiries)
   getUrgentEnquiries: (enquiries: TransformedEnquiry[]): TransformedEnquiry[] => {
     return enquiries.filter(enquiry => 
-      enquiry.status === 'new' && enquiry.priority === 'high'
+      enquiry.status === 'new'
     );
   },
 
@@ -106,11 +86,10 @@ export const enquiryHelpers = {
       'Location',
       'Start Date',
       'End Date',
-      'Duration (days)',
+      'Duration (Days)',
       'Price per Day (AED)',
       'Total Amount (AED)',
       'Status',
-      'Priority',
       'Enquiry Date',
       'Message'
     ];
@@ -128,7 +107,6 @@ export const enquiryHelpers = {
       enquiry.booking.price.toString(),
       enquiry.booking.totalAmount.toString(),
       enquiry.status,
-      enquiry.priority,
       enquiry.enquiryDate,
       `"${enquiry.booking.message.replace(/"/g, '""')}"` // Escape quotes in message
     ]);

@@ -38,8 +38,6 @@ interface UseEnquiryManagementReturn {
   setSearchTerm: (term: string) => void;
   statusFilter: string;
   setStatusFilter: (status: string) => void;
-  priorityFilter: string;
-  setPriorityFilter: (priority: string) => void;
   locationFilter: string;
   setLocationFilter: (location: string) => void;
   clearFilters: () => void;
@@ -63,9 +61,6 @@ interface UseEnquiryManagementReturn {
     contacted: number;
     cancelled: number;
     declined: number;
-    highPriority: number;
-    mediumPriority: number;
-    lowPriority: number;
   };
 
   // Additional utilities
@@ -80,7 +75,7 @@ interface UseEnquiryManagementReturn {
 
   // Helper functions
   sortEnquiries: (
-    sortBy: "priority" | "date" | "amount"
+    sortBy: "date" | "amount"
   ) => TransformedEnquiry[];
   exportToCSV: () => void;
   downloadCSV: (filename?: string) => void;
@@ -92,7 +87,6 @@ export const useEnquiryManagement = ({
   // Filter states
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
-  const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [locationFilter, setLocationFilter] = useState<string>("all");
 
   // Use the React Query hooks
@@ -138,12 +132,10 @@ export const useEnquiryManagement = ({
 
     const matchesStatus =
       statusFilter === "all" || enquiry.status === statusFilter;
-    const matchesPriority =
-      priorityFilter === "all" || enquiry.priority === priorityFilter;
     const matchesLocation =
       locationFilter === "all" || enquiry.car.location === locationFilter;
 
-    return matchesSearch && matchesStatus && matchesPriority && matchesLocation;
+    return matchesSearch && matchesStatus && matchesLocation;
   });
 
   // Get unique locations for filter dropdown
@@ -159,9 +151,6 @@ export const useEnquiryManagement = ({
       contacted: enquiries.filter((e) => e.status === "contacted").length,
       cancelled: enquiries.filter((e) => e.status === "cancelled").length,
       declined: enquiries.filter((e) => e.status === "declined").length,
-      highPriority: enquiries.filter((e) => e.priority === "high").length,
-      mediumPriority: enquiries.filter((e) => e.priority === "medium").length,
-      lowPriority: enquiries.filter((e) => e.priority === "low").length,
     }),
     [enquiries]
   );
@@ -184,7 +173,6 @@ export const useEnquiryManagement = ({
   const clearFilters = useCallback(() => {
     setSearchTerm("");
     setStatusFilter("all");
-    setPriorityFilter("all");
     setLocationFilter("all");
   }, []);
 
@@ -250,7 +238,7 @@ export const useEnquiryManagement = ({
 
   // Helper functions
   const sortEnquiries = useCallback(
-    (sortBy: "date" | "priority" | "amount") => {
+    (sortBy: "date" | "amount") => {
       return enquiryHelpers.sortEnquiries(filteredEnquiries, sortBy);
     },
     [filteredEnquiries]
@@ -293,8 +281,6 @@ export const useEnquiryManagement = ({
     setSearchTerm,
     statusFilter,
     setStatusFilter,
-    priorityFilter,
-    setPriorityFilter,
     locationFilter,
     setLocationFilter,
     clearFilters,
