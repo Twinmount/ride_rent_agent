@@ -54,6 +54,7 @@ interface UseEnquiryManagementReturn {
   contactEnquiry: (enquiryId: string) => Promise<void>;
   declineEnquiry: (enquiryId: string, cancelReason?: string) => Promise<void>;
   cancelEnquiry: (enquiryId: string, cancelReason?: string) => Promise<void>;
+  reApproveEnquiry: (enquiryId: string) => Promise<void>;
 
   // Statistics
   stats: {
@@ -61,6 +62,7 @@ interface UseEnquiryManagementReturn {
     new: number;
     contacted: number;
     cancelled: number;
+    declined: number;
     highPriority: number;
     mediumPriority: number;
     lowPriority: number;
@@ -156,6 +158,7 @@ export const useEnquiryManagement = ({
       new: enquiries.filter((e) => e.status === "new").length,
       contacted: enquiries.filter((e) => e.status === "contacted").length,
       cancelled: enquiries.filter((e) => e.status === "cancelled").length,
+      declined: enquiries.filter((e) => e.status === "declined").length,
       highPriority: enquiries.filter((e) => e.priority === "high").length,
       mediumPriority: enquiries.filter((e) => e.priority === "medium").length,
       lowPriority: enquiries.filter((e) => e.priority === "low").length,
@@ -226,7 +229,7 @@ export const useEnquiryManagement = ({
 
   const declineEnquiry = useCallback(
     async (enquiryId: string, cancelReason?: string) => {
-      return updateEnquiryStatus(enquiryId, "CANCELLED", cancelReason);
+      return updateEnquiryStatus(enquiryId, "DECLINED", cancelReason);
     },
     [updateEnquiryStatus]
   );
@@ -234,6 +237,13 @@ export const useEnquiryManagement = ({
   const cancelEnquiry = useCallback(
     async (enquiryId: string, cancelReason?: string) => {
       return updateEnquiryStatus(enquiryId, "CANCELLED", cancelReason);
+    },
+    [updateEnquiryStatus]
+  );
+
+  const reApproveEnquiry = useCallback(
+    async (enquiryId: string) => {
+      return updateEnquiryStatus(enquiryId, "NEW");
     },
     [updateEnquiryStatus]
   );
@@ -295,6 +305,7 @@ export const useEnquiryManagement = ({
     contactEnquiry,
     declineEnquiry,
     cancelEnquiry,
+    reApproveEnquiry,
 
     // Statistics
     stats,

@@ -39,12 +39,13 @@ import {
   X,
   Send,
   ChevronDown,
+  RotateCcw,
 } from "lucide-react";
 import { useEnquiryManagement } from "@/hooks/useEnquiryManagement";
 
 // For demo purposes, using a hardcoded agent ID
 // In a real app, this would come from authentication context
-const AGENT_ID = "67dd785d0b9fd66fb2575b97";
+const userId = JSON.parse(localStorage.getItem("userId") || "");
 
 export default function AgentTableView() {
   const {
@@ -57,11 +58,11 @@ export default function AgentTableView() {
     setSearchTerm,
     statusFilter,
     setStatusFilter,
-    priorityFilter,
-    setPriorityFilter,
-    locationFilter,
-    setLocationFilter,
-    uniqueLocations,
+    // priorityFilter,
+    // setPriorityFilter,
+    // locationFilter,
+    // setLocationFilter,
+    // uniqueLocations,
     clearFilters,
     isRefetching,
     isUpdating,
@@ -70,8 +71,9 @@ export default function AgentTableView() {
     deleteError,
     contactEnquiry,
     declineEnquiry,
+    reApproveEnquiry,
     stats,
-  } = useEnquiryManagement({ agentId: AGENT_ID });
+  } = useEnquiryManagement({ agentId: userId || "" });
 
   // Action handlers with error handling
   const handleContactEnquiry = async (enquiryId: string) => {
@@ -80,6 +82,15 @@ export default function AgentTableView() {
       console.log("Enquiry status updated to CONTACTED");
     } catch (error) {
       console.error("Failed to update enquiry status:", error);
+    }
+  };
+
+  const handleReApproveEnquiry = async (enquiryId: string) => {
+    try {
+      await reApproveEnquiry(enquiryId);
+      console.log("Enquiry re-approved successfully");
+    } catch (error) {
+      console.error("Failed to re-approve enquiry:", error);
     }
   };
 
@@ -158,6 +169,8 @@ export default function AgentTableView() {
         return <Badge variant="secondary">Contacted</Badge>;
       case "cancelled":
         return <Badge variant="destructive">Cancelled</Badge>;
+      case "declined":
+        return <Badge variant="destructive">Declined</Badge>;
       default:
         return null;
     }
@@ -276,6 +289,12 @@ export default function AgentTableView() {
                 </div>
                 <div className="text-sm text-muted-foreground">Cancelled</div>
               </div>
+              <div className="p-4 bg-card border rounded-lg">
+                <div className="text-2xl font-bold text-orange-600">
+                  {stats.declined}
+                </div>
+                <div className="text-sm text-muted-foreground">Declined</div>
+              </div>
               {/* <div className="p-4 bg-card border rounded-lg">
                 <div className="text-2xl font-bold text-red-500">{stats.highPriority}</div>
                 <div className="text-sm text-muted-foreground">High Priority</div>
@@ -321,9 +340,10 @@ export default function AgentTableView() {
                   <SelectItem value="new">New</SelectItem>
                   <SelectItem value="contacted">Contacted</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
+                  <SelectItem value="declined">Declined</SelectItem>
                 </SelectContent>
               </Select>
-
+              {/* 
               <Select value={priorityFilter} onValueChange={setPriorityFilter}>
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="Priority" />
@@ -334,9 +354,9 @@ export default function AgentTableView() {
                   <SelectItem value="medium">Medium</SelectItem>
                   <SelectItem value="low">Low</SelectItem>
                 </SelectContent>
-              </Select>
+              </Select> */}
 
-              <Select value={locationFilter} onValueChange={setLocationFilter}>
+              {/* <Select value={locationFilter} onValueChange={setLocationFilter}>
                 <SelectTrigger className="w-48">
                   <SelectValue placeholder="Location" />
                 </SelectTrigger>
@@ -348,7 +368,7 @@ export default function AgentTableView() {
                     </SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
+              </Select> */}
 
               <Button
                 variant="outline"
@@ -584,6 +604,16 @@ export default function AgentTableView() {
                                 View
                               </Button>
                             )}
+                            {enquiry.status === "declined" && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="gap-1 h-8"
+                              >
+                                <Eye className="h-3 w-3" />
+                                View
+                              </Button>
+                            )}
                             <Button
                               size="sm"
                               variant="ghost"
@@ -751,6 +781,21 @@ export default function AgentTableView() {
                                   )}
                                 </div>
                               </>
+                            )}
+                            {(enquiry.status === "cancelled" ||
+                              enquiry.status === "declined") && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="gap-1 border-green-500 text-green-700 hover:bg-green-50 hover:border-green-600 font-medium"
+                                onClick={() =>
+                                  handleReApproveEnquiry(enquiry.id)
+                                }
+                                disabled={isUpdating}
+                              >
+                                <RotateCcw className="h-3 w-3" />
+                                Re-approve
+                              </Button>
                             )}
                           </div>
                         </TableCell>

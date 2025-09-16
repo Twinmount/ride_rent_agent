@@ -168,10 +168,7 @@ export const useEnquiries = (
     queryKey: enquiryKeys.list(agentId, status, page, limit),
     queryFn: () => fetchEnquiriesApi(agentId, status, page, limit),
     enabled: !!agentId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    gcTime: 1000 * 60 * 30, // 30 minutes (was cacheTime in older versions)
-    retry: 3,
-    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+    staleTime: 0,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
   });
@@ -250,7 +247,7 @@ export const usePrefetchEnquiries = () => {
     queryClient.prefetchQuery({
       queryKey: enquiryKeys.list(agentId, status, page, limit),
       queryFn: () => fetchEnquiriesApi(agentId, status, page, limit),
-      staleTime: 1000 * 60 * 5,
+      staleTime: 0,
     });
   };
 };
