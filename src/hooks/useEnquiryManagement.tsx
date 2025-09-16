@@ -74,9 +74,7 @@ interface UseEnquiryManagementReturn {
   }>;
 
   // Helper functions
-  sortEnquiries: (
-    sortBy: "date" | "amount"
-  ) => TransformedEnquiry[];
+  sortEnquiries: (sortBy: "date" | "amount") => TransformedEnquiry[];
   exportToCSV: () => void;
   downloadCSV: (filename?: string) => void;
 }
