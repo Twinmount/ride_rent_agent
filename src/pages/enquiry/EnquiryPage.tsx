@@ -45,7 +45,8 @@ import { useEnquiryManagement } from "@/hooks/useEnquiryManagement";
 
 // For demo purposes, using a hardcoded agent ID
 // In a real app, this would come from authentication context
-const userId = JSON.parse(localStorage.getItem("userId") || "");
+const userIdRaw = localStorage?.getItem("userId");
+const userId = userIdRaw ? JSON.parse(userIdRaw) : "";
 
 export default function AgentTableView() {
   const {
