@@ -14,14 +14,12 @@ import RouteErrorBoundary from "./layout/RouteErrorBoundary";
 import { router } from "./routes/routerConfig";
 import { MantineProvider } from "@mantine/core";
 
-
 const appCountry = localStorage.getItem("appCountry") || "ae";
 
 axios.defaults.baseURL =
   appCountry === "in"
     ? import.meta.env.VITE_API_URL_INDIA
     : import.meta.env.VITE_API_URL_UAE;
-
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
