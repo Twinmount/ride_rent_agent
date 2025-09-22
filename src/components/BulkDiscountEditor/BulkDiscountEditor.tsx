@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react";
 import { useBulkDiscounts } from "@/hooks/useBulkDiscounts";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { BulkDiscountData, updateBulkDiscount as apiUpdateDiscount } from "@/api/rateManager";
-import { Button } from "@/components/ui/button";
-import SuccessModal from "@/components/modal/SuccessModal"; // ★ 2. Import the new modal component
+import {
+  BulkDiscountData,
+  updateBulkDiscount as apiUpdateDiscount,
+} from "@/api/rateManager";
+import { Button } from "../ui/button";
+import SuccessModal from "../modal/SuccessModal";
+import BulkDiscountSkeleton from "../loading-skelton/RateMangerSkelton";
 
 const DISCOUNT_TYPES = [
   { label: "Daily", icon: "calendar" },
@@ -11,36 +15,27 @@ const DISCOUNT_TYPES = [
   { label: "Monthly", icon: "calendar" },
 ];
 const DAYS = [
-  { label: "Mo", value: "Mo" }, { label: "Tu", value: "Tu" },
-  { label: "We", value: "We" }, { label: "Th", value: "Th" },
-  { label: "Fr", value: "Fr" }, { label: "Sa", value: "Sa" },
+  { label: "Mo", value: "Mo" },
+  { label: "Tu", value: "Tu" },
+  { label: "We", value: "We" },
+  { label: "Th", value: "Th" },
+  { label: "Fr", value: "Fr" },
+  { label: "Sa", value: "Sa" },
   { label: "Su", value: "Su" },
 ];
 
-const SkeletonLoader = () => (
-  <div className="p-4 animate-pulse">
-    <div className="flex flex-col sm:flex-row gap-4 mb-8">
-      <div className="flex-1 border-2 rounded-2xl p-6 h-40 bg-gray-200"></div>
-      <div className="flex-1 border-2 rounded-2xl p-6 h-40 bg-gray-200"></div>
-      <div className="flex-1 border-2 rounded-2xl p-6 h-40 bg-gray-200"></div>
-    </div>
-    <div className="mb-6">
-      <div className="h-5 w-1/3 bg-gray-200 rounded mb-3"></div>
-      <div className="flex gap-3 mb-2">
-        {DAYS.map((day) => <div key={day.value} className="w-10 h-10 rounded-full bg-gray-200"></div>)}
-      </div>
-    </div>
-    <div className="flex justify-end gap-4 pt-4 border-t">
-      <div className="h-10 w-24 bg-gray-200 rounded-lg"></div>
-      <div className="h-10 w-32 bg-gray-200 rounded-lg"></div>
-    </div>
-  </div>
-);
-
 export default function BulkDiscountEditor() {
-  const { discountData, isLoading: isLoadingData, isError } = useBulkDiscounts();
+  const {
+    discountData,
+    isLoading: isLoadingData,
+    isError,
+  } = useBulkDiscounts();
 
-  const [discounts, setDiscounts] = useState({ Daily: 0, Weekly: 0, Monthly: 0 });
+  const [discounts, setDiscounts] = useState({
+    Daily: 0,
+    Weekly: 0,
+    Monthly: 0,
+  });
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [recurring, setRecurring] = useState(false);
   const [selectedType, setSelectedType] = useState("Daily");
@@ -52,11 +47,11 @@ export default function BulkDiscountEditor() {
     mutationFn: apiUpdateDiscount,
     onSuccess: () => {
       setIsModalOpen(true);
-      queryClient.invalidateQueries({ queryKey: ['vehicles'] });
-      queryClient.invalidateQueries({ queryKey: ['bulkDiscounts'] });
+      queryClient.invalidateQueries({ queryKey: ["vehicles"] });
+      queryClient.invalidateQueries({ queryKey: ["bulkDiscounts"] });
     },
     onError: (error: any) => {
-      console.error("❌ Mutation failed:", error);
+      console.error("Mutation failed:", error);
     },
   });
 
@@ -72,7 +67,10 @@ export default function BulkDiscountEditor() {
     }
   }, [discountData]);
 
-  const handleDiscountChange = (type: "Daily" | "Weekly" | "Monthly", value: string) => {
+  const handleDiscountChange = (
+    type: "Daily" | "Weekly" | "Monthly",
+    value: string
+  ) => {
     setDiscounts((prev) => ({
       ...prev,
       [type]: Math.max(0, Math.min(30, Number(value))),
@@ -81,9 +79,7 @@ export default function BulkDiscountEditor() {
 
   const toggleDay = (day: string) => {
     setSelectedDays((prev) =>
-      prev.includes(day)
-        ? prev.filter((d) => d !== day)
-        : [...prev, day]
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
     );
   };
 
@@ -98,8 +94,13 @@ export default function BulkDiscountEditor() {
     mutation.mutate(payload);
   };
 
-  if (isLoadingData) return <SkeletonLoader />;
-  if (isError) return <div className="p-4 text-center text-red-500">Error: Could not load discount settings.</div>;
+  if (isLoadingData) return <BulkDiscountSkeleton />;
+  if (isError)
+    return (
+      <div className="p-4 text-center text-red-500">
+        Error: Could not load discount settings.
+      </div>
+    );
 
   return (
     <div className="p-3 sm:p-6">
@@ -108,30 +109,71 @@ export default function BulkDiscountEditor() {
           <div
             key={type.label}
             className={`flex-1 border-2 rounded-2xl p-4 sm:p-6 flex flex-col items-center transition cursor-pointer
-              ${selectedType === type.label
-                ? "border-[#feac40] bg-[#fff7e8] shadow"
-                : "border-gray-200 bg-white"}
+              ${
+                selectedType === type.label
+                  ? "border-[#feac40] bg-[#fff7e8] shadow"
+                  : "border-gray-200 bg-white"
+              }
             `}
             onClick={() => setSelectedType(type.label)}
           >
             <div className="text-[#feac40] mb-2">
               <svg width={32} height={32} fill="none" viewBox="0 0 24 24">
-                <rect x="3" y="5" width="18" height="16" rx="3" fill="currentColor" opacity="0.15" />
-                <rect x="3" y="5" width="18" height="16" rx="3" stroke="currentColor" strokeWidth="2" />
-                <rect x="7" y="2" width="2" height="6" rx="1" fill="currentColor" />
-                <rect x="15" y="2" width="2" height="6" rx="1" fill="currentColor" />
+                <rect
+                  x="3"
+                  y="5"
+                  width="18"
+                  height="16"
+                  rx="3"
+                  fill="currentColor"
+                  opacity="0.15"
+                />
+                <rect
+                  x="3"
+                  y="5"
+                  width="18"
+                  height="16"
+                  rx="3"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                />
+                <rect
+                  x="7"
+                  y="2"
+                  width="2"
+                  height="6"
+                  rx="1"
+                  fill="currentColor"
+                />
+                <rect
+                  x="15"
+                  y="2"
+                  width="2"
+                  height="6"
+                  rx="1"
+                  fill="currentColor"
+                />
               </svg>
             </div>
-            <div className="font-bold text-base sm:text-lg mb-2">{type.label}</div>
+            <div className="font-bold text-base sm:text-lg mb-2">
+              {type.label}
+            </div>
             <div className="flex items-center gap-2">
               <span className="text-gray-500">Discount</span>
               <select
                 value={discounts[type.label as keyof typeof discounts]}
-                onChange={(e) => handleDiscountChange(type.label as "Daily" | "Weekly" | "Monthly", e.target.value)}
+                onChange={(e) =>
+                  handleDiscountChange(
+                    type.label as "Daily" | "Weekly" | "Monthly",
+                    e.target.value
+                  )
+                }
                 className="w-16 sm:w-20 px-2 py-1 border rounded text-center font-semibold"
               >
                 {Array.from({ length: 31 }, (_, i) => (
-                  <option key={i} value={i}>{i}</option>
+                  <option key={i} value={i}>
+                    {i}
+                  </option>
                 ))}
               </select>
               <span className="text-gray-500">%</span>
@@ -149,9 +191,11 @@ export default function BulkDiscountEditor() {
               type="button"
               onClick={() => toggleDay(day.value)}
               className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold transition
-                ${selectedDays?.includes(day.value)
-                  ? "bg-[#feac40] text-white"
-                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"}
+                ${
+                  selectedDays?.includes(day.value)
+                    ? "bg-[#feac40] text-white"
+                    : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                }
               `}
             >
               {day.label}
@@ -159,14 +203,19 @@ export default function BulkDiscountEditor() {
           ))}
         </div>
         <div className="text-xs sm:text-sm text-gray-500">
-          The offer rates will be displayed exclusively on the specified dates, refreshed automatically on a weekly basis.
+          The offer rates will be displayed exclusively on the specified dates,
+          refreshed automatically on a weekly basis.
         </div>
       </div>
 
       <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 mb-8">
         <div className="flex items-center gap-1">
           <span className="font-medium">Enable Recurring</span>
-          <span tabIndex={0} className="ml-1 text-[#feac40] cursor-pointer" title="If enabled, the discount will repeat automatically on selected days.">
+          <span
+            tabIndex={0}
+            className="ml-1 text-[#feac40] cursor-pointer"
+            title="If enabled, the discount will repeat automatically on selected days."
+          >
             ⓘ
           </span>
         </div>

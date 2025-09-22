@@ -584,7 +584,7 @@ export type GetVehicleResponse = RateManagerVehicleType;
 // Get all vehicles API response
 export interface FetchAllVehiclesResponse {
   result: {
-    list: SingleVehicleType[];
+    list: SingleVehicleType[]; // Adjusted to match the nested structure
     page: number;
     limit: number;
     total: number;
@@ -593,7 +593,6 @@ export interface FetchAllVehiclesResponse {
   status: string;
   statusCode: number;
 }
-
 
 //  response for dashboard enquiries and portfolios response
 export interface FetchDashboardResponse {
@@ -680,3 +679,41 @@ export interface DeleteSingleImageResponse {
     fileFullPath: string;
   };
 }
+
+export type ApiVehicleUpdate = {
+  registrationNumber: string;
+  dailyRate: number;
+  dailyDiscount: number;
+  dailyMileage: number;
+  dailyRecurring: boolean;
+  dailyWeekdays: string[];
+  weeklyRate: number;
+  weeklyDiscount: number;
+  weeklyMileage: number;
+  weeklyRecurring: boolean;
+  weeklyWeekdays: string[];
+  monthlyRate: number;
+  monthlyDiscount: number;
+  monthlyMileage: number;
+  monthlyRecurring: boolean;
+  monthlyWeekdays: string[];
+};
+
+export type VehicleRateRow = {
+  "Registration Number": string;
+  "Daily Rate": number;
+  "Daily Discount": number;
+  "Daily Mileage": number;
+  "Daily Recurring": string | boolean | number;
+  "Daily Weekdays": string;
+  "Weekly Rate": number;
+  "Weekly Discount": number;
+  "Weekly Mileage": number;
+  "Weekly Recurring": string | boolean | number;
+  "Weekly Weekdays": string;
+  "Monthly Rate": number;
+  "Monthly Discount": number;
+  "Monthly Mileage": number;
+  "Monthly Recurring": string | boolean | number;
+  "Monthly Weekdays": string;
+};

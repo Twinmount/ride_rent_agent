@@ -24,7 +24,6 @@ export enum Slug {
   GET_ALL_COMPANY = "/company/list",
   PUT_TOGGLE_VEHICLE_VISIBILITY = "/vehicle/toggle-visibility",
   BULK_DISCOUNTS = "/rate-manager/discounts",
-  
 
   // user end point
   GET_USER = "/users",

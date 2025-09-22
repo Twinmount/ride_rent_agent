@@ -43,6 +43,7 @@ export const protectedRoutes = [
     path: "/listings/view/:vehicleId/:companyId/:userId",
     element: <VehiclesFormUpdatePage />,
   },
+<<<<<<< HEAD
   {
     path: "/enquiries",
     element: <AgentTableView />,
@@ -51,6 +52,9 @@ export const protectedRoutes = [
     path: "/rate-manager",
     element: <RateManager />
   },
+=======
+  { path: "/rate-manager", element: <RateManager /> },
+>>>>>>> c9c0ed4 (feat: implemented updated bulk discount and rate manager frontend changes)
 
   //  These SRM routes are always accessible (not wrapped by SRMConditionalWrapper)
 

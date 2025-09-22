@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 
 interface SuccessModalProps {
   isOpen: boolean;
@@ -13,12 +13,11 @@ export default function SuccessModal({
   title = "Success",
   message = "Your changes have been saved successfully.",
 }: SuccessModalProps) {
-  
   useEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {
         onClose();
-      }, 1500); 
+      }, 1500);
 
       return () => clearTimeout(timer);
     }
@@ -29,16 +28,28 @@ export default function SuccessModal({
   }
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50" onClick={onClose} >
-
-      
-      <div 
+    <div
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black bg-opacity-50"
+      onClick={onClose}
+    >
+      <div
         className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-8 text-center flex flex-col items-center"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="w-16 h-16 mb-4 flex items-center justify-center bg-green-100 rounded-full">
-          <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+          <svg
+            className="w-10 h-10 text-green-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M5 13l4 4L19 7"
+            ></path>
           </svg>
         </div>
 

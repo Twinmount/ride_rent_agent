@@ -11,29 +11,38 @@ export interface BulkDiscountData {
 }
 
 export const getBulkDiscount = async (): Promise<BulkDiscountData> => {
-  const res = await API.get<{ status: string; result: BulkDiscountData }>({
-    slug: Slug.BULK_DISCOUNTS,
-  });
+  try {
+    const data = await API.get<{ status: string; result: BulkDiscountData }>({
+      slug: Slug.BULK_DISCOUNTS,
+    });
 
-  if (!res) {
-    throw new Error("No response from API.get");
+    if (!data) {
+      throw new Error("Failed to fetch bulk discount");
+    }
+
+    return data.result;
+  } catch (error) {
+    console.error("Error fetching bulk discount:", error);
+    throw error;
   }
-
-  return res.result ?? (res as unknown as BulkDiscountData);
 };
 
 export const updateBulkDiscount = async (
-  data: Partial<BulkDiscountData>
+  body: Partial<BulkDiscountData>
 ): Promise<BulkDiscountData> => {
-  const res = await API.post<{ status: string; result: BulkDiscountData }>({
-    slug: Slug.BULK_DISCOUNTS,
-    body: data,
-  });
+  try {
+    const data = await API.post<{ status: string; result: BulkDiscountData }>({
+      slug: Slug.BULK_DISCOUNTS,
+      body,
+    });
 
-  if (!res) {
-    throw new Error("No response from API.post");
+    if (!data) {
+      throw new Error("Failed to update bulk discount");
+    }
+
+    return data.result;
+  } catch (error) {
+    console.error("Error updating bulk discount:", error);
+    throw error;
   }
-
-  return res.result ?? (res as unknown as BulkDiscountData);
 };
-

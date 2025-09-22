@@ -378,7 +378,7 @@ type FeatureItem = {
 
 // add features form function
 type AddFeaturesRequestBody = {
-  features: Record<string, FeatureItem[]>; // Dynamic keys for features, each key contains an array of selected features 
+  features: Record<string, FeatureItem[]>; // Dynamic keys for features, each key contains an array of selected features
   userId: string;
   vehicleId: string;
   vehicleCategoryId: string;
@@ -516,22 +516,25 @@ export const getLevelsFilled = async (
   }
 };
 
-export async function fetchAgentVehicles(userId: string, token: string): Promise<GetVehicleResponse[]> {
+export async function fetchAgentVehicles(
+  userId: string,
+  token: string
+): Promise<GetVehicleResponse[]> {
   try {
-    const response = await fetch(`/vehicle/listed/all?userId=${encodeURIComponent(userId)}`, {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`,
-        "Content-Type": "application/json",
+    const data = await API.get<{ vehicles: GetVehicleResponse[] }>({
+      slug: `/vehicle/listed/all?userId=${encodeURIComponent(userId)}`,
+      axiosConfig: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
       },
     });
 
-    console.log("API Response status:", response.status);
-    const data = await response.json();
-    console.log("API Response data:", data);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch vehicles: ${response.statusText}`);
+    if (!data) {
+      throw new Error("Failed to fetch vehicles");
     }
+
     return data.vehicles || [];
   } catch (error) {
     console.error("Error fetching agent vehicles:", error);
@@ -546,7 +549,7 @@ export const bulkUpdateRatesFromFile = async (file: File) => {
     formData.append('file', file);
 
     const data = await API.post({
-      slug: '/vehicle/bulk-update-rates',
+      slug: "/vehicle/bulk-update-rates",
       body: formData,
       axiosConfig: {
         headers: {
@@ -569,7 +572,7 @@ export const bulkUpdateRatesFromFile = async (file: File) => {
 export const downloadRatesTemplate = async () => {
   try {
     const response = await API.get<Blob>({
-      slug: '/vehicle/download-rates-template',
+      slug: "/vehicle/download-rates-template",
       axiosConfig: {
         responseType: 'blob',
         timeout: 10000,
@@ -585,4 +588,3 @@ export const downloadRatesTemplate = async () => {
     throw error;
   }
 };
-
