@@ -22,7 +22,7 @@ export function PriceRecommendationBar({ priceData, currentPrice, onApplyBestPri
                 onClick={() => onApplyBestPrice?.(priceData)}
                 className="px-3 py-1 rounded bg-green-600 hover:bg-green-700 text-white text-sm"
             >
-                Apply Best Price
+                Apply Best Price : {JSON.stringify(priceData)}
             </button>
         </div>
     );
