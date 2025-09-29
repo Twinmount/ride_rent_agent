@@ -39,7 +39,7 @@ import {
   X,
   Send,
   ChevronDown,
-  RotateCcw,
+  Unlock,
 } from "lucide-react";
 import { useEnquiryManagement } from "@/hooks/useEnquiryManagement";
 
@@ -70,38 +70,40 @@ export default function AgentTableView() {
     isDeleting,
     updateError,
     deleteError,
-    contactEnquiry,
-    declineEnquiry,
-    reApproveEnquiry,
+    cancelEnquiry,
     stats,
+    // Contact visibility function
+    handleContactVisibility,
   } = useEnquiryManagement({ agentId: userId || "" });
 
+  console.log("filteredEnquiries: ", filteredEnquiries);
+
   // Action handlers with error handling
+  const handleUnlockEnquiry = async (enquiryId: string) => {
+    try {
+      await handleContactVisibility(enquiryId, "unlock");
+      console.log("Enquiry unlocked and status updated to AGENTVIEW");
+    } catch (error) {
+      console.error("Failed to unlock enquiry:", error);
+    }
+  };
+
   const handleContactEnquiry = async (enquiryId: string) => {
     try {
-      await contactEnquiry(enquiryId);
+      await handleContactVisibility(enquiryId, "contact");
       console.log("Enquiry status updated to CONTACTED");
     } catch (error) {
       console.error("Failed to update enquiry status:", error);
     }
   };
 
-  const handleReApproveEnquiry = async (enquiryId: string) => {
-    try {
-      await reApproveEnquiry(enquiryId);
-      console.log("Enquiry re-approved successfully");
-    } catch (error) {
-      console.error("Failed to re-approve enquiry:", error);
-    }
-  };
-
-  // State for decline reason selection
+  // State for cancel reason selection
   const [selectedReasons, setSelectedReasons] = useState<
     Record<string, string>
   >({});
 
-  // Decline reasons
-  const declineReasons = [
+  // Cancel reasons
+  const cancelReasons = [
     "Vehicle not available",
     "Price too low",
     "Customer requirements not met",
@@ -123,15 +125,15 @@ export default function AgentTableView() {
     return reasonMap[uiReason] || "OTHER_REASONS";
   };
 
-  // Handler functions for decline functionality
-  const handleDeclineSelect = (enquiryId: string, reason: string) => {
+  // Handler functions for cancel functionality
+  const handleCancelSelect = (enquiryId: string, reason: string) => {
     setSelectedReasons((prev) => ({
       ...prev,
       [enquiryId]: reason,
     }));
   };
 
-  const handleClearDeclineSelection = (enquiryId: string) => {
+  const handleClearCancelSelection = (enquiryId: string) => {
     setSelectedReasons((prev) => {
       const newReasons = { ...prev };
       delete newReasons[enquiryId];
@@ -139,19 +141,55 @@ export default function AgentTableView() {
     });
   };
 
-  const handleSendDecline = async (enquiryId: string) => {
+  const handleSendCancel = async (enquiryId: string) => {
     try {
       const selectedReason = getSelectedReason(enquiryId);
       const apiReasonCode = selectedReason
         ? getApiReasonCode(selectedReason)
         : undefined;
 
-      await declineEnquiry(enquiryId, apiReasonCode);
+      await cancelEnquiry(enquiryId, apiReasonCode);
       // Clear the selected reason after sending
-      handleClearDeclineSelection(enquiryId);
-      console.log("Enquiry declined successfully");
+      handleClearCancelSelection(enquiryId);
+      console.log("Enquiry cancelled successfully");
     } catch (error) {
-      console.error("Failed to decline enquiry:", error);
+      console.error("Failed to cancel enquiry:", error);
+    }
+  };
+
+  // Helper function to format date
+  const formatDate = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return dateString; // Return original if invalid date
+      }
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    } catch {
+      return dateString; // Return original if parsing fails
+    }
+  };
+
+  // Helper function to format date only (no time)
+  const formatDateOnly = (dateString: string) => {
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) {
+        return dateString; // Return original if invalid date
+      }
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    } catch {
+      return dateString; // Return original if parsing fails
     }
   };
 
@@ -166,12 +204,21 @@ export default function AgentTableView() {
         return (
           <Badge className="bg-primary text-primary-foreground">New</Badge>
         );
+      case "agentview":
+        return <Badge className="bg-blue-500 text-white">Agent View</Badge>;
       case "contacted":
         return <Badge variant="secondary">Contacted</Badge>;
       case "cancelled":
         return <Badge variant="destructive">Cancelled</Badge>;
-      case "declined":
-        return <Badge variant="destructive">Declined</Badge>;
+      case "expired":
+        return (
+          <Badge
+            className="text-white font-medium border-0"
+            style={{ backgroundColor: "#f59e0b" }}
+          >
+            Expired
+          </Badge>
+        );
       default:
         return null;
     }
@@ -262,6 +309,12 @@ export default function AgentTableView() {
                 <div className="text-sm text-muted-foreground">New</div>
               </div>
               <div className="p-4 bg-card border rounded-lg">
+                <div className="text-2xl font-bold text-blue-500">
+                  {stats.agentview}
+                </div>
+                <div className="text-sm text-muted-foreground">Agent View</div>
+              </div>
+              <div className="p-4 bg-card border rounded-lg">
                 <div className="text-2xl font-bold text-green-600">
                   {stats.contacted}
                 </div>
@@ -274,10 +327,10 @@ export default function AgentTableView() {
                 <div className="text-sm text-muted-foreground">Cancelled</div>
               </div>
               <div className="p-4 bg-card border rounded-lg">
-                <div className="text-2xl font-bold text-orange-600">
-                  {stats.declined}
+                <div className="text-2xl font-bold text-yellow-600">
+                  {stats.expired}
                 </div>
-                <div className="text-sm text-muted-foreground">Declined</div>
+                <div className="text-sm text-muted-foreground">Expired</div>
               </div>
               {/* <div className="p-4 bg-card border rounded-lg">
                 <div className="text-2xl font-bold text-red-500">{stats.highPriority}</div>
@@ -322,9 +375,10 @@ export default function AgentTableView() {
                 <SelectContent>
                   <SelectItem value="all">All Status</SelectItem>
                   <SelectItem value="new">New</SelectItem>
+                  <SelectItem value="agentview">Agent View</SelectItem>
                   <SelectItem value="contacted">Contacted</SelectItem>
                   <SelectItem value="cancelled">Cancelled</SelectItem>
-                  <SelectItem value="declined">Declined</SelectItem>
+                  <SelectItem value="expired">Expired</SelectItem>
                 </SelectContent>
               </Select>
               {/* 
@@ -378,6 +432,14 @@ export default function AgentTableView() {
                   {filteredEnquiries.filter((e) => e.status === "new").length}
                 </span>
                 <span className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                  Agent View:{" "}
+                  {
+                    filteredEnquiries.filter((e) => e.status === "agentview")
+                      .length
+                  }
+                </span>
+                <span className="flex items-center gap-1">
                   <div className="w-2 h-2 bg-secondary rounded-full"></div>
                   Contacted:{" "}
                   {
@@ -390,6 +452,14 @@ export default function AgentTableView() {
                   Cancelled:{" "}
                   {
                     filteredEnquiries.filter((e) => e.status === "cancelled")
+                      .length
+                  }
+                </span>
+                <span className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
+                  Expired:{" "}
+                  {
+                    filteredEnquiries.filter((e) => e.status === "expired")
                       .length
                   }
                 </span>
@@ -467,8 +537,8 @@ export default function AgentTableView() {
                         {/* Customer */}
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
-                              <AvatarFallback className="text-xs text-white">
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="text-xs bg-primary text-white font-medium">
                                 {enquiry.customer.avatar}
                               </AvatarFallback>
                             </Avatar>
@@ -506,8 +576,8 @@ export default function AgentTableView() {
                               Total: {enquiry.booking.totalAmount} AED
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              {enquiry.booking.startDate} -{" "}
-                              {enquiry.booking.endDate}
+                              {formatDateOnly(enquiry.booking.startDate)} -{" "}
+                              {formatDateOnly(enquiry.booking.endDate)}
                             </div>
                           </div>
                         </TableCell>
@@ -517,172 +587,31 @@ export default function AgentTableView() {
 
                         {/* Enquiry Date */}
                         <TableCell className="text-sm text-muted-foreground">
-                          {enquiry.enquiryDate}
+                          {formatDate(enquiry.enquiryDate)}
                         </TableCell>
-
-                        {/* Actions */}
-                        {/* <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            {enquiry.status === "new" && (
-                              <>
-                                <Button
-                                  size="sm"
-                                  className="gap-1 h-8"
-                                  onClick={() =>
-                                    handleContactEnquiry(enquiry.id)
-                                  }
-                                  disabled={isUpdating}
-                                >
-                                  <Phone className="h-3 w-3" />
-                                  Contact
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  className="h-8"
-                                  onClick={() =>
-                                    handleDeclineEnquiry(enquiry.id)
-                                  }
-                                  disabled={isUpdating}
-                                >
-                                  Decline
-                                </Button>
-                              </>
-                            )}
-                            {enquiry.status === "contacted" && (
-                              <>
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="gap-1 h-8 bg-transparent"
-                                >
-                                  <MessageSquare className="h-3 w-3" />
-                                  Follow Up
-                                </Button>
-                                <Button
-                                  size="sm"
-                                  variant="destructive"
-                                  className="h-8"
-                                  onClick={() =>
-                                    handleCancelEnquiry(enquiry.id)
-                                  }
-                                  disabled={isDeleting}
-                                >
-                                  Cancel
-                                </Button>
-                              </>
-                            )}
-                            {enquiry.status === "cancelled" && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="gap-1 h-8"
-                              >
-                                <Eye className="h-3 w-3" />
-                                View
-                              </Button>
-                            )}
-                            {enquiry.status === "declined" && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                className="gap-1 h-8"
-                              >
-                                <Eye className="h-3 w-3" />
-                                View
-                              </Button>
-                            )}
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="gap-1 h-8"
-                              title={enquiry.booking.message}
-                            >
-                              <MessageSquare className="h-3 w-3" />
-                              Message
-                            </Button>
-                          </div>
-                        </TableCell> */}
                         <TableCell>
                           <div className="flex gap-2">
                             {enquiry.status === "new" && (
-                              <>
-                                <Button
-                                  size="sm"
-                                  className="gap-1"
-                                  onClick={() =>
-                                    handleContactEnquiry(enquiry.id)
-                                  }
-                                  disabled={isUpdating}
-                                >
-                                  <Phone className="h-3 w-3" />
-                                  Contact
-                                </Button>
-                                <div className="flex items-center gap-1">
-                                  {getSelectedReason(enquiry.id) ? (
-                                    <div className="flex items-center gap-1 bg-destructive/10 border border-destructive/20 rounded-md px-2 py-1">
-                                      <span className="text-xs text-destructive font-medium">
-                                        {getSelectedReason(enquiry.id)}
-                                      </span>
-                                      <Button
-                                        size="sm"
-                                        variant="ghost"
-                                        className="h-6 w-6 p-0 hover:bg-destructive/20"
-                                        onClick={() =>
-                                          handleClearDeclineSelection(
-                                            enquiry.id
-                                          )
-                                        }
-                                      >
-                                        <X className="h-3 w-3" />
-                                      </Button>
-                                      <Button
-                                        size="sm"
-                                        variant="destructive"
-                                        className="h-6 px-2 gap-1 ml-1"
-                                        onClick={() =>
-                                          handleSendDecline(enquiry.id)
-                                        }
-                                      >
-                                        <Send className="h-3 w-3" />
-                                        Send
-                                      </Button>
-                                    </div>
-                                  ) : (
-                                    <DropdownMenu>
-                                      <DropdownMenuTrigger asChild>
-                                        <Button
-                                          size="sm"
-                                          variant="destructive"
-                                          className="gap-1"
-                                        >
-                                          Decline
-                                          <ChevronDown className="h-3 w-3" />
-                                        </Button>
-                                      </DropdownMenuTrigger>
-                                      <DropdownMenuContent
-                                        align="end"
-                                        className="w-56"
-                                      >
-                                        {declineReasons.map((reason) => (
-                                          <DropdownMenuItem
-                                            key={reason}
-                                            onClick={() =>
-                                              handleDeclineSelect(
-                                                enquiry.id,
-                                                reason
-                                              )
-                                            }
-                                            className="cursor-pointer hover:bg-destructive/10 focus:bg-destructive/10"
-                                          >
-                                            {reason}
-                                          </DropdownMenuItem>
-                                        ))}
-                                      </DropdownMenuContent>
-                                    </DropdownMenu>
-                                  )}
-                                </div>
-                              </>
+                              <Button
+                                size="sm"
+                                className="gap-1"
+                                onClick={() => handleUnlockEnquiry(enquiry.id)}
+                                disabled={isUpdating}
+                              >
+                                <Unlock className="h-3 w-3" />
+                                Unlock
+                              </Button>
+                            )}
+                            {enquiry.status === "agentview" && (
+                              <Button
+                                size="sm"
+                                className="gap-1"
+                                onClick={() => handleContactEnquiry(enquiry.id)}
+                                disabled={isUpdating}
+                              >
+                                <Phone className="h-3 w-3" />
+                                Contact
+                              </Button>
                             )}
                             {enquiry.status === "contacted" && (
                               <>
@@ -705,9 +634,7 @@ export default function AgentTableView() {
                                         variant="ghost"
                                         className="h-6 w-6 p-0 hover:bg-destructive/20"
                                         onClick={() =>
-                                          handleClearDeclineSelection(
-                                            enquiry.id
-                                          )
+                                          handleClearCancelSelection(enquiry.id)
                                         }
                                       >
                                         <X className="h-3 w-3" />
@@ -717,7 +644,7 @@ export default function AgentTableView() {
                                         variant="destructive"
                                         className="h-6 px-2 gap-1 ml-1"
                                         onClick={() =>
-                                          handleSendDecline(enquiry.id)
+                                          handleSendCancel(enquiry.id)
                                         }
                                       >
                                         <Send className="h-3 w-3" />
@@ -740,11 +667,11 @@ export default function AgentTableView() {
                                         align="end"
                                         className="w-56"
                                       >
-                                        {declineReasons.map((reason) => (
+                                        {cancelReasons.map((reason) => (
                                           <DropdownMenuItem
                                             key={reason}
                                             onClick={() =>
-                                              handleDeclineSelect(
+                                              handleCancelSelect(
                                                 enquiry.id,
                                                 reason
                                               )
@@ -759,21 +686,6 @@ export default function AgentTableView() {
                                   )}
                                 </div>
                               </>
-                            )}
-                            {(enquiry.status === "cancelled" ||
-                              enquiry.status === "declined") && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="gap-1 border-green-500 text-green-700 hover:bg-green-50 hover:border-green-600 font-medium"
-                                onClick={() =>
-                                  handleReApproveEnquiry(enquiry.id)
-                                }
-                                disabled={isUpdating}
-                              >
-                                <RotateCcw className="h-3 w-3" />
-                                Re-approve
-                              </Button>
                             )}
                           </div>
                         </TableCell>

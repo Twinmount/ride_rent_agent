@@ -74,6 +74,9 @@ export enum Slug {
   GET_ENQUIRIES = "/queries",
   GET_PORTFOLIO = "/portfolio",
 
+  // admin enquiries endpoints
+  GET_ADMIN_ENQUIRIES = "/riderent/enquiries/admin/all",
+
   // SRM
   GET_SRM_LEVELS_FILLED = "/srm-bookings/levels-filled",
   POST_SRM_CUSTOMER_PUBLIC_FORM = "/auth/temp-auth-token",
