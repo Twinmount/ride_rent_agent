@@ -22,7 +22,7 @@ interface ContactVisibilityControlsProps {
 
 export const ContactVisibilityControls: React.FC<ContactVisibilityControlsProps> = ({
   enquiryId,
-  enquiryStatus,
+  enquiryStatus: _enquiryStatus,
   isMasked = true,
   onShowContactDetails,
   onHideContactDetails,
