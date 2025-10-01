@@ -4,6 +4,7 @@ import {
   useUpdateEnquiryStatus,
   useDeleteEnquiry,
   usePrefetchEnquiries,
+  useUpdateContactVisibility,
 } from "./useEnquiryQueries";
 import { type TransformedEnquiry } from "@/utils/enquiryUtils";
 import { enquiryHelpers } from "@/utils/enquiryHelpers";
@@ -50,17 +51,23 @@ interface UseEnquiryManagementReturn {
   ) => Promise<void>;
   deleteEnquiry: (enquiryId: string, cancelReason?: string) => Promise<void>;
   contactEnquiry: (enquiryId: string) => Promise<void>;
-  declineEnquiry: (enquiryId: string, cancelReason?: string) => Promise<void>;
   cancelEnquiry: (enquiryId: string, cancelReason?: string) => Promise<void>;
   reApproveEnquiry: (enquiryId: string) => Promise<void>;
+
+  // Contact Visibility Actions
+  handleContactVisibility: (
+    enquiryId: string,
+    action: "unlock" | "contact" | "enable_masking" | "disable_masking"
+  ) => Promise<void>;
 
   // Statistics
   stats: {
     total: number;
     new: number;
+    agentview: number;
     contacted: number;
     cancelled: number;
-    declined: number;
+    expired: number;
   };
 
   // Additional utilities
@@ -99,6 +106,7 @@ export const useEnquiryManagement = ({
   // Mutation hooks
   const updateStatusMutation = useUpdateEnquiryStatus();
   const deleteEnquiryMutation = useDeleteEnquiry();
+  const updateContactVisibilityMutation = useUpdateContactVisibility();
   const prefetchEnquiries = usePrefetchEnquiries();
 
   // Convert query errors to strings
@@ -108,11 +116,15 @@ export const useEnquiryManagement = ({
       : "An error occurred while fetching enquiries"
     : null;
 
-  const updateError = updateStatusMutation.error
-    ? updateStatusMutation.error instanceof Error
-      ? updateStatusMutation.error.message
-      : "Failed to update enquiry"
-    : null;
+  const updateError = (() => {
+    const statusError = updateStatusMutation.error;
+    const visibilityError = updateContactVisibilityMutation.error;
+    const error = statusError || visibilityError;
+
+    if (!error) return null;
+
+    return error instanceof Error ? error.message : "Failed to update enquiry";
+  })();
 
   const deleteError = deleteEnquiryMutation.error
     ? deleteEnquiryMutation.error instanceof Error
@@ -146,9 +158,10 @@ export const useEnquiryManagement = ({
     () => ({
       total: enquiries.length,
       new: enquiries.filter((e) => e.status === "new").length,
+      agentview: enquiries.filter((e) => e.status === "agentview").length,
       contacted: enquiries.filter((e) => e.status === "contacted").length,
       cancelled: enquiries.filter((e) => e.status === "cancelled").length,
-      declined: enquiries.filter((e) => e.status === "declined").length,
+      expired: enquiries.filter((e) => e.status === "expired").length,
     }),
     [enquiries]
   );
@@ -213,13 +226,6 @@ export const useEnquiryManagement = ({
     [updateEnquiryStatus]
   );
 
-  const declineEnquiry = useCallback(
-    async (enquiryId: string, cancelReason?: string) => {
-      return updateEnquiryStatus(enquiryId, "DECLINED", cancelReason);
-    },
-    [updateEnquiryStatus]
-  );
-
   const cancelEnquiry = useCallback(
     async (enquiryId: string, cancelReason?: string) => {
       return updateEnquiryStatus(enquiryId, "CANCELLED", cancelReason);
@@ -232,6 +238,44 @@ export const useEnquiryManagement = ({
       return updateEnquiryStatus(enquiryId, "NEW");
     },
     [updateEnquiryStatus]
+  );
+
+  // Contact visibility action functions
+  const handleContactVisibility = useCallback(
+    async (
+      enquiryId: string,
+      action: "unlock" | "contact" | "enable_masking" | "disable_masking"
+    ) => {
+      return new Promise<void>((resolve, reject) => {
+        let mutationOptions;
+
+        switch (action) {
+          case "unlock":
+            // Unlock button: NEW -> AGENTVIEW (show contact details)
+            mutationOptions = { enquiryId, action: "mark_agentview" as const };
+            break;
+          case "contact":
+            // Contact button: AGENTVIEW -> CONTACTED
+            mutationOptions = { enquiryId, action: "mark_contacted" as const };
+            break;
+          case "enable_masking":
+            mutationOptions = { enquiryId, action: "enable_masking" as const };
+            break;
+          case "disable_masking":
+            mutationOptions = { enquiryId, action: "disable_masking" as const };
+            break;
+          default:
+            reject(new Error(`Unknown action: ${action}`));
+            return;
+        }
+
+        updateContactVisibilityMutation.mutate(mutationOptions, {
+          onSuccess: () => resolve(),
+          onError: (error) => reject(error),
+        });
+      });
+    },
+    [updateContactVisibilityMutation]
   );
 
   // Helper functions
@@ -262,7 +306,9 @@ export const useEnquiryManagement = ({
     // Loading states
     loading,
     isRefetching,
-    isUpdating: updateStatusMutation.isPending,
+    isUpdating:
+      updateStatusMutation.isPending ||
+      updateContactVisibilityMutation.isPending,
     isDeleting: deleteEnquiryMutation.isPending,
 
     // Error handling
@@ -287,9 +333,11 @@ export const useEnquiryManagement = ({
     updateEnquiryStatus,
     deleteEnquiry,
     contactEnquiry,
-    declineEnquiry,
     cancelEnquiry,
     reApproveEnquiry,
+
+    // Contact Visibility Actions
+    handleContactVisibility,
 
     // Statistics
     stats,

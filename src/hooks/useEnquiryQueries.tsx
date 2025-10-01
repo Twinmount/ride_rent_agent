@@ -157,6 +157,48 @@ const cancelEnquiryApi = async ({
   return { response: response.data, agentId };
 };
 
+// Update Contact Visibility API function
+const updateContactVisibilityApi = async ({
+  enquiryId,
+  action,
+  isMasked,
+  status,
+}: {
+  enquiryId: string;
+  action?: "enable_masking" | "disable_masking" | "mark_agentview" | "mark_contacted";
+  isMasked?: boolean;
+  status?: string;
+}) => {
+  // Build request body based on provided parameters
+  const body: {
+    action?: string;
+    isMasked?: boolean;
+    status?: string;
+  } = {};
+
+  if (action) {
+    body.action = action;
+  }
+  if (isMasked !== undefined) {
+    body.isMasked = isMasked;
+  }
+  if (status) {
+    body.status = status;
+  }
+
+  const response = await axios.patch(
+    `${DEFAULT_API_CONFIG.baseURL}/enquiries/${enquiryId}/update-contact-visibility`,
+    body,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return response.data;
+};
+
 // Hook to fetch enquiries
 export const useEnquiries = (
   agentId: string,
@@ -230,6 +272,24 @@ export const useDeleteEnquiry = () => {
     },
     onError: (error) => {
       console.error("Failed to cancel enquiry:", error);
+    },
+  });
+};
+
+// Hook to update contact visibility
+export const useUpdateContactVisibility = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: updateContactVisibilityApi,
+    onSuccess: () => {
+      // Invalidate all enquiry list queries to refresh the data
+      queryClient.invalidateQueries({
+        queryKey: enquiryKeys.lists(),
+      });
+    },
+    onError: (error) => {
+      console.error("Failed to update contact visibility:", error);
     },
   });
 };
