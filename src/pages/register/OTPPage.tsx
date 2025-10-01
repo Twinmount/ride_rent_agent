@@ -109,6 +109,7 @@ const OTPPage = () => {
           className: "bg-yellow text-white",
         });
         let link = searchParams.get("country") || "ae";
+        if (link === "india") link = "in";
         navigate(`/${link}/login`);
       }
     } catch (error: any) {
