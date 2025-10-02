@@ -49,6 +49,8 @@ const fetchEnquiriesApi = async (
     totalPages: number;
   };
 }> => {
+  console.log("DEFAULT_API_CONFIG.baseURL: ", DEFAULT_API_CONFIG.baseURL);
+
   // Build query parameters
   const queryParams = new URLSearchParams({
     page: page.toString(),
@@ -165,7 +167,11 @@ const updateContactVisibilityApi = async ({
   status,
 }: {
   enquiryId: string;
-  action?: "enable_masking" | "disable_masking" | "mark_agentview" | "mark_contacted";
+  action?:
+    | "enable_masking"
+    | "disable_masking"
+    | "mark_agentview"
+    | "mark_contacted";
   isMasked?: boolean;
   status?: string;
 }) => {

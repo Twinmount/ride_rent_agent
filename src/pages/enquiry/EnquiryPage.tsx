@@ -42,13 +42,11 @@ import {
   Unlock,
 } from "lucide-react";
 import { useEnquiryManagement } from "@/hooks/useEnquiryManagement";
-
-// For demo purposes, using a hardcoded agent ID
-// In a real app, this would come from authentication context
-const userIdRaw = localStorage?.getItem("userId");
-const userId = userIdRaw ? JSON.parse(userIdRaw) : "";
+import { useAgentContext } from "@/context/AgentContext";
 
 export default function AgentTableView() {
+  const { userId } = useAgentContext();
+
   const {
     enquiries,
     loading,
@@ -59,11 +57,6 @@ export default function AgentTableView() {
     setSearchTerm,
     statusFilter,
     setStatusFilter,
-    // priorityFilter,
-    // setPriorityFilter,
-    // locationFilter,
-    // setLocationFilter,
-    // uniqueLocations,
     clearFilters,
     isRefetching,
     isUpdating,
