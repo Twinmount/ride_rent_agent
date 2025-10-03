@@ -7,6 +7,7 @@ interface ExpiryTimerProps {
   expiryMinutes?: number;
   status: string;
   className?: string;
+  onExpiry?: () => void; // Callback function to trigger refetch when enquiry expires
 }
 
 interface TimeRemaining {
@@ -21,7 +22,8 @@ export const ExpiryTimer: React.FC<ExpiryTimerProps> = ({
   createdAt,
   expiryMinutes = 30,
   status,
-  className
+  className,
+  onExpiry
 }) => {
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
     minutes: 0,
@@ -30,6 +32,9 @@ export const ExpiryTimer: React.FC<ExpiryTimerProps> = ({
     isWarning: false,
     isCritical: false
   });
+
+  // Track previous expiry state to detect when enquiry just expired
+  const [previouslyExpired, setPreviouslyExpired] = useState<boolean>(false);
 
   const calculateTimeRemaining = useCallback((): TimeRemaining => {
     try {
@@ -91,7 +96,14 @@ export const ExpiryTimer: React.FC<ExpiryTimerProps> = ({
     }
 
     const updateTimer = () => {
-      setTimeRemaining(calculateTimeRemaining());
+      const newTimeRemaining = calculateTimeRemaining();
+      setTimeRemaining(newTimeRemaining);
+      
+      // Check if enquiry just expired (transition from active to expired)
+      if (!previouslyExpired && newTimeRemaining.isExpired && onExpiry) {
+        onExpiry();
+        setPreviouslyExpired(true);
+      }
     };
 
     // Update immediately
@@ -102,6 +114,11 @@ export const ExpiryTimer: React.FC<ExpiryTimerProps> = ({
 
     return () => clearInterval(interval);
   }, [status, calculateTimeRemaining]);
+
+  // Reset previouslyExpired when enquiry changes (new enquiry loaded)
+  useEffect(() => {
+    setPreviouslyExpired(false);
+  }, [createdAt]);
 
   // Don't render timer for non-NEW status enquiries
   if (status.toLowerCase() !== 'new') {

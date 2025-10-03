@@ -66,13 +66,24 @@ export default function AgentTableView() {
     deleteError,
     cancelEnquiry,
     stats,
+
     // Contact visibility function
     handleContactVisibility,
   } = useEnquiryManagement({ agentId: userId || "" });
 
   console.log("filteredEnquiries: ", filteredEnquiries);
 
-  // Action handlers with error handling
+  // Handler for expiry-triggered refetch with user feedback
+  const handleExpiryRefetch = async () => {
+    // Add a small delay to ensure backend queue has processed the expiration
+    setTimeout(async () => {
+      try {
+        await refetch();
+      } catch (error) {
+        console.error('❌ Failed to refresh enquiries after expiry:', error);
+      }
+    }, 2000); // 2 second delay to ensure backend processing
+  };
   const handleUnlockEnquiry = async (enquiryId: string) => {
     try {
       await handleContactVisibility(enquiryId, "unlock");
@@ -601,6 +612,7 @@ export default function AgentTableView() {
                             createdAt={enquiry.createdAt}
                             status={enquiry.status}
                             expiryMinutes={30}
+                            onExpiry={handleExpiryRefetch} // Use enhanced refetch handler
                           />
                         </TableCell>
 

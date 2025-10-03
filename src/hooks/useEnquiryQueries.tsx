@@ -219,6 +219,7 @@ export const useEnquiries = (
     staleTime: 0,
     refetchOnWindowFocus: false,
     refetchOnMount: true,
+    refetchInterval: 5 * 60 * 1000, 
   });
 
   return {
