@@ -43,6 +43,7 @@ import {
 } from "lucide-react";
 import { useEnquiryManagement } from "@/hooks/useEnquiryManagement";
 import { useAgentContext } from "@/context/AgentContext";
+import { ExpiryTimer } from "@/components/ui/expiry-timer";
 
 export default function AgentTableView() {
   const { userId } = useAgentContext();
@@ -325,18 +326,20 @@ export default function AgentTableView() {
                 </div>
                 <div className="text-sm text-muted-foreground">Expired</div>
               </div>
-              {/* <div className="p-4 bg-card border rounded-lg">
-                <div className="text-2xl font-bold text-red-500">{stats.highPriority}</div>
-                <div className="text-sm text-muted-foreground">High Priority</div>
+              <div className="p-4 bg-card border rounded-lg border-orange-200 bg-orange-50">
+                <div className="text-2xl font-bold text-orange-600">
+                  {filteredEnquiries.filter(e => {
+                    if (e.status !== 'new') return false;
+                    const createdTime = new Date(e.createdAt).getTime();
+                    const expiryTime = createdTime + (30 * 60 * 1000);
+                    const now = Date.now();
+                    const timeRemaining = expiryTime - now;
+                    const minutesRemaining = Math.floor(timeRemaining / (1000 * 60));
+                    return minutesRemaining <= 6 && minutesRemaining > 0; // Warning when 6 minutes or less remaining
+                  }).length}
+                </div>
+                <div className="text-sm text-orange-700 font-medium">Expiring Soon</div>
               </div>
-              <div className="p-4 bg-card border rounded-lg">
-                <div className="text-2xl font-bold text-yellow-500">{stats.mediumPriority}</div>
-                <div className="text-sm text-muted-foreground">Medium Priority</div>
-              </div>
-              <div className="p-4 bg-card border rounded-lg">
-                <div className="text-2xl font-bold text-gray-500">{stats.lowPriority}</div>
-                <div className="text-sm text-muted-foreground">Low Priority</div>
-              </div> */}
             </div>
 
             {/* Update/Delete Errors */}
@@ -456,6 +459,19 @@ export default function AgentTableView() {
                       .length
                   }
                 </span>
+                <span className="flex items-center gap-1 text-orange-600 font-medium">
+                  <div className="w-2 h-2 bg-orange-600 rounded-full animate-pulse"></div>
+                  Expiring Soon:{" "}
+                  {filteredEnquiries.filter(e => {
+                    if (e.status !== 'new') return false;
+                    const createdTime = new Date(e.createdAt).getTime();
+                    const expiryTime = createdTime + (30 * 60 * 1000);
+                    const now = Date.now();
+                    const timeRemaining = expiryTime - now;
+                    const minutesRemaining = Math.floor(timeRemaining / (1000 * 60));
+                    return minutesRemaining <= 6 && minutesRemaining > 0;
+                  }).length}
+                </span>
               </div>
             </div>
 
@@ -469,6 +485,7 @@ export default function AgentTableView() {
                     <TableHead>Customer</TableHead>
                     <TableHead>Booking Details</TableHead>
                     <TableHead>Status</TableHead>
+                    <TableHead>Expiry</TableHead>
                     <TableHead>Enquiry Date</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -476,7 +493,7 @@ export default function AgentTableView() {
                 <TableBody>
                   {loading ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8">
+                      <TableCell colSpan={8} className="text-center py-8">
                         <div className="flex items-center justify-center gap-2">
                           <Loader2 className="h-5 w-5 animate-spin" />
                           <span>Loading enquiries...</span>
@@ -485,7 +502,7 @@ export default function AgentTableView() {
                     </TableRow>
                   ) : filteredEnquiries.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} className="text-center py-8">
+                      <TableCell colSpan={8} className="text-center py-8">
                         <div className="text-muted-foreground">
                           {enquiries.length === 0
                             ? "No enquiries found"
@@ -578,9 +595,18 @@ export default function AgentTableView() {
                         {/* Status */}
                         <TableCell>{getStatusBadge(enquiry.status)}</TableCell>
 
+                        {/* Expiry Timer */}
+                        <TableCell>
+                          <ExpiryTimer 
+                            createdAt={enquiry.createdAt}
+                            status={enquiry.status}
+                            expiryMinutes={30}
+                          />
+                        </TableCell>
+
                         {/* Enquiry Date */}
                         <TableCell className="text-sm text-muted-foreground">
-                          {formatDate(enquiry.enquiryDate)}
+                          {formatDate(enquiry.createdAt)}
                         </TableCell>
                         <TableCell>
                           <div className="flex gap-2">

@@ -24,6 +24,7 @@ export interface TransformedEnquiry {
   };
   status: string;
   enquiryDate: string;
+  createdAt: string;
 }
 
 export interface ApiEnquiry {
@@ -261,6 +262,7 @@ export const transformEnquiryData = (
       },
       status: enquiry.status.toLowerCase(),
       enquiryDate: formatEnquiryDate(enquiry.createdAt),
+      createdAt: enquiry.createdAt,
     };
   });
 };
