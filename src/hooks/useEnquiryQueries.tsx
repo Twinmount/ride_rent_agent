@@ -217,7 +217,7 @@ export const useEnquiries = (
     queryFn: () => fetchEnquiriesApi(agentId, status, page, limit),
     enabled: !!agentId,
     staleTime: 0,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     refetchOnMount: true,
     refetchInterval: 5 * 60 * 1000, 
   });
