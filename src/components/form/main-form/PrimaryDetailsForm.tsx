@@ -119,18 +119,18 @@ export default function PrimaryDetailsForm({
       .then((res: any) => {
         setData(res?.result);
       })
-      .catch(() => setData(null));
+      .catch(() => setData(null));;
   }, [vehicleId]);
 
   const initialValues = formData
     ? {
-        ...formData,
-        cityIds: [
-          ...formData.cityIds,
-          ...(formData.tempCitys ?? []).map((city: CityType) => city.cityId),
-        ],
-      }
-    : getPrimaryFormDefaultValues(isIndia, countryCode);
+      ...formData,
+      cityIds: [
+        ...formData.cityIds,
+        ...(formData.tempCitys ?? []).map((city: CityType) => city.cityId),
+      ],
+    }
+    : getPrimaryFormDefaultValues(isIndia, countryCode, countryCode);
 
   // Define your form.
   const form = useForm<z.infer<typeof PrimaryFormSchema>>({
@@ -616,9 +616,8 @@ export default function PrimaryDetailsForm({
                   <span className="text-sm text-gray-500">(DD/MM/YYYY)</span>
                 </span>
               }
-              description={`Enter the expiry date for the Registration Card ${
-                isIndia ? "" : "/ Mulkia"
-              } in the format DD/MM/YYYY.`}
+              description={`Enter the expiry date for the Registration Card ${isIndia ? "" : "/ Mulkia"
+                } in the format DD/MM/YYYY.`}
             >
               <DatePicker
                 selected={field.value}

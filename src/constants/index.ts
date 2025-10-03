@@ -25,21 +25,22 @@ import {
   Box,
   Globe,
   Users,
+  MessageSquare,
 } from "lucide-react";
 
 // sidebar content
 export const sidebarContent = [
   { label: "Dashboard", icon: LayoutDashboard, link: "/" },
   { label: "My Listings", icon: List, link: "/listings" },
-  // {
-  //   label: "SRM",
-  //   icon: Box,
-  //   link: "/srm",
-  // },
   {
     label: "Profile",
     icon: UserRoundPen,
     link: "/profile",
+  },
+  {
+    label: "Enquiries",
+    icon: MessageSquare,
+    link: "/enquiries",
   },
 ];
 

@@ -24,6 +24,8 @@ const BaseConfig: Config = {
   ),
 };
 
+console.log("BaseConfig: ", BaseConfig);
+
 // Export the configuration as a readonly object to prevent modification.
 export const Config: Readonly<Config> = { ...BaseConfig };
 

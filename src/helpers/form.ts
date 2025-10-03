@@ -316,7 +316,7 @@ export function mapGetPrimaryFormToPrimaryFormType(
       | "USA_SPEC"
       | "OTHERS",
     rentalDetails: data.rentalDetails,
-    phoneNumber: formattedPhoneNumber, // Set the combined phone number
+    phoneNumber: formattedPhoneNumber,
     stateId: data.stateId,
     cityIds: data.cityIds,
     additionalVehicleTypes: data?.additionalVehicleTypes || [],

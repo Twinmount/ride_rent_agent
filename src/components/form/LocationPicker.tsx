@@ -1,6 +1,7 @@
 // LocationPicker.tsx
 import React, { useState } from "react";
 import MapModal from "./MapModal";
+import { toast } from "@/components/ui/use-toast";
 
 interface Location {
   lat: number;
@@ -23,18 +24,27 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const hasLocation =
+    initialLocation?.lat !== undefined && initialLocation?.lng !== undefined;
+
+  const appliedText = hasLocation ? "Change Location" : buttonText;
+
   const openModal = () => setIsOpen(true);
   const closeModal = () => setIsOpen(false);
 
   const handleLocationSelected = (location: Location) => {
     onChangeHandler(location);
+    toast({
+      title: `Location added successful`,
+      className: "bg-yellow text-white",
+    });
     closeModal();
   };
 
   return (
     <>
       <button type="button" onClick={openModal} className={buttonClassName}>
-        {buttonText}
+        {appliedText}
       </button>
 
       {/* Only render the map component when modal is open */}

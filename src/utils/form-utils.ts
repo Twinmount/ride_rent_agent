@@ -1,6 +1,6 @@
 // utils/submitForm.ts
 import { addPrimaryDetailsForm, updatePrimaryDetailsForm } from "@/api/vehicle";
-import { deleteMultipleFiles } from "@/helpers/form";
+// import { deleteMultipleFiles } from "@/helpers/form";
 import { PrimaryFormType } from "@/types/types";
 
 export const handleLevelOneFormSubmission = async (
@@ -11,7 +11,6 @@ export const handleLevelOneFormSubmission = async (
     userId,
     vehicleId,
     isCarsCategory,
-    deletedFiles,
   }: {
     countryCode: string;
     userId?: string;
@@ -38,9 +37,9 @@ export const handleLevelOneFormSubmission = async (
     );
   }
 
-  if (data) {
-    await deleteMultipleFiles(deletedFiles);
-  }
+  // if (data) {
+  //   await deleteMultipleFiles(deletedFiles);
+  // }
 
   return data;
 };
