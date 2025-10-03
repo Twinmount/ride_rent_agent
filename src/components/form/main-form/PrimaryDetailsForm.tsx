@@ -130,7 +130,7 @@ export default function PrimaryDetailsForm({
         ...(formData.tempCitys ?? []).map((city: CityType) => city.cityId),
       ],
     }
-    : getPrimaryFormDefaultValues(isIndia, countryCode, countryCode);
+    : getPrimaryFormDefaultValues(isIndia, countryCode);
 
   // Define your form.
   const form = useForm<z.infer<typeof PrimaryFormSchema>>({
