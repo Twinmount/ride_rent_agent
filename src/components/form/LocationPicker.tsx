@@ -1,6 +1,7 @@
 // LocationPicker.tsx
 import React, { useState } from "react";
 import MapModal from "./MapModal";
+import { toast } from "@/components/ui/use-toast";
 
 interface Location {
   lat: number;
@@ -26,10 +27,6 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
   const hasLocation =
     initialLocation?.lat !== undefined && initialLocation?.lng !== undefined;
 
-  const appliedClassName = hasLocation
-    ? "w-full cursor-pointer bg-yellow text-white px-4 py-2 rounded-md"
-    : buttonClassName;
-
   const appliedText = hasLocation ? "Change Location" : buttonText;
 
   const openModal = () => setIsOpen(true);
@@ -37,12 +34,16 @@ const LocationPicker: React.FC<LocationPickerProps> = ({
 
   const handleLocationSelected = (location: Location) => {
     onChangeHandler(location);
+    toast({
+      title: `Location added successful`,
+      className: "bg-yellow text-white",
+    });
     closeModal();
   };
 
   return (
     <>
-      <button type="button" onClick={openModal} className={appliedClassName}>
+      <button type="button" onClick={openModal} className={buttonClassName}>
         {appliedText}
       </button>
 
