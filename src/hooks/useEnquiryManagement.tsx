@@ -135,15 +135,23 @@ export const useEnquiryManagement = ({
   // Filter enquiries based on search term and filters
   const filteredEnquiries = enquiries.filter((enquiry) => {
     const matchesSearch =
-      enquiry.car.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      enquiry.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      enquiry.car.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      enquiry.booking.message.toLowerCase().includes(searchTerm.toLowerCase());
+      enquiry?.car?.name
+        ?.toLowerCase()
+        ?.includes(searchTerm?.toLowerCase() || "") ||
+      enquiry?.customer?.name
+        ?.toLowerCase()
+        ?.includes(searchTerm?.toLowerCase() || "") ||
+      enquiry?.car?.location
+        ?.toLowerCase()
+        ?.includes(searchTerm?.toLowerCase() || "") ||
+      enquiry?.booking?.message
+        ?.toLowerCase()
+        ?.includes(searchTerm?.toLowerCase() || "");
 
     const matchesStatus =
-      statusFilter === "all" || enquiry.status === statusFilter;
+      statusFilter === "all" || enquiry?.status === statusFilter;
     const matchesLocation =
-      locationFilter === "all" || enquiry.car.location === locationFilter;
+      locationFilter === "all" || enquiry?.car?.location === locationFilter;
 
     return matchesSearch && matchesStatus && matchesLocation;
   });
