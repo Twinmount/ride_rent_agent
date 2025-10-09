@@ -80,12 +80,12 @@ const RegistrationForm = ({ country }: { country: string }) => {
         if (typeof errorMessage === "string") {
           form.setError("phoneNumber", {
             type: "manual",
-            message: "mobile already registered",
+            message: "Mobile already registered",
           });
         } else if (errorMessage[0]?.constraints?.IsCustomPhoneNumber) {
           form.setError("phoneNumber", {
             type: "manual",
-            message: "mobile number is invalid",
+            message: "Mobile number is invalid",
           });
         }
       } else {
