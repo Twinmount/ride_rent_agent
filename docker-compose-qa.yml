@@ -1,0 +1,10 @@
+version: "3.8"
+
+services:
+  web-agent-qa:
+    build:
+      context: .
+      dockerfile: Dockerfile-dev
+    ports:
+      - "4001:80"
+    restart: always
