@@ -94,7 +94,7 @@ const ResetPasswordOTPPage = () => {
                       Please enter the OTP sent to your{" "}
                       <span className="font-bold">registered</span> number.
                       <br />
-                      OTP is valid for only 10 minutes
+                      Valid for only 10 minutes.
                     </FormDescription>
                     <FormMessage className="ml-2" />
                   </FormItem>

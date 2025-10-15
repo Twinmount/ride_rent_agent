@@ -1,4 +1,4 @@
-name: Deploy to HostHatch
+name: Deploy to AWS EC2 (ride-rent-stage)
 
 on:
   push:
@@ -6,40 +6,35 @@ on:
       - development
 
 jobs:
-  deploy:
+  deploy-Agent-:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Setup SSH
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          sed -i 's/\r$//' ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy via SSH
+      - name: Deploy Agent via SSH
         run: |
-          ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            set -e
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            echo "🚀 Deploying Agent..."
 
-            # Go to repo folder and update code
-            cd /root/docker/ride-rent/ride_rent_agent
+            cd /home/ubuntu/ride_rent_agent
             git fetch origin
             git checkout development || git checkout -b development origin/development
             git reset --hard origin/development
 
-            # Move back to central compose folder
             cd ..
-
-            # Stop old container
             docker compose down ride-rent-agent || true
-
-            # Build fresh image without cache
             docker compose build --no-cache ride-rent-agent
-
-            # Start container in detached mode
             docker compose up -d ride-rent-agent
+
+            echo "✅ Agent deployed successfully."
           EOF
