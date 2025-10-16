@@ -124,12 +124,12 @@ export default function PrimaryDetailsForm({
 
   const initialValues = formData
     ? {
-        ...formData,
-        cityIds: [
-          ...formData.cityIds,
-          ...(formData.tempCitys ?? []).map((city: CityType) => city.cityId),
-        ],
-      }
+      ...formData,
+      cityIds: [
+        ...formData.cityIds,
+        ...(formData.tempCitys ?? []).map((city: CityType) => city.cityId),
+      ],
+    }
     : getPrimaryFormDefaultValues(isIndia, countryCode);
 
   // Define your form.
@@ -612,9 +612,8 @@ export default function PrimaryDetailsForm({
                   <span className="text-sm text-gray-500">(DD/MM/YYYY)</span>
                 </span>
               }
-              description={`Enter the expiry date for the Registration Card ${
-                isIndia ? "" : "/ Mulkia"
-              } in the format DD/MM/YYYY.`}
+              description={`Enter the expiry date for the Registration Card ${isIndia ? "" : "/ Mulkia"
+                } in the format DD/MM/YYYY.`}
             >
               <DatePicker
                 selected={field.value}
@@ -990,7 +989,7 @@ export default function PrimaryDetailsForm({
                         onChange={field.onChange}
                       />
                       <FormDescription className="ml-7 mt-1">
-                        Select if your accepts payments via Cash.
+                        Select if your accepts payments by Cash.
                       </FormDescription>
                       <FormMessage className="ml-2" />
                     </div>
