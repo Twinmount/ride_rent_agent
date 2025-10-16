@@ -32,7 +32,7 @@ const ResetPasswordPage = ({ country = 'ae' }: { country?: string }) => {
   const [countryCode, setCountryCode] = useState("");
   const navigate = useNavigate();
 
-  const { setAppState, updateAppCountry } = useAgentContext();
+  const { updateAppCountry } = useAgentContext();
 
   useEffect(() => {
     updateAppCountry(country === "india" ? "in" : "ae");
