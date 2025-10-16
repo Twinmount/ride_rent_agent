@@ -16,7 +16,7 @@ export const CompanyFormSchema = (isIndia: boolean) =>
       .max(50, "Maximum 50 characters allowed"),
     companyLogo: z.string().min(1, "Company logo is required"),
     commercialLicense: z.string().min(1, "Commercial License is required"),
-    expireDate: z.date(),
+    expireDate: isIndia ? z.date().optional() : z.date(),
     regNumber: z
       .string()
       .min(1, `${isIndia ? "GST" : "Registration"} number is required`)
@@ -87,7 +87,7 @@ export const IndividualFormSchema = z.object({
 // Company Form Schema
 export const ProfileUpdateFormSchema = z.object({
   commercialLicense: z.string().min(1, "Commercial License is required"),
-  expireDate: z.date(),
+  expireDate: z.date().optional(),
   regNumber: z.string().min(1, "Registration number is required"),
   companyAddress: z
     .string()

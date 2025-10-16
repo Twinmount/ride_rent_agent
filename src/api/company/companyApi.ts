@@ -15,7 +15,7 @@ export interface CompanyType {
   companyName: string;
   companyLogo: string;
   commercialLicense: string;
-  expireDate: Date;
+  expireDate?: Date;
   regNumber: string;
   location?: Location;
 }
@@ -29,7 +29,7 @@ export const addCompany = async (values: CompanyFormType, userId: string) => {
       body: {
         userId: userId,
         companyName: values.companyName,
-        expireDate: values.expireDate!.toISOString(),
+        expireDate: values?.expireDate ? values?.expireDate!.toISOString() : null,
         regNumber: values.regNumber,
         companyLogo: values.companyLogo, // Assuming this is a URL or string
         commercialLicense: values.commercialLicense, // Assuming this is a URL or string'
@@ -57,7 +57,7 @@ export const updateCompanyProfile = async (
       slug: Slug.PUT_COMPANY,
       body: {
         companyId: companyId,
-        expireDate: values.expireDate!.toISOString(),
+        expireDate: values.expireDate ? values.expireDate!.toISOString() : null,
         regNumber: values.regNumber,
         commercialLicense: values.commercialLicense, // Assuming this is a URL or string
         companyAddress: values.companyAddress,
@@ -81,7 +81,7 @@ export const updateCompany = async (values: CompanyType, companyId: string) => {
       body: {
         companyId: companyId,
         companyName: values.companyName,
-        expireDate: values.expireDate!.toISOString(),
+        expireDate: values?.expireDate ? values?.expireDate!.toISOString() : null,
         regNumber: values.regNumber,
         companyLogo: values.companyLogo, // Assuming this is a URL or string
         commercialLicense: values.commercialLicense, // Assuming this is a URL or string
