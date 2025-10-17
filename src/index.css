@@ -140,3 +140,11 @@
 .custom-register-modal-content > button {
   color: #ffffff !important;
 }
+
+.leaflet-control-container {
+  display: none !important;
+}
+
+.leaflet-bottom {
+  display: none !important;
+}

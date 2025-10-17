@@ -46,7 +46,7 @@ export type CompanyFormType = {
   companyName: string;
   companyLogo: string;
   commercialLicense: string;
-  expireDate: Date | undefined;
+  expireDate?: Date | undefined;
   regNumber: string;
   companyAddress: string;
   companyLanguages: string[];
@@ -57,7 +57,7 @@ export type CompanyFormType = {
 
 export type ProfileUpdateFormType = {
   commercialLicense: string;
-  expireDate: Date | undefined;
+  expireDate?: Date | undefined;
   regNumber: string;
   companyAddress: string;
   companyLanguages: string[];

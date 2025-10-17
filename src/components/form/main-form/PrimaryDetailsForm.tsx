@@ -993,7 +993,7 @@ export default function PrimaryDetailsForm({
                         onChange={field.onChange}
                       />
                       <FormDescription className="ml-7 mt-1">
-                        Select if your accepts payments via Cash.
+                        Select if your accepts payments by Cash.
                       </FormDescription>
                       <FormMessage className="ml-2" />
                     </div>

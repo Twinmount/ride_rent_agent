@@ -198,7 +198,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
 
           <div className="text-sm text-center">
             An OTP will be sent to your provided{" "}
-            <span className="font-bold">mobile</span> number
+            <span className="font-bold">WhatsApp Mobile Number</span>
           </div>
 
           <Button

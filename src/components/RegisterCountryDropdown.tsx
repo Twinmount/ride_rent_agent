@@ -1,9 +1,22 @@
-type CountryKey = keyof typeof countries;
-
 import { useAgentContext } from "@/context/AgentContext";
 import { useState } from "react";
 
-const countries = {
+type Country = {
+  registerUrl: string;
+  loginUrl: string;
+  forgotPasswordUrl: string;
+  imagePath: string;
+  name: string;
+  value: string;
+};
+
+type CountryKey = "UAE" | "India";
+
+type Countries = {
+  [key in CountryKey]: Country;
+};
+
+const countries: Countries = {
   UAE: {
     name: "UAE",
     value: "ae",
@@ -11,6 +24,7 @@ const countries = {
       "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f1e6-1f1ea.svg",
     registerUrl: "/ae/register",
     loginUrl: "/ae/login",
+    forgotPasswordUrl: "/ae/reset-password",
   },
   India: {
     name: "India",
@@ -19,6 +33,7 @@ const countries = {
       "https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f1ee-1f1f3.svg", // 🇮🇳
     registerUrl: "/in/register",
     loginUrl: "/in/login",
+    forgotPasswordUrl: "/in/reset-password",
   },
 };
 
@@ -34,6 +49,26 @@ const RegisterCountryDropdown = ({
   );
   const [open, setOpen] = useState(false);
   const { updateAppCountry } = useAgentContext();
+
+  const switchHref = (type: string, country) => {
+    let href: string;
+
+    switch (type) {
+      case "register":
+        href = country.registerUrl;
+        break;
+      case "login":
+        href = country.loginUrl;
+        break;
+      case "forgotPassword":
+        href = country.forgotPasswordUrl;
+        break;
+      default:
+        href = country.loginUrl;
+    }
+
+    return href;
+  };
 
   return (
     <div className="relative inline-block text-left">
@@ -57,7 +92,7 @@ const RegisterCountryDropdown = ({
           {Object.entries(countries).map(([key, country]) => (
             <a
               href={
-                type === "register" ? country.registerUrl : country.loginUrl
+                switchHref(type, country)
               }
               key={key}
               onClick={() => {

@@ -242,7 +242,7 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
               </Button>
             </div>
             <div className="px-2 mt-3 flex-between max-sm:text-xs">
-              <Link to={"/reset-password"} className="text-yellow">
+              <Link to={`${country === "india" ? "/in" : "/ae"}/reset-password`} className="text-yellow">
                 Forgot Password ?
               </Link>
               <div>

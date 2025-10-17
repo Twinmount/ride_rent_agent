@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -22,6 +22,7 @@ import Footer from "@/components/footer/Footer";
 
 const ResetPasswordOTPPage = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const form = useForm<z.infer<typeof OTPFormSchema>>({
     resolver: zodResolver(OTPFormSchema),
@@ -30,7 +31,8 @@ const ResetPasswordOTPPage = () => {
 
   async function onSubmit(values: z.infer<typeof OTPFormSchema>) {
     sessionStorage.setItem("otp", values.otp);
-    navigate("/confirm-new-password");
+    let link = searchParams.get("country") || "ae";
+    navigate("/confirm-new-password?country=" + link);
   }
 
   return (
