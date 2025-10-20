@@ -1,3 +1,4 @@
+import { FormCheckbox } from "../../form-ui/FormCheckbox";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -283,6 +284,30 @@ export default function CompanyRegistrationForm({
             </FormFieldLayout>
           )}
         />
+
+        {/* no registration checkbox for India */}
+        {isIndia && (
+          <FormField
+            control={form.control}
+            name="noRegNumber"
+            render={({ field }) => (
+              <FormFieldLayout label="No GST / Registration Number" description="Check if your company does not have a GST number.">
+                <FormCheckbox
+                  id={field.name}
+                  checked={!!field.value}
+                  onChange={(checked) => {
+                    field.onChange(checked);
+                    if (checked) {
+                      // clear regNumber when checkbox is checked
+                      form.setValue("regNumber", "");
+                    }
+                  }}
+                  label={"I do not have a GST number"}
+                />
+              </FormFieldLayout>
+            )}
+          />
+        )}
 
         {/* company languages */}
         <FormField

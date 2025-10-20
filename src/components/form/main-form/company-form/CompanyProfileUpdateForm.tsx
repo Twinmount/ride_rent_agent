@@ -17,7 +17,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ProfileUpdateFormDefaultValues } from "@/constants";
-import { ProfileUpdateFormSchema } from "@/lib/validator";
+import {
+  ProfileUpdateFormSchemaWithConditionalReg,
+} from "@/lib/validator";
 import { ProfileUpdateFormType } from "@/types/types";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -36,6 +38,7 @@ import CompanyLanguagesDropdown from "../../dropdowns/CompanyLanguagesDropdown";
 import { Textarea } from "@/components/ui/textarea";
 import { useQueryClient } from "@tanstack/react-query";
 import LocationPicker from "../../LocationPicker";
+import { FormCheckbox } from "../../form-ui/FormCheckbox";
 
 type CompanyProfileUpdateFormProps = {
   formData?: ProfileUpdateFormType | null;
@@ -69,16 +72,16 @@ export default function CompanyProfileUpdateForm({
   const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
   const { userId } = jwtDecode<DecodedRefreshToken>(refreshToken as string);
   const isIndia = country === "India" || country === "india";
-  // creating form
-  const form = useForm<z.infer<typeof ProfileUpdateFormSchema>>({
-    resolver: zodResolver(ProfileUpdateFormSchema),
+  // creating form (use schema with conditional regNumber validation)
+  const form = useForm<z.infer<typeof ProfileUpdateFormSchemaWithConditionalReg>>({
+    resolver: zodResolver(ProfileUpdateFormSchemaWithConditionalReg),
     defaultValues: initialValues,
   });
 
   const isIndividual =
     !!formData?.accountType && formData?.accountType === "individual";
 
-  async function onSubmit(values: z.infer<typeof ProfileUpdateFormSchema>) {
+  async function onSubmit(values: z.infer<typeof ProfileUpdateFormSchemaWithConditionalReg>) {
     console.log('working');
 
     if (isLicenseUploading) {
@@ -242,6 +245,33 @@ export default function CompanyProfileUpdateForm({
               </FormItem>
             )}
           />
+          {isIndia && !isIndividual && (
+            <FormField
+              control={form.control}
+              name="noRegNumber"
+              render={({ field }) => (
+                <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg" />
+                  <div className="flex-col items-start w-full">
+                    <FormControl>
+                      <FormCheckbox
+                        id={field.name}
+                        checked={!!field.value}
+                        onChange={(checked) => {
+                          field.onChange(checked);
+                          if (checked) form.setValue("regNumber", "");
+                        }}
+                        label={"I do not have a GST number"}
+                      />
+                    </FormControl>
+                    <FormDescription className="mt-1 ml-1">
+                      If your company doesn't have a GST number, check this box to skip validation.
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+          )}
           <FormField
             control={form.control}
             name="companyLanguages"
