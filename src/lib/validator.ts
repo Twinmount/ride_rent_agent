@@ -9,7 +9,8 @@ export const RegistrationFormSchema = z.object({
 
 // Company Form Schema
 export const CompanyFormSchema = (isIndia: boolean) =>
-  z.object({
+  z
+    .object({
     companyName: z
       .string()
       .min(1, "Company name is required")
@@ -17,22 +18,9 @@ export const CompanyFormSchema = (isIndia: boolean) =>
     companyLogo: z.string().min(1, "Company logo is required"),
     commercialLicense: z.string().min(1, "Commercial License is required"),
     expireDate: isIndia ? z.date().optional() : z.date(),
-    regNumber: z
-      .string()
-      .min(1, `${isIndia ? "GST" : "Registration"} number is required`)
-      .refine(
-        (val) => {
-          if (isIndia) {
-            return /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/.test(
-              val
-            );
-          }
-          return true; // Skip validation if not India
-        },
-        {
-          message: "Invalid GST number format",
-        }
-      ),
+    // If noRegNumber is true (used for India), regNumber becomes optional
+    noRegNumber: isIndia ? z.boolean().optional().default(false) : z.boolean().optional().default(false),
+    regNumber: z.string().optional(),
     companyAddress: z
       .string()
       .min(5, "Company address is required")
@@ -50,7 +38,31 @@ export const CompanyFormSchema = (isIndia: boolean) =>
       .refine((val) => val.lat && val.lng, {
         message: "Location is required",
       }),
-  });
+    })
+    .superRefine((data, ctx) => {
+      const noReg = (data as any).noRegNumber;
+      const reg = (data as any).regNumber;
+      if (!noReg) {
+        // regNumber is required when noRegNumber is false
+        if (!reg || (typeof reg === "string" && reg.trim().length === 0)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `${isIndia ? "GST" : "Registration"} number is required`,
+            path: ["regNumber"],
+          });
+        } else if (isIndia) {
+          // if India, validate GST format
+          const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/;
+          if (!gstRegex.test(reg)) {
+            ctx.addIssue({
+              code: z.ZodIssueCode.custom,
+              message: "Invalid GST number format",
+              path: ["regNumber"],
+            });
+          }
+        }
+      }
+    });
 
 // individual Form Schema
 export const IndividualFormSchema = z.object({
@@ -88,7 +100,9 @@ export const IndividualFormSchema = z.object({
 export const ProfileUpdateFormSchema = z.object({
   commercialLicense: z.string().min(1, "Commercial License is required"),
   expireDate: z.date().optional(),
-  regNumber: z.string().min(1, "Registration number is required"),
+  // Allow optional noRegNumber flag to make regNumber optional when true (India only handled in forms)
+  noRegNumber: z.boolean().optional().default(false),
+  regNumber: z.string().optional(),
   companyAddress: z
     .string()
     .min(5, "Company address is required")
@@ -105,6 +119,21 @@ export const ProfileUpdateFormSchema = z.object({
     .refine((val) => val.lat && val.lng, {
       message: "Location is required",
     }),
+});
+
+// Add object-level validation to conditionally require regNumber based on noRegNumber
+export const ProfileUpdateFormSchemaWithConditionalReg = ProfileUpdateFormSchema.superRefine((data, ctx) => {
+  const noReg = (data as any).noRegNumber;
+  const reg = (data as any).regNumber;
+  if (!noReg) {
+    if (!reg || (typeof reg === "string" && reg.trim().length === 0)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Registration number is required",
+        path: ["regNumber"],
+      });
+    }
+  }
 });
 
 // otp page form schema
@@ -165,7 +194,7 @@ export const PrimaryFormSchema = z
       .min(1, "At least one vehicle photo is required"),
     vehicleVideos: z.array(z.string().optional()),
     commercialLicenses: z.array(z.string().optional()),
-    commercialLicenseExpireDate: z.date(),
+    commercialLicenseExpireDate: z.date().optional(),
     isLease: z.boolean().default(false),
     isCryptoAccepted: z.boolean().default(false),
     isVehicleModified: z.boolean().default(false),

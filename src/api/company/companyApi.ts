@@ -16,7 +16,7 @@ export interface CompanyType {
   companyLogo: string;
   commercialLicense: string;
   expireDate?: Date;
-  regNumber: string;
+  regNumber?: string;
   location?: Location;
 }
 
