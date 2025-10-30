@@ -31,10 +31,9 @@ jobs:
             git checkout development || git checkout -b development origin/development
             git reset --hard origin/development
 
-            cd ..
             docker compose down ride-rent-agent || true
-            docker compose build --no-cache ride-rent-agent
-            docker compose up -d ride-rent-agent
+            docker compose -f docker-compose-dev.yml build --no-cache
+            docker compose -f docker-compose-dev.yml up -d
 
             echo "✅ Agent deployed successfully."
           EOF
