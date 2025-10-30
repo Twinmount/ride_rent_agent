@@ -65,11 +65,16 @@ const AgentProvider = ({ children }: AgentProviderProps) => {
     agentId: "",
   });
 
+  const isLoginOrRegisterPage =
+    window.location.pathname.includes("login") ||
+    window.location.pathname.includes("register");
+
   const { data, isLoading, isError } = useQuery({
     queryKey: ["users", accessToken, refreshToken],
     queryFn: getUser,
-    enabled: !!accessToken && !!refreshToken,
+    enabled: !!accessToken && !!refreshToken && !isLoginOrRegisterPage,
   });
+
 
   const { agentId, id } = data?.result || {};
 
