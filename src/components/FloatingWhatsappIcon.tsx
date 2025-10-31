@@ -18,7 +18,7 @@ const FloatingWhatsAppButton: React.FC = () => {
 
   return (
     <div
-      className={`fixed bottom-8 right-0 z-10 h-14 flex items-center rounded-l-full  bg-green-500  transition-all duration-300 ${
+      className={`fixed bottom-24 right-0 z-10 h-14 flex items-center rounded-l-full  bg-green-500  transition-all duration-300 ${
         isExpanded ? "w-48" : "w-12"
       }`}
     >
@@ -34,7 +34,7 @@ const FloatingWhatsAppButton: React.FC = () => {
         <div className="flex flex-col justify-center items-start px-4 h-full text-sm text-white bg-green-500 rounded-r-full">
           <Link
             to={
-              "https://api.whatsapp.com/send?phone=971502972335&text=Hello%2C%0AI would like to list my vehicles with https%3A%2F%2Fagent.ride.rent%2Fregister %26 advertise my fleet for *free*. "
+              "https://api.whatsapp.com/send?phone=919686443261&text=Hi%2C%20I%E2%80%99d%20like%20to%20connect%20with%20Ride.Rent%20Support%20for%20assistance. would like to list my vehicles with https%3A%2F%2Fagent.ride.rent%2Fregister %26 advertise my fleet for *free*. "
             }
             target="_blank"
             className="hover:underline"

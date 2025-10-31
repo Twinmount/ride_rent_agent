@@ -14,9 +14,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
 import { Link, useLocation } from "react-router-dom";
-import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
 import { useEffect } from "react";
 import { useAgentContext } from "@/context/AgentContext";
 
@@ -28,7 +26,6 @@ export default function RegistrationPage({
   const location = useLocation();
   const { updateAppCountry } = useAgentContext();
 
-  // Check if the current pathname is "/register"
   const isRegisterPage =
     location.pathname === "/register" ||
     location.pathname === "/ae/register" ||
@@ -36,7 +33,7 @@ export default function RegistrationPage({
 
   useEffect(() => {
     updateAppCountry(country === "india" ? "in" : "ae");
-  }, []);
+  }, [country, updateAppCountry]);
 
   return (
     <>
@@ -48,7 +45,7 @@ export default function RegistrationPage({
           </title>
           <meta
             name="description"
-            content=" Maximize your earnings with zero upfront costs! Ride.Rent connects vehicle owners with
+            content="Maximize your earnings with zero upfront costs! Ride.Rent connects vehicle owners with
             thousands of renters seeking high-quality, well-maintained vehicles for short-term or long-term
             use. Whether you own a luxury yacht, a powerful sports bike, or a private jet, this is the perfect
             opportunity to showcase your vehicle and start earning. We believe in providing a seamless
@@ -120,11 +117,9 @@ export default function RegistrationPage({
               )}
             </div>
 
+            {/* Right Navigation Section */}
             <div className="flex items-center gap-4">
-              <RegisterCountryDropdown country={country} type="register" />
-              <h4 className="text-white ms-4 hidden md:block">
-                Already an Agent?
-              </h4>
+              <h4 className="text-white hidden md:block">Already an Agent?</h4>
               <Link
                 to={`${country === "india" ? "/in" : "/ae"}/login`}
                 className="font-semibold text-yellow"
@@ -155,6 +150,7 @@ export default function RegistrationPage({
         {/* why opt */}
         <WhyOpt country={country} />
       </section>
+
       <Footer />
 
       {/* whatsapp floating button */}
