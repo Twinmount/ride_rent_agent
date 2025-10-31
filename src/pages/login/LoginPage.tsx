@@ -173,29 +173,55 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                       </FormLabel>
                       <div className="flex-col items-start w-full">
                         <FormControl>
-                          <div className="bg-gray-50 rounded-xl p-2 border border-gray-200">
-                            <div className="flex items-center gap-2">
-                              <PhoneInput
-                                defaultCountry={
-                                  country === "india" ? "in" : "ae"
-                                }
-                                value={field.value}
-                                onChange={(value, country) => {
-                                  field.onChange(value);
-                                  setCountryCode(country.country.dialCode);
+                          {/* Separate Boxes Layout */}
+                          <div className="flex gap-3 w-full">
+                            {/* Country Code Box with Flag */}
+                            <div className="w-28">
+                              <div className="border-2 border-gray-300 rounded-lg bg-gray-50 h-12 flex items-center justify-center gap-2 px-3">
+                                <PhoneInput
+                                  defaultCountry={
+                                    country === "india" ? "in" : "ae"
+                                  }
+                                  value={field.value}
+                                  onChange={(value, countryData) => {
+                                    field.onChange(value);
+                                    setCountryCode(
+                                      countryData.country.dialCode
+                                    );
+                                  }}
+                                  className="flex items-center justify-center"
+                                  inputClassName="hidden"
+                                  placeholder="WhatsApp number"
+                                  countrySelectorStyleProps={{
+                                    className:
+                                      "bg-transparent !border-none outline-none !text-sm flex items-center justify-center",
+                                    style: {
+                                      border: "none",
+                                    },
+                                    buttonClassName:
+                                      "!border-none outline-none !h-full !w-full !rounded-none bg-transparent flex items-center justify-center",
+                                  }}
+                                />
+                                <span className="text-gray-700 font-semibold text-sm whitespace-nowrap">
+                                  +{countryCode}
+                                </span>
+                              </div>
+                            </div>
+
+                            {/* Phone Number Box */}
+                            <div className="flex-1">
+                              <input
+                                type="tel"
+                                placeholder="50 123 4567"
+                                value={field.value
+                                  .replace(`+${countryCode}`, "")
+                                  .trim()}
+                                onChange={(e) => {
+                                  field.onChange(
+                                    `+${countryCode}${e.target.value}`
+                                  );
                                 }}
-                                className="flex items-center flex-1"
-                                inputClassName="input-field !w-full !text-base !bg-white !border-none max-md:!text-sm"
-                                placeholder="WhatsApp number"
-                                countrySelectorStyleProps={{
-                                  className:
-                                    "bg-white !border !border-gray-200 outline-none !rounded-lg !text-lg max-md:!text-base shadow-sm",
-                                  style: {
-                                    marginRight: "8px",
-                                  },
-                                  buttonClassName:
-                                    "!border !border-gray-200 outline-none !h-[48px] !w-[70px] !rounded-lg bg-white hover:!bg-gray-50 max-md:!h-[44px] max-md:!w-[65px] transition-colors",
-                                }}
+                                className="w-full border-2 border-gray-300 rounded-lg bg-gray-50 px-4 py-3 outline-none text-base text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition max-md:text-sm"
                               />
                             </div>
                           </div>
@@ -217,11 +243,11 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                       </FormLabel>
                       <div className="flex-col items-start w-full">
                         <FormControl>
-                          <div className="relative">
+                          <div className="relative border-2 border-gray-300 rounded-lg bg-gray-50 px-4 py-2 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 transition">
                             <Input
                               type={isView ? "text" : "password"}
                               id="password"
-                              className={`input-field !text-lg max-md:!text-base`}
+                              className="!border-0 !outline-none !bg-transparent !text-lg max-md:!text-base !ring-0"
                               placeholder="Password"
                               {...field}
                             />
