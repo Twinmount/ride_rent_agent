@@ -600,31 +600,33 @@ export default function PrimaryDetailsForm({
         )}
 
         {/* Mulkia Expiry */}
-        <FormField
-          control={form.control}
-          name="commercialLicenseExpireDate"
-          render={({ field }) => (
-            <FormFieldLayout
-              label={
-                <span>
-                  {`Registration Card ${isIndia ? "" : "/ Mulkia"} Expiry Date`}{" "}
-                  <br />
-                  <span className="text-sm text-gray-500">(DD/MM/YYYY)</span>
-                </span>
-              }
-              description={`Enter the expiry date for the Registration Card ${isIndia ? "" : "/ Mulkia"
-                } in the format DD/MM/YYYY.`}
-            >
-              <DatePicker
-                selected={field.value}
-                onChange={(date: Date | null) => field.onChange(date)}
-                dateFormat="dd/MM/yyyy"
-                wrapperClassName="datePicker text-base -ml-4"
-                placeholderText="DD/MM/YYYY"
-              />
-            </FormFieldLayout>
-          )}
-        />
+        {!isIndia && (
+          <FormField
+            control={form.control}
+            name="commercialLicenseExpireDate"
+            render={({ field }) => (
+              <FormFieldLayout
+                label={
+                  <span>
+                    {`Registration Card ${isIndia ? "" : "/ Mulkia"} Expiry Date`}{" "}
+                    <br />
+                    <span className="text-sm text-gray-500">(DD/MM/YYYY)</span>
+                  </span>
+                }
+                description={`Enter the expiry date for the Registration Card ${isIndia ? "" : "/ Mulkia"
+                  } in the format DD/MM/YYYY.`}
+              >
+                <DatePicker
+                  selected={field.value}
+                  onChange={(date: Date | null) => field.onChange(date)}
+                  dateFormat="dd/MM/yyyy"
+                  wrapperClassName="datePicker text-base -ml-4"
+                  placeholderText="DD/MM/YYYY"
+                />
+              </FormFieldLayout>
+            )}
+          />
+        )}
 
         {/* Specification */}
         <FormField
