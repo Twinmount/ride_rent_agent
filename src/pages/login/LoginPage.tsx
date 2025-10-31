@@ -55,6 +55,9 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
       ? "/assets/img/bg/india.webp"
       : "/assets/img/bg/uae.webp";
 
+  // Dynamic phone placeholder
+  const phonePlaceholder = country === "india" ? "9812345678" : "50 123 4567";
+
   async function onSubmit(values: z.infer<typeof LoginFormSchema>) {
     try {
       const phoneNumber = values.phoneNumber
@@ -157,10 +160,13 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                 <RegisterCountryDropdown country={country} type="login" />
               </div>
             </div>
+
+            {/* Horizontal Divider */}
+            <div className="border-t border-gray-300 w-full"></div>
           </div>
 
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="px-4 pb-6">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="px-4 pb-6 ">
               <div className="flex flex-col gap-5 w-full h-fit max-w-full md:max-w-[800px] max-h-fit mx-auto">
                 {/* mobile / whatsapp*/}
                 <FormField
@@ -173,11 +179,11 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                       </FormLabel>
                       <div className="flex-col items-start w-full">
                         <FormControl>
-                          {/* Separate Boxes Layout */}
-                          <div className="flex gap-3 w-full">
+                          {/* Separate Boxes Layout - SAME HEIGHT */}
+                          <div className="flex gap-3 w-full items-center">
                             {/* Country Code Box with Flag */}
-                            <div className="w-28">
-                              <div className="border-2 border-gray-300 rounded-lg bg-gray-50 h-12 flex items-center justify-center gap-2 px-3">
+                            <div className="w-28 h-12">
+                              <div className="border-2 border-gray-300 rounded-lg bg-gray-50 h-full flex items-center justify-center gap-2 px-3">
                                 <PhoneInput
                                   defaultCountry={
                                     country === "india" ? "in" : "ae"
@@ -209,10 +215,10 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                             </div>
 
                             {/* Phone Number Box */}
-                            <div className="flex-1">
+                            <div className="flex-1 h-12">
                               <input
                                 type="tel"
-                                placeholder="50 123 4567"
+                                placeholder={phonePlaceholder}
                                 value={field.value
                                   .replace(`+${countryCode}`, "")
                                   .trim()}
@@ -221,7 +227,7 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                                     `+${countryCode}${e.target.value}`
                                   );
                                 }}
-                                className="w-full border-2 border-gray-300 rounded-lg bg-gray-50 px-4 py-3 outline-none text-base text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition max-md:text-sm"
+                                className="w-full h-full border-2 border-gray-300 rounded-lg bg-gray-50 px-4 py-3 outline-none text-base text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition max-md:text-sm"
                               />
                             </div>
                           </div>

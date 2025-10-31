@@ -37,6 +37,9 @@ const RegistrationForm = ({ country }: { country: string }) => {
 
   const [countryCode, setCountryCode] = useState(storedCountryCode);
 
+  // Dynamic phone placeholder
+  const phonePlaceholder = country === "india" ? "9812345678" : "50 123 4567";
+
   const initialValues = {
     phoneNumber: storedCountryCode + storedPhoneNumber,
     password: storedPassword,
@@ -99,14 +102,16 @@ const RegistrationForm = ({ country }: { country: string }) => {
   }
 
   return (
-    <div className="bg-white shadow-lg p-4 lg:mt-2 pb-6 rounded-[1rem] border w-full min-w-[350px] max-w-[400px]">
+    <div className="bg-white shadow-lg p-4 lg:mt-2 rounded-[1rem] border w-full min-w-[350px] max-w-[400px]">
       {/* Header Section - CENTERED */}
       <div className="text-center mb-6">
-        <div className="flex items-center justify-center gap-3 mb-4">
-          <h3 className="text-2xl font-bold">Register In</h3>
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <h3 className="text-2xl font-bold">Register Now</h3>
           <RegisterCountryDropdown country={country} type="register" />
         </div>
-        <h4 className="text-base text-gray-600 mb-4">No Payment Required</h4>
+        <h4 className="text-base text-gray-600 mb-2">
+          No Payment Required To List Vehicles.
+        </h4>
 
         {/* Horizontal Divider */}
         <div className="border-t border-gray-300 w-full"></div>
@@ -120,21 +125,20 @@ const RegistrationForm = ({ country }: { country: string }) => {
           className="flex-1 flex flex-col w-full max-w-full md:max-w-[800px] mx-auto"
         >
           {/* mobile / whatsapp*/}
-          {/* mobile / whatsapp*/}
           <FormField
             control={form.control}
             name="phoneNumber"
             render={({ field }) => (
               <FormItem className="flex flex-col mb-2 w-full">
-                <FormLabel className="text-base lg:text-lg font-semibold ml-2 mb-3">
+                <FormLabel className="text-base lg:text-lg font-semibold ml-2 mb-2">
                   Mobile
                 </FormLabel>
 
-                {/* Separate Boxes Layout */}
-                <div className="flex gap-3 w-full">
+                {/* Separate Boxes Layout - SAME HEIGHT */}
+                <div className="flex gap-3 w-full items-center">
                   {/* Country Code Box with Flag */}
-                  <div className="w-28">
-                    <div className="border-2 border-gray-300 rounded-lg bg-gray-50 h-12 flex items-center justify-center gap-2 px-3">
+                  <div className="w-28 h-12">
+                    <div className="border-2 border-gray-300 rounded-lg bg-gray-50 h-full flex items-center justify-center gap-2 px-3">
                       <PhoneInput
                         defaultCountry={country === "india" ? "in" : "ae"}
                         value={field.value}
@@ -162,18 +166,18 @@ const RegistrationForm = ({ country }: { country: string }) => {
                   </div>
 
                   {/* Phone Number Box */}
-                  <div className="flex-1">
+                  <div className="flex-1 h-12">
                     <FormControl>
                       <input
                         type="tel"
-                        placeholder="50 123 4567"
+                        placeholder={phonePlaceholder}
                         value={field.value
                           .replace(`+${countryCode}`, "")
                           .trim()}
                         onChange={(e) => {
                           field.onChange(`+${countryCode}${e.target.value}`);
                         }}
-                        className="w-full border-2 border-gray-300 rounded-lg bg-gray-50 px-4 py-3 outline-none text-base text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition"
+                        className="w-full h-full border-2 border-gray-300 rounded-lg bg-gray-50 px-4 py-3 outline-none text-base text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition max-md:text-sm"
                       />
                     </FormControl>
                   </div>
@@ -196,30 +200,30 @@ const RegistrationForm = ({ country }: { country: string }) => {
             control={form.control}
             name="password"
             render={({ field }) => (
-              <FormItem className="flex flex-col mb-2 w-full">
-                <FormLabel className="flex justify-between ml-2 w-72 text-base lg:text-lg">
+              <FormItem className="flex flex-col mb-6 w-full">
+                <FormLabel className="text-base lg:text-lg font-semibold ml-2 mb-3">
                   Password
                 </FormLabel>
                 <div className="flex-col items-start w-full">
                   <FormControl>
-                    <div className="relative">
+                    <div className="relative border-2 border-gray-300 rounded-lg bg-gray-50 h-12 flex items-center px-4 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 transition">
                       <Input
                         type={isView ? "text" : "password"}
                         id="password"
-                        className={`input-field !text-lg`}
+                        className="!border-0 !outline-none !bg-transparent !text-base !padding-0 !h-full max-md:!text-sm !ring-0"
                         placeholder="Password"
                         {...field}
                       />
                       {isView ? (
                         <Eye
-                          className="absolute top-4 right-4 z-10 text-gray-500 cursor-pointer"
+                          className="absolute top-3 right-4 z-10 text-gray-500 cursor-pointer"
                           onClick={() => {
                             setIsView(!isView);
                           }}
                         />
                       ) : (
                         <EyeOff
-                          className="absolute top-4 right-4 z-10 text-gray-500 cursor-pointer"
+                          className="absolute top-3 right-4 z-10 text-gray-500 cursor-pointer"
                           onClick={() => setIsView(!isView)}
                         />
                       )}
@@ -234,7 +238,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
             )}
           />
 
-          <div className="text-sm text-center">
+          <div className="text-sm text-center mb-6">
             An OTP will be sent to your provided{" "}
             <span className="font-bold">WhatsApp Mobile Number</span>
           </div>
@@ -243,7 +247,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
             type="submit"
             size="lg"
             disabled={form.formState.isSubmitting}
-            className="w-full mx-auto flex-center col-span-2 mt-2 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow"
+            className="w-full mx-auto flex-center col-span-2 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow"
           >
             Send OTP {form.formState.isSubmitting && <Spinner />}
           </Button>
