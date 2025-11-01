@@ -1,11 +1,23 @@
-import React, { useState, useEffect } from "react";
-import { MessageCircleQuestion, X } from "lucide-react"; // Import icons from Lucide
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { MessageCircleQuestion, X } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 const FloatingWhatsAppButton: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const location = useLocation();
 
-  // Auto-collapse after 3 seconds
+  // Extract country from URL path
+  const country = location.pathname.startsWith("/in") ? "in" : "ae";
+
+  // Dynamic WhatsApp links based on country
+  const whatsappLinks = {
+    in: "https://api.whatsapp.com/send?phone=919686443261&text=Hi%2C%20I%E2%80%99d%20like%20to%20connect%20with%20Ride.Rent%20Support%20for%20assistance",
+    ae: "https://api.whatsapp.com/send?phone=971502972335&text=Hi%2C%20I%E2%80%99d%20like%20to%20connect%20with%20Ride.Rent%20Support%20for%20assistance",
+  };
+
+  const whatsappLink = whatsappLinks[country as keyof typeof whatsappLinks];
+
+  // Auto-collapse after 5 seconds
   useEffect(() => {
     let timeout: NodeJS.Timeout;
     if (isExpanded) {
@@ -18,7 +30,7 @@ const FloatingWhatsAppButton: React.FC = () => {
 
   return (
     <div
-      className={`fixed bottom-8 right-0 z-10 h-14 flex items-center rounded-l-full  bg-green-500  transition-all duration-300 ${
+      className={`fixed bottom-24 right-0 z-10 h-14 flex items-center rounded-l-full bg-green-500 transition-all duration-300 ${
         isExpanded ? "w-48" : "w-12"
       }`}
     >
@@ -32,18 +44,17 @@ const FloatingWhatsAppButton: React.FC = () => {
       </div>
       {isExpanded && (
         <div className="flex flex-col justify-center items-start px-4 h-full text-sm text-white bg-green-500 rounded-r-full">
-          <Link
-            to={
-              "https://api.whatsapp.com/send?phone=971502972335&text=Hello%2C%0AI would like to list my vehicles with https%3A%2F%2Fagent.ride.rent%2Fregister %26 advertise my fleet for *free*. "
-            }
+          <a
+            href={whatsappLink}
             target="_blank"
+            rel="noopener noreferrer"
             className="hover:underline"
           >
             <div className="font-semibold">Need help?</div>
             <div className="text-[0.65rem] leading-4 whitespace-nowrap">
               Click to chat on WhatsApp
             </div>
-          </Link>
+          </a>
           <X
             className="absolute top-2 right-3 w-4 h-4 cursor-pointer"
             onClick={() => setIsExpanded(false)}
