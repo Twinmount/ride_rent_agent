@@ -12,7 +12,6 @@ export default function Footer() {
 
   // Extract country from URL path
   const country = location.pathname.startsWith("/in") ? "in" : "ae";
-  const agentBaseUrl = `https://agent.ride.rent/${country}`;
 
   return (
     <footer className="bg-black text-white p-6 md:p-8">
