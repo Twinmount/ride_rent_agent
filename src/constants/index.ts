@@ -213,6 +213,7 @@ export const getPrimaryFormDefaultValues = (
   isCreditOrDebitCardsSupported: false,
   isTabbySupported: false,
   isCashSupported: false,
+  isUPIAccepted: false,
   tempCitys: [],
   isVehicleModified: false,
 });

@@ -123,6 +123,7 @@ export type PrimaryFormType = {
   isCreditOrDebitCardsSupported: boolean;
   isTabbySupported: boolean;
   isCashSupported: boolean;
+  isUPIAccepted: boolean;
   tempCitys?: CityType[];
   isVehicleModified: boolean;
 };

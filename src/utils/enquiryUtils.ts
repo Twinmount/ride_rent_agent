@@ -129,6 +129,7 @@ export interface ApiEnquiry {
     vehicleSeriesId?: string;
     vehicleTitleH1?: string;
     isCashSupported?: boolean;
+    isUPIAccepted?: boolean;
     isFancyNumber?: boolean;
     isVehicleModified?: boolean;
     location?: {
