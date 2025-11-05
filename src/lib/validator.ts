@@ -223,6 +223,7 @@ export const PrimaryFormSchema = z
     isCreditOrDebitCardsSupported: z.boolean().default(false),
     isTabbySupported: z.boolean().default(false),
     isCashSupported: z.boolean().default(false),
+    isUPIAccepted: z.boolean().default(false),
     tempCitys: z
       .array(
         z.object({
