@@ -11,15 +11,10 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { LoginPageDefaultValues } from "@/constants";
 import { LoginFormSchema } from "@/lib/validator";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-// phone input
 import { PhoneInput } from "react-international-phone";
 import "react-international-phone/style.css";
-
 import Spinner from "@/components/general/Spinner";
 import { API } from "@/api/ApiService";
 import { Slug } from "@/api/Api-Endpoints";
@@ -27,7 +22,7 @@ import { toast } from "@/components/ui/use-toast";
 import { remove, save, StorageKeys } from "@/utils/storage";
 import { LoginResponse } from "@/types/API-types";
 import Footer from "@/components/footer/Footer";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useAgentContext } from "@/context/AgentContext";
 import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
 
@@ -35,90 +30,90 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
   const [isView, setIsView] = useState(false);
   const [countryCode, setCountryCode] = useState("");
   const navigate = useNavigate();
-
   const { setAppState, updateAppCountry } = useAgentContext();
 
-  const initialValues = LoginPageDefaultValues;
-
-  useEffect(() => {
-    updateAppCountry(country === "india" ? "in" : "ae");
-  }, []);
-
+  // Initialize form with validation schema
   const form = useForm<z.infer<typeof LoginFormSchema>>({
     resolver: zodResolver(LoginFormSchema),
-    defaultValues: initialValues,
+    defaultValues: {
+      phoneNumber: "",
+      password: "",
+      country: "",
+    },
   });
 
-  // Dynamic background images based on country
-  const backgroundImage =
-    country === "india"
-      ? "/assets/img/bg/india.webp"
-      : "/assets/img/bg/uae.webp";
+  // Set app country context on mount
+  useEffect(() => {
+    updateAppCountry(country === "india" ? "in" : "ae");
+  }, [country, updateAppCountry]);
 
-  // Dynamic phone placeholder
-  const phonePlaceholder = country === "india" ? "9812345678" : "50 123 4567";
+  // Handle login form submission
+  const onSubmit = async (values: z.infer<typeof LoginFormSchema>) => {
+    if (!values.country) {
+      form.setError("country", {
+        type: "manual",
+        message: "Select a country",
+      });
+      return;
+    }
 
-  async function onSubmit(values: z.infer<typeof LoginFormSchema>) {
     try {
       const phoneNumber = values.phoneNumber
         .replace(`+${countryCode}`, "")
         .trim();
 
-      const requestBody = {
-        countryCode,
-        phoneNumber,
-        password: values.password,
-      };
-
-      const data = await API.post<LoginResponse>({
+      const response = await API.post<LoginResponse>({
         slug: Slug.LOGIN,
-        body: requestBody,
+        body: {
+          countryCode,
+          phoneNumber,
+          password: values.password,
+        },
       });
 
-      if (data) {
+      if (response) {
         remove(StorageKeys.ACCESS_TOKEN);
         remove(StorageKeys.REFRESH_TOKEN);
-        save(StorageKeys.ACCESS_TOKEN, data.result.token);
-        save(StorageKeys.REFRESH_TOKEN, data.result.refreshToken);
-        save(StorageKeys.USER_ID, data.result.userId);
+        save(StorageKeys.ACCESS_TOKEN, response.result.token);
+        save(StorageKeys.REFRESH_TOKEN, response.result.refreshToken);
+        save(StorageKeys.USER_ID, response.result.userId);
+
         setAppState((prev) => ({
           ...prev,
-          accessToken: data.result.token,
-          refreshToken: data.result.refreshToken,
-          userId: data.result.userId,
+          accessToken: response.result.token,
+          refreshToken: response.result.refreshToken,
+          userId: response.result.userId,
         }));
         navigate("/");
       }
     } catch (error: any) {
-      console.error("error : ", error);
-      if (error.response && error.response.status === 400) {
+      if (error.response?.status === 400) {
         toast({
           variant: "destructive",
           title: "Login Failed!",
           description: "Invalid mobile number or password",
         });
-        form.setError("phoneNumber", {
-          type: "manual",
-          message: "",
-        });
-        form.setError("password", {
-          type: "manual",
-          message: "",
-        });
+        form.setError("phoneNumber", { type: "manual", message: "" });
+        form.setError("password", { type: "manual", message: "" });
       } else {
         toast({
           variant: "destructive",
           title: "Login Failed",
-          description: "something went wrong :(",
+          description: "Something went wrong",
         });
       }
     }
-  }
+  };
+
+  const backgroundImage =
+    country === "india"
+      ? "/assets/img/bg/india.webp"
+      : "/assets/img/bg/uae.webp";
 
   return (
     <>
       <section
-        className="flex relative flex-col pt-8 pb-16 h-auto min-h-screen bg-gray-100 flex-center"
+        className="relative flex flex-col py-6 h-auto bg-gray-900 overflow-hidden"
         style={{
           backgroundImage: `url('${backgroundImage}')`,
           backgroundSize: "cover",
@@ -126,190 +121,264 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
           backgroundRepeat: "no-repeat",
         }}
       >
+        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/50 to-black/60"></div>
+
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-amber-600/10 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute top-1/3 right-0 w-80 h-80 bg-gradient-to-bl from-blue-600/10 to-transparent rounded-full blur-3xl"></div>
+
         <Link
-          to={"/"}
-          className="absolute left-4 top-6 z-20 w-32 lg:left-20 md:w-40 lg:w-44"
+          to="/"
+          className="absolute top-6 left-6 z-20 w-36 md:w-44 md:left-10 hover:scale-105 transition-transform"
         >
           <img
             src="/assets/logo/header/agent_white_logo.webp"
-            alt="riderent logo"
-            className="object-contain w-full h-full"
+            alt="Ride.Rent Agent Portal"
+            className="w-full h-auto drop-shadow-lg"
           />
         </Link>
-        <div className="absolute inset-0 bg-black opacity-50"></div>
-        <h1 className="z-10 mt-20 mb-3 text-5xl font-extrabold text-white max-lg:text-4xl max-md:text-3xl max-lg:text-center">
-          SHOWCASE YOUR FLEET TO THE WORLD
-        </h1>
-        <h2 className="z-10 mb-4 text-3xl font-semibold text-white max-md:text-base max-lg:text-xl max-lg:text-center">
-          Log in and manage your fleet, categories, and bookings
-        </h2>
 
-        {/* Login Form Card with Country Selector */}
-        <div className="z-10 bg-white shadow-lg rounded-[1rem] w-full max-md:w-[95%] h-fit max-h-fit max-w-[500px] mx-auto overflow-visible">
-          <div className="p-4 pb-3">
-            <h3 className="mb-4 text-3xl font-bold text-center text-yellow max-md:text-2xl">
-              Login In
-            </h3>
-
-            {/* Country Selector - Outside Form */}
-            <div className="flex items-center justify-center gap-2 mb-6">
-              <span className="text-sm font-medium text-gray-600">
-                Country:
-              </span>
-              <div className="relative z-50">
-                <RegisterCountryDropdown country={country} type="login" />
-              </div>
+        <div className="w-full flex lg:mt-16 flex-col items-center justify-center z-10 px-4">
+          <div className="w-full max-w-md backdrop-blur-2xl bg-gradient-to-br from-white/15 to-white/10 border border-white/25 rounded-3xl shadow-2xl p-7 hover:border-white/35 transition-all relative z-20">
+            <div className="text-center mb-6">
+              <h1 className="text-4xl font-bold text-white mb-1">
+                Agent Portal
+              </h1>
+              <p className="text-white/70 text-sm font-light">
+                Sign in to manage your fleet
+              </p>
             </div>
 
-            {/* Horizontal Divider */}
-            <div className="border-t border-gray-300 w-full"></div>
-          </div>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4"
+              >
+                {/* Country field */}
+                <FormField
+                  control={form.control}
+                  name="country"
+                  render={({ field }) => {
+                    const hasError = !!form.formState.errors.country;
+                    return (
+                      <FormItem>
+                        <div className="flex items-center justify-between gap-2">
+                          <FormLabel
+                            className={`text-sm md:text-base font-medium flex-shrink-0 transition-colors ${
+                              hasError ? "text-red-400" : "text-white/90"
+                            }`}
+                          >
+                            Country
+                          </FormLabel>
+                          <FormControl>
+                            <RegisterCountryDropdown
+                              country={country}
+                              type="login"
+                              value={field.value}
+                              onChange={(value) => {
+                                field.onChange(value);
+                                if (form.formState.errors.country) {
+                                  form.clearErrors("country");
+                                }
+                              }}
+                              pageType="login"
+                              isCompact={true}
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage className="text-xs text-red-400 mt-0.5" />
+                      </FormItem>
+                    );
+                  }}
+                />
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="px-4 pb-6 ">
-              <div className="flex flex-col gap-5 w-full h-fit max-w-full md:max-w-[800px] max-h-fit mx-auto">
-                {/* mobile / whatsapp*/}
+                {/* Phone Number field */}
                 <FormField
                   control={form.control}
                   name="phoneNumber"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col mb-2 w-full">
-                      <FormLabel className="flex justify-between mt-4 ml-2 text-base lg:text-lg max-md:text-sm">
-                        Mobile
-                      </FormLabel>
-                      <div className="flex-col items-start w-full">
+                  render={({ field }) => {
+                    const hasError = !!form.formState.errors.phoneNumber;
+                    return (
+                      <FormItem>
+                        <FormLabel
+                          className={`text-sm md:text-base font-medium block mb-1.5 transition-colors ${
+                            hasError ? "text-red-400" : "text-white/90"
+                          }`}
+                        >
+                          Mobile Number
+                        </FormLabel>
                         <FormControl>
-                          {/* Separate Boxes Layout - SAME HEIGHT */}
-                          <div className="flex gap-3 w-full items-center">
-                            {/* Country Code Box with Flag */}
-                            <div className="w-28 h-12">
-                              <div className="border-2 border-gray-300 rounded-lg bg-gray-50 h-full flex items-center justify-center gap-2 px-3">
-                                <PhoneInput
-                                  defaultCountry={
-                                    country === "india" ? "in" : "ae"
-                                  }
-                                  value={field.value}
-                                  onChange={(value, countryData) => {
-                                    field.onChange(value);
-                                    setCountryCode(
-                                      countryData.country.dialCode
-                                    );
-                                  }}
-                                  className="flex items-center justify-center"
-                                  inputClassName="hidden"
-                                  placeholder="WhatsApp number"
-                                  countrySelectorStyleProps={{
-                                    className:
-                                      "bg-transparent !border-none outline-none !text-sm flex items-center justify-center",
-                                    style: {
-                                      border: "none",
-                                    },
-                                    buttonClassName:
-                                      "!border-none outline-none !h-full !w-full !rounded-none bg-transparent flex items-center justify-center",
-                                  }}
-                                />
-                                <span className="text-gray-700 font-semibold text-sm whitespace-nowrap">
-                                  +{countryCode}
-                                </span>
-                              </div>
+                          <div className="flex gap-2 relative z-10">
+                            <div
+                              className={`w-20 h-10 border-2 rounded-lg bg-transparent backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0 ${
+                                hasError
+                                  ? "border-red-400"
+                                  : "border-white/20 hover:border-white/40 focus-within:border-white/60 focus-within:ring-2 focus-within:ring-amber-500/30"
+                              }`}
+                            >
+                              <PhoneInput
+                                defaultCountry={
+                                  country === "india" ? "in" : "ae"
+                                }
+                                value={field.value}
+                                onChange={(value, countryData) => {
+                                  field.onChange(value);
+                                  setCountryCode(countryData.country.dialCode);
+                                }}
+                                className="flex items-center justify-center"
+                                inputClassName="hidden"
+                                countrySelectorStyleProps={{
+                                  className:
+                                    "bg-transparent !border-none outline-none !text-xs !p-0 !bg-transparent !shadow-none",
+                                  style: {
+                                    border: "none",
+                                    padding: 0,
+                                    backgroundColor: "transparent",
+                                    background: "transparent",
+                                    boxShadow: "none",
+                                  },
+                                  buttonClassName:
+                                    "!border-none outline-none !h-full !w-full !rounded-none bg-transparent !p-0 !bg-transparent !shadow-none",
+                                }}
+                              />
+                              <span className="text-white font-semibold text-xs ml-0.5">
+                                +{countryCode}
+                              </span>
                             </div>
 
-                            {/* Phone Number Box */}
-                            <div className="flex-1 h-12">
-                              <input
-                                type="tel"
-                                placeholder={phonePlaceholder}
-                                value={field.value
-                                  .replace(`+${countryCode}`, "")
-                                  .trim()}
-                                onChange={(e) => {
-                                  field.onChange(
-                                    `+${countryCode}${e.target.value}`
-                                  );
-                                }}
-                                className="w-full h-full border-2 border-gray-300 rounded-lg bg-gray-50 px-4 py-3 outline-none text-base text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition max-md:text-sm"
-                              />
-                            </div>
+                            <input
+                              type="tel"
+                              placeholder={
+                                country === "india"
+                                  ? "9812345678"
+                                  : "50 123 4567"
+                              }
+                              value={field.value
+                                .replace(`+${countryCode}`, "")
+                                .trim()}
+                              onChange={(e) => {
+                                field.onChange(
+                                  `+${countryCode}${e.target.value}`
+                                );
+                              }}
+                              className={`flex-1 h-10 px-3 border-2 rounded-lg bg-transparent backdrop-blur-sm outline-none text-white placeholder:text-white/40 text-sm transition-all ${
+                                hasError
+                                  ? "border-red-400 focus:border-red-400 focus:ring-2 focus:ring-red-400/20"
+                                  : "border-white/20 hover:border-white/40 focus:border-white/60 focus:ring-2 focus:ring-amber-500/30"
+                              }`}
+                            />
                           </div>
                         </FormControl>
-                        <FormMessage className="ml-2" />
-                      </div>
-                    </FormItem>
-                  )}
+                        <FormMessage className="text-xs text-red-400 mt-0.5" />
+                      </FormItem>
+                    );
+                  }}
                 />
 
-                {/* password field */}
+                {/* Password field */}
                 <FormField
                   control={form.control}
                   name="password"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-col mb-2 w-full">
-                      <FormLabel className="flex justify-between ml-2 text-base lg:text-lg max-md:text-sm">
-                        Password
-                      </FormLabel>
-                      <div className="flex-col items-start w-full">
+                  render={({ field }) => {
+                    const hasError = !!form.formState.errors.password;
+                    return (
+                      <FormItem>
+                        <FormLabel
+                          className={`text-sm md:text-base font-medium block mb-1.5 transition-colors ${
+                            hasError ? "text-red-400" : "text-white/90"
+                          }`}
+                        >
+                          Password
+                        </FormLabel>
                         <FormControl>
-                          <div className="relative border-2 border-gray-300 rounded-lg bg-gray-50 px-4 py-2 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 transition">
-                            <Input
+                          <div className="relative">
+                            <input
                               type={isView ? "text" : "password"}
-                              id="password"
-                              className="!border-0 !outline-none !bg-transparent !text-lg max-md:!text-base !ring-0"
-                              placeholder="Password"
+                              placeholder="Enter your password"
+                              className={`h-10 w-full px-3 border-2 rounded-lg bg-transparent backdrop-blur-sm outline-none text-white placeholder:text-white/40 text-sm pr-10 transition-all ${
+                                hasError
+                                  ? "border-red-400 focus:border-red-400 focus:ring-2 focus:ring-red-400/20"
+                                  : "border-white/20 hover:border-white/40 focus:border-white/60 focus:ring-2 focus:ring-amber-500/30"
+                              }`}
                               {...field}
                             />
-                            {isView ? (
-                              <Eye
-                                className="absolute top-4 right-4 z-10 text-gray-500 cursor-pointer max-md:w-5 max-md:h-5"
-                                onClick={() => {
-                                  setIsView(!isView);
-                                }}
-                              />
-                            ) : (
-                              <EyeOff
-                                className="absolute top-4 right-4 z-10 text-gray-500 cursor-pointer max-md:w-5 max-md:h-5"
-                                onClick={() => setIsView(!isView)}
-                              />
-                            )}
+                            <button
+                              type="button"
+                              onClick={() => setIsView(!isView)}
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white/80 transition-colors"
+                            >
+                              {isView ? (
+                                <Eye className="w-4 h-4" />
+                              ) : (
+                                <EyeOff className="w-4 h-4" />
+                              )}
+                            </button>
                           </div>
                         </FormControl>
-                        <FormMessage className="ml-2" />
-                      </div>
-                    </FormItem>
-                  )}
+                        <FormMessage className="text-xs text-red-400 mt-0.5" />
+                      </FormItem>
+                    );
+                  }}
                 />
 
-                <Button
-                  type="submit"
-                  size="lg"
-                  disabled={form.formState.isSubmitting}
-                  className="w-full mx-auto flex-center col-span-2 mt-2 !text-lg !font-semibold button bg-yellow hover:bg-darkYellow max-md:!text-base"
-                >
-                  Login {form.formState.isSubmitting && <Spinner />}
-                </Button>
-              </div>
-              <div className="px-2 mt-3 flex-between max-sm:text-xs max-sm:flex-col max-sm:gap-2 max-sm:items-start">
-                <Link
-                  to={`${country === "india" ? "/in" : "/ae"}/reset-password`}
-                  className="text-yellow hover:underline"
-                >
-                  Forgot Password ?
-                </Link>
-                <div className="max-sm:text-left">
-                  New to Ride.Rent?{" "}
+                <div className="flex justify-end">
                   <Link
-                    to={`${country === "india" ? "/in" : "/ae"}/register`}
-                    className="font-semibold text-yellow hover:underline"
+                    to={`${country === "india" ? "/in" : "/ae"}/reset-password`}
+                    className="text-xs font-medium text-white/60 hover:text-white transition-colors"
                   >
-                    Register
+                    Forgot password?
                   </Link>
                 </div>
+
+                {/* Sign in button */}
+                <Button
+                  type="submit"
+                  disabled={form.formState.isSubmitting}
+                  className="w-full h-11 mt-5 bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 hover:from-amber-600 hover:via-orange-600 hover:to-red-600 text-white font-bold rounded-xl shadow-2xl hover:shadow-3xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-[1.03] active:scale-95 text-base relative overflow-hidden group"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform -skew-x-12 group-hover:translate-x-full"></div>
+
+                  <div className="relative flex items-center justify-center gap-2">
+                    {form.formState.isSubmitting ? (
+                      <>
+                        <Spinner />
+                        <span>Signing in...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span>Sign In</span>
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </>
+                    )}
+                  </div>
+                </Button>
+              </form>
+            </Form>
+
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/15"></div>
               </div>
-            </form>
-          </Form>
+            </div>
+
+            <div className="text-center">
+              <p className="text-white/70 text-sm">
+                New to Ride.Rent?{" "}
+                <Link
+                  to={`${country === "india" ? "/in" : "/ae"}/register`}
+                  className="font-semibold text-amber-300 hover:text-white transition-colors"
+                >
+                  Create an account
+                </Link>
+              </p>
+            </div>
+          </div>
+
+          <p className="text-white/40 text-xs font-light tracking-widest uppercase mt-3 text-center">
+            Secure. Fast. Reliable.
+          </p>
         </div>
       </section>
 
-      {/* footer */}
       <Footer />
     </>
   );

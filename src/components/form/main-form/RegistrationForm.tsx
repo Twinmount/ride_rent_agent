@@ -30,33 +30,36 @@ const RegistrationForm = ({ country }: { country: string }) => {
   const navigate = useNavigate();
   const [isView, setIsView] = useState(false);
 
-  // Retrieve stored values from sessionStorage
   const storedPhoneNumber = sessionStorage.getItem("phoneNumber") || "";
   const storedCountryCode = sessionStorage.getItem("countryCode") || "";
   const storedPassword = sessionStorage.getItem("password") || "";
+  // const storedCountry = sessionStorage.getItem("country") || "";
 
   const [countryCode, setCountryCode] = useState(storedCountryCode);
 
-  // Dynamic phone placeholder
   const phonePlaceholder = country === "india" ? "9812345678" : "50 123 4567";
 
   const initialValues = {
     phoneNumber: storedCountryCode + storedPhoneNumber,
     password: storedPassword,
-    country:
-      country === "ae"
-        ? "ee8a7c95-303d-4f55-bd6c-85063ff1cf48"
-        : "68ea1314-08ed-4bba-a2b1-af549946523d",
+    country: "", // ALWAYS empty - user MUST select
   };
 
-  // Define your form.
   const form = useForm<z.infer<typeof RegistrationFormSchema>>({
     resolver: zodResolver(RegistrationFormSchema),
     defaultValues: initialValues,
   });
 
-  // Define a submit handler.
   async function onSubmit(values: z.infer<typeof RegistrationFormSchema>) {
+    // Explicit validation check
+    if (!values.country || values.country === "") {
+      form.setError("country", {
+        type: "manual",
+        message: "Select a country",
+      });
+      return;
+    }
+
     try {
       const phoneNumber = values.phoneNumber
         .replace(`+${countryCode}`, "")
@@ -67,14 +70,18 @@ const RegistrationForm = ({ country }: { country: string }) => {
       if (data) {
         sessionStorage.setItem("otpId", data?.result.otpId);
         sessionStorage.setItem("userId", data?.result.userId);
-
-        // Store phoneNumber, countryCode, and password separately in sessionStorage
         sessionStorage.setItem("phoneNumber", phoneNumber);
         sessionStorage.setItem("countryCode", countryCode);
         sessionStorage.setItem("password", values.password);
-        sessionStorage.setItem("country", values.country);
+        sessionStorage.setItem("country", values.country); // Store for OTP page
 
-        navigate(`/verify-otp?country=${country}`);
+        // Derive country from form value
+        const selectedCountryCode =
+          values.country === "ee8a7c95-303d-4f55-bd6c-85063ff1cf48"
+            ? "ae"
+            : "in";
+
+        navigate(`/verify-otp?country=${selectedCountryCode}`);
       }
     } catch (error: any) {
       if (error.response && error.response.status === 400) {
@@ -103,16 +110,12 @@ const RegistrationForm = ({ country }: { country: string }) => {
 
   return (
     <div className="bg-white shadow-lg p-4 lg:mt-2 rounded-[1rem] border w-full min-w-[350px] max-w-[400px]">
-      {/* Header Section - CENTERED */}
+      {/* Header Section */}
       <div className="text-center mb-6">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <h3 className="text-2xl font-bold">Register Now</h3>
-          <RegisterCountryDropdown country={country} type="register" />
-        </div>
+        <h3 className="text-2xl font-bold mb-2">Register Now</h3>
         <h4 className="text-base text-gray-600 mb-2">
           No Payment Required To List Vehicles.
         </h4>
-
         {/* Horizontal Divider */}
         <div className="border-t border-gray-300 w-full"></div>
       </div>
@@ -124,7 +127,37 @@ const RegistrationForm = ({ country }: { country: string }) => {
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex-1 flex flex-col w-full max-w-full md:max-w-[800px] mx-auto"
         >
-          {/* mobile / whatsapp*/}
+          {/* Country Selection */}
+          <FormField
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem className="flex flex-col mb-4 w-full">
+                <FormLabel className="text-base lg:text-lg font-semibold ml-2 mb-2">
+                  Country <span className="text-red-500">*</span>
+                </FormLabel>
+                <FormControl>
+                  <div className="ml-2">
+                    <RegisterCountryDropdown
+                      country={country}
+                      type="register"
+                      value={field.value}
+                      onChange={(value) => {
+                        field.onChange(value);
+                        // Clear error when user selects a country
+                        if (form.formState.errors.country) {
+                          form.clearErrors("country");
+                        }
+                      }}
+                    />
+                  </div>
+                </FormControl>
+                <FormMessage className="ml-2" />
+              </FormItem>
+            )}
+          />
+
+          {/* Mobile / WhatsApp */}
           <FormField
             control={form.control}
             name="phoneNumber"
@@ -134,7 +167,6 @@ const RegistrationForm = ({ country }: { country: string }) => {
                   Mobile
                 </FormLabel>
 
-                {/* Separate Boxes Layout - SAME HEIGHT */}
                 <div className="flex gap-3 w-full items-center">
                   {/* Country Code Box with Flag */}
                   <div className="w-28 h-12">
@@ -195,7 +227,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
             )}
           />
 
-          {/* password field */}
+          {/* Password field */}
           <FormField
             control={form.control}
             name="password"
@@ -254,7 +286,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
         </form>
       </Form>
 
-      {/* Footer Links - OUTSIDE FORM */}
+      {/* Footer Links */}
       <div className="px-2 mt-3 text-center">
         <div>
           Already registered?{" "}
