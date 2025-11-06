@@ -25,6 +25,7 @@ import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
 import { Eye, EyeOff } from "lucide-react";
 import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
+import axios from "axios";
 
 const RegistrationForm = ({ country }: { country: string }) => {
   const navigate = useNavigate();
@@ -64,6 +65,14 @@ const RegistrationForm = ({ country }: { country: string }) => {
       const phoneNumber = values.phoneNumber
         .replace(`+${countryCode}`, "")
         .trim();
+      const selectedCountryCode =
+        values.country === "ee8a7c95-303d-4f55-bd6c-85063ff1cf48" ? "ae" : "in";
+
+      localStorage.setItem("appCountry", selectedCountryCode);
+      axios.defaults.baseURL =
+        selectedCountryCode === "in"
+          ? import.meta.env.VITE_API_URL_INDIA
+          : import.meta.env.VITE_API_URL_UAE;
 
       const data = await register(values, countryCode);
 
@@ -76,10 +85,6 @@ const RegistrationForm = ({ country }: { country: string }) => {
         sessionStorage.setItem("country", values.country); // Store for OTP page
 
         // Derive country from form value
-        const selectedCountryCode =
-          values.country === "ee8a7c95-303d-4f55-bd6c-85063ff1cf48"
-            ? "ae"
-            : "in";
 
         navigate(`/verify-otp?country=${selectedCountryCode}`);
       }
