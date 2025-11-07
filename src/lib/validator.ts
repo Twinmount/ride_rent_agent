@@ -11,33 +11,35 @@ export const RegistrationFormSchema = z.object({
 export const CompanyFormSchema = (isIndia: boolean) =>
   z
     .object({
-    companyName: z
-      .string()
-      .min(1, "Company name is required")
-      .max(50, "Maximum 50 characters allowed"),
-    companyLogo: z.string().min(1, "Company logo is required"),
-    commercialLicense: z.string().min(1, "Commercial License is required"),
-    expireDate: isIndia ? z.date().optional() : z.date(),
-    // If noRegNumber is true (used for India), regNumber becomes optional
-    noRegNumber: isIndia ? z.boolean().optional().default(false) : z.boolean().optional().default(false),
-    regNumber: z.string().optional(),
-    companyAddress: z
-      .string()
-      .min(5, "Company address is required")
-      .max(150, "Address can be up to 150 characters"),
-    companyLanguages: z
-      .array(z.string())
-      .min(1, "At least one language must be selected"),
-    accountType: z.enum(["company", "individual"]),
-    location: z
-      .object({
-        lat: z.number(),
-        lng: z.number(),
-        address: z.string().optional(),
-      })
-      .refine((val) => val.lat && val.lng, {
-        message: "Location is required",
-      }),
+      companyName: z
+        .string()
+        .min(1, "Company name is required")
+        .max(50, "Maximum 50 characters allowed"),
+      companyLogo: z.string().min(1, "Company logo is required"),
+      commercialLicense: z.string().min(1, "Commercial License is required"),
+      expireDate: isIndia ? z.date().optional() : z.date(),
+      // If noRegNumber is true (used for India), regNumber becomes optional
+      noRegNumber: isIndia
+        ? z.boolean().optional().default(false)
+        : z.boolean().optional().default(false),
+      regNumber: z.string().optional(),
+      companyAddress: z
+        .string()
+        .min(5, "Company address is required")
+        .max(150, "Address can be up to 150 characters"),
+      companyLanguages: z
+        .array(z.string())
+        .min(1, "At least one language must be selected"),
+      accountType: z.enum(["company", "individual"]),
+      location: z
+        .object({
+          lat: z.number(),
+          lng: z.number(),
+          address: z.string().optional(),
+        })
+        .refine((val) => val.lat && val.lng, {
+          message: "Location is required",
+        }),
     })
     .superRefine((data, ctx) => {
       const noReg = (data as any).noRegNumber;
@@ -52,7 +54,8 @@ export const CompanyFormSchema = (isIndia: boolean) =>
           });
         } else if (isIndia) {
           // if India, validate GST format
-          const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/;
+          const gstRegex =
+            /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[A-Z0-9]{1}Z[A-Z0-9]{1}$/;
           if (!gstRegex.test(reg)) {
             ctx.addIssue({
               code: z.ZodIssueCode.custom,
@@ -122,19 +125,20 @@ export const ProfileUpdateFormSchema = z.object({
 });
 
 // Add object-level validation to conditionally require regNumber based on noRegNumber
-export const ProfileUpdateFormSchemaWithConditionalReg = ProfileUpdateFormSchema.superRefine((data, ctx) => {
-  const noReg = (data as any).noRegNumber;
-  const reg = (data as any).regNumber;
-  if (!noReg) {
-    if (!reg || (typeof reg === "string" && reg.trim().length === 0)) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Registration number is required",
-        path: ["regNumber"],
-      });
+export const ProfileUpdateFormSchemaWithConditionalReg =
+  ProfileUpdateFormSchema.superRefine((data, ctx) => {
+    const noReg = (data as any).noRegNumber;
+    const reg = (data as any).regNumber;
+    if (!noReg) {
+      if (!reg || (typeof reg === "string" && reg.trim().length === 0)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Registration number is required",
+          path: ["regNumber"],
+        });
+      }
     }
-  }
-});
+  });
 
 // otp page form schema
 export const OTPFormSchema = z.object({
@@ -145,6 +149,7 @@ export const OTPFormSchema = z.object({
 export const LoginFormSchema = z.object({
   phoneNumber: z.string().min(1, "Provide your registered phone number"),
   password: z.string().min(1, "Password is required"),
+  country: z.string().min(1, "Select a country"),
 });
 
 // confirm password schema
@@ -160,6 +165,7 @@ export const ConfirmPasswordFormSchema = z
 
 // reset password schema
 export const ResetPasswordFormSchema = z.object({
+  country: z.string().min(1, "Select a country"),
   phoneNumber: z.string().min(1, "Provide your registered phone number"),
 });
 
@@ -223,6 +229,7 @@ export const PrimaryFormSchema = z
     isCreditOrDebitCardsSupported: z.boolean().default(false),
     isTabbySupported: z.boolean().default(false),
     isCashSupported: z.boolean().default(false),
+    isUPIAccepted: z.boolean().default(false),
     tempCitys: z
       .array(
         z.object({

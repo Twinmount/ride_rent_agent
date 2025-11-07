@@ -9,73 +9,26 @@ import { ApiConfig, DEFAULT_API_CONFIG } from "./Api-config";
 import { Slug } from "./Api-Endpoints";
 import { StorageKeys, load } from "@/utils/storage";
 
-/**
- * Represents the response structure of an API request.
- *
- * @template T - The type of data in the response.
- */
-
 export interface ApiResponse<T> {
   data: T;
 }
 
-/**
- * Represents parameters for making API requests.
- */
 export interface APIParameters {
-  /**
-   * Additional Axios request configuration.
-   */
   axiosConfig?: AxiosRequestConfig;
-
-  /**
-   * The request body data.
-   */
   body?: object;
-
-  /**
-   * Query parameters to include in the request.
-   */
   queryParameters?: object;
-
-  /**
-   * The API endpoint slug.
-   */
   slug: Slug | string;
 }
 
-/**
- * Service class for making API requests.
- */
 export class ApiService {
-  // The static instance of the class.
   private static instance: ApiService | null = null;
-  /**
-   * The underlying axios instance which performs the requests.
-   */
   axios: AxiosInstance | undefined;
-
-  /**
-   * Configurable options.
-   */
   config: ApiConfig;
 
-  /**
-   * Private constructor to prevent instantiation from outside the class.
-   * Use ApiService.getInstance() to get an instance of the class.
-   *
-   * @param config The configuration to use.
-   */
   private constructor(config: ApiConfig = DEFAULT_API_CONFIG) {
     this.config = config;
   }
 
-  /**
-   * Returns the instance of the class. If it doesn't exist, creates one.
-   *
-   * @param config The configuration to use. Optional if the instance already exists.
-   * @returns The instance of the class.
-   */
   public static getInstance(config?: ApiConfig): ApiService {
     if (!ApiService.instance) {
       ApiService.instance = new ApiService(config);
@@ -89,8 +42,7 @@ export class ApiService {
   }
 
   /**
-   * Sets up the API. This will be called during the boot-up sequence
-   * and will happen before the first component is mounted.
+   * Sets up the API with interceptors for request and response handling.
    */
   setup() {
     this.axios = axios.create({
@@ -98,10 +50,24 @@ export class ApiService {
       timeout: this.config.timeout,
       headers: {
         Accept: "application/json",
-        // "Content-Type": "application/json",
       },
     });
 
+    // ✅ REQUEST INTERCEPTOR 1: Set dynamic baseURL from localStorage
+    this.axios.interceptors.request.use((req: InternalAxiosRequestConfig) => {
+      // Read country from localStorage before EVERY request
+      const appCountry = localStorage.getItem("appCountry") || "ae";
+
+      // Set the correct baseURL based on country
+      req.baseURL =
+        appCountry === "in"
+          ? import.meta.env.VITE_API_URL_INDIA
+          : import.meta.env.VITE_API_URL_UAE;
+
+      return req;
+    });
+
+    // ✅ REQUEST INTERCEPTOR 2: Add authorization token (existing logic)
     this.axios.interceptors.request.use((req: InternalAxiosRequestConfig) => {
       const { url } = req;
       if (
@@ -118,6 +84,7 @@ export class ApiService {
       return req;
     });
 
+    // ✅ RESPONSE INTERCEPTOR (existing logic - no changes)
     this.axios.interceptors.response.use(
       (response: AxiosResponse) => {
         return response;
@@ -131,13 +98,6 @@ export class ApiService {
     );
   }
 
-  /**
-   * Performs a GET request.
-   *
-   * @template T - The expected response data type.
-   * @param {APIParameters} param - The API request parameters.
-   * @returns {Promise<T | undefined>} - The response data or undefined on error.
-   */
   public async get<T>({
     slug,
     axiosConfig = {},
@@ -153,13 +113,6 @@ export class ApiService {
     return response.data as unknown as T;
   }
 
-  /**
-   * Performs a POST request.
-   *
-   * @template T - The expected response data type.
-   * @param {APIParameters} param - The API request parameters.
-   * @returns {Promise<T | undefined>} - The response data or undefined on error.
-   */
   public async post<T>({
     slug,
     body,
@@ -176,13 +129,6 @@ export class ApiService {
     return response.data as unknown as T;
   }
 
-  /**
-   * Performs a PUT request.
-   *
-   * @template T - The expected response data type.
-   * @param {APIParameters} param - The API request parameters.
-   * @returns {Promise<T | undefined>} - The response data or undefined on error.
-   */
   public async put<T>({
     slug,
     body,
@@ -199,13 +145,6 @@ export class ApiService {
     return response.data as unknown as T;
   }
 
-  /**
-   * Performs a DELETE request.
-   *
-   * @template T - The expected response data type.
-   * @param {APIParameters} param - The API request parameters.
-   * @returns {Promise<T | undefined>} - The response data or undefined on error.
-   */
   public async delete<T>({
     slug,
     axiosConfig = {},
@@ -221,13 +160,6 @@ export class ApiService {
     return response.data as unknown as T;
   }
 
-  /**
-   * Performs a PATCH request.
-   *
-   * @template T - The expected response data type.
-   * @param {APIParameters} param - The API request parameters.
-   * @returns {Promise<T | undefined>} - The response data or undefined on error.
-   */
   public async patch<T>({
     slug,
     body,
@@ -244,8 +176,6 @@ export class ApiService {
     return response.data as unknown as T;
   }
 }
-
-// Export a singleton instance of the ApiService.
 
 export const API = ApiService.getInstance(DEFAULT_API_CONFIG);
 

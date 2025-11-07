@@ -34,8 +34,9 @@ export const addPrimaryDetailsForm = async (
       vehicleRegistrationNumber: values.vehicleRegistrationNumber,
       isFancyNumber: values.isFancyNumber,
       vehicleRegisteredYear: values.vehicleRegisteredYear,
-      commercialLicenseExpireDate:
-        values?.commercialLicenseExpireDate ? values.commercialLicenseExpireDate!.toISOString() : null,
+      commercialLicenseExpireDate: values?.commercialLicenseExpireDate
+        ? values.commercialLicenseExpireDate!.toISOString()
+        : null,
       isLease: values.isLease.toString(), // Convert boolean to string
       isCryptoAccepted: values.isCryptoAccepted.toString(), // Convert boolean to string
       isSpotDeliverySupported: values.isSpotDeliverySupported.toString(), // Convert boolean to string
@@ -51,6 +52,7 @@ export const addPrimaryDetailsForm = async (
       isCreditOrDebitCardsSupported: values.isCreditOrDebitCardsSupported,
       isTabbySupported: values.isTabbySupported,
       isCashSupported: values.isCashSupported,
+      isUPIAccepted: values.isUPIAccepted,
       tempCitys: values.tempCitys,
       isVehicleModified: values.isVehicleModified.toString(),
     };
@@ -121,6 +123,7 @@ export const updatePrimaryDetailsForm = async (
       isCreditOrDebitCardsSupported: values.isCreditOrDebitCardsSupported,
       isTabbySupported: values.isTabbySupported,
       isCashSupported: values.isCashSupported,
+      isUPIAccepted: values.isUPIAccepted,
       tempCitys: values.tempCitys,
       isVehicleModified: values.isVehicleModified.toString(),
     };

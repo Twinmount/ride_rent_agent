@@ -612,13 +612,16 @@ export default function PrimaryDetailsForm({
               <FormFieldLayout
                 label={
                   <span>
-                    {`Registration Card ${isIndia ? "" : "/ Mulkia"} Expiry Date`}{" "}
+                    {`Registration Card ${
+                      isIndia ? "" : "/ Mulkia"
+                    } Expiry Date`}{" "}
                     <br />
                     <span className="text-sm text-gray-500">(DD/MM/YYYY)</span>
                   </span>
                 }
-                description={`Enter the expiry date for the Registration Card ${isIndia ? "" : "/ Mulkia"
-                  } in the format DD/MM/YYYY.`}
+                description={`Enter the expiry date for the Registration Card ${
+                  isIndia ? "" : "/ Mulkia"
+                } in the format DD/MM/YYYY.`}
               >
                 <DatePicker
                   selected={field.value}
@@ -982,26 +985,46 @@ export default function PrimaryDetailsForm({
               )}
 
               {/* Cash */}
-              {isIndia && (
+
+              <FormField
+                control={form.control}
+                name="isCashSupported"
+                render={({ field }) => (
+                  <div className="mb-2">
+                    <FormCheckbox
+                      id="isCash"
+                      label="Cash"
+                      checked={field.value}
+                      onChange={field.onChange}
+                    />
+                    <FormDescription className="ml-7 mt-1">
+                      Select if your accepts payments by Cash.
+                    </FormDescription>
+                    <FormMessage className="ml-2" />
+                  </div>
+                )}
+              />
+
+              {/* {isIndia && (
                 <FormField
                   control={form.control}
-                  name="isCashSupported"
+                  name="isUPIAccepted"
                   render={({ field }) => (
                     <div className="mb-2">
                       <FormCheckbox
-                        id="isCash"
-                        label="Cash"
+                        id="isUPIAccepted"
+                        label="UPI"
                         checked={field.value}
                         onChange={field.onChange}
                       />
                       <FormDescription className="ml-7 mt-1">
-                        Select if your accepts payments by Cash.
+                        Select if your company accepts payments via UPI.
                       </FormDescription>
                       <FormMessage className="ml-2" />
                     </div>
                   )}
                 />
-              )}
+              )} */}
             </div>
           </FormFieldLayout>
         </div>
