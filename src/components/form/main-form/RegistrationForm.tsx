@@ -25,7 +25,7 @@ import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
 import { Eye, EyeOff } from "lucide-react";
 import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
-import axios from "axios";
+// ❌ REMOVE: import axios from "axios";
 
 const RegistrationForm = ({ country }: { country: string }) => {
   const navigate = useNavigate();
@@ -34,7 +34,6 @@ const RegistrationForm = ({ country }: { country: string }) => {
   const storedPhoneNumber = sessionStorage.getItem("phoneNumber") || "";
   const storedCountryCode = sessionStorage.getItem("countryCode") || "";
   const storedPassword = sessionStorage.getItem("password") || "";
-  // const storedCountry = sessionStorage.getItem("country") || "";
 
   const [countryCode, setCountryCode] = useState(storedCountryCode);
 
@@ -43,7 +42,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
   const initialValues = {
     phoneNumber: storedCountryCode + storedPhoneNumber,
     password: storedPassword,
-    country: "", // ALWAYS empty - user MUST select
+    country: "",
   };
 
   const form = useForm<z.infer<typeof RegistrationFormSchema>>({
@@ -52,7 +51,6 @@ const RegistrationForm = ({ country }: { country: string }) => {
   });
 
   async function onSubmit(values: z.infer<typeof RegistrationFormSchema>) {
-    // Explicit validation check
     if (!values.country || values.country === "") {
       form.setError("country", {
         type: "manual",
@@ -65,26 +63,25 @@ const RegistrationForm = ({ country }: { country: string }) => {
       const phoneNumber = values.phoneNumber
         .replace(`+${countryCode}`, "")
         .trim();
-      const selectedCountryCode =
-        values.country === "ee8a7c95-303d-4f55-bd6c-85063ff1cf48" ? "ae" : "in";
 
-      localStorage.setItem("appCountry", selectedCountryCode);
-      axios.defaults.baseURL =
-        selectedCountryCode === "in"
-          ? import.meta.env.VITE_API_URL_INDIA
-          : import.meta.env.VITE_API_URL_UAE;
+      sessionStorage.setItem("phoneNumber", phoneNumber);
+      sessionStorage.setItem("countryCode", countryCode);
+      sessionStorage.setItem("password", values.password);
+      sessionStorage.setItem("country", values.country);
+
+      const selectedCountryCode =
+        values.country === "ee8a7c95-303d-4f55-bd6c-85063ff1cf48"
+          ? "ae"
+          : "in";
+
+      // localStorage.setItem("appCountry", selectedCountryCode);
+      // axios.defaults.baseURL = ...;
 
       const data = await register(values, countryCode);
 
       if (data) {
         sessionStorage.setItem("otpId", data?.result.otpId);
         sessionStorage.setItem("userId", data?.result.userId);
-        sessionStorage.setItem("phoneNumber", phoneNumber);
-        sessionStorage.setItem("countryCode", countryCode);
-        sessionStorage.setItem("password", values.password);
-        sessionStorage.setItem("country", values.country); // Store for OTP page
-
-        // Derive country from form value
 
         navigate(`/verify-otp?country=${selectedCountryCode}`);
       }
@@ -115,24 +112,20 @@ const RegistrationForm = ({ country }: { country: string }) => {
 
   return (
     <div className="bg-white shadow-lg p-4 lg:mt-2 rounded-[1rem] border w-full min-w-[350px] max-w-[400px]">
-      {/* Header Section */}
       <div className="text-center mb-6">
         <h3 className="text-2xl font-bold mb-2">Register Now</h3>
         <h4 className="text-base text-gray-600 mb-2">
           No Payment Required To List Vehicles.
         </h4>
-        {/* Horizontal Divider */}
         <div className="border-t border-gray-300 w-full"></div>
       </div>
 
-      {/* Form Section */}
       <Form {...form}>
         <form
           id="agent-account-registration-form"
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex-1 flex flex-col w-full max-w-full md:max-w-[800px] mx-auto"
         >
-          {/* Country Selection */}
           <FormField
             control={form.control}
             name="country"
@@ -149,7 +142,6 @@ const RegistrationForm = ({ country }: { country: string }) => {
                       value={field.value}
                       onChange={(value) => {
                         field.onChange(value);
-                        // Clear error when user selects a country
                         if (form.formState.errors.country) {
                           form.clearErrors("country");
                         }
@@ -162,7 +154,6 @@ const RegistrationForm = ({ country }: { country: string }) => {
             )}
           />
 
-          {/* Mobile / WhatsApp */}
           <FormField
             control={form.control}
             name="phoneNumber"
@@ -173,7 +164,6 @@ const RegistrationForm = ({ country }: { country: string }) => {
                 </FormLabel>
 
                 <div className="flex gap-3 w-full items-center">
-                  {/* Country Code Box with Flag */}
                   <div className="w-28 h-12">
                     <div className="border-2 border-gray-300 rounded-lg bg-gray-50 h-full flex items-center justify-center gap-2 px-3">
                       <PhoneInput
@@ -202,7 +192,6 @@ const RegistrationForm = ({ country }: { country: string }) => {
                     </div>
                   </div>
 
-                  {/* Phone Number Box */}
                   <div className="flex-1 h-12">
                     <FormControl>
                       <input
@@ -232,7 +221,6 @@ const RegistrationForm = ({ country }: { country: string }) => {
             )}
           />
 
-          {/* Password field */}
           <FormField
             control={form.control}
             name="password"
@@ -291,7 +279,6 @@ const RegistrationForm = ({ country }: { country: string }) => {
         </form>
       </Form>
 
-      {/* Footer Links */}
       <div className="px-2 mt-3 text-center">
         <div>
           Already registered?{" "}
