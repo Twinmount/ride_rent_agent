@@ -1001,7 +1001,7 @@ export default function PrimaryDetailsForm({
                 )}
               />
 
-              {isIndia && (
+              {/* {isIndia && (
                 <FormField
                   control={form.control}
                   name="isUPIAccepted"
@@ -1020,7 +1020,7 @@ export default function PrimaryDetailsForm({
                     </div>
                   )}
                 />
-              )}
+              )} */}
             </div>
           </FormFieldLayout>
         </div>
