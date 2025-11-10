@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
@@ -25,7 +25,6 @@ import { toast } from "@/components/ui/use-toast";
 import Spinner from "@/components/general/Spinner";
 import { Eye, EyeOff } from "lucide-react";
 import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
-// ❌ REMOVE: import axios from "axios";
 
 const RegistrationForm = ({ country }: { country: string }) => {
   const navigate = useNavigate();
@@ -35,7 +34,10 @@ const RegistrationForm = ({ country }: { country: string }) => {
   const storedCountryCode = sessionStorage.getItem("countryCode") || "";
   const storedPassword = sessionStorage.getItem("password") || "";
 
-  const [countryCode, setCountryCode] = useState(storedCountryCode);
+  // ✅ FIX: Initialize with proper fallback based on country prop
+  const initialCountryCode =
+    storedCountryCode || (country === "india" ? "91" : "971");
+  const [countryCode, setCountryCode] = useState(initialCountryCode);
 
   const phonePlaceholder = country === "india" ? "9812345678" : "50 123 4567";
 
@@ -49,6 +51,29 @@ const RegistrationForm = ({ country }: { country: string }) => {
     resolver: zodResolver(RegistrationFormSchema),
     defaultValues: initialValues,
   });
+
+  useEffect(() => {
+    const newCountryCode = country === "india" ? "91" : "971";
+    const oldCountryCode = newCountryCode === "91" ? "971" : "91";
+
+    setCountryCode(newCountryCode);
+
+    const currentPhone = form.getValues("phoneNumber");
+
+    // Extract only the phone digits (remove both possible country codes)
+    let phoneDigits = currentPhone
+      .replace(`+${oldCountryCode}`, "")
+      .replace(`+${newCountryCode}`, "")
+      .replace(/^\+/, "") // Remove leading +
+      .replace(/\D/g, ""); // Remove non-digits
+
+    if (phoneDigits) {
+      form.setValue("phoneNumber", `+${newCountryCode}${phoneDigits}`, {
+        shouldValidate: false,
+        shouldDirty: false,
+      });
+    }
+  }, [country, form]);
 
   async function onSubmit(values: z.infer<typeof RegistrationFormSchema>) {
     if (!values.country || values.country === "") {
@@ -70,12 +95,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
       sessionStorage.setItem("country", values.country);
 
       const selectedCountryCode =
-        values.country === "ee8a7c95-303d-4f55-bd6c-85063ff1cf48"
-          ? "ae"
-          : "in";
-
-      // localStorage.setItem("appCountry", selectedCountryCode);
-      // axios.defaults.baseURL = ...;
+        values.country === "ee8a7c95-303d-4f55-bd6c-85063ff1cf48" ? "ae" : "in";
 
       const data = await register(values, countryCode);
 
@@ -167,6 +187,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
                   <div className="w-28 h-12">
                     <div className="border-2 border-gray-300 rounded-lg bg-gray-50 h-full flex items-center justify-center gap-2 px-3">
                       <PhoneInput
+                        key={country}
                         defaultCountry={country === "india" ? "in" : "ae"}
                         value={field.value}
                         onChange={(value, countryData) => {
