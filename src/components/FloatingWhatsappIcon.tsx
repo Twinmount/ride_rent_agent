@@ -1,9 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { MessageCircleQuestion, X } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
 const FloatingWhatsAppButton: React.FC = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [hasAutoCollapsed, setHasAutoCollapsed] = useState(false);
+  const [userClosedManually, setUserClosedManually] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const location = useLocation();
 
   // Extract country from URL path
@@ -17,48 +20,91 @@ const FloatingWhatsAppButton: React.FC = () => {
 
   const whatsappLink = whatsappLinks[country as keyof typeof whatsappLinks];
 
-  // Auto-collapse after 5 seconds
+  // Auto-collapse after 2 seconds on initial load
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    if (isExpanded) {
-      timeout = setTimeout(() => {
+    const initialTimeout = setTimeout(() => {
+      setIsExpanded(false);
+      setHasAutoCollapsed(true);
+    }, 2000);
+
+    return () => clearTimeout(initialTimeout);
+  }, []);
+
+  //  Expand on scroll, then collapse 2 seconds after scrolling stops
+  useEffect(() => {
+    if (!hasAutoCollapsed || userClosedManually) return;
+
+    const handleScroll = () => {
+      // Expand immediately on scroll
+      setIsExpanded(true);
+
+      // Clear previous timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      scrollTimeoutRef.current = setTimeout(() => {
         setIsExpanded(false);
-      }, 5000);
-    }
-    return () => clearTimeout(timeout);
-  }, [isExpanded]);
+      }, 2000);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [hasAutoCollapsed, userClosedManually]);
+
+  const handleToggle = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const handleClose = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsExpanded(false);
+    setUserClosedManually(true);
+  };
 
   return (
     <div
-      className={`fixed bottom-24 right-0 z-10 h-14 flex items-center rounded-l-full bg-green-500 transition-all duration-300 ${
-        isExpanded ? "w-48" : "w-12"
+      className={`fixed bottom-24 right-0 z-10 h-14 flex items-center rounded-l-full bg-green-500 transition-all duration-300 shadow-lg hover:shadow-xl ${
+        isExpanded ? "w-52" : "w-12"
       }`}
     >
       <div
         className="flex justify-center items-center ml-3 h-full text-white cursor-pointer w-fit"
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={handleToggle}
+        aria-label="Toggle WhatsApp help"
       >
         <MessageCircleQuestion
           className={`${!isExpanded && "animate-bounce"} scale-125`}
         />
       </div>
+
       {isExpanded && (
-        <div className="flex flex-col justify-center items-start px-4 h-full text-sm text-white bg-green-500 rounded-r-full">
+        <div className="flex justify-between items-center px-4 h-full w-full text-sm text-white bg-green-500 rounded-r-full">
           <a
             href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:underline"
+            className="hover:underline flex-1"
           >
             <div className="font-semibold">Need help?</div>
             <div className="text-[0.65rem] leading-4 whitespace-nowrap">
               Click to chat on WhatsApp
             </div>
           </a>
-          <X
-            className="absolute top-2 right-3 w-4 h-4 cursor-pointer"
-            onClick={() => setIsExpanded(false)}
-          />
+
+          <button
+            onClick={handleClose}
+            className="ml-2 hover:bg-green-600 rounded-full p-1 transition-colors"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
     </div>
