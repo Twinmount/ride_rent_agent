@@ -28,9 +28,15 @@ import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
 
 const LoginPage = ({ country = "ae" }: { country?: string }) => {
   const [isView, setIsView] = useState(false);
-  const [countryCode, setCountryCode] = useState("");
+
+  // ✅ Initialize countryCode based on country prop
+  const initialCountryCode = country === "india" ? "91" : "971";
+  const [countryCode, setCountryCode] = useState(initialCountryCode);
+
   const navigate = useNavigate();
   const { setAppState, updateAppCountry } = useAgentContext();
+
+  const phonePlaceholder = country === "india" ? "9812345678" : "50 123 4567";
 
   // Initialize form with validation schema
   const form = useForm<z.infer<typeof LoginFormSchema>>({
@@ -46,6 +52,31 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
   useEffect(() => {
     updateAppCountry(country === "india" ? "in" : "ae");
   }, [country, updateAppCountry]);
+
+  useEffect(() => {
+    const newCountryCode = country === "india" ? "91" : "971";
+    setCountryCode(newCountryCode);
+
+    // ✅ FIX: Properly extract phone number without country code
+    const currentPhone = form.getValues("phoneNumber");
+
+    // Remove the OLD country code (91 or 971)
+    const oldCountryCode = newCountryCode === "91" ? "971" : "91";
+
+    // Try to extract digits after removing old country code
+    let phoneDigits = currentPhone
+      .replace(`+${oldCountryCode}`, "") // Remove old code
+      .replace(`+${newCountryCode}`, "") // Remove new code (if already present)
+      .replace(/\D/g, ""); // Remove any non-digits
+
+    // Set new value with correct country code
+    if (phoneDigits) {
+      form.setValue("phoneNumber", `+${newCountryCode}${phoneDigits}`, {
+        shouldValidate: false,
+        shouldDirty: false,
+      });
+    }
+  }, [country, form]);
 
   // Handle login form submission
   const onSubmit = async (values: z.infer<typeof LoginFormSchema>) => {
@@ -192,6 +223,7 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                 />
 
                 {/* Phone Number field */}
+                {/* Phone Number field */}
                 <FormField
                   control={form.control}
                   name="phoneNumber"
@@ -215,15 +247,12 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                                   : "border-white/20 hover:border-white/40 focus-within:border-white/60 focus-within:ring-2 focus-within:ring-amber-500/30"
                               }`}
                             >
+                              {/* ✅ PhoneInput ONLY for flag display - no value/onChange */}
                               <PhoneInput
+                                key={country}
                                 defaultCountry={
                                   country === "india" ? "in" : "ae"
                                 }
-                                value={field.value}
-                                onChange={(value, countryData) => {
-                                  field.onChange(value);
-                                  setCountryCode(countryData.country.dialCode);
-                                }}
                                 className="flex items-center justify-center"
                                 inputClassName="hidden"
                                 countrySelectorStyleProps={{
@@ -247,11 +276,7 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
 
                             <input
                               type="tel"
-                              placeholder={
-                                country === "india"
-                                  ? "9812345678"
-                                  : "50 123 4567"
-                              }
+                              placeholder={phonePlaceholder}
                               value={field.value
                                 .replace(`+${countryCode}`, "")
                                 .trim()}
@@ -372,10 +397,6 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
               </p>
             </div>
           </div>
-
-          <p className="text-white/40 text-xs font-light tracking-widest uppercase mt-3 text-center">
-            Secure. Fast. Reliable.
-          </p>
         </div>
       </section>
 
