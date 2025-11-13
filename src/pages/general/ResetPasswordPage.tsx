@@ -26,9 +26,14 @@ import { useAgentContext } from "@/context/AgentContext";
 import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
 
 const ResetPasswordPage = ({ country = "ae" }: { country?: string }) => {
-  const [countryCode, setCountryCode] = useState("");
+  // ✅ Initialize countryCode based on country prop
+  const initialCountryCode = country === "india" ? "91" : "971";
+  const [countryCode, setCountryCode] = useState(initialCountryCode);
+
   const navigate = useNavigate();
   const { updateAppCountry } = useAgentContext();
+
+  const phonePlaceholder = country === "india" ? "9812345678" : "50 123 4567";
 
   // Initialize form with validation schema
   const form = useForm<z.infer<typeof ResetPasswordFormSchema>>({
@@ -43,6 +48,18 @@ const ResetPasswordPage = ({ country = "ae" }: { country?: string }) => {
   useEffect(() => {
     updateAppCountry(country === "india" ? "in" : "ae");
   }, [country, updateAppCountry]);
+
+  // ✅ Clear phone number when country changes (cleanest UX)
+  useEffect(() => {
+    const newCountryCode = country === "india" ? "91" : "971";
+    setCountryCode(newCountryCode);
+
+    // Clear phone number when switching countries
+    form.setValue("phoneNumber", "", {
+      shouldValidate: false,
+      shouldDirty: false,
+    });
+  }, [country, form]);
 
   // Handle reset password submission
   async function onSubmit(values: z.infer<typeof ResetPasswordFormSchema>) {
@@ -215,15 +232,12 @@ const ResetPasswordPage = ({ country = "ae" }: { country?: string }) => {
                                   : "border-white/20 hover:border-white/40 focus-within:border-white/60 focus-within:ring-2 focus-within:ring-amber-500/30"
                               }`}
                             >
+                              {/* ✅ PhoneInput only for flag display */}
                               <PhoneInput
+                                key={country}
                                 defaultCountry={
                                   country === "india" ? "in" : "ae"
                                 }
-                                value={field.value}
-                                onChange={(value, countryData) => {
-                                  field.onChange(value);
-                                  setCountryCode(countryData.country.dialCode);
-                                }}
                                 className="flex items-center justify-center"
                                 inputClassName="hidden"
                                 countrySelectorStyleProps={{
@@ -247,11 +261,7 @@ const ResetPasswordPage = ({ country = "ae" }: { country?: string }) => {
 
                             <input
                               type="tel"
-                              placeholder={
-                                country === "india"
-                                  ? "9812345678"
-                                  : "50 123 4567"
-                              }
+                              placeholder={phonePlaceholder}
                               value={field.value
                                 .replace(`+${countryCode}`, "")
                                 .trim()}
@@ -319,10 +329,6 @@ const ResetPasswordPage = ({ country = "ae" }: { country?: string }) => {
               </p>
             </div>
           </div>
-
-          <p className="text-white/40 text-xs font-light tracking-widest uppercase mt-3 text-center">
-            Secure. Fast. Reliable.
-          </p>
         </div>
       </section>
 
