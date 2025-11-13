@@ -28,17 +28,14 @@ import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
 
 const LoginPage = ({ country = "ae" }: { country?: string }) => {
   const [isView, setIsView] = useState(false);
-
-  // ✅ Initialize countryCode based on country prop
-  const initialCountryCode = country === "india" ? "91" : "971";
-  const [countryCode, setCountryCode] = useState(initialCountryCode);
+  // Track selected country from dropdown (null means no country selected yet)
+  const [selectedCountryFromDropdown, setSelectedCountryFromDropdown] =
+    useState<string | null>(null);
 
   const navigate = useNavigate();
   const { setAppState, updateAppCountry } = useAgentContext();
 
-  const phonePlaceholder = country === "india" ? "9812345678" : "50 123 4567";
-
-  // Initialize form with validation schema
+  // Initialize form
   const form = useForm<z.infer<typeof LoginFormSchema>>({
     resolver: zodResolver(LoginFormSchema),
     defaultValues: {
@@ -53,32 +50,17 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
     updateAppCountry(country === "india" ? "in" : "ae");
   }, [country, updateAppCountry]);
 
+  // Clear phone number when country changes
   useEffect(() => {
-    const newCountryCode = country === "india" ? "91" : "971";
-    setCountryCode(newCountryCode);
-
-    // ✅ FIX: Properly extract phone number without country code
-    const currentPhone = form.getValues("phoneNumber");
-
-    // Remove the OLD country code (91 or 971)
-    const oldCountryCode = newCountryCode === "91" ? "971" : "91";
-
-    // Try to extract digits after removing old country code
-    let phoneDigits = currentPhone
-      .replace(`+${oldCountryCode}`, "") // Remove old code
-      .replace(`+${newCountryCode}`, "") // Remove new code (if already present)
-      .replace(/\D/g, ""); // Remove any non-digits
-
-    // Set new value with correct country code
-    if (phoneDigits) {
-      form.setValue("phoneNumber", `+${newCountryCode}${phoneDigits}`, {
+    if (selectedCountryFromDropdown) {
+      form.setValue("phoneNumber", "", {
         shouldValidate: false,
         shouldDirty: false,
       });
     }
-  }, [country, form]);
+  }, [selectedCountryFromDropdown, form]);
 
-  // Handle login form submission
+  // Handle login submission
   const onSubmit = async (values: z.infer<typeof LoginFormSchema>) => {
     if (!values.country) {
       form.setError("country", {
@@ -89,10 +71,15 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
     }
 
     try {
+      // Get country code based on selected country
+      const countryCode = selectedCountryFromDropdown === "ae" ? "971" : "91";
+
+      // Extract phone number without country code
       const phoneNumber = values.phoneNumber
         .replace(`+${countryCode}`, "")
         .trim();
 
+      // API call to login
       const response = await API.post<LoginResponse>({
         slug: Slug.LOGIN,
         body: {
@@ -103,18 +90,21 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
       });
 
       if (response) {
+        // Clear old tokens and save new ones
         remove(StorageKeys.ACCESS_TOKEN);
         remove(StorageKeys.REFRESH_TOKEN);
         save(StorageKeys.ACCESS_TOKEN, response.result.token);
         save(StorageKeys.REFRESH_TOKEN, response.result.refreshToken);
         save(StorageKeys.USER_ID, response.result.userId);
 
+        // Update app state
         setAppState((prev) => ({
           ...prev,
           accessToken: response.result.token,
           refreshToken: response.result.refreshToken,
           userId: response.result.userId,
         }));
+
         navigate("/");
       }
     } catch (error: any) {
@@ -136,6 +126,29 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
     }
   };
 
+  // Get country code based on selected country
+  const getCountryCode = () => {
+    if (!selectedCountryFromDropdown) return "";
+    return selectedCountryFromDropdown === "ae" ? "971" : "91";
+  };
+
+  // Get phone country for PhoneInput component
+  const getPhoneCountry = () => {
+    if (!selectedCountryFromDropdown) return undefined;
+    return selectedCountryFromDropdown === "ae" ? "ae" : "in";
+  };
+
+  // Get phone placeholder based on selected country
+  const getPhonePlaceholder = () => {
+    if (!selectedCountryFromDropdown) return "Select country first";
+    return selectedCountryFromDropdown === "in" ? "9812345678" : "50 123 4567";
+  };
+
+  const countryCode = getCountryCode();
+  const phoneCountry = getPhoneCountry();
+  const phonePlaceholder = getPhonePlaceholder();
+
+  // Background image based on country
   const backgroundImage =
     country === "india"
       ? "/assets/img/bg/india.webp"
@@ -184,7 +197,7 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-4"
               >
-                {/* Country field */}
+                {/* Country selection field */}
                 <FormField
                   control={form.control}
                   name="country"
@@ -207,6 +220,15 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                               value={field.value}
                               onChange={(value) => {
                                 field.onChange(value);
+
+                                // Set selected country from dropdown
+                                const selectedCountry =
+                                  value ===
+                                  "ee8a7c95-303d-4f55-bd6c-85063ff1cf48"
+                                    ? "ae"
+                                    : "in";
+                                setSelectedCountryFromDropdown(selectedCountry);
+
                                 if (form.formState.errors.country) {
                                   form.clearErrors("country");
                                 }
@@ -222,8 +244,7 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                   }}
                 />
 
-                {/* Phone Number field */}
-                {/* Phone Number field */}
+                {/* Phone number field */}
                 <FormField
                   control={form.control}
                   name="phoneNumber"
@@ -240,6 +261,7 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                         </FormLabel>
                         <FormControl>
                           <div className="flex gap-2 relative z-10">
+                            {/* Country code display with flag */}
                             <div
                               className={`w-20 h-10 border-2 rounded-lg bg-transparent backdrop-blur-sm flex items-center justify-center transition-all flex-shrink-0 ${
                                 hasError
@@ -247,48 +269,63 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                                   : "border-white/20 hover:border-white/40 focus-within:border-white/60 focus-within:ring-2 focus-within:ring-amber-500/30"
                               }`}
                             >
-                              {/* ✅ PhoneInput ONLY for flag display - no value/onChange */}
-                              <PhoneInput
-                                key={country}
-                                defaultCountry={
-                                  country === "india" ? "in" : "ae"
-                                }
-                                className="flex items-center justify-center"
-                                inputClassName="hidden"
-                                countrySelectorStyleProps={{
-                                  className:
-                                    "bg-transparent !border-none outline-none !text-xs !p-0 !bg-transparent !shadow-none",
-                                  style: {
-                                    border: "none",
-                                    padding: 0,
-                                    backgroundColor: "transparent",
-                                    background: "transparent",
-                                    boxShadow: "none",
-                                  },
-                                  buttonClassName:
-                                    "!border-none outline-none !h-full !w-full !rounded-none bg-transparent !p-0 !bg-transparent !shadow-none",
-                                }}
-                              />
-                              <span className="text-white font-semibold text-xs ml-0.5">
-                                +{countryCode}
-                              </span>
+                              {selectedCountryFromDropdown ? (
+                                <>
+                                  <PhoneInput
+                                    key={selectedCountryFromDropdown}
+                                    defaultCountry={phoneCountry}
+                                    className="flex items-center justify-center"
+                                    inputClassName="hidden"
+                                    countrySelectorStyleProps={{
+                                      className:
+                                        "bg-transparent !border-none outline-none !text-xs !p-0 !bg-transparent !shadow-none",
+                                      style: {
+                                        border: "none",
+                                        padding: 0,
+                                        backgroundColor: "transparent",
+                                        background: "transparent",
+                                        boxShadow: "none",
+                                      },
+                                      buttonClassName:
+                                        "!border-none outline-none !h-full !w-full !rounded-none bg-transparent !p-0 !bg-transparent !shadow-none",
+                                    }}
+                                  />
+                                  <span className="text-white font-semibold text-xs ml-0.5">
+                                    +{countryCode}
+                                  </span>
+                                </>
+                              ) : (
+                                <span className="text-white/40 text-[0.65rem] text-center px-1">
+                                  Select country
+                                </span>
+                              )}
                             </div>
 
+                            {/* Phone number input */}
                             <input
                               type="tel"
                               placeholder={phonePlaceholder}
-                              value={field.value
-                                .replace(`+${countryCode}`, "")
-                                .trim()}
+                              disabled={!selectedCountryFromDropdown}
+                              value={
+                                countryCode
+                                  ? field.value
+                                      .replace(`+${countryCode}`, "")
+                                      .trim()
+                                  : ""
+                              }
                               onChange={(e) => {
-                                field.onChange(
-                                  `+${countryCode}${e.target.value}`
-                                );
+                                if (countryCode) {
+                                  field.onChange(
+                                    `+${countryCode}${e.target.value}`
+                                  );
+                                }
                               }}
                               className={`flex-1 h-10 px-3 border-2 rounded-lg bg-transparent backdrop-blur-sm outline-none text-white placeholder:text-white/40 text-sm transition-all ${
                                 hasError
                                   ? "border-red-400 focus:border-red-400 focus:ring-2 focus:ring-red-400/20"
-                                  : "border-white/20 hover:border-white/40 focus:border-white/60 focus:ring-2 focus:ring-amber-500/30"
+                                  : selectedCountryFromDropdown
+                                  ? "border-white/20 hover:border-white/40 focus:border-white/60 focus:ring-2 focus:ring-amber-500/30"
+                                  : "border-white/20 cursor-not-allowed opacity-60"
                               }`}
                             />
                           </div>
@@ -326,6 +363,7 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                               }`}
                               {...field}
                             />
+                            {/* Toggle password visibility */}
                             <button
                               type="button"
                               onClick={() => setIsView(!isView)}
@@ -354,7 +392,7 @@ const LoginPage = ({ country = "ae" }: { country?: string }) => {
                   </Link>
                 </div>
 
-                {/* Sign in button */}
+                {/* Submit button */}
                 <Button
                   type="submit"
                   disabled={form.formState.isSubmitting}
