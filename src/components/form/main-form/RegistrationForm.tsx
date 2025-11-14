@@ -62,7 +62,7 @@ const RegistrationForm = ({ country }: { country: string }) => {
     if (!values.country || values.country === "") {
       form.setError("country", {
         type: "manual",
-        message: "Select a country",
+        message: "Select your country",
       });
       return;
     }
