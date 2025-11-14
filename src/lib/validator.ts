@@ -4,7 +4,7 @@ import * as z from "zod";
 export const RegistrationFormSchema = z.object({
   phoneNumber: z.string().min(6, "Provide a valid mobile  number"),
   password: z.string().min(4, "Password must be at least 4 characters"),
-  country: z.string().min(1, "Select a country"),
+  country: z.string().min(1, "Select your country"),
 });
 
 // Company Form Schema
@@ -149,7 +149,7 @@ export const OTPFormSchema = z.object({
 export const LoginFormSchema = z.object({
   phoneNumber: z.string().min(1, "Provide your registered phone number"),
   password: z.string().min(1, "Password is required"),
-  country: z.string().min(1, "Select a country"),
+  country: z.string().min(1, "Select your country"),
 });
 
 // confirm password schema
@@ -165,7 +165,7 @@ export const ConfirmPasswordFormSchema = z
 
 // reset password schema
 export const ResetPasswordFormSchema = z.object({
-  country: z.string().min(1, "Select a country"),
+  country: z.string().min(1, "Select your country"),
   phoneNumber: z.string().min(1, "Provide your registered phone number"),
 });
 

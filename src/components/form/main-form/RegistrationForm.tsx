@@ -29,20 +29,16 @@ import RegisterCountryDropdown from "@/components/RegisterCountryDropdown";
 const RegistrationForm = ({ country }: { country: string }) => {
   const navigate = useNavigate();
   const [isView, setIsView] = useState(false);
+  
+  const [selectedCountryFromDropdown, setSelectedCountryFromDropdown] =
+    useState<string | null>(null);
 
-  const storedPhoneNumber = sessionStorage.getItem("phoneNumber") || "";
-  const storedCountryCode = sessionStorage.getItem("countryCode") || "";
   const storedPassword = sessionStorage.getItem("password") || "";
-
-  // ✅ FIX: Initialize with proper fallback based on country prop
-  const initialCountryCode =
-    storedCountryCode || (country === "india" ? "91" : "971");
-  const [countryCode, setCountryCode] = useState(initialCountryCode);
 
   const phonePlaceholder = country === "india" ? "9812345678" : "50 123 4567";
 
   const initialValues = {
-    phoneNumber: storedCountryCode + storedPhoneNumber,
+    phoneNumber: "",
     password: storedPassword,
     country: "",
   };
@@ -52,45 +48,33 @@ const RegistrationForm = ({ country }: { country: string }) => {
     defaultValues: initialValues,
   });
 
+  // ✅ Update phone input when country is selected from dropdown
   useEffect(() => {
-    const newCountryCode = country === "india" ? "91" : "971";
-    const oldCountryCode = newCountryCode === "91" ? "971" : "91";
-
-    setCountryCode(newCountryCode);
-
-    const currentPhone = form.getValues("phoneNumber");
-
-    // Extract only the phone digits (remove both possible country codes)
-    let phoneDigits = currentPhone
-      .replace(`+${oldCountryCode}`, "")
-      .replace(`+${newCountryCode}`, "")
-      .replace(/^\+/, "") // Remove leading +
-      .replace(/\D/g, ""); // Remove non-digits
-
-    if (phoneDigits) {
-      form.setValue("phoneNumber", `+${newCountryCode}${phoneDigits}`, {
+    if (selectedCountryFromDropdown) {
+      form.setValue("phoneNumber", "", {
         shouldValidate: false,
         shouldDirty: false,
       });
     }
-  }, [country, form]);
+  }, [selectedCountryFromDropdown, form]);
 
   async function onSubmit(values: z.infer<typeof RegistrationFormSchema>) {
     if (!values.country || values.country === "") {
       form.setError("country", {
         type: "manual",
-        message: "Select a country",
+        message: "Select your country",
       });
       return;
     }
 
     try {
+      const countryCode = selectedCountryFromDropdown === "ae" ? "971" : "91";
+
       const phoneNumber = values.phoneNumber
         .replace(`+${countryCode}`, "")
         .trim();
 
       sessionStorage.setItem("phoneNumber", phoneNumber);
-      sessionStorage.setItem("countryCode", countryCode);
       sessionStorage.setItem("password", values.password);
       sessionStorage.setItem("country", values.country);
 
@@ -130,6 +114,18 @@ const RegistrationForm = ({ country }: { country: string }) => {
     }
   }
 
+  const getCountryCode = () => {
+    if (!selectedCountryFromDropdown) return "";
+    return selectedCountryFromDropdown === "ae" ? "971" : "91";
+  };
+  const getPhoneCountry = () => {
+    if (!selectedCountryFromDropdown) return undefined;
+    return selectedCountryFromDropdown === "ae" ? "ae" : "in";
+  };
+
+  const countryCode = getCountryCode();
+  const phoneCountry = getPhoneCountry();
+
   return (
     <div className="bg-white shadow-lg p-4 lg:mt-2 rounded-[1rem] border w-full min-w-[350px] max-w-[400px]">
       <div className="text-center mb-6">
@@ -162,6 +158,13 @@ const RegistrationForm = ({ country }: { country: string }) => {
                       value={field.value}
                       onChange={(value) => {
                         field.onChange(value);
+
+                        const selectedCountry =
+                          value === "ee8a7c95-303d-4f55-bd6c-85063ff1cf48"
+                            ? "ae"
+                            : "in";
+                        setSelectedCountryFromDropdown(selectedCountry);
+
                         if (form.formState.errors.country) {
                           form.clearErrors("country");
                         }
@@ -186,30 +189,32 @@ const RegistrationForm = ({ country }: { country: string }) => {
                 <div className="flex gap-3 w-full items-center">
                   <div className="w-28 h-12">
                     <div className="border-2 border-gray-300 rounded-lg bg-gray-50 h-full flex items-center justify-center gap-2 px-3">
-                      <PhoneInput
-                        key={country}
-                        defaultCountry={country === "india" ? "in" : "ae"}
-                        value={field.value}
-                        onChange={(value, countryData) => {
-                          field.onChange(value);
-                          setCountryCode(countryData.country.dialCode);
-                        }}
-                        className="flex items-center justify-center"
-                        inputClassName="hidden"
-                        placeholder="WhatsApp number"
-                        countrySelectorStyleProps={{
-                          className:
-                            "bg-transparent !border-none outline-none !text-sm flex items-center justify-center",
-                          style: {
-                            border: "none",
-                          },
-                          buttonClassName:
-                            "!border-none outline-none !h-full !w-full !rounded-none bg-transparent flex items-center justify-center",
-                        }}
-                      />
-                      <span className="text-gray-700 font-semibold text-sm whitespace-nowrap">
-                        +{countryCode}
-                      </span>
+                      {selectedCountryFromDropdown ? (
+                        <>
+                          <PhoneInput
+                            key={selectedCountryFromDropdown}
+                            defaultCountry={phoneCountry}
+                            className="flex items-center justify-center"
+                            inputClassName="hidden"
+                            countrySelectorStyleProps={{
+                              className:
+                                "bg-transparent !border-none outline-none !text-sm flex items-center justify-center",
+                              style: {
+                                border: "none",
+                              },
+                              buttonClassName:
+                                "!border-none outline-none !h-full !w-full !rounded-none bg-transparent flex items-center justify-center",
+                            }}
+                          />
+                          <span className="text-gray-700 font-semibold text-sm whitespace-nowrap">
+                            +{countryCode}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-gray-400 text-xs text-center">
+                          Select country first
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -217,14 +222,27 @@ const RegistrationForm = ({ country }: { country: string }) => {
                     <FormControl>
                       <input
                         type="tel"
-                        placeholder={phonePlaceholder}
-                        value={field.value
-                          .replace(`+${countryCode}`, "")
-                          .trim()}
+                        placeholder={
+                          selectedCountryFromDropdown
+                            ? phonePlaceholder
+                            : "Select country first"
+                        }
+                        disabled={!selectedCountryFromDropdown}
+                        value={
+                          countryCode
+                            ? field.value.replace(`+${countryCode}`, "").trim()
+                            : ""
+                        }
                         onChange={(e) => {
-                          field.onChange(`+${countryCode}${e.target.value}`);
+                          if (countryCode) {
+                            field.onChange(`+${countryCode}${e.target.value}`);
+                          }
                         }}
-                        className="w-full h-full border-2 border-gray-300 rounded-lg bg-gray-50 px-4 py-3 outline-none text-base text-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition max-md:text-sm"
+                        className={`w-full h-full border-2 border-gray-300 rounded-lg bg-gray-50 px-4 py-3 outline-none text-base text-gray-700 transition max-md:text-sm ${
+                          selectedCountryFromDropdown
+                            ? "focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                            : "cursor-not-allowed opacity-60"
+                        }`}
                       />
                     </FormControl>
                   </div>
