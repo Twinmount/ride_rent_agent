@@ -1001,14 +1001,14 @@ export default function PrimaryDetailsForm({
                 )}
               />
 
-              {/* {isIndia && (
+              {isIndia && (
                 <FormField
                   control={form.control}
-                  name="isUPIAccepted"
+                  name="isUPISupported"
                   render={({ field }) => (
                     <div className="mb-2">
                       <FormCheckbox
-                        id="isUPIAccepted"
+                        id="isUPISupported"
                         label="UPI"
                         checked={field.value}
                         onChange={field.onChange}
@@ -1020,7 +1020,7 @@ export default function PrimaryDetailsForm({
                     </div>
                   )}
                 />
-              )} */}
+              )}
             </div>
           </FormFieldLayout>
         </div>

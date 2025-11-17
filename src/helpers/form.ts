@@ -349,7 +349,7 @@ export function mapGetPrimaryFormToPrimaryFormType(
     isCreditOrDebitCardsSupported: data.isCreditOrDebitCardsSupported,
     isTabbySupported: data.isTabbySupported,
     isCashSupported: data.isCashSupported,
-    isUPIAccepted: data.isUPIAccepted,
+    isUPISupported: data.isUPISupported,
     isVehicleModified: data.isVehicleModified,
     tempCitys: data.tempCitys || [],
   };

@@ -52,7 +52,7 @@ export const addPrimaryDetailsForm = async (
       isCreditOrDebitCardsSupported: values.isCreditOrDebitCardsSupported,
       isTabbySupported: values.isTabbySupported,
       isCashSupported: values.isCashSupported,
-      isUPIAccepted: values.isUPIAccepted,
+      isUPISupported: values.isUPISupported,
       tempCitys: values.tempCitys,
       isVehicleModified: values.isVehicleModified.toString(),
     };
@@ -123,7 +123,7 @@ export const updatePrimaryDetailsForm = async (
       isCreditOrDebitCardsSupported: values.isCreditOrDebitCardsSupported,
       isTabbySupported: values.isTabbySupported,
       isCashSupported: values.isCashSupported,
-      isUPIAccepted: values.isUPIAccepted,
+      isUPISupported: values.isUPISupported,
       tempCitys: values.tempCitys,
       isVehicleModified: values.isVehicleModified.toString(),
     };
