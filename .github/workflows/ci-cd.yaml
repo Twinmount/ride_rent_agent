@@ -100,16 +100,16 @@ jobs:
             -   name: Checkout
                 uses: actions/checkout@v4
 
-            # -   name: Await Approval
-            #     uses: trstringer/manual-approval@v1
-            #     with:
-            #         secret: ${{ secrets.GIT_TOKEN }}
-            #         approvers: ${{ secrets.GIT_APPROVERS }}
-            #         minimum-approvals: 1
-            #         issue-title: "Approve DEV deployment"
-            #         issue-body: "Please approve or deny the DEV deployment. Reply with 'approve' or 'deny'."
-            #         polling-interval-seconds: 30
-            #     timeout-minutes: 120
+            -   name: Await Approval
+                uses: trstringer/manual-approval@v1
+                with:
+                    secret: ${{ secrets.GIT_TOKEN }}
+                    approvers: ${{ secrets.GIT_APPROVERS }}
+                    minimum-approvals: 1
+                    issue-title: "Approve DEV deployment"
+                    issue-body: "Please approve or deny the DEV deployment. Reply with 'approve' or 'deny'."
+                    polling-interval-seconds: 30
+                timeout-minutes: 120
                     
             -   name: Authenticate to Google Cloud (WIF)
                 id: auth
