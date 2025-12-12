@@ -48,7 +48,7 @@ export default function VehiclesFormAddPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["primary-details-form-default", companyId],
     queryFn: () => getPrimaryDetailsFormDefaultData(companyId as string),
-    staleTime: 60000,
+    staleTime: 0,
     enabled: !!companyId,
   });
 
@@ -132,7 +132,7 @@ export default function VehiclesFormAddPage() {
                   onNextTab={() => handleNextTab("specifications")}
                   isIndia={isIndia}
                   countryId={countryId}
-                  initialCountryCode={isIndia ? "+91" : "+971"}
+                  initialCountryCode={isIndia ? "91" : "971"}
                 />
               )}
             </Suspense>

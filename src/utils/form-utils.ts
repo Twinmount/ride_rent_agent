@@ -20,6 +20,7 @@ export const handleLevelOneFormSubmission = async (
   }
 ) => {
   let data;
+
   if (type === "Add") {
     data = await addPrimaryDetailsForm(
       values,
