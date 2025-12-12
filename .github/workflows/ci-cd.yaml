@@ -5,6 +5,7 @@ on:
         branches:
             - development
             - prod
+            - main
             - devops-test
 
 permissions:
