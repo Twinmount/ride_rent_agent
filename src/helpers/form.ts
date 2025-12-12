@@ -52,6 +52,7 @@ type RentalDetailType = {
   enabled?: boolean;
   rentInAED?: string;
   mileageLimit?: string;
+  unlimitedMileage?: boolean;
 };
 
 // Hourly rental detail type (with minBookingHours)
@@ -60,6 +61,7 @@ type HourlyRentalDetailType = {
   rentInAED?: string;
   mileageLimit?: string;
   minBookingHours?: string; // Only for hourly rentals
+  unlimitedMileage?: boolean;
 };
 
 // Rental details type, incorporating hour as an HourlyRentalDetailType
@@ -76,38 +78,61 @@ export const validateRentalDetails = (
 ): string | null => {
   const { day, week, month, hour } = rentalDetails;
 
-  const message =
-    "Rent in AED as well as Mileage should be provided for the checked values";
-
   // Check if at least one rental period is enabled
   if (!day.enabled && !week.enabled && !month.enabled) {
     return "At least one rental period (day, week, or month) must be enabled";
   }
 
   // Validate day
-  if (day.enabled && (!day.rentInAED || !day.mileageLimit)) {
-    return message;
+  if (day.enabled) {
+    if (!day.rentInAED) {
+      return "Rent in AED is required for daily rental";
+    }
+    // Only validate mileageLimit if unlimitedMileage is NOT checked
+    if (!day.unlimitedMileage && !day.mileageLimit) {
+      return "Mileage Limit is required for daily rental or select Unlimited Mileage";
+    }
   }
 
   // Validate week
-  if (week.enabled && (!week.rentInAED || !week.mileageLimit)) {
-    return message;
+  if (week.enabled) {
+    if (!week.rentInAED) {
+      return "Rent in AED is required for weekly rental";
+    }
+    // Only validate mileageLimit if unlimitedMileage is NOT checked
+    if (!week.unlimitedMileage && !week.mileageLimit) {
+      return "Mileage Limit is required for weekly rental or select Unlimited Mileage";
+    }
   }
 
   // Validate month
-  if (month.enabled && (!month.rentInAED || !month.mileageLimit)) {
-    return message;
+  if (month.enabled) {
+    if (!month.rentInAED) {
+      return "Rent in AED is required for monthly rental";
+    }
+    // Only validate mileageLimit if unlimitedMileage is NOT checked
+    if (!month.unlimitedMileage && !month.mileageLimit) {
+      return "Mileage Limit is required for monthly rental or select Unlimited Mileage";
+    }
   }
 
   // Validate hour, including minBookingHours
   if (hour.enabled) {
-    if (!hour.rentInAED || !hour.mileageLimit || !hour.minBookingHours) {
-      return "Rent in AED, Mileage Limit, and Minimum Booking Hours are required for hourly rental";
+    if (!hour.rentInAED) {
+      return "Rent in AED is required for hourly rental";
+    }
+    // Only validate mileageLimit if unlimitedMileage is NOT checked
+    if (!hour.unlimitedMileage && !hour.mileageLimit) {
+      return "Mileage Limit is required for hourly rental or select Unlimited Mileage";
+    }
+    if (!hour.minBookingHours) {
+      return "Minimum Booking Hours is required for hourly rental";
     }
   }
 
   return null;
 };
+
 
 // rental details form field validation helper function
 export const validateSRMRentalDetails = (
@@ -324,6 +349,7 @@ export function mapGetPrimaryFormToPrimaryFormType(
     isCreditOrDebitCardsSupported: data.isCreditOrDebitCardsSupported,
     isTabbySupported: data.isTabbySupported,
     isCashSupported: data.isCashSupported,
+    isUPISupported: data.isUPISupported,
     isVehicleModified: data.isVehicleModified,
     tempCitys: data.tempCitys || [],
   };

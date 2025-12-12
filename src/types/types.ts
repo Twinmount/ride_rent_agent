@@ -46,8 +46,9 @@ export type CompanyFormType = {
   companyName: string;
   companyLogo: string;
   commercialLicense: string;
-  expireDate: Date | undefined;
-  regNumber: string;
+  expireDate?: Date | undefined;
+  regNumber?: string;
+  noRegNumber?: boolean;
   companyAddress: string;
   companyLanguages: string[];
   accountType?: "company" | "individual";
@@ -57,8 +58,9 @@ export type CompanyFormType = {
 
 export type ProfileUpdateFormType = {
   commercialLicense: string;
-  expireDate: Date | undefined;
-  regNumber: string;
+  expireDate?: Date | undefined;
+  regNumber?: string;
+  noRegNumber?: boolean;
   companyAddress: string;
   companyLanguages: string[];
   accountType?: string;
@@ -121,6 +123,7 @@ export type PrimaryFormType = {
   isCreditOrDebitCardsSupported: boolean;
   isTabbySupported: boolean;
   isCashSupported: boolean;
+  isUPISupported: boolean;
   tempCitys?: CityType[];
   isVehicleModified: boolean;
 };

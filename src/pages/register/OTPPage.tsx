@@ -175,7 +175,7 @@ const OTPPage = () => {
                     <span className="font-bold text-green-500">WhatsApp</span>{" "}
                     number.
                     <br />
-                    OTP is valid for only 10 minutes
+                    Valid for only 10 minutes.
                   </FormDescription>
                   <FormMessage className="ml-2" />
                 </FormItem>
@@ -193,10 +193,11 @@ const OTPPage = () => {
               <Button
                 onClick={() => resendOTPMutation()}
                 disabled={isPending || timer > 0}
-                className={`bg-transparent hover:bg-transparent w-fit h-fit text-yellow ${isPending || (timer > 0 && "text-black")
-                  }`}
+                className={`bg-transparent hover:bg-transparent w-fit h-fit text-yellow ${
+                  isPending || (timer > 0 && "text-black")
+                }`}
               >
-                {timer > 0 ? `Resend otp in ${timer} seconds` : "Resend otp"}
+                {timer > 0 ? `Resend OTP in ${timer} seconds` : "Resend OTP"}
               </Button>
             </div>
 

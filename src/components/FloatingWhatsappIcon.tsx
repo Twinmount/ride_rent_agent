@@ -1,53 +1,110 @@
-import React, { useState, useEffect } from "react";
-import { MessageCircleQuestion, X } from "lucide-react"; // Import icons from Lucide
-import { Link } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { MessageCircleQuestion, X } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 const FloatingWhatsAppButton: React.FC = () => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [hasAutoCollapsed, setHasAutoCollapsed] = useState(false);
+  const [userClosedManually, setUserClosedManually] = useState(false);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const location = useLocation();
 
-  // Auto-collapse after 3 seconds
+  // Extract country from URL path
+  const country = location.pathname.startsWith("/in") ? "in" : "ae";
+
+  // Dynamic WhatsApp links based on country
+  const whatsappLinks = {
+    in: "https://api.whatsapp.com/send?phone=919686443261&text=Hi%2C%20I%E2%80%99d%20like%20to%20connect%20with%20Ride.Rent%20Support%20for%20assistance",
+    ae: "https://api.whatsapp.com/send?phone=971502972335&text=Hi%2C%20I%E2%80%99d%20like%20to%20connect%20with%20Ride.Rent%20Support%20for%20assistance",
+  };
+
+  const whatsappLink = whatsappLinks[country as keyof typeof whatsappLinks];
+
+  // Auto-collapse after 2 seconds on initial load
   useEffect(() => {
-    let timeout: NodeJS.Timeout;
-    if (isExpanded) {
-      timeout = setTimeout(() => {
+    const initialTimeout = setTimeout(() => {
+      setIsExpanded(false);
+      setHasAutoCollapsed(true);
+    }, 2000);
+
+    return () => clearTimeout(initialTimeout);
+  }, []);
+
+  //  Expand on scroll, then collapse 2 seconds after scrolling stops
+  useEffect(() => {
+    if (!hasAutoCollapsed || userClosedManually) return;
+
+    const handleScroll = () => {
+      // Expand immediately on scroll
+      setIsExpanded(true);
+
+      // Clear previous timeout
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+
+      scrollTimeoutRef.current = setTimeout(() => {
         setIsExpanded(false);
-      }, 5000);
-    }
-    return () => clearTimeout(timeout);
-  }, [isExpanded]);
+      }, 2000);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+      }
+    };
+  }, [hasAutoCollapsed, userClosedManually]);
+
+  const handleToggle = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  const handleClose = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsExpanded(false);
+    setUserClosedManually(true);
+  };
 
   return (
     <div
-      className={`fixed bottom-8 right-0 z-10 h-14 flex items-center rounded-l-full  bg-green-500  transition-all duration-300 ${
-        isExpanded ? "w-48" : "w-12"
+      className={`fixed bottom-24 right-0 z-10 h-14 flex items-center rounded-l-full bg-green-500 transition-all duration-300 shadow-lg hover:shadow-xl ${
+        isExpanded ? "w-52" : "w-12"
       }`}
     >
       <div
         className="flex justify-center items-center ml-3 h-full text-white cursor-pointer w-fit"
-        onClick={() => setIsExpanded(!isExpanded)}
+        onClick={handleToggle}
+        aria-label="Toggle WhatsApp help"
       >
         <MessageCircleQuestion
           className={`${!isExpanded && "animate-bounce"} scale-125`}
         />
       </div>
+
       {isExpanded && (
-        <div className="flex flex-col justify-center items-start px-4 h-full text-sm text-white bg-green-500 rounded-r-full">
-          <Link
-            to={
-              "https://api.whatsapp.com/send?phone=971502972335&text=Hello%2C%0AI would like to list my vehicles with https%3A%2F%2Fagent.ride.rent%2Fregister %26 advertise my fleet for *free*. "
-            }
+        <div className="flex justify-between items-center px-4 h-full w-full text-sm text-white bg-green-500 rounded-r-full">
+          <a
+            href={whatsappLink}
             target="_blank"
-            className="hover:underline"
+            rel="noopener noreferrer"
+            className="hover:underline flex-1"
           >
             <div className="font-semibold">Need help?</div>
             <div className="text-[0.65rem] leading-4 whitespace-nowrap">
               Click to chat on WhatsApp
             </div>
-          </Link>
-          <X
-            className="absolute top-2 right-3 w-4 h-4 cursor-pointer"
-            onClick={() => setIsExpanded(false)}
-          />
+          </a>
+
+          <button
+            onClick={handleClose}
+            className="ml-2 hover:bg-green-600 rounded-full p-1 transition-colors"
+            aria-label="Close"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
     </div>

@@ -1,3 +1,4 @@
+import { FormCheckbox } from "../../form-ui/FormCheckbox";
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -53,6 +54,7 @@ export default function CompanyRegistrationForm({
   const [isLicenseUploading, setIsLicenseUploading] = useState(false);
   const [deletedImages, setDeletedImages] = useState<string[]>([]);
   const navigate = useNavigate();
+  console.log(country);
 
   // accessing userId from useUserId hook
   const { userId } = useUserId();
@@ -224,32 +226,34 @@ export default function CompanyRegistrationForm({
         />
 
         {/* expiry date */}
-        <FormField
-          control={form.control}
-          name="expireDate"
-          render={({ field }) => (
-            <FormFieldLayout
-              label="Expiry Date"
-              description={
-                <span>
-                  Enter the expiry of your{" "}
-                  {isIndia
-                    ? `Company Registration / GST Registration / Trade License`
-                    : "Commercial License/Trade License"}{" "}
-                  &#40;DD/MM/YYYY&#41;.
-                </span>
-              }
-            >
-              <DatePicker
-                selected={field.value}
-                onChange={(date: Date | null) => field.onChange(date)}
-                dateFormat="dd/MM/yyyy"
-                wrapperClassName="datePicker text-base  "
-                placeholderText="DD/MM/YYYY"
-              />
-            </FormFieldLayout>
-          )}
-        />
+        {!isIndia && (
+          <FormField
+            control={form.control}
+            name="expireDate"
+            render={({ field }) => (
+              <FormFieldLayout
+                label="Expiry Date"
+                description={
+                  <span>
+                    Enter the expiry of your{" "}
+                    {isIndia
+                      ? `Company Registration / GST Registration / Trade License`
+                      : "Commercial License/Trade License"}{" "}
+                    &#40;DD/MM/YYYY&#41;.
+                  </span>
+                }
+              >
+                <DatePicker
+                  selected={field.value}
+                  onChange={(date: Date | null) => field.onChange(date)}
+                  dateFormat="dd/MM/yyyy"
+                  wrapperClassName="datePicker text-base  "
+                  placeholderText="DD/MM/YYYY"
+                />
+              </FormFieldLayout>
+            )}
+          />
+        )}
 
         {/* registration number */}
         <FormField
@@ -280,6 +284,30 @@ export default function CompanyRegistrationForm({
             </FormFieldLayout>
           )}
         />
+
+        {/* no registration checkbox for India */}
+        {isIndia && (
+          <FormField
+            control={form.control}
+            name="noRegNumber"
+            render={({ field }) => (
+              <FormFieldLayout label="No GST / Registration Number" description="Check if your company does not have a GST number.">
+                <FormCheckbox
+                  id={field.name}
+                  checked={!!field.value}
+                  onChange={(checked) => {
+                    field.onChange(checked);
+                    if (checked) {
+                      // clear regNumber when checkbox is checked
+                      form.setValue("regNumber", "");
+                    }
+                  }}
+                  label={"I do not have a GST number"}
+                />
+              </FormFieldLayout>
+            )}
+          />
+        )}
 
         {/* company languages */}
         <FormField

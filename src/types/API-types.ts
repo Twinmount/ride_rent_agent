@@ -385,6 +385,7 @@ export type GetPrimaryForm = {
   isCreditOrDebitCardsSupported: boolean;
   isTabbySupported: boolean;
   isCashSupported: boolean;
+  isUPISupported: boolean;
   tempCitys: CityType[];
 };
 

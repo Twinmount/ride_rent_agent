@@ -17,7 +17,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ProfileUpdateFormDefaultValues } from "@/constants";
-import { ProfileUpdateFormSchema } from "@/lib/validator";
+import {
+  ProfileUpdateFormSchemaWithConditionalReg,
+} from "@/lib/validator";
 import { ProfileUpdateFormType } from "@/types/types";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -36,6 +38,7 @@ import CompanyLanguagesDropdown from "../../dropdowns/CompanyLanguagesDropdown";
 import { Textarea } from "@/components/ui/textarea";
 import { useQueryClient } from "@tanstack/react-query";
 import LocationPicker from "../../LocationPicker";
+import { FormCheckbox } from "../../form-ui/FormCheckbox";
 
 type CompanyProfileUpdateFormProps = {
   formData?: ProfileUpdateFormType | null;
@@ -58,27 +61,29 @@ export default function CompanyProfileUpdateForm({
 
   const initialValues = formData
     ? {
-        ...formData,
-        expireDate: formData.expireDate
-          ? new Date(formData.expireDate)
-          : undefined,
-      }
+      ...formData,
+      expireDate: formData.expireDate
+        ? new Date(formData.expireDate)
+        : undefined,
+    }
     : ProfileUpdateFormDefaultValues;
 
   // accessing refresh token to get the userId
   const refreshToken = load<string>(StorageKeys.REFRESH_TOKEN);
   const { userId } = jwtDecode<DecodedRefreshToken>(refreshToken as string);
   const isIndia = country === "India" || country === "india";
-  // creating form
-  const form = useForm<z.infer<typeof ProfileUpdateFormSchema>>({
-    resolver: zodResolver(ProfileUpdateFormSchema),
+  // creating form (use schema with conditional regNumber validation)
+  const form = useForm<z.infer<typeof ProfileUpdateFormSchemaWithConditionalReg>>({
+    resolver: zodResolver(ProfileUpdateFormSchemaWithConditionalReg),
     defaultValues: initialValues,
   });
 
   const isIndividual =
     !!formData?.accountType && formData?.accountType === "individual";
 
-  async function onSubmit(values: z.infer<typeof ProfileUpdateFormSchema>) {
+  async function onSubmit(values: z.infer<typeof ProfileUpdateFormSchemaWithConditionalReg>) {
+    console.log('working');
+
     if (isLicenseUploading) {
       toast({
         title: "File Upload in Progress",
@@ -140,8 +145,8 @@ export default function CompanyProfileUpdateForm({
                   isIndia && !isIndividual
                     ? "Registration Details"
                     : isIndia && isIndividual
-                    ? "Commercial Registration"
-                    : "Commercial License"
+                      ? "Commercial Registration"
+                      : "Commercial License"
                 }
                 description={
                   <>
@@ -150,8 +155,8 @@ export default function CompanyProfileUpdateForm({
                     {isIndia && !isIndividual
                       ? `Company Registration / GST Registration / Trade License,`
                       : isIndia && isIndividual
-                      ? "Commercial Registration / Tourist Permit"
-                      : `commercial license,
+                        ? "Commercial Registration / Tourist Permit"
+                        : `commercial license,
                     `}{" "}
                     maximum file size 5MB.
                   </>
@@ -167,39 +172,41 @@ export default function CompanyProfileUpdateForm({
             )}
           />
           {/* expiry date */}
-          <FormField
-            control={form.control}
-            name="expireDate"
-            render={({ field }) => (
-              <FormItem className="flex mb-2 w-full max-sm:flex-col">
-                <FormLabel className="flex justify-between mt-4 ml-2 w-52 text-base max-sm:w-fit lg:text-lg">
-                  Expiry Date <span className="mr-5 max-sm:hidden">:</span>
-                </FormLabel>
-                <div className="flex-col items-start w-fit">
-                  <FormControl>
-                    <DatePicker
-                      selected={field.value}
-                      onChange={(date: Date | null) => field.onChange(date)}
-                      dateFormat="dd/MM/yyyy"
-                      wrapperClassName="datePicker text-base  "
-                      placeholderText="DD/MM/YYYY"
-                      minDate={new Date()}
-                    />
-                  </FormControl>
-                  <FormDescription className="mt-1 ml-1">
-                    Enter the expiry of your
-                    {isIndia && !isIndividual
-                      ? " Commercial License / GST Registration / Trade License"
-                      : isIndia && isIndividual
-                      ? " Commercial Registration / Tourist Permit"
-                      : " Commercial License / Trade License"}{" "}
-                    &#40;DD/MM/YYYY&#41;.
-                  </FormDescription>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
+          {!isIndia && (
+            <FormField
+              control={form.control}
+              name="expireDate"
+              render={({ field }) => (
+                <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                  <FormLabel className="flex justify-between mt-4 ml-2 w-52 text-base max-sm:w-fit lg:text-lg">
+                    Expiry Date <span className="mr-5 max-sm:hidden">:</span>
+                  </FormLabel>
+                  <div className="flex-col items-start w-fit">
+                    <FormControl>
+                      <DatePicker
+                        selected={field.value}
+                        onChange={(date: Date | null) => field.onChange(date)}
+                        dateFormat="dd/MM/yyyy"
+                        wrapperClassName="datePicker text-base  "
+                        placeholderText="DD/MM/YYYY"
+                        minDate={new Date()}
+                      />
+                    </FormControl>
+                    <FormDescription className="mt-1 ml-1">
+                      Enter the expiry of your
+                      {isIndia && !isIndividual
+                        ? " Commercial License / GST Registration / Trade License"
+                        : isIndia && isIndividual
+                          ? " Commercial Registration / Tourist Permit"
+                          : " Commercial License / Trade License"}{" "}
+                      &#40;DD/MM/YYYY&#41;.
+                    </FormDescription>
+                    <FormMessage />
+                  </div>
+                </FormItem>
+              )}
+            />
+          )}
           {/* registration number */}
           <FormField
             control={form.control}
@@ -210,8 +217,8 @@ export default function CompanyProfileUpdateForm({
                   {isIndia && !isIndividual
                     ? "GST Number"
                     : isIndia && isIndividual
-                    ? "PAN Number"
-                    : "Registration Number / Trade License Number"}{" "}
+                      ? "PAN Number"
+                      : "Registration Number / Trade License Number"}{" "}
                   <span className="mr-5 max-sm:hidden">:</span>
                 </FormLabel>
                 <div className="flex-col items-start w-full">
@@ -230,14 +237,41 @@ export default function CompanyProfileUpdateForm({
                     {isIndia && !isIndividual
                       ? `Enter your company GST number. The number should be a combination of letters and numbers, without any spaces or special characters.`
                       : isIndia && isIndividual
-                      ? "Enter your company PAN. The number should be a combination of letters and numbers, without any spaces or special characters."
-                      : `Enter your company registration number. The number should be a combination of letters and numbers, without any spaces or special characters, up to 15 characters.`}
+                        ? "Enter your company PAN. The number should be a combination of letters and numbers, without any spaces or special characters."
+                        : `Enter your company registration number. The number should be a combination of letters and numbers, without any spaces or special characters, up to 15 characters.`}
                   </FormDescription>
                   <FormMessage />
                 </div>
               </FormItem>
             )}
           />
+          {isIndia && !isIndividual && (
+            <FormField
+              control={form.control}
+              name="noRegNumber"
+              render={({ field }) => (
+                <FormItem className="flex mb-2 w-full max-sm:flex-col">
+                  <FormLabel className="flex justify-between mt-4 ml-2 w-72 text-base max-sm:w-fit lg:text-lg" />
+                  <div className="flex-col items-start w-full">
+                    <FormControl>
+                      <FormCheckbox
+                        id={field.name}
+                        checked={!!field.value}
+                        onChange={(checked) => {
+                          field.onChange(checked);
+                          if (checked) form.setValue("regNumber", "");
+                        }}
+                        label={"I do not have a GST number"}
+                      />
+                    </FormControl>
+                    <FormDescription className="mt-1 ml-1">
+                      If your company doesn't have a GST number, check this box to skip validation.
+                    </FormDescription>
+                  </div>
+                </FormItem>
+              )}
+            />
+          )}
           <FormField
             control={form.control}
             name="companyLanguages"

@@ -79,12 +79,16 @@ export const publicRoutes = [
     element: <LoginPage country="india" />,
   },
   {
-    path: "/reset-password",
+    path: "/ae/reset-password",
     element: <ResetPasswordPage />,
   },
   {
     path: "/reset-password/verify-otp",
     element: <ResetPasswordOtpPage />,
+  },
+  {
+    path: "/in/reset-password",
+    element: <ResetPasswordPage country="india" />,
   },
   {
     path: "/confirm-new-password",
@@ -98,5 +102,4 @@ export const publicRoutes = [
     path: "/srm/customer-details/public/success",
     element: <PublicCustomerSuccessPage />,
   },
-  
 ];

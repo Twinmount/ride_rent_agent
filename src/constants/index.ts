@@ -113,6 +113,7 @@ export const CompanyFormDefaultValues: CompanyFormType = {
   commercialLicense: "",
   expireDate: undefined,
   regNumber: "",
+  noRegNumber: false,
   companyAddress: "", // Default empty value
   companyLanguages: [],
   accountType: "company",
@@ -126,6 +127,7 @@ export const IndividualFormDefaultValues: CompanyFormType = {
   commercialLicense: "",
   expireDate: undefined,
   regNumber: "",
+  noRegNumber: false,
   companyAddress: "", // Default empty value
   companyLanguages: [],
   accountType: "individual",
@@ -137,6 +139,7 @@ export const ProfileUpdateFormDefaultValues: ProfileUpdateFormType = {
   commercialLicense: "",
   expireDate: undefined,
   regNumber: "",
+  noRegNumber: false,
   companyAddress: "", // Default empty value
   companyLanguages: [],
 };
@@ -210,6 +213,7 @@ export const getPrimaryFormDefaultValues = (
   isCreditOrDebitCardsSupported: false,
   isTabbySupported: false,
   isCashSupported: false,
+  isUPISupported: false,
   tempCitys: [],
   isVehicleModified: false,
 });
