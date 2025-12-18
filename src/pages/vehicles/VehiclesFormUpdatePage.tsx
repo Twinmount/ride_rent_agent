@@ -40,7 +40,8 @@ export default function VehiclesFormUpdatePage() {
   const { data, isLoading } = useQuery({
     queryKey: ["primary-details-form", vehicleId],
     queryFn: () => getPrimaryDetailsFormData(vehicleId as string),
-    staleTime: 60000,
+    staleTime: 0,
+    gcTime: 0,
   });
 
   // Fetch levelsFilled only if the type is "Update"
