@@ -119,17 +119,17 @@ export default function PrimaryDetailsForm({
       .then((res: any) => {
         setData(res?.result);
       })
-      .catch(() => setData(null));;
+      .catch(() => setData(null));
   }, [vehicleId]);
 
   const initialValues = formData
     ? {
-      ...formData,
-      cityIds: [
-        ...formData.cityIds,
-        ...(formData.tempCitys ?? []).map((city: CityType) => city.cityId),
-      ],
-    }
+        ...formData,
+        cityIds: [
+          ...formData.cityIds,
+          ...(formData.tempCitys ?? []).map((city: CityType) => city.cityId),
+        ],
+      }
     : getPrimaryFormDefaultValues(isIndia, countryCode);
 
   // Define your form.
@@ -232,6 +232,16 @@ export default function PrimaryDetailsForm({
           save(StorageKeys.VEHICLE_ID, data.result.vehicleId);
           save(StorageKeys.CATEGORY_ID, data.result.vehicleCategory.categoryId);
           save(StorageKeys.VEHICLE_TYPE_ID, data.result.vehicleType.typeId);
+
+          // invalidating cached data in the listing page
+          queryClient.invalidateQueries({
+            queryKey: ["primary-details-form", vehicleId],
+            exact: true,
+          });
+
+          queryClient.invalidateQueries({
+            queryKey: ["primary-details-form-default"],
+          });
 
           if (onNextTab) onNextTab();
         }
@@ -612,14 +622,16 @@ export default function PrimaryDetailsForm({
               <FormFieldLayout
                 label={
                   <span>
-                    {`Registration Card ${isIndia ? "" : "/ Mulkia"
-                      } Expiry Date`}{" "}
+                    {`Registration Card ${
+                      isIndia ? "" : "/ Mulkia"
+                    } Expiry Date`}{" "}
                     <br />
                     <span className="text-sm text-gray-500">(DD/MM/YYYY)</span>
                   </span>
                 }
-                description={`Enter the expiry date for the Registration Card ${isIndia ? "" : "/ Mulkia"
-                  } in the format DD/MM/YYYY.`}
+                description={`Enter the expiry date for the Registration Card ${
+                  isIndia ? "" : "/ Mulkia"
+                } in the format DD/MM/YYYY.`}
               >
                 <DatePicker
                   selected={field.value}
