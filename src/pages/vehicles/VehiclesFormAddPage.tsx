@@ -49,6 +49,7 @@ export default function VehiclesFormAddPage() {
     queryKey: ["primary-details-form-default", companyId],
     queryFn: () => getPrimaryDetailsFormDefaultData(companyId as string),
     staleTime: 0,
+    gcTime: 0,
     enabled: !!companyId,
   });
 
