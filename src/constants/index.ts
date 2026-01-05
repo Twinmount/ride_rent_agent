@@ -32,6 +32,7 @@ import {
 export const sidebarContent = [
   { label: "Dashboard", icon: LayoutDashboard, link: "/" },
   { label: "My Listings", icon: List, link: "/listings" },
+  { label: "Rate Manager", icon: ClipboardList, link: "/rate-manager" },
   {
     label: "Profile",
     icon: UserRoundPen,

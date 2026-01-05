@@ -9,6 +9,7 @@ import {
   GetPrimaryFormResponse,
   GetSpecificationFormDataResponse,
   GetSpecificationFormFieldsResponse,
+  GetVehicleResponse,
 } from "@/types/API-types";
 import { ApprovalStatusTypes, PrimaryFormType } from "@/types/types";
 import { extractPhoneNumber } from "@/helpers/form";
@@ -511,6 +512,79 @@ export const getLevelsFilled = async (
     return data;
   } catch (error) {
     console.error("Error fetching levels filled data:", error);
+    throw error;
+  }
+};
+
+export async function fetchAgentVehicles(
+  userId: string,
+  token: string
+): Promise<GetVehicleResponse[]> {
+  try {
+    const data = await API.get<{ vehicles: GetVehicleResponse[] }>({
+      slug: `/vehicle/listed/all?userId=${encodeURIComponent(userId)}`,
+      axiosConfig: {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      },
+    });
+
+    if (!data) {
+      throw new Error("Failed to fetch vehicles");
+    }
+
+    return data.vehicles || [];
+  } catch (error) {
+    console.error("Error fetching agent vehicles:", error);
+    throw error;
+  }
+}
+
+export const bulkUpdateRatesFromFile = async (file: File) => {
+  try {
+    const formData = new FormData();
+    // 'file' must match the key in the @UseInterceptors(FileInterceptor('file')) on the backend
+    formData.append('file', file);
+
+    const data = await API.post({
+      slug: "/vehicle/bulk-update-rates",
+      body: formData,
+      axiosConfig: {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    });
+
+    if (!data) {
+      throw new Error("Failed to get response from bulk update");
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error on bulk vehicle update:", error);
+    throw error;
+  }
+};
+
+export const downloadRatesTemplate = async () => {
+  try {
+    const response = await API.get<Blob>({
+      slug: "/vehicle/download-rates-template",
+      axiosConfig: {
+        responseType: 'blob',
+        timeout: 10000,
+      },
+    });
+
+    if (!response) {
+      throw new Error("Failed to download the template file.");
+    }
+    return response;
+  } catch (error) {
+    console.error("Error downloading template:", error);
     throw error;
   }
 };

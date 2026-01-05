@@ -512,6 +512,31 @@ export type CompanyType = {
   expireDate: string;
 };
 
+// Rental entry
+export type RentalType = {
+  type: "Daily" | "Weekly" | "Monthly";
+  mileage: number;
+  rate: number;
+  discount: number;
+  recurring: boolean;
+  weekdays: string[];
+  isDiscountActive: boolean;
+};
+
+// Bulk discount
+export type BulkDiscountType = {
+  _id?: string;
+  companyId?: string;
+  dailyDiscount: number;
+  weeklyDiscount: number;
+  monthlyDiscount: number;
+  applicableDays: string[];
+  isRecurring: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+};
+
 // Vehicle Type
 export type SingleVehicleType = {
   vehicleId: string;
@@ -549,7 +574,14 @@ export type SingleVehicleType = {
   isPriceHigh?: boolean;
 };
 
-// get all vehicles api response
+export type RateManagerVehicleType = SingleVehicleType & {
+  hasManualOverride?: boolean;
+  rentals?: RentalType[];
+  bulkDiscount?: BulkDiscountType;
+};
+
+export type GetVehicleResponse = RateManagerVehicleType;
+// Get all vehicles API response
 export interface FetchAllVehiclesResponse {
   result: {
     list: SingleVehicleType[]; // Adjusted to match the nested structure
@@ -647,3 +679,41 @@ export interface DeleteSingleImageResponse {
     fileFullPath: string;
   };
 }
+
+export type ApiVehicleUpdate = {
+  registrationNumber: string;
+  dailyRate: number;
+  dailyDiscount: number;
+  dailyMileage: number;
+  dailyRecurring: boolean;
+  dailyWeekdays: string[];
+  weeklyRate: number;
+  weeklyDiscount: number;
+  weeklyMileage: number;
+  weeklyRecurring: boolean;
+  weeklyWeekdays: string[];
+  monthlyRate: number;
+  monthlyDiscount: number;
+  monthlyMileage: number;
+  monthlyRecurring: boolean;
+  monthlyWeekdays: string[];
+};
+
+export type VehicleRateRow = {
+  "Registration Number": string;
+  "Daily Rate": number;
+  "Daily Discount": number;
+  "Daily Mileage": number;
+  "Daily Recurring": string | boolean | number;
+  "Daily Weekdays": string;
+  "Weekly Rate": number;
+  "Weekly Discount": number;
+  "Weekly Mileage": number;
+  "Weekly Recurring": string | boolean | number;
+  "Weekly Weekdays": string;
+  "Monthly Rate": number;
+  "Monthly Discount": number;
+  "Monthly Mileage": number;
+  "Monthly Recurring": string | boolean | number;
+  "Monthly Weekdays": string;
+};

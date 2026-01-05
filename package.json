@@ -47,6 +47,8 @@
     "@tiptap/starter-kit": "^2.23.0",
     "@types/react-lottie": "^1.2.10",
     "axios": "^1.7.9",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.4",
@@ -68,6 +70,7 @@
     "react-router-dom": "^6.28.0",
     "tailwind-merge": "2.4.0",
     "tailwindcss-animate": "1.0.7",
+    "xlsx": "^0.18.5",
     "zod": "^3.24.1"
   },
   "devDependencies": {
@@ -75,6 +78,7 @@
     "@types/node": "^20.17.10",
     "@types/react": "^18.3.17",
     "@types/react-dom": "^18.3.5",
+    "@types/xlsx": "^0.0.35",
     "@typescript-eslint/eslint-plugin": "^7.18.0",
     "@typescript-eslint/parser": "^7.18.0",
     "@vitejs/plugin-react": "^4.3.4",
