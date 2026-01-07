@@ -107,16 +107,16 @@ jobs:
             -   name: Checkout code
                 uses: actions/checkout@v4
 
-            -   name: Await Approval
-                uses: trstringer/manual-approval@v1
-                with:
-                    secret: ${{ secrets.GIT_TOKEN }}
-                    approvers: ${{ secrets.GIT_APPROVERS }}
-                    minimum-approvals: 1
-                    issue-title: "Approve DEV deployment"
-                    issue-body: "Please approve or deny the DEV deployment to Cloud Run. Reply with 'approve' or 'deny'."
-                    polling-interval-seconds: 30
-                timeout-minutes: 60
+            # -   name: Await Approval
+            #     uses: trstringer/manual-approval@v1
+            #     with:
+            #         secret: ${{ secrets.GIT_TOKEN }}
+            #         approvers: ${{ secrets.GIT_APPROVERS }}
+            #         minimum-approvals: 1
+            #         issue-title: "Approve DEV deployment"
+            #         issue-body: "Please approve or deny the DEV deployment to Cloud Run. Reply with 'approve' or 'deny'."
+            #         polling-interval-seconds: 30
+            #     timeout-minutes: 60
 
             -   name: Authenticate to Google Cloud (WIF) for SHRD (export ADC)
                 id: auth-shrd
